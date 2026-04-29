@@ -1,5 +1,4 @@
 import m0Data from '@/content/m0/sites.json'
-import { paintingStep } from '@/engine/systems/painting'
 import { INITIAL_DATE } from '@/shared/constants'
 import { M0DataSchema } from '@/shared/schemas'
 import type {
@@ -105,6 +104,6 @@ export function createInitialWorld(data: M0Data, seed: number): World {
     realms,
     edges: edgesMap,
     rngState: { seed, counter: 0 },
-    phases: [paintingStep],
+    phases: [],
   }
 }

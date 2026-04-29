@@ -1,6 +1,10 @@
+import { enableMapSet } from 'immer'
+
 import type { GameEvent, RNGState, SpeedTier, World } from '@/shared/types'
 import { TICK_INTERVAL_MS } from '@/shared/constants'
 import { addOneTick } from '@/engine/date/calendar'
+
+enableMapSet()
 
 export interface ClockState {
   speed: SpeedTier

@@ -43,3 +43,7 @@
 ## T1.2 verification note
 - TypeScript ESLint rejected an `as any` shortcut in the missing-armyId test; resolved by relying on `zod`'s `unknown` input and removing the cast.
 - Language-server diagnostics were unavailable in this environment because `typescript-language-server` is not installed.
+
+## 2026-04-29 T1.4 gotcha
+- Removing paintingStep also removed the only nableMapSet() call, which broke store tests until MapSet initialization was moved to src/engine/clock/clock.ts.
+

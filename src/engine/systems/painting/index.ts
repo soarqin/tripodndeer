@@ -1,1 +1,0 @@
-export { paintingStep } from './painting'

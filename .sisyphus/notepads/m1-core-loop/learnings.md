@@ -52,3 +52,8 @@
 - Added runtime `ArmyState`, `Army`, `OrderType`, `Order`, and `WarKey` shapes without expanding Army beyond the requested fields.
 - Zod schemas mirror the type layer closely; `ArmySchema` keeps `destination`/`source` nullable and `ticksRemaining` nonnegative.
 - Shared test file now covers valid/invalid cases for ArmySchema, OrderSchema, and ArmyStateSchema in one pass.
+
+## 2026-04-29 T1.4 painting deletion
+- src/engine/systems/painting/ was removed entirely; keep engine phase constants in src/engine/phases/index.ts only.
+- Immer MapSet support still needs to be initialized from a live engine module; nableMapSet() now lives in src/engine/clock/clock.ts after the painting system removal.
+

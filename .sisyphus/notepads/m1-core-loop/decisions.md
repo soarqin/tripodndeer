@@ -60,3 +60,8 @@
 ## T1.2 schema choices
 - Kept `WarKey` as a plain string alias with a minimal non-empty schema, matching the project’s string-opaque pattern.
 - Left `src/shared/index.ts` as star-exports because it already exposes all new shared types/schemas through the existing barrel.
+
+## 2026-04-29 T1.4 phase chain constants
+- Phase name/order constants live in src/engine/phases/index.ts as static data only; no phase logic belongs there yet.
+- createInitialWorld() now initializes with an empty phases array until the real phase chain is wired in later.
+

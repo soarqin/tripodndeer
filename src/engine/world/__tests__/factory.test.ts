@@ -18,7 +18,7 @@ describe('createInitialWorld — structure', () => {
     expect(world.sites.size).toBe(5)
     expect(world.realms.size).toBe(2)
     expect(world.rngState).toEqual({ seed: 42, counter: 0 })
-    expect(world.phases.length).toBe(1)
+    expect(world.phases.length).toBe(0)
     expect(world.tick).toBe(0)
     expect(world.date.yearBC).toBe(453)
     expect(world.date.season).toBe('spring')
