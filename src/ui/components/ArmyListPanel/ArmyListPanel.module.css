@@ -1,0 +1,95 @@
+.panel {
+  position: absolute;
+  top: 60px; /* Below TopBar */
+  left: 16px;
+  width: 320px;
+  max-height: calc(100vh - 140px); /* Leave space for BottomBar */
+  background-color: #2c2c2c;
+  border: 1px solid #444;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  font-family: sans-serif;
+}
+
+.title {
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  border-bottom: 1px solid #444;
+  background-color: #1a1a1a;
+}
+
+.empty {
+  padding: 16px;
+  margin: 0;
+  color: #888;
+  text-align: center;
+  font-size: 14px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #444;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #ddd;
+  font-size: 14px;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background-color: #3a3a3a;
+}
+
+.selected {
+  background-color: #4a2a1a; /* Realm color tint */
+  border-left: 4px solid #8b2500;
+  padding-left: 12px; /* Adjust for border */
+}
+
+.selected:hover {
+  background-color: #5a3a2a;
+}
+
+.armyId {
+  font-weight: bold;
+  color: #fff;
+}
+
+.location {
+  color: #aaa;
+}
+
+.manpower {
+  background-color: #444;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.state {
+  color: #888;
+}
+
+.destination {
+  color: #8b2500;
+  font-weight: bold;
+}
+
+.ticks {
+  color: #aaa;
+  font-size: 12px;
+}

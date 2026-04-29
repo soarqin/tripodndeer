@@ -3,6 +3,7 @@ import { TopBar } from '@/ui/components/TopBar'
 import { MapCanvas } from '@/rendering/map'
 import { TimeControlBar } from '@/ui/components/TimeControlBar'
 import { BottomBar } from '@/ui/components/BottomBar'
+import { ArmyListPanel } from '@/ui/components/ArmyListPanel'
 import { useRafDriver } from '@/ui/store/raf-driver'
 import { useGameStore } from '@/ui/store/game-store'
 import { isVictorious } from '@/engine/systems/victory'
@@ -22,6 +23,7 @@ export function App(): React.JSX.Element {
       <TopBar />
       <div className={styles.mapContainer}>
         <MapCanvas />
+        <ArmyListPanel />
         {victorious && (
           <div className={styles.demoComplete} data-testid="demo-complete">
             江山一统
