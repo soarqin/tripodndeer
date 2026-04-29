@@ -4,6 +4,7 @@ import { MapCanvas } from '@/rendering/map'
 import { TimeControlBar } from '@/ui/components/TimeControlBar'
 import { BottomBar } from '@/ui/components/BottomBar'
 import { ArmyListPanel } from '@/ui/components/ArmyListPanel'
+import { RealmOverviewPanel } from '@/ui/components/RealmOverviewPanel'
 import { useRafDriver } from '@/ui/store/raf-driver'
 import { useGameStore } from '@/ui/store/game-store'
 import { isVictorious } from '@/engine/systems/victory'
@@ -23,6 +24,7 @@ export function App(): React.JSX.Element {
       <TopBar />
       <div className={styles.mapContainer}>
         <MapCanvas />
+        <RealmOverviewPanel />
         <ArmyListPanel />
         {victorious && (
           <div className={styles.demoComplete} data-testid="demo-complete">
@@ -31,8 +33,8 @@ export function App(): React.JSX.Element {
         )}
       </div>
       <BottomBar 
-        onWanggong={() => console.log('王宫 clicked')}
-        onJunshi={() => console.log('军事 clicked')}
+        onWanggong={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'wanggong' ? null : 'wanggong')}
+        onJunshi={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'junshi' ? null : 'junshi')}
       />
       <TimeControlBar />
     </div>
