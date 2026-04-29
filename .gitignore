@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env*.local
+playwright-report/
+test-results/
+artifacts/
+.sisyphus/evidence/*
