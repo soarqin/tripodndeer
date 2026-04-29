@@ -1,85 +1,21 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import { Delaunay } from 'd3-delaunay'
 
-// 一次性地图数据生成脚本
-// 使用方案 B：手工预设不规则多边形，避免 d3-delaunay 依赖
-// 运行：pnpm generate:m0-map
+const WIDTH = 800
+const HEIGHT = 600
+const N_SITES = 5
+const LLOYD_ITER = 4
+const SUBDIVISIONS = 20
+const NOISE_RATIO = 0.08
 
-interface MapSite {
-  id: string
-  name: string
-  position: [number, number]
-  polygon: [number, number][]
-  adjacency: string[]
-}
-
-interface MapFaction {
-  id: string
-  displayName: string
-  color: string
-}
-
-const sites: MapSite[] = [
-  {
-    id: 'site_1',
-    name: '邑甲',
-    position: [190, 160],
-    polygon: [
-      [20, 20], [280, 10], [330, 80], [310, 200],
-      [250, 250], [180, 280], [80, 260], [15, 180],
-    ],
-    adjacency: ['site_2', 'site_3'],
-  },
-  {
-    id: 'site_2',
-    name: '邑乙',
-    position: [580, 150],
-    polygon: [
-      [340, 5], [780, 15], [790, 280], [710, 310],
-      [600, 260], [480, 230], [340, 200], [330, 85],
-    ],
-    adjacency: ['site_1', 'site_4'],
-  },
-  {
-    id: 'site_3',
-    name: '邑丙',
-    position: [200, 400],
-    polygon: [
-      [10, 270], [170, 285], [255, 260], [310, 310],
-      [290, 470], [220, 530], [80, 560], [5, 480],
-    ],
-    adjacency: ['site_1', 'site_4', 'site_5'],
-  },
-  {
-    id: 'site_4',
-    name: '邑丁',
-    position: [580, 400],
-    polygon: [
-      [480, 240], [600, 265], [710, 315], [790, 290],
-      [785, 540], [680, 575], [520, 540], [380, 480],
-      [300, 315], [310, 315],
-    ],
-    adjacency: ['site_2', 'site_3', 'site_5'],
-  },
-  {
-    id: 'site_5',
-    name: '邑戊',
-    position: [380, 560],
-    polygon: [
-      [80, 570], [220, 535], [290, 475], [380, 490],
-      [520, 545], [680, 580], [600, 595], [300, 598],
-      [100, 595],
-    ],
-    adjacency: ['site_3', 'site_4'],
-  },
-]
-
-const factions: MapFaction[] = [
+const SITE_IDS = ['site_1', 'site_2', 'site_3', 'site_4', 'site_5'] as const
+const SITE_NAMES = ['邑甲', '邑乙', '邑丙', '邑丁', '邑戊'] as const
+const FACTIONS = [
   { id: 'faction_red', displayName: '红', color: '#dc2626' },
   { id: 'faction_blue', displayName: '蓝', color: '#2563eb' },
 ]
-
-const initialOwnership: Record<string, string> = {
+const INITIAL_OWNERSHIP: Record<string, string> = {
   site_1: 'faction_red',
   site_2: 'faction_blue',
   site_3: 'faction_blue',
@@ -87,40 +23,170 @@ const initialOwnership: Record<string, string> = {
   site_5: 'faction_blue',
 }
 
-// 验证邻接关系闭合
-for (const site of sites) {
-  for (const neighborId of site.adjacency) {
-    const neighbor = sites.find(s => s.id === neighborId)
-    if (!neighbor) {
-      throw new Error(`Site ${site.id} references unknown neighbor ${neighborId}`)
+type P = [number, number]
+
+function mulberry32(seed: number): () => number {
+  let s = seed >>> 0
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0
+    let t = Math.imul(s ^ (s >>> 15), s | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+const rng = mulberry32(12345)
+const randRange = (min: number, max: number) => min + rng() * (max - min)
+
+function centroid(pts: P[]): P {
+  let cx = 0
+  let cy = 0
+  for (const [x, y] of pts) {
+    cx += x
+    cy += y
+  }
+  return [cx / pts.length, cy / pts.length]
+}
+
+function edgeLength(a: P, b: P): number {
+  return Math.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2)
+}
+
+function perpUnit(a: P, b: P): P {
+  const dx = b[0] - a[0]
+  const dy = b[1] - a[1]
+  const len = Math.sqrt(dx * dx + dy * dy) || 1
+  return [-dy / len, dx / len]
+}
+
+function edgeHash(a: P, b: P): number {
+  const [p, q] = a[0] < b[0] || (a[0] === b[0] && a[1] < b[1]) ? [a, b] : [b, a]
+  return (
+    (Math.round(p[0] * 1000) * 73856093) ^
+    (Math.round(p[1] * 1000) * 19349663) ^
+    (Math.round(q[0] * 1000) * 83492791) ^
+    (Math.round(q[1] * 1000) * 59349677)
+  )
+}
+
+function perturbEdge(a: P, b: P): P[] {
+  const hash = edgeHash(a, b)
+  const edgeRng = mulberry32(Math.abs(hash) || 1)
+  const len = edgeLength(a, b)
+  const perp = perpUnit(a, b)
+  const result: P[] = [a]
+
+  for (let j = 1; j < SUBDIVISIONS; j++) {
+    const t = j / SUBDIVISIONS
+    const amplitude = Math.sin(t * Math.PI) * len * NOISE_RATIO
+    const noise = (edgeRng() - 0.5) * 2 * amplitude
+    result.push([
+      a[0] + (b[0] - a[0]) * t + perp[0] * noise,
+      a[1] + (b[1] - a[1]) * t + perp[1] * noise,
+    ])
+  }
+
+  return result
+}
+
+function createRelaxedPoints(): P[] {
+  let pts: P[] = Array.from(
+    { length: N_SITES },
+    () => [randRange(120, WIDTH - 120), randRange(100, HEIGHT - 100)] as P,
+  )
+
+  for (let iter = 0; iter < LLOYD_ITER; iter++) {
+    const d = Delaunay.from(pts)
+    const v = d.voronoi([0, 0, WIDTH, HEIGHT])
+    pts = pts.map((fallback, i) => {
+      const poly = v.cellPolygon(i)
+      return poly ? centroid(poly as P[]) : fallback
+    })
+  }
+
+  return pts
+}
+
+function getRawPolygons(pts: P[], delaunay: Delaunay<P>): P[][] {
+  const voronoi = delaunay.voronoi([0, 0, WIDTH, HEIGHT])
+  return pts.map((_, i) => {
+    const poly = voronoi.cellPolygon(i)
+    if (!poly) throw new Error(`Cell ${i} has no polygon`)
+    return (poly as P[]).slice(0, -1)
+  })
+}
+
+function perturbPolygon(poly: P[]): P[] {
+  const result: P[] = []
+  for (let i = 0; i < poly.length; i++) {
+    const a = poly[i]!
+    const b = poly[(i + 1) % poly.length]!
+    result.push(...perturbEdge(a, b))
+  }
+  return result
+}
+
+function buildAdjacency(delaunay: Delaunay<P>): Set<number>[] {
+  const adjSets: Set<number>[] = Array.from({ length: N_SITES }, () => new Set())
+  for (let i = 0; i < N_SITES; i++) {
+    for (const j of delaunay.neighbors(i)) {
+      adjSets[i]!.add(j)
+      adjSets[j]!.add(i)
     }
-    if (!neighbor.adjacency.includes(site.id)) {
-      throw new Error(`Adjacency not closed: ${site.id} → ${neighborId} but not ←`)
+  }
+  return adjSets
+}
+
+function round2(n: number): number {
+  return Math.round(n * 100) / 100
+}
+
+function validateSites(sites: ReturnType<typeof buildSites>): void {
+  const minVerts = Math.min(...sites.map(s => s.polygon.length))
+  if (minVerts < 80) throw new Error(`Min polygon vertices = ${minVerts} (need ≥80)`)
+
+  for (const site of sites) {
+    for (const nId of site.adjacency) {
+      const nb = sites.find(s => s.id === nId)!
+      if (!nb.adjacency.includes(site.id)) {
+        throw new Error(`Adjacency not closed: ${site.id} ↔ ${nId}`)
+      }
     }
   }
 }
 
-// 验证多边形顶点数
-for (const site of sites) {
-  if (site.polygon.length < 6) {
-    throw new Error(`Site ${site.id} has only ${site.polygon.length} vertices (min 6)`)
-  }
+function buildSites(pts: P[], perturbedPolygons: P[][], adjSets: Set<number>[]) {
+  return pts.map((_, i) => {
+    const ctr = centroid(perturbedPolygons[i]!)
+    return {
+      id: SITE_IDS[i]!,
+      name: SITE_NAMES[i]!,
+      position: [round2(ctr[0]), round2(ctr[1])] as [number, number],
+      polygon: perturbedPolygons[i]!.map(([x, y]) => [round2(x), round2(y)] as [number, number]),
+      adjacency: [...adjSets[i]!].map(j => SITE_IDS[j]!).sort(),
+    }
+  })
 }
 
-// 验证所有 site 都在 initialOwnership 中
-for (const site of sites) {
-  if (!(site.id in initialOwnership)) {
-    throw new Error(`Site ${site.id} missing from initialOwnership`)
-  }
+function generate(): void {
+  const pts = createRelaxedPoints()
+  const delaunay = Delaunay.from(pts)
+  const rawPolygons = getRawPolygons(pts, delaunay)
+  const perturbedPolygons = rawPolygons.map(perturbPolygon)
+  const adjSets = buildAdjacency(delaunay)
+  const sites = buildSites(pts, perturbedPolygons, adjSets)
+
+  validateSites(sites)
+
+  const output = { sites, factions: FACTIONS, initialOwnership: INITIAL_OWNERSHIP }
+  const outPath = path.join(process.cwd(), 'src', 'content', 'm0', 'sites.json')
+  fs.mkdirSync(path.dirname(outPath), { recursive: true })
+  fs.writeFileSync(outPath, JSON.stringify(output, null, 2), 'utf-8')
+
+  console.log(`✅ Generated ${outPath}`)
+  console.log(`   Sites: ${sites.length}`)
+  console.log(`   Min polygon vertices: ${Math.min(...sites.map(s => s.polygon.length))}`)
+  console.log(`   Sites with ≥3 neighbors: ${sites.filter(s => s.adjacency.length >= 3).map(s => s.id).join(', ')}`)
 }
 
-const output = { sites, factions, initialOwnership }
-
-const outPath = path.join(process.cwd(), 'src', 'content', 'm0', 'sites.json')
-fs.mkdirSync(path.dirname(outPath), { recursive: true })
-fs.writeFileSync(outPath, JSON.stringify(output, null, 2), 'utf-8')
-console.log(`✅ Generated ${outPath}`)
-console.log(`   Sites: ${sites.length}`)
-console.log(`   Min polygon vertices: ${Math.min(...sites.map(s => s.polygon.length))}`)
-console.log(`   Sites with ≥3 neighbors: ${sites.filter(s => s.adjacency.length >= 3).map(s => s.id).join(', ')}`)
-console.log(`   Adjacency closure: OK`)
+generate()
