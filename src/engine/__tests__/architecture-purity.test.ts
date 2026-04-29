@@ -4,7 +4,8 @@ import * as path from 'path'
 import { fileURLToPath } from 'url'
 
 const testDir = path.dirname(fileURLToPath(import.meta.url))
-const engineDir = path.resolve(testDir, '../../')
+// testDir = src/engine/__tests__；engine 根 = ../，向上一层即 src/engine/
+const engineDir = path.resolve(testDir, '../')
 
 function getAllTsFiles(dir: string): string[] {
   const entries = fs.readdirSync(dir, { withFileTypes: true })
