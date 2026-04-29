@@ -1,41 +1,30 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { TopBar } from '@/ui/components/TopBar'
 import { MapCanvas } from '@/rendering/map'
 import { TimeControlBar } from '@/ui/components/TimeControlBar'
 import { BottomBar } from '@/ui/components/BottomBar'
 import { useRafDriver } from '@/ui/store/raf-driver'
-import { useSites, useRealms } from '@/ui/store/selectors'
+import { useGameStore } from '@/ui/store/game-store'
+import { isVictorious } from '@/engine/systems/victory'
 import styles from './App.module.css'
 
-function useAllRed(): boolean {
-  const sites = useSites()
-  const realms = useRealms()
-  const redId = useMemo(() => {
-    for (const [id, realm] of realms) {
-      if (realm.displayName === '红') return id
-    }
-    return 'realm_red'
-  }, [realms])
-
-  if (sites.size === 0) return false
-  for (const site of sites.values()) {
-    if (site.ownerId !== redId) return false
-  }
-  return true
+function useVictory(): boolean {
+  const world = useGameStore((state) => state.world)
+  return isVictorious(world)
 }
 
 export function App(): React.JSX.Element {
   useRafDriver()
-  const allRed = useAllRed()
+  const victorious = useVictory()
 
   return (
     <div className={styles.app}>
       <TopBar />
       <div className={styles.mapContainer}>
         <MapCanvas />
-        {allRed && (
+        {victorious && (
           <div className={styles.demoComplete} data-testid="demo-complete">
-            演示完成 🎉
+            江山一统
           </div>
         )}
       </div>

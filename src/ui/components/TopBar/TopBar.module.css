@@ -1,12 +1,36 @@
 .topBar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
   padding: 8px 16px;
   border-bottom: 1px solid #ccc;
   font-family: sans-serif;
   font-size: 14px;
 }
+
+.leftGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
 .separator {
   color: #999;
+}
+
+.realmBadge,
+.manpowerBadge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.realmBadge {
+  font-weight: 600;
+}
+
+.manpowerBadge {
+  background: #444;
 }
