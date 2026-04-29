@@ -117,6 +117,72 @@ async function issueDeclareWarAndMarch(
   )
 }
 
+async function waitForArmyToProcessMarch(page: Page, target: MarchTarget): Promise<void> {
+  await page.waitForFunction(
+    ({ armyId, sourceSiteId }) => {
+      type Army = { id: string; location: string; state: string }
+      type World = { armies: Map<string, Army> }
+      const game = (window as unknown as { __game?: { world: () => World } }).__game
+      if (!game) return false
+      const army = game.world().armies.get(armyId)
+      if (!army) return true
+      return army.state === 'marching' || army.location !== sourceSiteId
+    },
+    { armyId: target.armyId, sourceSiteId: target.sourceSiteId },
+    { timeout: 15000 },
+  )
+}
+
+async function getMarchStateResult(page: Page, target: MarchTarget) {
+  return page.evaluate(
+    ({ armyId, sourceSiteId, targetSiteId, playerRealmId }) => {
+      type Army = { id: string; location: string; state: string }
+      type Site = { id: string; ownerId: string | null }
+      type World = {
+        armies: Map<string, Army>
+        sites: Map<string, Site>
+      }
+      const game = (window as unknown as { __game: { world: () => World } }).__game
+      const world = game.world()
+      const army = world.armies.get(armyId)
+      const target = world.sites.get(targetSiteId)
+      return {
+        armyExists: Boolean(army),
+        armyState: army?.state ?? null,
+        armyLocation: army?.location ?? null,
+        targetOwner: target?.ownerId ?? null,
+        conquered: target?.ownerId === playerRealmId,
+        marchedOff: army ? army.location !== sourceSiteId || army.state === 'marching' : false,
+      }
+    },
+    target,
+  )
+}
+
+async function waitForConquest(page: Page, target: MarchTarget): Promise<void> {
+  await page.waitForFunction(
+    ({ siteId, playerRealmId }) => {
+      type Site = { id: string; ownerId: string | null }
+      type World = { sites: Map<string, Site> }
+      const game = (window as unknown as { __game?: { world: () => World } }).__game
+      if (!game) return false
+      const site = game.world().sites.get(siteId)
+      return site?.ownerId === playerRealmId
+    },
+    { siteId: target.targetSiteId, playerRealmId: target.playerRealmId },
+    { timeout: 30000 },
+  )
+}
+
+async function getSiteOwner(page: Page, siteId: string): Promise<string | null> {
+  return page.evaluate((id) => {
+    type Site = { id: string; ownerId: string | null }
+    type World = { sites: Map<string, Site> }
+    const game = (window as unknown as { __game: { world: () => World } }).__game
+    return game.world().sites.get(id)?.ownerId ?? null
+  }, siteId)
+}
+
 test.beforeAll(() => {
   ensureEvidenceDir()
 })
@@ -126,94 +192,52 @@ test.beforeEach(async ({ page }) => {
 })
 
 test.describe('M1 March and Conquest', () => {
-  test('player order transitions army to marching state', async ({ page }) => {
-    test.setTimeout(30000)
+  test('player order transitions army to marching state', async ({ page }) =>
+    runMarchTransitionTest(page),
+  )
 
-    const target = await findUndefendedAdjacentTarget(page)
-    await issueDeclareWarAndMarch(page, target.armyId, target.targetSiteId)
-
-    // Run engine ticks: pendingOrders are consumed during the orderApply phase.
-    await page.click('[data-testid="time-control-5x"]')
-
-    // Wait for the engine to PROCESS the order. With travel_cost=1 + 5x speed,
-    // the marching window is very brief (~400ms), so we accept either:
-    //   (a) army currently marching, OR
-    //   (b) army already moved away from its source site (post-combat).
-    await page.waitForFunction(
-      ({ armyId, sourceSiteId }) => {
-        type Army = { id: string; location: string; state: string }
-        type World = { armies: Map<string, Army> }
-        const game = (window as unknown as { __game?: { world: () => World } }).__game
-        if (!game) return false
-        const army = game.world().armies.get(armyId)
-        if (!army) return true
-        return army.state === 'marching' || army.location !== sourceSiteId
-      },
-      { armyId: target.armyId, sourceSiteId: target.sourceSiteId },
-      { timeout: 15000 },
-    )
-
-    const result = await page.evaluate(
-      ({ armyId, sourceSiteId, targetSiteId, playerRealmId }) => {
-        type Army = { id: string; location: string; state: string }
-        type Site = { id: string; ownerId: string | null }
-        type World = {
-          armies: Map<string, Army>
-          sites: Map<string, Site>
-        }
-        const game = (window as unknown as { __game: { world: () => World } }).__game
-        const world = game.world()
-        const army = world.armies.get(armyId)
-        const target = world.sites.get(targetSiteId)
-        return {
-          armyExists: Boolean(army),
-          armyState: army?.state ?? null,
-          armyLocation: army?.location ?? null,
-          targetOwner: target?.ownerId ?? null,
-          conquered: target?.ownerId === playerRealmId,
-          marchedOff: army ? army.location !== sourceSiteId || army.state === 'marching' : false,
-        }
-      },
-      target,
-    )
-
-    expect(result.armyExists).toBe(true)
-    expect(result.marchedOff || result.conquered).toBe(true)
-  })
-
-  test('army conquers undefended enemy site at 5x speed', async ({ page }) => {
-    // Travel cost ≤ 2, 5x = 400ms/tick: orderApply (1) + march (≤2) + combat (1)
-    // ≈ 1.6s of in-engine time. Real-time pending-RAF accounting: leave ample
-    // headroom so tab-throttling / CI variance doesn't flake the test.
-    test.setTimeout(60000)
-
-    const target = await findUndefendedAdjacentTarget(page)
-    await issueDeclareWarAndMarch(page, target.armyId, target.targetSiteId)
-
-    await page.click('[data-testid="time-control-5x"]')
-
-    await page.waitForFunction(
-      ({ siteId, playerRealmId }) => {
-        type Site = { id: string; ownerId: string | null }
-        type World = { sites: Map<string, Site> }
-        const game = (window as unknown as { __game?: { world: () => World } }).__game
-        if (!game) return false
-        const site = game.world().sites.get(siteId)
-        return site?.ownerId === playerRealmId
-      },
-      { siteId: target.targetSiteId, playerRealmId: target.playerRealmId },
-      { timeout: 30000 },
-    )
-
-    const finalOwner = await page.evaluate((siteId) => {
-      type Site = { id: string; ownerId: string | null }
-      type World = { sites: Map<string, Site> }
-      const game = (window as unknown as { __game: { world: () => World } }).__game
-      return game.world().sites.get(siteId)?.ownerId ?? null
-    }, target.targetSiteId)
-
-    expect(finalOwner).toBe(target.playerRealmId)
-
-    await page.screenshot({ path: path.join(EVIDENCE_DIR, 'm1-task-4.2-conquest.png') })
-  })
+  test('army conquers undefended enemy site at 5x speed', async ({ page }) =>
+    runConquestTest(page),
+  )
 })
+
+async function runMarchTransitionTest(page: Page): Promise<void> {
+  test.setTimeout(30000)
+
+  const target = await findUndefendedAdjacentTarget(page)
+  await issueDeclareWarAndMarch(page, target.armyId, target.targetSiteId)
+
+  // Run engine ticks: pendingOrders are consumed during the orderApply phase.
+  await page.click('[data-testid="time-control-5x"]')
+
+  // Wait for the engine to PROCESS the order. With travel_cost=1 + 5x speed,
+  // the marching window is very brief (~400ms), so we accept either:
+  //   (a) army currently marching, OR
+  //   (b) army already moved away from its source site (post-combat).
+  await waitForArmyToProcessMarch(page, target)
+
+  const result = await getMarchStateResult(page, target)
+
+  expect(result.armyExists).toBe(true)
+  expect(result.marchedOff || result.conquered).toBe(true)
+}
+
+async function runConquestTest(page: Page): Promise<void> {
+  // Travel cost ≤ 2, 5x = 400ms/tick: orderApply (1) + march (≤2) + combat (1)
+  // ≈ 1.6s of in-engine time. Real-time pending-RAF accounting: leave ample
+  // headroom so tab-throttling / CI variance doesn't flake the test.
+  test.setTimeout(60000)
+
+  const target = await findUndefendedAdjacentTarget(page)
+  await issueDeclareWarAndMarch(page, target.armyId, target.targetSiteId)
+
+  await page.click('[data-testid="time-control-5x"]')
+
+  await waitForConquest(page, target)
+
+  const finalOwner = await getSiteOwner(page, target.targetSiteId)
+
+  expect(finalOwner).toBe(target.playerRealmId)
+
+  await page.screenshot({ path: path.join(EVIDENCE_DIR, 'm1-task-4.2-conquest.png') })
+}
