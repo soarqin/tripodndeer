@@ -158,3 +158,21 @@
 
 **Test scripts:**
 - `pnpm test:e2e e2e/m1-march-conquest.spec.ts` — webServer auto-starts `pnpm dev` (playwright.config.ts L22-27)
+
+
+## T4.3 - AI Behavior e2e
+
+### AI dispatch + travel_cost=1 = atomic tick
+- Most M1 edges have `travel_cost: 1` in `src/content/m1/scenario.json`.
+- `computeMarchTicks(1) === 1`: army marches for 1 tick, then combat resolves in same tick.
+- Therefore: AI dispatch + march + combat all happen within ONE engine tick.
+- Implication: snapshotting `army.state === 'marching'` from the store is unreliable - subscribe fires AFTER the tick, by which time the army is back to `idle`.
+- Solution: hook into zustand's `(state, prevState)` subscribe and read per-tick `state.events` for `aiDispatchedArmy` events. Use `prevState.world` to determine the dispatch source.
+
+### Browser-side observer pattern
+- `page.evaluate` body counts as a single arrow function for `max-lines-per-function` ESLint rule.
+- Workaround: pass observer init as a string constant to `page.evaluate`. Keeps spec readable while staying under the 50-line cap.
+
+### Speed control testid
+- `data-testid="time-control-{tier}"` (e.g. `time-control-5x`) per `src/ui/components/TimeControlBar/TimeControlBar.tsx`.
+
