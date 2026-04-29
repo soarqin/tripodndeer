@@ -68,7 +68,8 @@ describe('buildTileCache', () => {
   })
 
   it('calls fill() for each tile (canvas drawing happens)', () => {
-    const mockCtx = (HTMLCanvasElement.prototype.getContext as ReturnType<typeof vi.spyOn>).getMockImplementation()?.()
+    const getContextMock = vi.mocked(HTMLCanvasElement.prototype.getContext)
+    const mockCtx = getContextMock.mock.results[0]?.value || getContextMock('2d')
     buildTileCache(makeSites(), makeFactions())
     // 5 sites × 2 factions = 10 tiles, each calls fill once
     expect((mockCtx as { fill: ReturnType<typeof vi.fn> }).fill).toHaveBeenCalledTimes(10)
