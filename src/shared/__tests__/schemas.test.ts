@@ -157,7 +157,7 @@ describe('M1DataSchema valid', () => {
   })
 
   it('rejects missing realms field', () => {
-    const bad = { ...validM1Data }
+    const bad: Partial<typeof validM1Data> = { ...validM1Data }
     delete bad.realms
     expect(() => M1DataSchema.parse(bad)).toThrow()
   })

@@ -1,0 +1,12 @@
+> tripodndeer@ typecheck C:\Projects\tripodndeer
+> tsc --noEmit
+
+> tripodndeer@ lint C:\Projects\tripodndeer
+> eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0
+
+> tripodndeer@ test C:\Projects\tripodndeer
+> vitest run "src/engine/systems/victory"
+
+✓ src/engine/systems/victory/__tests__/victory.test.ts (9 tests)
+Test Files 1 passed (1)
+Tests 9 passed (9)

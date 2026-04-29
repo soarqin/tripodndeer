@@ -77,3 +77,15 @@
 - Shared world-building helpers (`buildRealmMap`, `buildSites`, `buildEdgesMap`) kept M0 and M1 factories aligned without changing the M0 call site.
 - `World` now always carries `armies`, `wars`, `playerRealmId`, and `pendingOrders`, even for M0, so the runtime shape is uniform.
 
+
+## 2026-04-29 T1.6 historical site naming + realm distribution
+- Replaced placeholder `site_001..site_050` names with 50 unique historical Chinese names committed in `tools/name-m1-sites.mjs`. The script is idempotent and double-checks (a) every site got a name, (b) no name maps to a non-existent site, (c) no duplicate names.
+- Wei (`realm_wei`) capital was relocated from `site_010` to `site_018` so that historic 大梁 (east) sits east of historic 安邑 (west). When you change a capital, also reorder `initialSites` so the capital is first and move `initialArmies[0]` to the new capital + `initialArmies[1]` to the next site.
+- Realm `displayName` / `fullTitle` / `color` were already correct from the T1.5 generator; the T1.6 script re-applies them anyway so the JSON is self-healing if someone hand-edits and drifts.
+- Distribution report at `.sisyphus/evidence/m1-task-1.6-realm-distribution.md` includes a constraint audit table — useful template for future scenario edits where designers need quick visual confirmation that 秦 is west / 楚 is south / etc.
+- `src/content/m1/__tests__/realm-colors.test.ts` locks all 8 hex colors plus capital/site referential integrity. 10 tests pass via `pnpm test src/content/m1`.
+
+## 2026-04-29 Victory system
+
+- Keep victory detection pure: read-only world inspection, no state mutation, no hidden side effects.
+- Use `playerRealmId` + full-site ownership as the M1 win condition; avoid adding elimination/capital rules early.

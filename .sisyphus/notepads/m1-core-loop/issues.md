@@ -53,3 +53,7 @@
 ## 2026-04-29 T1.3 verification gotchas
 - `typescript-language-server` is still unavailable here, so `lsp_diagnostics` could not be used; typecheck/lint/vitest were the fallback proof.
 - The widened `World` interface required updating older test fixtures (e.g. clock tests) to include `armies`, `wars`, `playerRealmId`, and `pendingOrders`.
+
+## 2026-04-29 Victory system
+
+- `pnpm typecheck` initially failed on `src/shared/__tests__/schemas.test.ts` because `delete` was used on a fully required inferred object; widened the local test object to `Partial<>`.

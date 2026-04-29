@@ -74,3 +74,8 @@
 - `createInitialWorld()` now returns the expanded `World` shape with empty runtime collections so legacy tests keep working.
 - `createWorldFromM1Data()` uses fixed opening date `260 BC / spring / 1 / shang` and empty initial wars, matching the committed M1 scenario format.
 
+
+## 2026-04-29 Victory system
+
+- Implemented victory as a standalone engine system under `src/engine/systems/victory/` with re-exports from `index.ts`.
+- Emit only `victoryAchieved` events when every site is owned by the player realm.
