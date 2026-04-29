@@ -1,13 +1,20 @@
 import { defineConfig } from 'vitest/config'
 import { resolve } from 'path'
+import { fileURLToPath } from 'url'
+
+const rootDir = fileURLToPath(new URL('.', import.meta.url))
 
 export default defineConfig({
-  test: {
-    environment: 'node',
-    globals: true,
-    alias: { '@': resolve(__dirname, 'src') },
-  },
   resolve: {
-    alias: { '@': resolve(__dirname, 'src') },
+    alias: { '@': resolve(rootDir, 'src') },
+  },
+  test: {
+    globals: true,
+    alias: { '@': resolve(rootDir, 'src') },
+    environmentMatchGlobs: [
+      ['src/ui/**', 'jsdom'],
+      ['src/rendering/**', 'jsdom'],
+    ],
+    environment: 'node',
   },
 })
