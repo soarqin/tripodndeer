@@ -1,0 +1,14 @@
+
+> tripodndeer@ test C:\Projects\tripodndeer
+> vitest run "src/engine/systems/march"
+
+
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90mC:/Projects/tripodndeer[39m
+
+ [32m鉁?[39m src/engine/systems/march/__tests__/march.test.ts [2m ([22m[2m12 tests[22m[2m)[22m[90m 5[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m12 passed[39m[22m[90m (12)[39m
+[2m   Start at [22m 23:15:19
+[2m   Duration [22m 516ms[2m (transform 47ms, setup 0ms, collect 82ms, tests 5ms, environment 0ms, prepare 178ms)[22m
+

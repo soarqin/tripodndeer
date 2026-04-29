@@ -62,3 +62,6 @@
 
 ## T2.1 combat system
 - LSP diagnostics could not run because typescript-language-server is not installed in the environment; pnpm typecheck passed instead.
+
+## 2026-04-29 T2.2 march system
+- `lsp_diagnostics` remains unavailable (`typescript-language-server` not installed); verification used `pnpm typecheck`, `pnpm lint`, targeted march tests, and architecture purity tests.

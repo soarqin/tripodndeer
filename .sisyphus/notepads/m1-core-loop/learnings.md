@@ -97,3 +97,8 @@
 - Combat resolution is deterministic: defender manpower gets ceil(1.3x), attacker wins only on strict greater-than.
 - combatStep clones world maps before applying combat results and returns the original RNG because M1 combat has no randomness.
 - ESLint max-lines-per-function applies to test describe callbacks, so table cases should live at module scope or be split across describes.
+
+## 2026-04-29 T2.2 march system
+- marchStep is a pure phase over cloned army maps: marching armies only count down to zero and remain `state='marching'` for combatStep, while retreating armies at zero become idle at their retreat destination and emit `armyRetreated`.
+- `computeMarchTicks` uses `Math.max(1, Math.ceil(travelCost / speedFactor))`, matching current M1 no-bonus speedFactor=1 while allowing future modifiers.
+- March tests need small describe blocks because ESLint max-lines-per-function counts Vitest callback bodies.
