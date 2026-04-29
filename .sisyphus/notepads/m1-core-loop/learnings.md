@@ -176,3 +176,25 @@
 ### Speed control testid
 - `data-testid="time-control-{tier}"` (e.g. `time-control-5x`) per `src/ui/components/TimeControlBar/TimeControlBar.tsx`.
 
+
+
+## T4.4 - 30-min Playthrough + Victory e2e
+
+### Long-form playthrough timing
+- Spec runs 6 minutes wall-clock at 5x speed; `test.setTimeout(420_000)` gives ~1 minute headroom.
+- Engine ticks at 400ms/tick at 5x → ~900 ticks over 6 minutes is the expected range; floor of 100 absorbs CI / tab-throttling variance.
+- Console.error and pageerror listeners must be installed BEFORE `page.goto` to capture early errors.
+
+### Near-victory fixture (m1-victory.spec.ts)
+- Strategy: flip every site EXCEPT one adjacent enemy target to the player realm, then conquer the last one via real `declareWarAndMarch`.
+- **Critical**: also strip every non-player army from `world.armies`. Otherwise the AI (`aiPlanStep` in `src/engine/systems/ai/ai.ts`) finds enemy armies standing on player territory and dispatches them — `findCandidateTargets` happily picks player-owned adjacencies. Result: enemy armies reconquer player sites during the few ticks the player needs to march, and the banner never appears.
+- Worked at first glance? No — initial run failed with `expect(banner).toBeVisible` timeout because of exactly this. Fix: clear non-player armies in the same `setState` callback as the site reassignment.
+
+### Map iteration inside immer setState
+- Pattern from m1-context-menu.spec.ts: build a fresh Map outside immer, then assign the whole world via `state.world = { ...state.world, sites: newSites, armies: newArmies }`.
+- `enableMapSet()` is already called by `src/engine/clock/clock.ts`, so Maps in immer drafts behave normally.
+
+### Victory check pathway
+- `src/App.tsx` → `useVictory()` selects `state.world` and runs `isVictorious(world)` (`src/engine/systems/victory/victory.ts`): true iff every `site.ownerId === world.playerRealmId`.
+- The banner element has `data-testid="demo-complete"` and is rendered conditionally — it is genuinely absent from the DOM when not victorious, so `toHaveCount(0)` is the right assertion for the negative case.
+
