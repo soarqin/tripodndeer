@@ -107,3 +107,16 @@
 - aiPlanStep reuses `nextRng`/`nextInt` from `src/engine/random` and threads RNG state explicitly; no module-level RNG or fresh PRNG implementation.
 - Candidate AI targets are one-hop from idle army locations via `Site.adjacency`; travel time comes from the shared boundary edge's `travel_cost` with a defensive fallback of 3.
 - ESLint max-lines-per-function also applies to the exported AI phase, so target discovery and dispatch side effects were split into small pure helpers.
+
+
+## T2.6: Map Hit Testing
+- Ray casting algorithm in src/rendering/map/hit-test.ts (no third-party deps)
+- `pointInPolygon(point, polygon)` — generic, handles concave shapes (verified via L-shape test)
+- `findHitSite(point, sites)` — first-match-wins iteration over Map (insertion order)
+- MapCanvas reads store via `useGameStore.getState()` inside event handlers (no rerender on army/owner changes)
+- Right-click `preventDefault()` to suppress browser context menu before dispatching `openContextMenu`
+- Canvas-local point: `[clientX - rect.left, clientY - rect.top]` via `getBoundingClientRect()`
+- Context menu coords use raw `event.clientX/Y` (viewport-relative, suits absolute-positioned popup)
+- ESLint `max-lines-per-function: 50` is enforced as warning + `--max-warnings 0` ⇒ effectively an error.
+  Extract handlers into module-level functions / dedicated hooks rather than inlining inside the component body.
+- Vitest mock pattern for store actions: combine `vi.hoisted` with `vi.mock('@/ui/store/game-store', ...)` returning an object with `getState: () => ({...mockActions, world: {armies}})`.

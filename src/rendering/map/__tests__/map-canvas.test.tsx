@@ -1,12 +1,64 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 import { MapCanvas } from '../MapCanvas'
+import type { Polygon, Site } from '@/shared/types'
+
+// Hoisted mocks so vi.mock factory can reference them.
+const {
+  mockSelectArmy,
+  mockClearSelection,
+  mockOpenContextMenu,
+  mockSites,
+  mockArmies,
+} = vi.hoisted(() => {
+  const polygon: Polygon = [
+    [0, 0],
+    [100, 0],
+    [100, 100],
+    [0, 100],
+  ]
+  const site: Partial<Site> & { id: string; polygon: Polygon } = {
+    id: 'site_a',
+    name: 'Site A',
+    polygon,
+    boundary: [],
+    position: [50, 50],
+    ownerId: null,
+    adjacency: [],
+  }
+  const sites = new Map<string, typeof site>([['site_a', site]])
+  // Two armies — only player's qualifies for hit.
+  const armies = new Map<string, { id: string; realmId: string; location: string }>([
+    ['army_enemy', { id: 'army_enemy', realmId: 'realm_chu', location: 'site_a' }],
+    ['army_player', { id: 'army_player', realmId: 'realm_qin', location: 'site_a' }],
+  ])
+  return {
+    mockSelectArmy: vi.fn(),
+    mockClearSelection: vi.fn(),
+    mockOpenContextMenu: vi.fn(),
+    mockSites: sites,
+    mockArmies: armies,
+  }
+})
 
 // Mock store selectors
 vi.mock('@/ui/store/selectors', () => ({
-  useSites: () => new Map(),
+  useSites: () => mockSites,
   useRealms: () => new Map(),
   useEdges: () => new Map(),
+}))
+
+// Mock game-store with getState returning fake actions + world slice.
+vi.mock('@/ui/store/game-store', () => ({
+  useGameStore: {
+    getState: () => ({
+      selectArmy: mockSelectArmy,
+      clearSelection: mockClearSelection,
+      openContextMenu: mockOpenContextMenu,
+      playerRealmId: 'realm_qin',
+      world: { armies: mockArmies },
+    }),
+  },
 }))
 
 // Mock tile-cache to avoid real canvas operations
@@ -17,6 +69,9 @@ vi.mock('../tile-cache', () => ({
 
 // Mock canvas context
 beforeEach(() => {
+  mockSelectArmy.mockClear()
+  mockClearSelection.mockClear()
+  mockOpenContextMenu.mockClear()
   const mockCtx = {
     fillRect: vi.fn(),
     drawImage: vi.fn(),
@@ -27,20 +82,66 @@ beforeEach(() => {
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
     mockCtx as unknown as CanvasRenderingContext2D
   )
+  // jsdom's getBoundingClientRect is all-zeros by default, so clientX/clientY
+  // map directly to canvas-local coordinates — fine for our tests.
 })
 
-describe('MapCanvas', () => {
+function renderCanvas(): HTMLCanvasElement {
+  const { container } = render(<MapCanvas />)
+  return container.querySelector('canvas') as HTMLCanvasElement
+}
+
+describe('MapCanvas (rendering)', () => {
   it('renders a canvas element with correct testid', () => {
-    const { container } = render(<MapCanvas />)
-    const canvas = container.querySelector('canvas')
+    const canvas = renderCanvas()
     expect(canvas).toBeTruthy()
-    expect(canvas?.getAttribute('data-testid')).toBe('map-canvas')
+    expect(canvas.getAttribute('data-testid')).toBe('map-canvas')
   })
 
   it('has correct dimensions (800×600)', () => {
-    const { container } = render(<MapCanvas />)
-    const canvas = container.querySelector('canvas') as HTMLCanvasElement
+    const canvas = renderCanvas()
     expect(canvas.width).toBe(800)
     expect(canvas.height).toBe(600)
+  })
+})
+
+describe('MapCanvas (left click)', () => {
+  it('selects the player army when clicking on a site that has one', () => {
+    const canvas = renderCanvas()
+    fireEvent.click(canvas, { clientX: 50, clientY: 50 })
+
+    expect(mockSelectArmy).toHaveBeenCalledTimes(1)
+    expect(mockSelectArmy).toHaveBeenCalledWith('army_player')
+    expect(mockClearSelection).not.toHaveBeenCalled()
+  })
+
+  it('clears selection when clicking on empty space (no site hit)', () => {
+    const canvas = renderCanvas()
+    // (200, 200) is outside the site polygon at [0,0]–[100,100]
+    fireEvent.click(canvas, { clientX: 200, clientY: 200 })
+
+    expect(mockSelectArmy).not.toHaveBeenCalled()
+    expect(mockClearSelection).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('MapCanvas (right click)', () => {
+  it('opens context menu with siteId and viewport coordinates when right-clicking on a site', () => {
+    const canvas = renderCanvas()
+    fireEvent.contextMenu(canvas, { clientX: 60, clientY: 70 })
+
+    expect(mockOpenContextMenu).toHaveBeenCalledTimes(1)
+    expect(mockOpenContextMenu).toHaveBeenCalledWith({
+      siteId: 'site_a',
+      x: 60,
+      y: 70,
+    })
+  })
+
+  it('does not open context menu when right-clicking outside any site', () => {
+    const canvas = renderCanvas()
+    fireEvent.contextMenu(canvas, { clientX: 500, clientY: 500 })
+
+    expect(mockOpenContextMenu).not.toHaveBeenCalled()
   })
 })

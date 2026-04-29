@@ -1,7 +1,9 @@
 import React, { useRef, useEffect, useCallback, useMemo } from 'react'
 import { useSites, useRealms, useEdges } from '@/ui/store/selectors'
-import type { Site } from '@/shared/types'
+import { useGameStore } from '@/ui/store/game-store'
+import type { Site, Vec2 } from '@/shared/types'
 import { buildTileCache } from './tile-cache'
+import { findHitSite } from './hit-test'
 
 const CANVAS_WIDTH = 800
 const CANVAS_HEIGHT = 600
@@ -105,6 +107,79 @@ function drawMap(
   }
 }
 
+function getCanvasPoint(
+  canvas: HTMLCanvasElement,
+  event: React.MouseEvent<HTMLCanvasElement>,
+): Vec2 {
+  const rect = canvas.getBoundingClientRect()
+  return [event.clientX - rect.left, event.clientY - rect.top]
+}
+
+function findPlayerArmyAtSite(
+  armies: ReadonlyMap<string, { id: string; realmId: string; location: string }>,
+  playerRealmId: string,
+  siteId: string,
+): string | null {
+  for (const army of armies.values()) {
+    if (army.realmId === playerRealmId && army.location === siteId) {
+      return army.id
+    }
+  }
+  return null
+}
+
+function dispatchLeftClick(hitSiteId: string | null): void {
+  const store = useGameStore.getState()
+  if (hitSiteId === null) {
+    store.clearSelection()
+    return
+  }
+  const playerArmyId = findPlayerArmyAtSite(
+    store.world.armies,
+    store.playerRealmId,
+    hitSiteId,
+  )
+  if (playerArmyId !== null) {
+    store.selectArmy(playerArmyId)
+  } else {
+    store.clearSelection()
+  }
+}
+
+function useCanvasInteractionHandlers(
+  canvasRef: React.RefObject<HTMLCanvasElement>,
+  sites: ReadonlyMap<string, Site>,
+) {
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLCanvasElement>) => {
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const point = getCanvasPoint(canvas, event)
+      dispatchLeftClick(findHitSite(point, sites))
+    },
+    [canvasRef, sites],
+  )
+
+  const handleContextMenu = useCallback(
+    (event: React.MouseEvent<HTMLCanvasElement>) => {
+      event.preventDefault()
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const point = getCanvasPoint(canvas, event)
+      const hitSiteId = findHitSite(point, sites)
+      if (hitSiteId === null) return
+      useGameStore.getState().openContextMenu({
+        siteId: hitSiteId,
+        x: event.clientX,
+        y: event.clientY,
+      })
+    },
+    [canvasRef, sites],
+  )
+
+  return { handleClick, handleContextMenu }
+}
+
 export function MapCanvas(): React.JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const transitionsRef = useRef<TransitionMap>(new Map())
@@ -127,6 +202,8 @@ export function MapCanvas(): React.JSX.Element {
 
   useCanvasAnimation(draw, transitionsRef)
 
+  const { handleClick, handleContextMenu } = useCanvasInteractionHandlers(canvasRef, sites)
+
   return (
     <canvas
       ref={canvasRef}
@@ -134,6 +211,8 @@ export function MapCanvas(): React.JSX.Element {
       height={CANVAS_HEIGHT}
       style={{ display: 'block' }}
       data-testid="map-canvas"
+      onClick={handleClick}
+      onContextMenu={handleContextMenu}
     />
   )
 }
