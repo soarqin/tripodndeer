@@ -1,0 +1,17 @@
+Verification run: 2026-04-29
+
+Commands:
+pnpm typecheck && pnpm lint && pnpm test src/engine/systems/ai && pnpm test src/engine/__tests__/architecture-purity.test.ts
+
+Result: PASS
+
+AI targeted tests:
+✓ src/engine/systems/ai/__tests__/ai.test.ts (12 tests)
+  - includes deterministic same seed + same world assertion
+  - includes RNG-threaded 80/20 monthly action-rate assertion
+  - includes adjacency-only targeting assertion
+
+Architecture purity:
+✓ src/engine/__tests__/architecture-purity.test.ts (3 tests)
+
+LSP diagnostics note: attempted on changed TypeScript files, but typescript-language-server is not installed in this environment.

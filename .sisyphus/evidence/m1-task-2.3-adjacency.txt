@@ -1,0 +1,13 @@
+Verification run: 2026-04-29
+
+Command:
+pnpm test src/engine/systems/ai
+
+Result: PASS
+
+Targeted adjacency proof:
+✓ only attacks adjacent sites, not long-range enemy sites
+✓ skips a realm with no adjacent enemy sites
+✓ changes the dispatched army state to marching with travel_cost from the shared boundary edge
+
+Full AI suite: 12 tests passed.

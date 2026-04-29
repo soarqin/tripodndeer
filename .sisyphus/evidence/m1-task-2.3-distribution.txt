@@ -1,0 +1,12 @@
+Verification run: 2026-04-29
+
+Command:
+pnpm test src/engine/systems/ai
+
+Result: PASS
+
+Targeted distribution proof:
+✓ keeps the action rate near 20 percent over 100 monthly opportunities
+
+The test uses seed 2 and asserts dispatched actions stay within 15..25 out of 100 eligible monthly AI opportunities.
+Full AI suite: 12 tests passed.

@@ -57,6 +57,10 @@
 3. march
 4. combat
 5. victoryCheck
+
+## 2026-04-29 T2.3 AI aggression
+- M1 AI behavior is uniform across non-player realms: every monthly tick each non-player realm rolls a 20% action chance, then picks a random adjacent target/army candidate.
+- AI declares war only when attacking an owned realm that is not already at war; neutral adjacent targets can be dispatched against without a war event.
 ## T1.2 schema choices
 - Kept `WarKey` as a plain string alias with a minimal non-empty schema, matching the project’s string-opaque pattern.
 - Left `src/shared/index.ts` as star-exports because it already exposes all new shared types/schemas through the existing barrel.

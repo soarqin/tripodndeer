@@ -102,3 +102,8 @@
 - marchStep is a pure phase over cloned army maps: marching armies only count down to zero and remain `state='marching'` for combatStep, while retreating armies at zero become idle at their retreat destination and emit `armyRetreated`.
 - `computeMarchTicks` uses `Math.max(1, Math.ceil(travelCost / speedFactor))`, matching current M1 no-bonus speedFactor=1 while allowing future modifiers.
 - March tests need small describe blocks because ESLint max-lines-per-function counts Vitest callback bodies.
+
+## 2026-04-29 T2.3 AI plan system
+- aiPlanStep reuses `nextRng`/`nextInt` from `src/engine/random` and threads RNG state explicitly; no module-level RNG or fresh PRNG implementation.
+- Candidate AI targets are one-hop from idle army locations via `Site.adjacency`; travel time comes from the shared boundary edge's `travel_cost` with a defensive fallback of 3.
+- ESLint max-lines-per-function also applies to the exported AI phase, so target discovery and dispatch side effects were split into small pure helpers.
