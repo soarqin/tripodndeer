@@ -7,7 +7,7 @@ describe('loadM0Data', () => {
     const data = loadM0Data()
     expect(data.sites.length).toBe(5)
     expect(Object.keys(data.edges).length).toBeGreaterThan(0)
-    expect(data.factions.length).toBe(2)
+    expect(data.realms.length).toBe(2)
   })
 })
 
@@ -16,7 +16,7 @@ describe('createInitialWorld — structure', () => {
     const data = loadM0Data()
     const world = createInitialWorld(data, 42)
     expect(world.sites.size).toBe(5)
-    expect(world.factions.size).toBe(2)
+    expect(world.realms.size).toBe(2)
     expect(world.rngState).toEqual({ seed: 42, counter: 0 })
     expect(world.phases.length).toBe(1)
     expect(world.tick).toBe(0)
@@ -45,13 +45,13 @@ describe('createInitialWorld — structure', () => {
 })
 
 describe('createInitialWorld — error paths', () => {
-  it('throws on unknown faction reference', () => {
+  it('throws on unknown realm reference', () => {
     const data = loadM0Data()
     const bad = {
       ...data,
-      initialOwnership: { ...data.initialOwnership, site_1: 'faction_unknown' },
+      initialOwnership: { ...data.initialOwnership, site_1: 'realm_unknown' },
     }
-    expect(() => createInitialWorld(bad, 42)).toThrow(/unknown faction/)
+    expect(() => createInitialWorld(bad, 42)).toThrow(/unknown realm/)
   })
 
   it('throws on unknown edge reference', () => {

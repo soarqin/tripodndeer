@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useCallback, useMemo } from 'react'
-import { useSites, useFactions, useEdges } from '@/ui/store/selectors'
+import { useSites, useRealms, useEdges } from '@/ui/store/selectors'
 import type { Site } from '@/shared/types'
 import { buildTileCache } from './tile-cache'
 
@@ -9,8 +9,8 @@ const TRANSITION_DURATION_MS = 300
 const BACKGROUND_COLOR = '#F5EFD9'
 
 interface TransitionState {
-  fromFactionId: string
-  toFactionId: string
+  fromRealmId: string
+  toRealmId: string
   startMs: number
 }
 
@@ -31,9 +31,9 @@ function useSiteTransitions(
       for (const [id, site] of sites) {
         const prevSite = prev.get(id)
         if (prevSite && prevSite.ownerId !== site.ownerId) {
-          transitionsRef.current.set(id, {
-            fromFactionId: prevSite.ownerId ?? '',
-            toFactionId: site.ownerId ?? '',
+            transitionsRef.current.set(id, {
+            fromRealmId: prevSite.ownerId ?? '',
+            toRealmId: site.ownerId ?? '',
             startMs: performance.now(),
           })
         }
@@ -92,8 +92,8 @@ function drawMap(
         if (tile) ctx.drawImage(tile, 0, 0)
       } else {
         const t = easeInOut(elapsed / TRANSITION_DURATION_MS)
-        const fromTile = siteTiles.get(transition.fromFactionId)
-        const toTile = siteTiles.get(transition.toFactionId)
+        const fromTile = siteTiles.get(transition.fromRealmId)
+        const toTile = siteTiles.get(transition.toRealmId)
         if (fromTile) { ctx.globalAlpha = 1 - t; ctx.drawImage(fromTile, 0, 0) }
         if (toTile) { ctx.globalAlpha = t; ctx.drawImage(toTile, 0, 0) }
         ctx.globalAlpha = 1
@@ -109,11 +109,11 @@ export function MapCanvas(): React.JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const transitionsRef = useRef<TransitionMap>(new Map())
   const sites = useSites()
-  const factions = useFactions()
+  const realms = useRealms()
   const edges = useEdges()
 
-  // Build tile cache once (or when sites/factions change — rare)
-  const tileCache = useMemo(() => buildTileCache(sites, factions, edges), [sites, factions, edges])
+  // Build tile cache once (or when sites/realms change — rare)
+  const tileCache = useMemo(() => buildTileCache(sites, realms, edges), [sites, realms, edges])
 
   useSiteTransitions(sites, transitionsRef)
 

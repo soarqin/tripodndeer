@@ -5,10 +5,10 @@ import { M0DataSchema } from '@/shared/schemas'
 import type {
   BoundaryRef,
   EdgeId,
-  Faction,
-  FactionId,
   M0Data,
   MapEdge,
+  Realm,
+  RealmId,
   Site,
   SiteId,
   Vec2,
@@ -66,10 +66,10 @@ export function createInitialWorld(data: M0Data, seed: number): World {
   // Paranoid validation
   M0DataSchema.parse(data)
 
-  // Build factions map
-  const factions = new Map<FactionId, Faction>()
-  for (const f of data.factions) {
-    factions.set(f.id, f)
+  // Build realms map
+  const realms = new Map<RealmId, Realm>()
+  for (const realm of data.realms) {
+    realms.set(realm.id, realm)
   }
 
   // Derive adjacency from shared edges
@@ -79,8 +79,8 @@ export function createInitialWorld(data: M0Data, seed: number): World {
   const sites = new Map<SiteId, Site>()
   for (const rawSite of data.sites) {
     const ownerId = data.initialOwnership[rawSite.id] ?? null
-    if (ownerId !== null && !factions.has(ownerId)) {
-      throw new Error(`${rawSite.id} references unknown faction ${ownerId}`)
+    if (ownerId !== null && !realms.has(ownerId)) {
+      throw new Error(`${rawSite.id} references unknown realm ${ownerId}`)
     }
     const polygon = expandPolygon(rawSite.boundary, data.edges)
     const adjacency = adjacencyMap.get(rawSite.id) ?? []
@@ -102,7 +102,7 @@ export function createInitialWorld(data: M0Data, seed: number): World {
     date: { ...INITIAL_DATE },
     tick: 0,
     sites,
-    factions,
+    realms,
     edges: edgesMap,
     rngState: { seed, counter: 0 },
     phases: [paintingStep],

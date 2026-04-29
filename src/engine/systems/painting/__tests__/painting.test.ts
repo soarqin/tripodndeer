@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import { INITIAL_DATE } from '@/shared/constants'
-import type { Faction, FactionId, RNGState, Site, World } from '@/shared/types'
+import type { Realm, RealmId, RNGState, Site, World } from '@/shared/types'
 
 import { paintingStep } from '../painting'
 
 function makeWorld(
-  siteConfigs: Array<{ id: string; adjacency: string[]; owner: FactionId }>,
+  siteConfigs: Array<{ id: string; adjacency: string[]; owner: RealmId }>,
 ): World {
   const sites = new Map<string, Site>()
   for (const cfg of siteConfigs) {
@@ -26,22 +26,22 @@ function makeWorld(
     })
   }
 
-  const factions = new Map<string, Faction>()
-  factions.set('faction_red', { id: 'faction_red', displayName: '红', color: '#dc2626' })
-  factions.set('faction_blue', { id: 'faction_blue', displayName: '蓝', color: '#2563eb' })
+  const realms = new Map<string, Realm>()
+  realms.set('realm_red', { id: 'realm_red', displayName: '红', fullTitle: '红方', color: '#dc2626', capital: 'site_1', initialSites: ['site_1'], initialArmies: [], aiPersonality: 'aggressive_random' })
+  realms.set('realm_blue', { id: 'realm_blue', displayName: '蓝', fullTitle: '蓝方', color: '#2563eb', capital: 'site_2', initialSites: ['site_2'], initialArmies: [], aiPersonality: 'aggressive_random' })
 
   return {
     date: { ...INITIAL_DATE },
     tick: 0,
     sites,
-    factions,
+    realms,
     edges: new Map(),
     rngState: { seed: 42, counter: 0 },
     phases: [],
   }
 }
 
-function owners(world: World): Record<string, FactionId | null> {
+function owners(world: World): Record<string, RealmId | null> {
   return Object.fromEntries(
     Array.from(world.sites.entries()).map(([id, site]) => [id, site.ownerId]),
   )
@@ -50,9 +50,9 @@ function owners(world: World): Record<string, FactionId | null> {
 describe('paintingStep adjacency rules', () => {
   it('only flips blue sites adjacent to red sites', () => {
     let world = makeWorld([
-      { id: 'A', adjacency: ['C'], owner: 'faction_red' },
-      { id: 'B', adjacency: [], owner: 'faction_blue' },
-      { id: 'C', adjacency: ['A'], owner: 'faction_blue' },
+      { id: 'A', adjacency: ['C'], owner: 'realm_red' },
+      { id: 'B', adjacency: [], owner: 'realm_blue' },
+      { id: 'C', adjacency: ['A'], owner: 'realm_blue' },
     ])
     let rng: RNGState = { seed: 7, counter: 0 }
 
@@ -62,15 +62,15 @@ describe('paintingStep adjacency rules', () => {
       rng = result.nextRng
     }
 
-    expect(owners(world)).toEqual({ A: 'faction_red', B: 'faction_blue', C: 'faction_red' })
+    expect(owners(world)).toEqual({ A: 'realm_red', B: 'realm_blue', C: 'realm_red' })
   })
 })
 
 describe('paintingStep no-op cases', () => {
   it('returns the same world when red has no blue neighbors', () => {
     const world = makeWorld([
-      { id: 'A', adjacency: [], owner: 'faction_red' },
-      { id: 'B', adjacency: [], owner: 'faction_blue' },
+      { id: 'A', adjacency: [], owner: 'realm_red' },
+      { id: 'B', adjacency: [], owner: 'realm_blue' },
     ])
     const rng: RNGState = { seed: 42, counter: 0 }
 
@@ -83,8 +83,8 @@ describe('paintingStep no-op cases', () => {
 
   it('returns the same world when every site is already red', () => {
     const world = makeWorld([
-      { id: 'A', adjacency: ['B'], owner: 'faction_red' },
-      { id: 'B', adjacency: ['A'], owner: 'faction_red' },
+      { id: 'A', adjacency: ['B'], owner: 'realm_red' },
+      { id: 'B', adjacency: ['A'], owner: 'realm_red' },
     ])
     const rng: RNGState = { seed: 42, counter: 0 }
 
@@ -99,9 +99,9 @@ describe('paintingStep no-op cases', () => {
 describe('paintingStep randomness', () => {
   it('is deterministic for the same world and rng', () => {
     const world = makeWorld([
-      { id: 'A', adjacency: ['B', 'C'], owner: 'faction_red' },
-      { id: 'B', adjacency: ['A'], owner: 'faction_blue' },
-      { id: 'C', adjacency: ['A'], owner: 'faction_blue' },
+      { id: 'A', adjacency: ['B', 'C'], owner: 'realm_red' },
+      { id: 'B', adjacency: ['A'], owner: 'realm_blue' },
+      { id: 'C', adjacency: ['A'], owner: 'realm_blue' },
     ])
     const rng: RNGState = { seed: 123, counter: 4 }
 
@@ -117,11 +117,11 @@ describe('paintingStep randomness', () => {
 describe('paintingStep evolution', () => {
   it('eventually turns a connected five-site graph red', () => {
     let world = makeWorld([
-      { id: 'A', adjacency: ['B'], owner: 'faction_red' },
-      { id: 'B', adjacency: ['A', 'C'], owner: 'faction_blue' },
-      { id: 'C', adjacency: ['B', 'D'], owner: 'faction_blue' },
-      { id: 'D', adjacency: ['C', 'E'], owner: 'faction_blue' },
-      { id: 'E', adjacency: ['D'], owner: 'faction_blue' },
+      { id: 'A', adjacency: ['B'], owner: 'realm_red' },
+      { id: 'B', adjacency: ['A', 'C'], owner: 'realm_blue' },
+      { id: 'C', adjacency: ['B', 'D'], owner: 'realm_blue' },
+      { id: 'D', adjacency: ['C', 'E'], owner: 'realm_blue' },
+      { id: 'E', adjacency: ['D'], owner: 'realm_blue' },
     ])
     let rng: RNGState = { seed: 42, counter: 0 }
 
@@ -131,6 +131,6 @@ describe('paintingStep evolution', () => {
       rng = result.nextRng
     }
 
-    expect(Array.from(world.sites.values()).every(site => site.ownerId === 'faction_red')).toBe(true)
+    expect(Array.from(world.sites.values()).every(site => site.ownerId === 'realm_red')).toBe(true)
   })
 })

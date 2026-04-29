@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { buildTileCache, buildSmoothPath, buildSitePathFromBoundary } from '../tile-cache'
-import type { Site, Faction, MapEdge } from '@/shared/types'
+import type { Site, Realm, MapEdge } from '@/shared/types'
 
 // jsdom 的 canvas 不支持 getContext('2d') — 需要 mock
 class MockPath2D {
@@ -41,14 +41,14 @@ function makeSites(): ReadonlyMap<string, Site> {
   const ids = ['site_1', 'site_2', 'site_3', 'site_4', 'site_5']
   return new Map(ids.map(id => [
     id,
-    { id, name: id, position: [50, 50] as const, boundary: [], polygon: poly, adjacency: [], ownerId: 'faction_blue' } satisfies Site,
+    { id, name: id, position: [50, 50] as const, boundary: [], polygon: poly, adjacency: [], ownerId: 'realm_blue' } satisfies Site,
   ]))
 }
 
-function makeFactions(): ReadonlyMap<string, Faction> {
+function makeRealms(): ReadonlyMap<string, Realm> {
   return new Map([
-    ['faction_red', { id: 'faction_red', displayName: '红', color: '#dc2626' }],
-    ['faction_blue', { id: 'faction_blue', displayName: '蓝', color: '#2563eb' }],
+    ['realm_red', { id: 'realm_red', displayName: '红', fullTitle: '红方', color: '#dc2626', capital: 'site_1', initialSites: ['site_1'], initialArmies: [], aiPersonality: 'aggressive_random' }],
+    ['realm_blue', { id: 'realm_blue', displayName: '蓝', fullTitle: '蓝方', color: '#2563eb', capital: 'site_2', initialSites: ['site_2'], initialArmies: [], aiPersonality: 'aggressive_random' }],
   ])
 }
 
@@ -58,7 +58,7 @@ function makeEdges(): ReadonlyMap<string, MapEdge> {
 
 describe('buildTileCache', () => {
   it('creates 5 × 2 = 10 canvas tiles', () => {
-    const cache = buildTileCache(makeSites(), makeFactions(), makeEdges())
+    const cache = buildTileCache(makeSites(), makeRealms(), makeEdges())
     expect(cache.size).toBe(5)
     for (const [, siteCache] of cache) {
       expect(siteCache.size).toBe(2)
@@ -66,7 +66,7 @@ describe('buildTileCache', () => {
   })
 
   it('each canvas has correct dimensions (800×600)', () => {
-    const cache = buildTileCache(makeSites(), makeFactions(), makeEdges())
+    const cache = buildTileCache(makeSites(), makeRealms(), makeEdges())
     for (const [, siteCache] of cache) {
       for (const [, canvas] of siteCache) {
         expect(canvas.width).toBe(800)
@@ -78,8 +78,8 @@ describe('buildTileCache', () => {
   it('calls fill() for each tile (canvas drawing happens)', () => {
     const getContextMock = vi.mocked(HTMLCanvasElement.prototype.getContext)
     const mockCtx = getContextMock.mock.results[0]?.value || getContextMock('2d')
-    buildTileCache(makeSites(), makeFactions(), makeEdges())
-    // 5 sites × 2 factions = 10 tiles, each calls fill once
+    buildTileCache(makeSites(), makeRealms(), makeEdges())
+    // 5 sites × 2 realms = 10 tiles, each calls fill once
     expect((mockCtx as { fill: ReturnType<typeof vi.fn> }).fill).toHaveBeenCalledTimes(10)
   })
 })

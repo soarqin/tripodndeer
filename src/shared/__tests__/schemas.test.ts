@@ -24,16 +24,21 @@ const validSite = {
     { edge: 'e_003', reverse: false },
   ],
 }
-const validFaction = {
-  id: 'faction_red',
+const validRealm = {
+  id: 'realm_red',
   displayName: '红',
+  fullTitle: '红方',
   color: '#dc2626',
+  capital: 'site_1',
+  initialSites: ['site_1'],
+  initialArmies: [],
+  aiPersonality: 'aggressive_random' as const,
 }
 const validData = {
   edges: { e_001: validPolylineEdge, e_002: validBezierEdge, e_003: validPolylineEdge },
   sites: [validSite],
-  factions: [validFaction],
-  initialOwnership: { site_1: 'faction_red' },
+  realms: [validRealm],
+  initialOwnership: { site_1: 'realm_red' },
 }
 
 describe('MapEdgeSchema valid', () => {

@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 export const SiteIdSchema = z.string().min(1)
-export const FactionIdSchema = z.string().min(1)
+export const RealmIdSchema = z.string().min(1)
+export const ArmyIdSchema = z.string().min(1)
 export const Vec2Schema = z.tuple([z.number(), z.number()]) as z.ZodType<readonly [number, number]>
 export const PolygonSchema = z.array(Vec2Schema).min(3)
 export const EdgeIdSchema = z.string().min(1)
@@ -37,17 +38,28 @@ export const RawSiteSchema = z.object({
   boundary: z.array(BoundaryRefSchema).min(3),
 })
 
-export const FactionSchema = z.object({
-  id: FactionIdSchema,
+export const ArmyTemplateSchema = z.object({
+  id: ArmyIdSchema,
+  manpower: z.number().int().positive(),
+  location: SiteIdSchema,
+})
+
+export const RealmSchema = z.object({
+  id: RealmIdSchema,
   displayName: z.string().min(1),
+  fullTitle: z.string().min(1),
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  capital: SiteIdSchema,
+  initialSites: z.array(SiteIdSchema),
+  initialArmies: z.array(ArmyTemplateSchema),
+  aiPersonality: z.literal('aggressive_random'),
 })
 
 export const M0DataSchema = z.object({
   edges: z.record(z.string(), MapEdgeSchema),
   sites: z.array(RawSiteSchema),
-  factions: z.array(FactionSchema),
-  initialOwnership: z.record(z.string(), FactionIdSchema),
+  realms: z.array(RealmSchema),
+  initialOwnership: z.record(z.string(), RealmIdSchema),
 })
 
 export type M0DataSchemaType = z.infer<typeof M0DataSchema>

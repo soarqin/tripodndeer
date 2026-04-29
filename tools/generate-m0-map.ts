@@ -12,16 +12,16 @@ const NOISE_RATIO = 0.08
 
 const SITE_IDS = ['site_1', 'site_2', 'site_3', 'site_4', 'site_5'] as const
 const SITE_NAMES = ['邑甲', '邑乙', '邑丙', '邑丁', '邑戊'] as const
-const FACTIONS = [
-  { id: 'faction_red', displayName: '红', color: '#dc2626' },
-  { id: 'faction_blue', displayName: '蓝', color: '#2563eb' },
+const REALMS = [
+  { id: 'realm_red', displayName: '红', fullTitle: '红方', color: '#dc2626', capital: 'site_1', initialSites: ['site_1'], initialArmies: [], aiPersonality: 'aggressive_random' },
+  { id: 'realm_blue', displayName: '蓝', fullTitle: '蓝方', color: '#2563eb', capital: 'site_2', initialSites: ['site_2', 'site_3', 'site_4', 'site_5'], initialArmies: [], aiPersonality: 'aggressive_random' },
 ]
 const INITIAL_OWNERSHIP: Record<string, string> = {
-  site_1: 'faction_red',
-  site_2: 'faction_blue',
-  site_3: 'faction_blue',
-  site_4: 'faction_blue',
-  site_5: 'faction_blue',
+  site_1: 'realm_red',
+  site_2: 'realm_blue',
+  site_3: 'realm_blue',
+  site_4: 'realm_blue',
+  site_5: 'realm_blue',
 }
 
 // ─── Deterministic PRNG ──────────────────────────────────────────────────────
@@ -284,7 +284,7 @@ function validateReverseFlags(sites: ReturnType<typeof buildSites>): void {
 }
 
 function writeOutput(edges: Record<string, object>, sites: ReturnType<typeof buildSites>, edgeTable: Map<string, EdgeEntry>): void {
-  const output = { edges, sites, factions: FACTIONS, initialOwnership: INITIAL_OWNERSHIP }
+  const output = { edges, sites, realms: REALMS, initialOwnership: INITIAL_OWNERSHIP }
   const outPath = path.join(process.cwd(), 'src', 'content', 'm0', 'sites.json')
   fs.mkdirSync(path.dirname(outPath), { recursive: true })
   fs.writeFileSync(outPath, JSON.stringify(output, null, 2), 'utf-8')

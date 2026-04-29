@@ -1,7 +1,7 @@
 export { useGameStore } from './game-store'
 export { useRafDriver } from './raf-driver'
 export {
-  useFactions,
+  useRealms,
   useSites,
   useSpeed,
   useWorldDate,

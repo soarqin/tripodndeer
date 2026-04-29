@@ -5,7 +5,7 @@ import { MapCanvas } from '../MapCanvas'
 // Mock store selectors
 vi.mock('@/ui/store/selectors', () => ({
   useSites: () => new Map(),
-  useFactions: () => new Map(),
+  useRealms: () => new Map(),
   useEdges: () => new Map(),
 }))
 

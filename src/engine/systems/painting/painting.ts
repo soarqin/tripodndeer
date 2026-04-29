@@ -18,11 +18,11 @@ export const paintingStep: TickPhase = (world, rng) => {
 
   const pairs: Array<{ redId: string; blueId: string }> = []
   for (const [siteId, site] of world.sites) {
-    if (site.ownerId !== 'faction_red') continue
+    if (site.ownerId !== 'realm_red') continue
 
     for (const neighborId of site.adjacency) {
       const neighbor = world.sites.get(neighborId)
-      if (neighbor?.ownerId === 'faction_blue') {
+      if (neighbor?.ownerId === 'realm_blue') {
         pairs.push({ redId: siteId, blueId: neighborId })
       }
     }
@@ -40,7 +40,7 @@ export const paintingStep: TickPhase = (world, rng) => {
   const nextWorld = produce(world, draft => {
     const site = draft.sites.get(picked.blueId)
     if (site) {
-      site.ownerId = 'faction_red'
+      site.ownerId = 'realm_red'
     }
   })
 
@@ -49,8 +49,8 @@ export const paintingStep: TickPhase = (world, rng) => {
       type: 'painting:siteFlipped',
       payload: {
         siteId: picked.blueId,
-        fromFaction: 'faction_blue',
-        toFaction: 'faction_red',
+        fromRealm: 'realm_blue',
+        toRealm: 'realm_red',
       },
     },
   ]

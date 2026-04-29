@@ -1,9 +1,9 @@
 // 邑的 ID 类型（opaque string，如 'site_1'）
 export type SiteId = string
 
-// 势力 ID（opaque string，如 'faction_red', 'faction_blue'）
+// 领域 ID（opaque string，如 'realm_red', 'realm_blue'）
 // CRITICAL: 绝对不用 'red' | 'blue' 字面量联合类型
-export type FactionId = string
+export type RealmId = string
 
 // 2D 坐标（只读 tuple）
 export type Vec2 = readonly [number, number]
@@ -42,16 +42,30 @@ export interface RawSite {
 
 /** 运行时形态的邑（含 ownerId + polygon + adjacency，均由 factory 派发） */
 export interface Site extends RawSite {
-  ownerId: FactionId | null
+  ownerId: RealmId | null
   polygon: Polygon
   adjacency: readonly SiteId[]
 }
 
-// 势力定义（id=opaque, color=CSS string）
-export interface Faction {
-  id: FactionId
-  displayName: string
-  color: string // e.g. '#dc2626'
+// ArmyId/ArmyTemplate - placed BEFORE Realm so Realm can reference them
+export type ArmyId = string
+
+export interface ArmyTemplate {
+  readonly id: ArmyId
+  readonly manpower: number
+  readonly location: SiteId
+}
+
+// Realm definition (id=opaque, color=CSS string)
+export interface Realm {
+  readonly id: RealmId
+  readonly displayName: string
+  readonly fullTitle: string
+  readonly color: string // e.g. '#dc2626'
+  readonly capital: SiteId
+  readonly initialSites: readonly SiteId[]
+  readonly initialArmies: readonly ArmyTemplate[]
+  readonly aiPersonality: 'aggressive_random'
 }
 
 // 游戏日期（旬为最小单位）
@@ -88,7 +102,7 @@ export interface World {
   date: GameDate
   tick: number
   sites: ReadonlyMap<SiteId, Site>
-  factions: ReadonlyMap<FactionId, Faction>
+  realms: ReadonlyMap<RealmId, Realm>
   edges: ReadonlyMap<EdgeId, MapEdge>
   rngState: RNGState // PRNG 状态在 World，不在 module 闭包
   phases: readonly TickPhase[] // Tick 阶段数组（M0 仅 1 个，但形状必须是数组）
@@ -98,6 +112,6 @@ export interface World {
 export interface M0Data {
   edges: Record<string, MapEdge>
   sites: RawSite[]
-  factions: Faction[]
-  initialOwnership: Record<string, FactionId>
+  realms: Realm[]
+  initialOwnership: Record<string, RealmId>
 }

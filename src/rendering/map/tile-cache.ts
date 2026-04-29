@@ -1,7 +1,7 @@
-import type { Site, Faction, SiteId, FactionId, MapEdge, EdgeId, Vec2 } from '@/shared/types'
+import type { Site, Realm, SiteId, RealmId, MapEdge, EdgeId, Vec2 } from '@/shared/types'
 
-/** 预渲染的 (site, faction) tile — HTMLCanvasElement */
-export type TileCache = ReadonlyMap<SiteId, ReadonlyMap<FactionId, HTMLCanvasElement>>
+/** 预渲染的 (site, realm) tile — HTMLCanvasElement */
+export type TileCache = ReadonlyMap<SiteId, ReadonlyMap<RealmId, HTMLCanvasElement>>
 
 const CANVAS_WIDTH = 800
 const CANVAS_HEIGHT = 600
@@ -100,14 +100,14 @@ export function buildSmoothPath(polygon: readonly (readonly [number, number])[])
 function paintSiteTile(
   canvas: HTMLCanvasElement,
   site: Site,
-  factionColor: string,
+  realmColor: string,
   edges: ReadonlyMap<EdgeId, MapEdge>,
 ): void {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
   const path = buildSitePathFromBoundary(site, edges)
-  ctx.fillStyle = factionColor
+  ctx.fillStyle = realmColor
   ctx.fill(path)
   ctx.strokeStyle = BORDER_COLOR
   ctx.lineWidth = 1.2
@@ -121,24 +121,24 @@ function paintSiteTile(
 }
 
 /**
- * 一次性构建所有 (site × faction) tile cache。
+ * 一次性构建所有 (site × realm) tile cache。
  * 在应用启动时调用一次，之后 runtime 仅用 ctx.drawImage()。
  * 使用 document.createElement('canvas') 而非 OffscreenCanvas（jsdom 兼容）。
  */
 export function buildTileCache(
   sites: ReadonlyMap<SiteId, Site>,
-  factions: ReadonlyMap<FactionId, Faction>,
+  realms: ReadonlyMap<RealmId, Realm>,
   edges: ReadonlyMap<EdgeId, MapEdge>,
 ): TileCache {
-  const cache = new Map<SiteId, Map<FactionId, HTMLCanvasElement>>()
+  const cache = new Map<SiteId, Map<RealmId, HTMLCanvasElement>>()
   for (const [siteId, site] of sites) {
-    const siteCache = new Map<FactionId, HTMLCanvasElement>()
-    for (const [factionId, faction] of factions) {
+    const siteCache = new Map<RealmId, HTMLCanvasElement>()
+    for (const [realmId, realm] of realms) {
       const canvas = document.createElement('canvas')
       canvas.width = CANVAS_WIDTH
       canvas.height = CANVAS_HEIGHT
-      paintSiteTile(canvas, site, faction.color, edges)
-      siteCache.set(factionId, canvas)
+      paintSiteTile(canvas, site, realm.color, edges)
+      siteCache.set(realmId, canvas)
     }
     cache.set(siteId, siteCache)
   }

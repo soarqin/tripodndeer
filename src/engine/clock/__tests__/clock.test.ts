@@ -8,7 +8,7 @@ function makeTestWorld(): World {
     date: { ...INITIAL_DATE },
     tick: 0,
     sites: new Map(),
-    factions: new Map(),
+    realms: new Map(),
     edges: new Map(),
     rngState: { seed: 42, counter: 0 },
     phases: [],
