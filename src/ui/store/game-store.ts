@@ -7,14 +7,6 @@ import { createInitialWorld, loadM0Data } from '@/engine/world'
 import type { GameEvent, SpeedTier, World } from '@/shared/types'
 
 // Vite 注入的 import.meta.env 类型增强（避免依赖 vite/client 全局类型）
-declare global {
-  interface ImportMetaEnv {
-    readonly DEV: boolean
-  }
-  interface ImportMeta {
-    readonly env: ImportMetaEnv
-  }
-}
 
 interface GameState {
   world: World
