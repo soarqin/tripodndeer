@@ -2326,7 +2326,7 @@ T0.1 (travel_cost) → T1.1 (Realm) → T2.2 (march) → T3.1 (阶段接线) →
   - Files: `src/ui/components/TopBar/TopBar.tsx`, `src/ui/components/TopBar/TopBar.module.css`, `src/ui/components/TopBar/__tests__/top-bar.test.tsx`, `src/App.tsx`, `src/App.module.css`
   - Pre-commit: `pnpm typecheck && pnpm lint && pnpm test`
 
-- [ ] 3.7 **MapCanvas 军团图标渲染层 + 选中高亮**
+- [x] 3.7 **MapCanvas 军团图标渲染层 + 选中高亮**
 
   **What to do**:
   - 在 `src/rendering/map/MapCanvas.tsx` 加新的 draw 阶段：
@@ -2404,7 +2404,7 @@ T0.1 (travel_cost) → T1.1 (Realm) → T2.2 (march) → T3.1 (阶段接线) →
 
 ### Wave 4 · 端到端验证
 
-- [ ] 4.1 **e2e m1-context-menu.spec.ts**
+- [x] 4.1 **e2e m1-context-menu.spec.ts**
 
   **What to do**:
   - 新建 `e2e/m1-context-menu.spec.ts`
@@ -2469,7 +2469,7 @@ T0.1 (travel_cost) → T1.1 (Realm) → T2.2 (march) → T3.1 (阶段接线) →
   - Files: `e2e/m1-context-menu.spec.ts`
   - Pre-commit: `pnpm typecheck && pnpm test:e2e e2e/m1-context-menu.spec.ts`
 
-- [ ] 4.2 **e2e m1-march-conquest.spec.ts**
+- [x] 4.2 **e2e m1-march-conquest.spec.ts**
 
   **What to do**:
   - 新建 `e2e/m1-march-conquest.spec.ts`
@@ -2524,7 +2524,7 @@ T0.1 (travel_cost) → T1.1 (Realm) → T2.2 (march) → T3.1 (阶段接线) →
   - Files: `e2e/m1-march-conquest.spec.ts`
   - Pre-commit: `pnpm test:e2e e2e/m1-march-conquest.spec.ts`
 
-- [ ] 4.3 **e2e m1-ai-behavior.spec.ts**
+- [x] 4.3 **e2e m1-ai-behavior.spec.ts**
 
   **What to do**:
   - 新建 `e2e/m1-ai-behavior.spec.ts`
@@ -2578,7 +2578,7 @@ T0.1 (travel_cost) → T1.1 (Realm) → T2.2 (march) → T3.1 (阶段接线) →
   - Files: `e2e/m1-ai-behavior.spec.ts`
   - Pre-commit: `pnpm test:e2e e2e/m1-ai-behavior.spec.ts`
 
-- [ ] 4.4 **e2e m1-30min-playthrough + m1-victory（关键交付）**
+- [x] 4.4 **e2e m1-30min-playthrough + m1-victory（关键交付）**
 
   **What to do**:
   - 新建 **两个 spec**：
@@ -2666,19 +2666,19 @@ T0.1 (travel_cost) → T1.1 (Realm) → T2.2 (march) → T3.1 (阶段接线) →
 > **不要**在审查后自动推进。在收到用户明确"okay"前，**绝不**勾选 F1-F4 或宣告"完成"。
 > 拒绝或用户反馈 → 修复 → 重新运行 → 再次呈现 → 等待 okay。
 
-- [ ] F1. **计划合规审计** — `oracle`
+- [x] F1. **计划合规审计** — `oracle`
   逐句通读本计划。对每条 "Must Have"：验证实现存在（read 文件/curl 端点/run 命令）。对每条 "Must NOT Have"：搜索代码库中是否有禁用模式 — 如发现，列出 file:line 拒绝。检查 `.sisyphus/evidence/` 中证据文件齐备。比对交付物与计划。
   输出格式：`Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
-- [ ] F2. **代码质量审查** — `unspecified-high`
+- [x] F2. **代码质量审查** — `unspecified-high`
   运行 `pnpm typecheck` + `pnpm lint` + `pnpm test`。审查所有变更文件：`as any`/`@ts-ignore`、空 catch、生产代码 console.log（事件横幅除外）、注释代码、未使用 import。检测 AI slop：过度注释、过度抽象、泛型命名（data/result/item/temp）。
   输出：`Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
 
-- [ ] F3. **真实手工 QA 执行** — `unspecified-high`（+ `playwright` skill）
+- [x] F3. **真实手工 QA 执行** — `unspecified-high`（+ `playwright` skill）
   从干净状态开始。手工执行**每个任务的每个 QA scenario**——遵循确切步骤、捕获证据。测试跨任务集成（多系统协同，不是孤立）。测试边缘场景：选中军团-切换势力、退却中目标被占、AI 与玩家同 tick 攻击同邑。证据保存到 `.sisyphus/evidence/m1-final-qa/`。
   输出：`Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
 
-- [ ] F4. **范围保真度检查** — `deep`
+- [x] F4. **范围保真度检查** — `deep`
   对每个任务：read "What to do"，read 实际 git diff（git log/diff）。1:1 比对——规范中的全部都被构建了吗（无遗漏）？规范之外的有被构建吗（无蔓延）？检查 "Must NOT do" 合规性。检测跨任务污染：T-N 接触了 T-M 的文件吗？标记未归属变更。
   输出：`Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
 

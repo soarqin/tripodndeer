@@ -198,3 +198,50 @@
 - `src/App.tsx` → `useVictory()` selects `state.world` and runs `isVictorious(world)` (`src/engine/systems/victory/victory.ts`): true iff every `site.ownerId === world.playerRealmId`.
 - The banner element has `data-testid="demo-complete"` and is rendered conditionally — it is genuinely absent from the DOM when not victorious, so `toHaveCount(0)` is the right assertion for the negative case.
 
+## 2026-04-30 T4.2 e2e march/conquest refactor
+- ESLint `max-lines-per-function: 50` can be satisfied by moving long Playwright test bodies into named async helpers, then keeping the `test(...)` callbacks as thin one-liners.
+- Shared wait/evaluate logic is easiest to reuse when extracted into small `Page` helpers (`waitFor...`, `get...`) instead of duplicating inline `page.waitForFunction`/`page.evaluate` blocks.
+
+
+## Screenshot evidence capture (M1 plan)
+
+Date: 2026-04-30
+
+Generated 9 missing screenshot files via a single Playwright spec
+`e2e/m1-screenshots-evidence.spec.ts` that runs sequentially in one
+browser session and captures all 9 PNGs to `.sisyphus/evidence/`:
+
+  - `m1-task-3.1-dev-screen.png`  (initial load)
+  - `m1-task-1.8-bottombar.png`   (same content, evidence file alias)
+  - `m1-task-3.7-visual.png`      (same content, evidence file alias)
+  - `m1-task-3.4-realtime.png`    (after clicking 王宫)
+  - `m1-task-3.2-rightclick.png`  (after openContextMenu via store)
+  - `m1-task-4.2-before.png`      (paused, no menu, army idle)
+  - `m1-task-4.2-after.png`       (post-conquest, ownership flipped)
+  - `m1-task-4.3-map.png`         (10s of 5x ticks, AI activity visible)
+  - `m1-task-3.6-victory.png`     (江山一统 banner)
+
+Key reusable patterns:
+  - The MCP playwright server requires Google Chrome (not installed),
+    but `npx playwright test` works fine with the bundled Chromium.
+  - For state mutations the store uses zustand-immer middleware, so
+    use `store.setState((state) => { state.world = ... })` (NOT object form).
+  - To force a clean second-half (victory arrangement) inside the same
+    test session, call `store.getState().reset()` then
+    `setSpeed('pause')` and re-wait for the world hook before
+    arranging the near-victory fixture.
+
+[2026-04-30T02:10:11.9585927+08:00] F4 scope fidelity check: M1 repository state shows required commits and files present, painting system deleted, forbidden engine patterns absent, phase chain wired aiPlanStep -> orderApplyStep -> marchStep -> combatStep -> victoryCheckStep. Build passed. LSP diagnostics unavailable because typescript-language-server is not installed.
+
+- 2026-04-30 F1 final plan compliance audit passed: Must Have 10/10, Must NOT Have 7/7, Tasks 27/27, Evidence 15/15.
+
+## F3 - Final QA Findings (2026-04-30)
+
+- All 6 manual QA scenarios PASS via Playwright MCP browser automation.
+- All 22 e2e specs PASS (pnpm test:e2e, 7.5m, exit 0).
+- Site key for ownership is ownerId (not `ownerRealmId` as some tasks initially documented). Confirmed in `SiteContextMenu.tsx` and store mutations.
+- Army key is ealmId; armies expose state, destination, 	icksRemaining, source, location, manpower.
+- Victory banner has correct `data-testid=""demo-complete""` and text `江山一统` and is reactive to world mutations (no explicit tick required).
+- Context menu correctly switches between `宣战并进军`, `进军`, `无空闲军团`, `驻军详情（未来功能）` based on relation/war/idle-adjacency state.
+- AI `aggressive_random` is active enough to flip ~18 sites in 5s of 5x play - confirmed AI dispatch + adjacency constraint.
+- Evidence: `.sisyphus/evidence/m1-final-qa/F3-QA-REPORT.md` + 5 screenshots + `e2e-results.txt`.
