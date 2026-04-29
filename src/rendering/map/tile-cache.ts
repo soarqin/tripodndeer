@@ -1,4 +1,4 @@
-import type { Site, Faction, SiteId, FactionId } from '@/shared/types'
+import type { Site, Faction, SiteId, FactionId, MapEdge, EdgeId, Vec2 } from '@/shared/types'
 
 /** 预渲染的 (site, faction) tile — HTMLCanvasElement */
 export type TileCache = ReadonlyMap<SiteId, ReadonlyMap<FactionId, HTMLCanvasElement>>
@@ -7,6 +7,63 @@ const CANVAS_WIDTH = 800
 const CANVAS_HEIGHT = 600
 const BORDER_COLOR = '#1A1A1A'
 const TEXT_COLOR = '#666666'
+
+type Segment =
+  | { kind: 'line'; start: Vec2; end: Vec2 }
+  | { kind: 'bezier'; start: Vec2; c1: Vec2; c2: Vec2; end: Vec2 }
+
+/** Get segments for an edge, respecting reverse direction */
+function getEdgeSegments(edge: MapEdge, reverse: boolean): Segment[] {
+  const anchors = reverse ? [...edge.anchors].reverse() : [...edge.anchors]
+  
+  if (edge.curveType === 'polyline' || !edge.controls) {
+    return anchors.slice(1).map((end, i) => ({
+      kind: 'line' as const,
+      start: anchors[i]!,
+      end,
+    }))
+  }
+  
+  // cubic-bezier: reverse means anchors reversed + controls reversed + each pair C1↔C2 swapped
+  const controls = reverse
+    ? [...edge.controls].reverse().map(([c1, c2]) => [c2, c1] as readonly [Vec2, Vec2])
+    : edge.controls
+  
+  return anchors.slice(1).map((end, i) => ({
+    kind: 'bezier' as const,
+    start: anchors[i]!,
+    c1: controls[i]![0],
+    c2: controls[i]![1],
+    end,
+  }))
+}
+
+/** Build a Path2D from a site's boundary refs + edge table */
+export function buildSitePathFromBoundary(
+  site: Site,
+  edges: ReadonlyMap<EdgeId, MapEdge>,
+): Path2D {
+  const path = new Path2D()
+  let isFirst = true
+  for (const ref of site.boundary) {
+    const edge = edges.get(ref.edge)
+    if (!edge) continue
+    const segments = getEdgeSegments(edge, ref.reverse)
+    for (const seg of segments) {
+      if (isFirst) {
+        path.moveTo(seg.start[0], seg.start[1])
+        isFirst = false
+      }
+      if (seg.kind === 'line') {
+        path.lineTo(seg.end[0], seg.end[1])
+      } else {
+        path.bezierCurveTo(seg.c1[0], seg.c1[1], seg.c2[0], seg.c2[1], seg.end[0], seg.end[1])
+      }
+    }
+  }
+  path.closePath()
+  return path
+}
 
 /** 计算多边形质心 */
 function centroid(polygon: readonly (readonly [number, number])[]): [number, number] {
@@ -44,11 +101,12 @@ function paintSiteTile(
   canvas: HTMLCanvasElement,
   site: Site,
   factionColor: string,
+  edges: ReadonlyMap<EdgeId, MapEdge>,
 ): void {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-  const path = buildSmoothPath(site.polygon)
+  const path = buildSitePathFromBoundary(site, edges)
   ctx.fillStyle = factionColor
   ctx.fill(path)
   ctx.strokeStyle = BORDER_COLOR
@@ -70,6 +128,7 @@ function paintSiteTile(
 export function buildTileCache(
   sites: ReadonlyMap<SiteId, Site>,
   factions: ReadonlyMap<FactionId, Faction>,
+  edges: ReadonlyMap<EdgeId, MapEdge>,
 ): TileCache {
   const cache = new Map<SiteId, Map<FactionId, HTMLCanvasElement>>()
   for (const [siteId, site] of sites) {
@@ -78,7 +137,7 @@ export function buildTileCache(
       const canvas = document.createElement('canvas')
       canvas.width = CANVAS_WIDTH
       canvas.height = CANVAS_HEIGHT
-      paintSiteTile(canvas, site, faction.color)
+      paintSiteTile(canvas, site, faction.color, edges)
       siteCache.set(factionId, canvas)
     }
     cache.set(siteId, siteCache)

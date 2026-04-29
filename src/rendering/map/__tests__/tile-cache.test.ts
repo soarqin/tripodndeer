@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { buildTileCache, buildSmoothPath } from '../tile-cache'
-import type { Site, Faction } from '@/shared/types'
+import { buildTileCache, buildSmoothPath, buildSitePathFromBoundary } from '../tile-cache'
+import type { Site, Faction, MapEdge } from '@/shared/types'
 
 // jsdom 的 canvas 不支持 getContext('2d') — 需要 mock
 class MockPath2D {
   moveTo = vi.fn()
+  lineTo = vi.fn()
   quadraticCurveTo = vi.fn()
+  bezierCurveTo = vi.fn()
   closePath = vi.fn()
 }
 global.Path2D = MockPath2D as unknown as typeof Path2D
@@ -17,7 +19,9 @@ beforeEach(() => {
     stroke: vi.fn(),
     fillText: vi.fn(),
     quadraticCurveTo: vi.fn(),
+    bezierCurveTo: vi.fn(),
     moveTo: vi.fn(),
+    lineTo: vi.fn(),
     closePath: vi.fn(),
     fillStyle: '',
     strokeStyle: '',
@@ -48,9 +52,13 @@ function makeFactions(): ReadonlyMap<string, Faction> {
   ])
 }
 
+function makeEdges(): ReadonlyMap<string, MapEdge> {
+  return new Map()
+}
+
 describe('buildTileCache', () => {
   it('creates 5 × 2 = 10 canvas tiles', () => {
-    const cache = buildTileCache(makeSites(), makeFactions())
+    const cache = buildTileCache(makeSites(), makeFactions(), makeEdges())
     expect(cache.size).toBe(5)
     for (const [, siteCache] of cache) {
       expect(siteCache.size).toBe(2)
@@ -58,7 +66,7 @@ describe('buildTileCache', () => {
   })
 
   it('each canvas has correct dimensions (800×600)', () => {
-    const cache = buildTileCache(makeSites(), makeFactions())
+    const cache = buildTileCache(makeSites(), makeFactions(), makeEdges())
     for (const [, siteCache] of cache) {
       for (const [, canvas] of siteCache) {
         expect(canvas.width).toBe(800)
@@ -70,7 +78,7 @@ describe('buildTileCache', () => {
   it('calls fill() for each tile (canvas drawing happens)', () => {
     const getContextMock = vi.mocked(HTMLCanvasElement.prototype.getContext)
     const mockCtx = getContextMock.mock.results[0]?.value || getContextMock('2d')
-    buildTileCache(makeSites(), makeFactions())
+    buildTileCache(makeSites(), makeFactions(), makeEdges())
     // 5 sites × 2 factions = 10 tiles, each calls fill once
     expect((mockCtx as { fill: ReturnType<typeof vi.fn> }).fill).toHaveBeenCalledTimes(10)
   })
@@ -88,5 +96,60 @@ describe('buildSmoothPath', () => {
     ]
     const path = buildSmoothPath(poly)
     expect(path).toBeInstanceOf(Path2D)
+  })
+})
+
+describe('buildSitePathFromBoundary', () => {
+  it('builds path with lineTo for polyline edges', () => {
+    const edges = new Map<string, MapEdge>([
+      ['e1', { id: 'e1', curveType: 'polyline', anchors: [[0, 0], [100, 0]] }],
+    ])
+    const site: Site = {
+      id: 's1', name: 's1', position: [50, 50],
+      boundary: [{ edge: 'e1', reverse: false }],
+      polygon: [], adjacency: [], ownerId: null,
+    }
+    const path = buildSitePathFromBoundary(site, edges) as unknown as MockPath2D
+    expect(path.moveTo).toHaveBeenCalledWith(0, 0)
+    expect(path.lineTo).toHaveBeenCalledWith(100, 0)
+  })
+
+  it('builds path with bezierCurveTo for cubic-bezier edges', () => {
+    const edges = new Map<string, MapEdge>([
+      ['e1', {
+        id: 'e1', curveType: 'cubic-bezier',
+        anchors: [[0, 0], [100, 0]],
+        controls: [[[25, 25], [75, -25]]],
+      }],
+    ])
+    const site: Site = {
+      id: 's1', name: 's1', position: [50, 50],
+      boundary: [{ edge: 'e1', reverse: false }],
+      polygon: [], adjacency: [], ownerId: null,
+    }
+    const path = buildSitePathFromBoundary(site, edges) as unknown as MockPath2D
+    expect(path.moveTo).toHaveBeenCalledWith(0, 0)
+    expect(path.bezierCurveTo).toHaveBeenCalledWith(25, 25, 75, -25, 100, 0)
+  })
+})
+
+describe('buildSitePathFromBoundary reverse', () => {
+  it('reverses bezier controls correctly', () => {
+    const edges = new Map<string, MapEdge>([
+      ['e1', {
+        id: 'e1', curveType: 'cubic-bezier',
+        anchors: [[0, 0], [100, 0]],
+        controls: [[[25, 25], [75, -25]]],
+      }],
+    ])
+    const site: Site = {
+      id: 's1', name: 's1', position: [50, 50],
+      boundary: [{ edge: 'e1', reverse: true }],
+      polygon: [], adjacency: [], ownerId: null,
+    }
+    const path = buildSitePathFromBoundary(site, edges) as unknown as MockPath2D
+    expect(path.moveTo).toHaveBeenCalledWith(100, 0)
+    // When reversed, C1 and C2 are swapped, and the order of segments is reversed
+    expect(path.bezierCurveTo).toHaveBeenCalledWith(75, -25, 25, 25, 0, 0)
   })
 })

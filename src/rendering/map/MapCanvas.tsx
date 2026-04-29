@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useCallback, useMemo } from 'react'
-import { useSites, useFactions } from '@/ui/store/selectors'
+import { useSites, useFactions, useEdges } from '@/ui/store/selectors'
 import type { Site } from '@/shared/types'
 import { buildTileCache } from './tile-cache'
 
@@ -110,9 +110,10 @@ export function MapCanvas(): React.JSX.Element {
   const transitionsRef = useRef<TransitionMap>(new Map())
   const sites = useSites()
   const factions = useFactions()
+  const edges = useEdges()
 
   // Build tile cache once (or when sites/factions change — rare)
-  const tileCache = useMemo(() => buildTileCache(sites, factions), [sites, factions])
+  const tileCache = useMemo(() => buildTileCache(sites, factions, edges), [sites, factions, edges])
 
   useSiteTransitions(sites, transitionsRef)
 

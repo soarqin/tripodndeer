@@ -93,11 +93,17 @@ export function createInitialWorld(data: M0Data, seed: number): World {
     sites.set(rawSite.id, site)
   }
 
+  const edgesMap = new Map<EdgeId, MapEdge>()
+  for (const [id, edge] of Object.entries(data.edges)) {
+    edgesMap.set(id, edge)
+  }
+
   return {
     date: { ...INITIAL_DATE },
     tick: 0,
     sites,
     factions,
+    edges: edgesMap,
     rngState: { seed, counter: 0 },
     phases: [paintingStep],
   }

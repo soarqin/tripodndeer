@@ -1,7 +1,9 @@
 import type {
+  EdgeId,
   Faction,
   FactionId,
   GameDate,
+  MapEdge,
   Site,
   SiteId,
   SpeedTier,
@@ -32,4 +34,8 @@ export function useSites(): ReadonlyMap<SiteId, Site> {
 
 export function useFactions(): ReadonlyMap<FactionId, Faction> {
   return useGameStore((s) => s.world.factions)
+}
+
+export function useEdges(): ReadonlyMap<EdgeId, MapEdge> {
+  return useGameStore((s) => s.world.edges)
 }

@@ -6,6 +6,7 @@ import { MapCanvas } from '../MapCanvas'
 vi.mock('@/ui/store/selectors', () => ({
   useSites: () => new Map(),
   useFactions: () => new Map(),
+  useEdges: () => new Map(),
 }))
 
 // Mock tile-cache to avoid real canvas operations

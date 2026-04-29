@@ -35,6 +35,7 @@ function makeWorld(
     tick: 0,
     sites,
     factions,
+    edges: new Map(),
     rngState: { seed: 42, counter: 0 },
     phases: [],
   }

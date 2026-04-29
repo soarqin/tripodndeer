@@ -9,6 +9,7 @@ function makeTestWorld(): World {
     tick: 0,
     sites: new Map(),
     factions: new Map(),
+    edges: new Map(),
     rngState: { seed: 42, counter: 0 },
     phases: [],
   }
