@@ -92,3 +92,8 @@
 - 2026-04-29: UI store can stay serializable while holding ephemeral UI state (`selectedArmyId`, `contextMenu`, `activePanel`, `transientBanner`) alongside world data.
 - 2026-04-29: `issueOrder` must replace `world.pendingOrders` immutably; spreading the world and appending to the readonly array was sufficient.
 - 2026-04-29: Selector tests are easier to keep stable when using synthetic store state for realm-specific selectors instead of depending on fixture-specific realm ids.
+
+## T2.1 combat system
+- Combat resolution is deterministic: defender manpower gets ceil(1.3x), attacker wins only on strict greater-than.
+- combatStep clones world maps before applying combat results and returns the original RNG because M1 combat has no randomness.
+- ESLint max-lines-per-function applies to test describe callbacks, so table cases should live at module scope or be split across describes.
