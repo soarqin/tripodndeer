@@ -1,0 +1,45 @@
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { BottomBar } from '../BottomBar'
+
+describe('BottomBar', () => {
+  it('renders 8 buttons', () => {
+    render(<BottomBar />)
+    const buttons = screen.getAllByRole('button')
+    expect(buttons).toHaveLength(8)
+  })
+
+  it('only 2 buttons are enabled (not disabled)', () => {
+    render(<BottomBar />)
+    const buttons = screen.getAllByRole('button')
+    const enabledButtons = buttons.filter(btn => !(btn as HTMLButtonElement).disabled)
+    expect(enabledButtons).toHaveLength(2)
+    expect(enabledButtons[0]?.textContent).toBe('王宫')
+    expect(enabledButtons[1]?.textContent).toBe('军事')
+  })
+
+  it('disabled buttons have aria-disabled="true"', () => {
+    render(<BottomBar />)
+    const disabledButtons = screen.getAllByRole('button').filter(btn => (btn as HTMLButtonElement).disabled)
+    expect(disabledButtons).toHaveLength(6)
+    disabledButtons.forEach(btn => {
+      expect(btn.getAttribute('aria-disabled')).toBe('true')
+    })
+  })
+
+  it('clicking 王宫 calls the onWanggong callback', () => {
+    const onWanggong = vi.fn()
+    render(<BottomBar onWanggong={onWanggong} />)
+    const wanggongBtn = screen.getByTestId('bottom-bar-wanggong')
+    fireEvent.click(wanggongBtn)
+    expect(onWanggong).toHaveBeenCalledTimes(1)
+  })
+
+  it('clicking 军事 calls the onJunshi callback', () => {
+    const onJunshi = vi.fn()
+    render(<BottomBar onJunshi={onJunshi} />)
+    const junshiBtn = screen.getByTestId('bottom-bar-junshi')
+    fireEvent.click(junshiBtn)
+    expect(onJunshi).toHaveBeenCalledTimes(1)
+  })
+})

@@ -1,0 +1,14 @@
+
+> tripodndeer@ test C:\Projects\tripodndeer
+> vitest run "src/ui/components/BottomBar"
+
+
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90mC:/Projects/tripodndeer[39m
+
+ [32m✓[39m src/ui/components/BottomBar/__tests__/bottom-bar.test.tsx [2m ([22m[2m5 tests[22m[2m)[22m[90m 102[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m   Start at [22m 22:20:08
+[2m   Duration [22m 1.30s[2m (transform 76ms, setup 1ms, collect 229ms, tests 102ms, environment 547ms, prepare 156ms)[22m
+

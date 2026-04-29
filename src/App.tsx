@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { TopBar } from '@/ui/components/TopBar'
 import { MapCanvas } from '@/rendering/map'
 import { TimeControlBar } from '@/ui/components/TimeControlBar'
+import { BottomBar } from '@/ui/components/BottomBar'
 import { useRafDriver } from '@/ui/store/raf-driver'
 import { useSites, useRealms } from '@/ui/store/selectors'
 import styles from './App.module.css'
@@ -38,6 +39,10 @@ export function App(): React.JSX.Element {
           </div>
         )}
       </div>
+      <BottomBar 
+        onWanggong={() => console.log('王宫 clicked')}
+        onJunshi={() => console.log('军事 clicked')}
+      />
       <TimeControlBar />
     </div>
   )
