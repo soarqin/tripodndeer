@@ -55,5 +55,9 @@
 
 ## 2026-04-29 T1.4 painting deletion
 - src/engine/systems/painting/ was removed entirely; keep engine phase constants in src/engine/phases/index.ts only.
+
+## 2026-04-29 T1.7 wars module
+- `warKey` stays a simple sorted string join, which keeps war lookups symmetric without extra hashing.
+- `declareWar` must clone the incoming `ReadonlyMap`; the tests now cover symmetry, idempotence, and immutability.
 - Immer MapSet support still needs to be initialized from a live engine module; nableMapSet() now lives in src/engine/clock/clock.ts after the painting system removal.
 

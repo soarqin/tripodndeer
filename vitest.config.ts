@@ -6,11 +6,11 @@ const rootDir = fileURLToPath(new URL('.', import.meta.url))
 
 export default defineConfig({
   resolve: {
-    alias: { '@': resolve(rootDir, 'src') },
+    alias: { '@': resolve(rootDir, 'src'), '~': resolve(rootDir, 'src') },
   },
   test: {
     globals: true,
-    alias: { '@': resolve(rootDir, 'src') },
+    alias: { '@': resolve(rootDir, 'src'), '~': resolve(rootDir, 'src') },
     environmentMatchGlobs: [
       ['src/ui/**', 'jsdom'],
       ['src/rendering/**', 'jsdom'],

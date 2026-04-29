@@ -65,3 +65,7 @@
 - Phase name/order constants live in src/engine/phases/index.ts as static data only; no phase logic belongs there yet.
 - createInitialWorld() now initializes with an empty phases array until the real phase chain is wired in later.
 
+## 2026-04-29 T1.7 wars module
+- `wars` lives in the engine layer, not shared, because it is runtime game state rather than a generic primitive.
+- Added `~/*` path alias support alongside the existing `@/*` mapping so the new engine module can use the documented import style and still typecheck.
+
