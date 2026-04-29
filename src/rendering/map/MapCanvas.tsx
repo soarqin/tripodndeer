@@ -4,6 +4,7 @@ import { useGameStore } from '@/ui/store/game-store'
 import type { Site, Vec2 } from '@/shared/types'
 import { buildTileCache } from './tile-cache'
 import { findHitSite } from './hit-test'
+import { drawArmies } from './army-render'
 
 const CANVAS_WIDTH = 800
 const CANVAS_HEIGHT = 600
@@ -186,6 +187,8 @@ export function MapCanvas(): React.JSX.Element {
   const sites = useSites()
   const realms = useRealms()
   const edges = useEdges()
+  const armies = useGameStore(s => s.world.armies)
+  const selectedArmyId = useGameStore(s => s.selectedArmyId)
 
   // Build tile cache once (or when sites/realms change — rare)
   const tileCache = useMemo(() => buildTileCache(sites, realms, edges), [sites, realms, edges])
@@ -198,7 +201,8 @@ export function MapCanvas(): React.JSX.Element {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
     drawMap(ctx, sites, tileCache, transitionsRef.current, performance.now())
-  }, [sites, tileCache])
+    drawArmies(ctx, armies, sites, realms, selectedArmyId)
+  }, [sites, tileCache, armies, realms, selectedArmyId])
 
   useCanvasAnimation(draw, transitionsRef)
 

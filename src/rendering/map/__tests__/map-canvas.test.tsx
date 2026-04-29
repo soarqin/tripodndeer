@@ -49,17 +49,19 @@ vi.mock('@/ui/store/selectors', () => ({
 }))
 
 // Mock game-store with getState returning fake actions + world slice.
-vi.mock('@/ui/store/game-store', () => ({
-  useGameStore: {
-    getState: () => ({
-      selectArmy: mockSelectArmy,
-      clearSelection: mockClearSelection,
-      openContextMenu: mockOpenContextMenu,
-      playerRealmId: 'realm_qin',
-      world: { armies: mockArmies },
-    }),
-  },
-}))
+vi.mock('@/ui/store/game-store', () => {
+  const storeState = {
+    selectArmy: mockSelectArmy,
+    clearSelection: mockClearSelection,
+    openContextMenu: mockOpenContextMenu,
+    playerRealmId: 'realm_qin',
+    world: { armies: mockArmies },
+    selectedArmyId: null,
+  }
+  const useGameStore = vi.fn((selector) => selector(storeState))
+  Object.assign(useGameStore, { getState: () => storeState })
+  return { useGameStore }
+})
 
 // Mock tile-cache to avoid real canvas operations
 vi.mock('../tile-cache', () => ({
@@ -76,7 +78,19 @@ beforeEach(() => {
     fillRect: vi.fn(),
     drawImage: vi.fn(),
     clearRect: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    beginPath: vi.fn(),
+    arc: vi.fn(),
+    fill: vi.fn(),
+    stroke: vi.fn(),
+    fillText: vi.fn(),
     fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 0,
+    font: '',
+    textAlign: '',
+    textBaseline: '',
     globalAlpha: 1,
   }
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(

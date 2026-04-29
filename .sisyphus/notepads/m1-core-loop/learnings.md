@@ -125,3 +125,4 @@
 - `createWorldFromM1Data` now owns the M1 runtime phase chain: aiPlan -> orderApply -> march -> combat -> victoryCheck.
 - UI initial state is wired through `loadM1Data()` + `createWorldFromM1Data(..., 'realm_qin')`; app entry remains a pure React mount while the store creates the world.
 - `TickPhase` accepts readonly event arrays because all current phase implementations return readonly events.
+- EventBanner component created with auto-hide functionality using setTimeout and clearBanner action.

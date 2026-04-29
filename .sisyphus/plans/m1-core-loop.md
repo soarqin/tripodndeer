@@ -1940,7 +1940,7 @@ T0.1 (travel_cost) → T1.1 (Realm) → T2.2 (march) → T3.1 (阶段接线) →
   - Files: `src/engine/world/factory.ts`, `src/engine/clock/clock.ts`（如改）, `src/main.tsx`, `src/engine/world/__tests__/factory.test.ts`, `src/engine/clock/__tests__/clock.test.ts`
   - Pre-commit: `pnpm typecheck && pnpm lint && pnpm test`
 
-- [ ] 3.2 **SiteContextMenu 右键菜单组件**
+- [x] 3.2 **SiteContextMenu 右键菜单组件**
 
   **What to do**:
   - 新建 `src/ui/components/SiteContextMenu/`：index.ts + SiteContextMenu.tsx + module.css + __tests__/
@@ -2178,7 +2178,7 @@ T0.1 (travel_cost) → T1.1 (Realm) → T2.2 (march) → T3.1 (阶段接线) →
   - Files: `src/ui/components/RealmOverviewPanel/`
   - Pre-commit: `pnpm typecheck && pnpm lint && pnpm test src/ui`
 
-- [ ] 3.5 **EventBanner 极简事件横幅**
+- [x] 3.5 **EventBanner 极简事件横幅**
 
   **What to do**:
   - 新建 `src/ui/components/EventBanner/`
