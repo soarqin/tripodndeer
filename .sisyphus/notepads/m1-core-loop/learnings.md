@@ -61,3 +61,14 @@
 - `declareWar` must clone the incoming `ReadonlyMap`; the tests now cover symmetry, idempotence, and immutability.
 - Immer MapSet support still needs to be initialized from a live engine module; nableMapSet() now lives in src/engine/clock/clock.ts after the painting system removal.
 
+
+## T1.5 - M1 map generator (algorithmic, 50 sites, 8 realms)
+
+- M1 generator extends M0 algorithm: same Voronoi+Lloyd relaxation pipeline, but with N_SITES=50, N_REALMS=8, seed 0xc0ffee, travel_cost divisor /80 (vs /100 in M0), and tighter padding (60px vs 100/120 in M0) so the bigger site count fits without clustering at the borders.
+- Realm assignment uses pure geographic partition by centroid quadrant: Qin(x<0.35W), Chu(y>0.65H), Yan(y<0.25H), Qi(x>0.65W); central remainder split among Zhou (1-2 sites at canvas centre) + Han/Zhao/Wei by sub-region.
+- Rebalance pass guarantees every major realm has >=5 sites and Zhou has >=1 by transferring the geographically nearest site from the largest donor realm. Caps at 50 iterations as a hard safety; with seed 0xc0ffee the partition naturally satisfies all minima on the first pass.
+- BFS connectivity verified by walking the shared-edge graph; with Lloyd relaxation it always passes for this seed, but the generator retries with seed+1 up to 32 times as defense in depth.
+- Output JSON shape differs from M0: top-level initialArmies and initialWars are EMPTY arrays; armies live on each realm.initialArmies (2 ArmyTemplate per realm with 5000 manpower at capital and second-owned site).
+- Sites get placeholder names matching their id (site_001..site_050) — historical names are T1.6's job.
+- ESLint max-lines-per-function=50 (warn, but --max-warnings 0 makes it block). Split assignRealms into partitionByQuadrant + distributeCentral helpers, and split the test describe block into 6 smaller describes to stay under limit.
+
