@@ -136,3 +136,25 @@
 - ESLint cap is `max-lines-per-function: 50` - keep `page.evaluate` callbacks small; large describe blocks must be split into multiple `test.describe` to stay under the limit.
 - War declaration in tests: mutate `state.world.wars` via `store.setState` with a new `Map` and `state.world = { ...state.world, wars: newWars }` (matching how engine actions reassign world). Adding a war key follows `[a,b].sort().join(':')`.
 - 7 testid-based assertions (`site-context-menu`, `menu-march`, `menu-declare-war`, `menu-army-{id}`) cover all 4 menu states (own / unreachable / declare / march) plus visibility, close-on-outside-click, and bottom-bar sanity. 3x consecutive green runs confirms no flakiness.
+
+## T4.2 (e2e M1 March + Conquest) — 2026-04-30
+
+**Pattern reused from T4.1 (m1-context-menu.spec.ts):**
+- Drive store via dev hook: `window.__game = { store: useGameStore, world: () => state.world }`
+- `world.playerRealmId` lives on World (types.ts L132), not on store state
+- Discover site/army IDs at runtime, never hardcode
+- Wait gate: `[data-testid="bottom-bar-wanggong"]` + `__game.world().sites.size > 0`
+
+**Conquest determinism trick:**
+- Combat formula: defenderEffective = ceil(defender * 1.3), attacker wins iff strictly greater
+- 5000 vs 5000 → defender wins (5000 < 6500). To make a 5x-speed e2e green:
+  → target an UNDEFENDED enemy site (no enemy army at that site) → resolveCombat short-circuits to attacker-wins-with-0-losses
+- Helper: `findUndefendedAdjacentTarget` filters `armies.some(a => a.location === adjId && a.realmId === adjSite.ownerId)`
+
+**Timing trap (caused first run to fail):**
+- At 5x (400ms/tick) + travel_cost=1, the 'marching' state window is one tick wide.
+- `waitForFunction(() => state === 'marching' || state === 'idle')` is **always true** since armies start idle → returns immediately, before any tick processed.
+- Fix: predicate must compare against initial conditions, e.g. `state === 'marching' || army.location !== sourceSiteId`.
+
+**Test scripts:**
+- `pnpm test:e2e e2e/m1-march-conquest.spec.ts` — webServer auto-starts `pnpm dev` (playwright.config.ts L22-27)
