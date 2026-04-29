@@ -66,3 +66,25 @@
 - Enforce engine purity in two layers: ESLint rules for import/global bans plus Vitest scans for filesystem/package checks.
 - Keep the default Vitest environment as `node`, with `jsdom` only for `src/ui/**` and `src/rendering/**`.
 - Use `@types/node` rather than local ad-hoc shims so Node-based tests typecheck cleanly.
+
+### 2026-04-29 Task: T8 world factory
+- Keep `sites.json` as a static module import and validate it through `M0DataSchema.parse()` instead of fetching at runtime.
+- Enforce `initialOwnership` references in the factory, not the schema, because schema typing alone cannot verify faction existence.
+
+### 2026-04-29 Task: T9 Zustand store bridge
+
+- Chose to keep `immer` middleware (per spec) and use `castDraft` from immer to bypass `WritableDraft` for whole-field replacements (`World`, `events`). Alternative was dropping `immer` and using object-return `set`; rejected because spec mandates immer and future actions may want partial draft mutations.
+- Selectors return raw fields with strict-equality; `useShallow`/custom equality reserved for future composite selectors when components need multiple fields in one render.
+- Did not introduce `src/vite-env.d.ts`; instead inlined minimal `ImportMeta`/`ImportMetaEnv` augmentation in `game-store.ts` to keep the deliverable scope tight. If more files need `import.meta.env.DEV` later, promote the augmentation to a shared `vite-env.d.ts`.
+- RAF id stored in a closure ref (`let rafId`) inside `useEffect`, NOT in Zustand state, so transient driver state never triggers store subscribers.
+
+### 2026-04-29 Task: T14 app wiring
+
+- Kept the final composition minimal: `TopBar` + `MapCanvas` + `TimeControlBar`, with layout handled in `App.module.css` only.
+- Chose `src/index.css` for the reset rather than touching `index.html`, since importing it from `main.tsx` keeps the entry self-contained.
+- Demo completion overlay is purely presentational and depends only on `useSites`/`useFactions`, avoiding any extra store state or routing.
+
+### 2026-04-29 Task: M0.2-T2 edge-indexed content
+
+- Chose canonical endpoint ordering as the stable source of truth for edge ids, reverse flags, and deterministic shared-edge perturbation.
+- Boundary/canvas-frame edges remain `polyline`; only edges referenced by two cells become perturbed `cubic-bezier` edges.

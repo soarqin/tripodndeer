@@ -38,6 +38,7 @@ interface GameActions {
   setActivePanel: (panel: 'wanggong' | 'junshi' | null) => void
   issueOrder: (order: Order) => void
   showBanner: (text: string) => void
+  clearBanner: () => void
 }
 
 type GameStore = GameState & GameActions
@@ -106,7 +107,7 @@ function createUiActions(
   }
 }
 
-function createWorldActions(set: StoreSet): Pick<GameActions, 'issueOrder' | 'showBanner'> {
+function createWorldActions(set: StoreSet): Pick<GameActions, 'issueOrder' | 'showBanner' | 'clearBanner'> {
   return {
     issueOrder: (order: Order) =>
       set((state) => {
@@ -121,6 +122,10 @@ function createWorldActions(set: StoreSet): Pick<GameActions, 'issueOrder' | 'sh
           text,
           createdAt: state.world.tick,
         }
+      }),
+    clearBanner: () =>
+      set((state) => {
+        state.transientBanner = null
       }),
   }
 }

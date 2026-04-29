@@ -5,6 +5,7 @@ import { TimeControlBar } from '@/ui/components/TimeControlBar'
 import { BottomBar } from '@/ui/components/BottomBar'
 import { ArmyListPanel } from '@/ui/components/ArmyListPanel'
 import { RealmOverviewPanel } from '@/ui/components/RealmOverviewPanel'
+import { EventBanner } from '@/ui/components/EventBanner'
 import { useRafDriver } from '@/ui/store/raf-driver'
 import { useGameStore } from '@/ui/store/game-store'
 import { isVictorious } from '@/engine/systems/victory'
@@ -22,6 +23,7 @@ export function App(): React.JSX.Element {
   return (
     <div className={styles.app}>
       <TopBar />
+      <EventBanner />
       <div className={styles.mapContainer}>
         <MapCanvas />
         <RealmOverviewPanel />

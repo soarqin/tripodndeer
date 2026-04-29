@@ -1,0 +1,1 @@
+Successfully updated tile-cache to render edge-indexed paths using cubic bezierCurveTo. Updated MapCanvas to pass edges to buildTileCache. Added useEdges selector. Updated World type to include edges and populated it in factory.ts. Added tests for bezierCurveTo and reverse.
