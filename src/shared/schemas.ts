@@ -85,4 +85,36 @@ export const M0DataSchema = z.object({
   initialOwnership: z.record(z.string(), RealmIdSchema),
 })
 
+// M1 Data Schema (for scenario.json validation)
+export const M1DataSchema = z.object({
+  edges: z.record(z.string(), MapEdgeSchema),
+  sites: z.array(RawSiteSchema),
+  realms: z.array(RealmSchema),
+  initialOwnership: z.record(z.string(), z.string()),
+  initialArmies: z.array(ArmySchema),
+  initialWars: z.array(z.object({ a: z.string(), b: z.string() })),
+})
+
+export type M1Data = z.infer<typeof M1DataSchema>
+
+// World Schema (for runtime World validation)
+export const WorldSchema = z.object({
+  date: z.object({
+    yearBC: z.number().int(),
+    season: z.enum(['spring', 'summer', 'autumn', 'winter']),
+    month: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+    xun: z.enum(['shang', 'zhong', 'xia']),
+  }),
+  tick: z.number().int().nonnegative(),
+  sites: z.instanceof(Map),
+  realms: z.instanceof(Map),
+  armies: z.instanceof(Map),
+  edges: z.instanceof(Map),
+  wars: z.instanceof(Map),
+  playerRealmId: z.string(),
+  rngState: z.object({ seed: z.number(), counter: z.number() }),
+  phases: z.array(z.function()),
+  pendingOrders: z.array(z.any()),
+})
+
 export type M0DataSchemaType = z.infer<typeof M0DataSchema>

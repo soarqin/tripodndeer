@@ -126,9 +126,13 @@ export interface World {
   tick: number
   sites: ReadonlyMap<SiteId, Site>
   realms: ReadonlyMap<RealmId, Realm>
+  armies: ReadonlyMap<ArmyId, Army>
   edges: ReadonlyMap<EdgeId, MapEdge>
+  wars: ReadonlyMap<WarKey, true>
+  playerRealmId: RealmId
   rngState: RNGState // PRNG 状态在 World，不在 module 闭包
   phases: readonly TickPhase[] // Tick 阶段数组（M0 仅 1 个，但形状必须是数组）
+  pendingOrders: readonly Order[]
 }
 
 // M0 数据文件结构（用于 factory 接收参数类型）

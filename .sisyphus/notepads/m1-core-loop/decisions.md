@@ -69,3 +69,8 @@
 - `wars` lives in the engine layer, not shared, because it is runtime game state rather than a generic primitive.
 - Added `~/*` path alias support alongside the existing `@/*` mapping so the new engine module can use the documented import style and still typecheck.
 
+## 2026-04-29 T1.3 schema + world factory
+- Kept `M0DataSchema` and `M1DataSchema` distinct instead of trying to unify the scenario JSON shapes.
+- `createInitialWorld()` now returns the expanded `World` shape with empty runtime collections so legacy tests keep working.
+- `createWorldFromM1Data()` uses fixed opening date `260 BC / spring / 1 / shang` and empty initial wars, matching the committed M1 scenario format.
+

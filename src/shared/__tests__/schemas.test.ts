@@ -3,8 +3,10 @@ import {
   ArmySchema,
   ArmyStateSchema,
   M0DataSchema,
+  M1DataSchema,
   MapEdgeSchema,
   OrderSchema,
+  WorldSchema,
 } from '../schemas'
 
 const validPolylineEdge = {
@@ -124,6 +126,72 @@ describe('M0DataSchema invalid', () => {
   it('rejects wrong types', () => {
     const bad = { ...validData, edges: 'not-an-object' }
     expect(() => M0DataSchema.parse(bad)).toThrow()
+  })
+})
+
+describe('M1DataSchema valid', () => {
+  const validM1Data = {
+    edges: validData.edges,
+    sites: validData.sites,
+    realms: [
+      validRealm,
+      { ...validRealm, id: 'realm_blue', displayName: '蓝', fullTitle: '蓝方', color: '#2563eb' },
+    ],
+    initialOwnership: { site_1: 'realm_red' },
+    initialArmies: [],
+    initialWars: [],
+  }
+
+  it('accepts valid M1 data', () => {
+    expect(() => M1DataSchema.parse(validM1Data)).not.toThrow()
+  })
+
+  it('accepts empty initialWars', () => {
+    const result = M1DataSchema.parse(validM1Data)
+    expect(result.initialWars).toEqual([])
+  })
+
+  it('accepts empty initialArmies', () => {
+    const result = M1DataSchema.parse(validM1Data)
+    expect(result.initialArmies).toEqual([])
+  })
+
+  it('rejects missing realms field', () => {
+    const bad = { ...validM1Data }
+    delete bad.realms
+    expect(() => M1DataSchema.parse(bad)).toThrow()
+  })
+
+  it('rejects invalid edge without travel_cost', () => {
+    const bad = {
+      ...validM1Data,
+      edges: {
+        ...validM1Data.edges,
+        e_001: { ...validPolylineEdge, travel_cost: undefined },
+      },
+    }
+    expect(() => M1DataSchema.parse(bad)).toThrow()
+  })
+})
+
+describe('WorldSchema', () => {
+  it('accepts a runtime world shape', () => {
+    expect(
+      () =>
+        WorldSchema.parse({
+          date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
+          tick: 0,
+          sites: new Map(),
+          realms: new Map(),
+          armies: new Map(),
+          edges: new Map(),
+          wars: new Map(),
+          playerRealmId: 'realm_red',
+          rngState: { seed: 1, counter: 0 },
+          phases: [],
+          pendingOrders: [],
+        }),
+    ).not.toThrow()
   })
 })
 

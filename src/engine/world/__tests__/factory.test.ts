@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createInitialWorld, loadM0Data } from '../factory'
+import { createInitialWorld, createWorldFromM1Data, loadM0Data, loadM1Data } from '../factory'
 
 describe('loadM0Data', () => {
   it('loads and validates m0 data with edges', () => {
@@ -68,5 +68,31 @@ describe('createInitialWorld — error paths', () => {
       ),
     }
     expect(() => createInitialWorld(bad, 42)).toThrow(/Unknown edge/)
+  })
+})
+
+describe('createWorldFromM1Data — structure', () => {
+  it('creates world with correct M1 structure', () => {
+    const data = loadM1Data()
+    const world = createWorldFromM1Data(data, 99, 'realm_qin')
+
+    expect(world.realms.size).toBe(8)
+    expect(world.armies.size).toBe(16)
+    expect(world.wars.size).toBe(0)
+    expect(world.playerRealmId).toBe('realm_qin')
+    expect(world.tick).toBe(0)
+    expect(world.date).toEqual({ yearBC: 260, season: 'spring', month: 1, xun: 'shang' })
+  })
+
+  it('builds populated sites and edges', () => {
+    const data = loadM1Data()
+    const world = createWorldFromM1Data(data, 99, 'realm_qin')
+
+    expect(world.sites.size).toBeGreaterThan(0)
+    expect(world.edges.size).toBeGreaterThan(0)
+    for (const [, site] of world.sites) {
+      expect(site.polygon.length).toBeGreaterThan(3)
+      expect(Array.isArray(site.adjacency)).toBe(true)
+    }
   })
 })

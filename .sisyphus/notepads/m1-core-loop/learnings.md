@@ -72,3 +72,8 @@
 - Sites get placeholder names matching their id (site_001..site_050) — historical names are T1.6's job.
 - ESLint max-lines-per-function=50 (warn, but --max-warnings 0 makes it block). Split assignRealms into partitionByQuadrant + distributeCentral helpers, and split the test describe block into 6 smaller describes to stay under limit.
 
+## 2026-04-29 T1.3 schema + factory wiring
+- M1 validation stayed intentionally separate from M0: `M1DataSchema` accepts top-level `initialWars`/`initialArmies`, while runtime armies still hydrate from realm-local `initialArmies` templates.
+- Shared world-building helpers (`buildRealmMap`, `buildSites`, `buildEdgesMap`) kept M0 and M1 factories aligned without changing the M0 call site.
+- `World` now always carries `armies`, `wars`, `playerRealmId`, and `pendingOrders`, even for M0, so the runtime shape is uniform.
+

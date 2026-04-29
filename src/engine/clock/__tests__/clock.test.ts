@@ -9,9 +9,13 @@ function makeTestWorld(): World {
     tick: 0,
     sites: new Map(),
     realms: new Map(),
+    armies: new Map(),
     edges: new Map(),
+    wars: new Map(),
+    playerRealmId: 'realm_red',
     rngState: { seed: 42, counter: 0 },
     phases: [],
+    pendingOrders: [],
   }
 }
 

@@ -50,3 +50,6 @@
 ## 2026-04-29 T1.4 gotcha
 - Removing paintingStep also removed the only nableMapSet() call, which broke store tests until MapSet initialization was moved to src/engine/clock/clock.ts.
 
+## 2026-04-29 T1.3 verification gotchas
+- `typescript-language-server` is still unavailable here, so `lsp_diagnostics` could not be used; typecheck/lint/vitest were the fallback proof.
+- The widened `World` interface required updating older test fixtures (e.g. clock tests) to include `armies`, `wars`, `playerRealmId`, and `pendingOrders`.
