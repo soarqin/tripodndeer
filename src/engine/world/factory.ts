@@ -25,7 +25,12 @@ export function createInitialWorld(data: M0Data, seed: number): World {
       throw new Error(`${rawSite.id} references unknown faction ${ownerId}`)
     }
 
-    sites.set(rawSite.id, { ...rawSite, ownerId })
+    sites.set(rawSite.id, {
+      ...rawSite,
+      ownerId,
+      polygon: [],
+      adjacency: [],
+    })
   }
 
   return {

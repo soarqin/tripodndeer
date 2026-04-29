@@ -14,6 +14,7 @@ function makeWorld(
       id: cfg.id,
       name: cfg.id,
       position: [0, 0],
+      boundary: [],
       polygon: [
         [0, 0],
         [1, 0],

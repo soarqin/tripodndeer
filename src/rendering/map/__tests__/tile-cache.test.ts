@@ -37,7 +37,7 @@ function makeSites(): ReadonlyMap<string, Site> {
   const ids = ['site_1', 'site_2', 'site_3', 'site_4', 'site_5']
   return new Map(ids.map(id => [
     id,
-    { id, name: id, position: [50, 50] as const, polygon: poly, adjacency: [], ownerId: 'faction_blue' } satisfies Site,
+    { id, name: id, position: [50, 50] as const, boundary: [], polygon: poly, adjacency: [], ownerId: 'faction_blue' } satisfies Site,
   ]))
 }
 

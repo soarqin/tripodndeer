@@ -11,18 +11,39 @@ export type Vec2 = readonly [number, number]
 // 多边形顶点列表
 export type Polygon = readonly Vec2[]
 
-// Content/JSON 形态的邑（无 ownerId）
+// ─── 边索引地图格式（M0.2+） ────────────────────────────────────────────────
+
+export type EdgeId = string
+export type CurveType = 'polyline' | 'cubic-bezier' | 'catmull-rom'
+
+/** 单条边（曲线段）— 全局唯一，多 site 共享引用 */
+export interface MapEdge {
+  id: EdgeId
+  curveType: CurveType
+  anchors: readonly Vec2[]
+  /** cubic-bezier 时必填：length === anchors.length - 1；每对 [C1, C2] 为控制点 */
+  controls?: readonly (readonly [Vec2, Vec2])[]
+}
+
+/** Site 的 boundary 边引用 */
+export interface BoundaryRef {
+  edge: EdgeId
+  reverse: boolean
+}
+
+/** Content/JSON 形态的邑（通过 boundary 引用 edges） */
 export interface RawSite {
   id: SiteId
   name: string
   position: Vec2
-  polygon: Polygon
-  adjacency: readonly SiteId[]
+  boundary: readonly BoundaryRef[]
 }
 
-// 运行时形态的邑（含 ownerId，由工厂派发 initialOwnership 填入）
+/** 运行时形态的邑（含 ownerId + polygon + adjacency，均由 factory 派发） */
 export interface Site extends RawSite {
   ownerId: FactionId | null
+  polygon: Polygon
+  adjacency: readonly SiteId[]
 }
 
 // 势力定义（id=opaque, color=CSS string）
@@ -73,6 +94,7 @@ export interface World {
 
 // M0 数据文件结构（用于 factory 接收参数类型）
 export interface M0Data {
+  edges: Record<string, MapEdge>
   sites: RawSite[]
   factions: Faction[]
   initialOwnership: Record<string, FactionId>
