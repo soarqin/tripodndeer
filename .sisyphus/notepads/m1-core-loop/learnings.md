@@ -126,3 +126,13 @@
 - UI initial state is wired through `loadM1Data()` + `createWorldFromM1Data(..., 'realm_qin')`; app entry remains a pure React mount while the store creates the world.
 - `TickPhase` accepts readonly event arrays because all current phase implementations return readonly events.
 - EventBanner component created with auto-hide functionality using setTimeout and clearBanner action.
+- MapCanvas rendering layer for armies implemented using canvas API.
+- Mocking zustand store in tests requires mocking the hook as a function and attaching getState to it.
+
+
+## 2026-04-30 T4.1 e2e SiteContextMenu
+- The Zustand store is exposed on window.__game.store (and window.__game.world()) under import.meta.env.DEV - canvas-based UI is best driven via the store + DOM assertions instead of pixel-coordinate clicks.
+- Right-click on canvas hands over to `MapCanvas.onContextMenu` -> `store.openContextMenu({siteId,x,y})`; for spec stability we call the action directly via `page.evaluate` and discover sites at runtime (no hardcoded site IDs).
+- ESLint cap is `max-lines-per-function: 50` - keep `page.evaluate` callbacks small; large describe blocks must be split into multiple `test.describe` to stay under the limit.
+- War declaration in tests: mutate `state.world.wars` via `store.setState` with a new `Map` and `state.world = { ...state.world, wars: newWars }` (matching how engine actions reassign world). Adding a war key follows `[a,b].sort().join(':')`.
+- 7 testid-based assertions (`site-context-menu`, `menu-march`, `menu-declare-war`, `menu-army-{id}`) cover all 4 menu states (own / unreachable / declare / march) plus visibility, close-on-outside-click, and bottom-bar sanity. 3x consecutive green runs confirms no flakiness.
