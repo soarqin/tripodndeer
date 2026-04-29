@@ -2,11 +2,12 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { Delaunay } from 'd3-delaunay'
 
+// ─── Constants ────────────────────────────────────────────────────────────────
 const WIDTH = 800
 const HEIGHT = 600
 const N_SITES = 5
 const LLOYD_ITER = 4
-const SUBDIVISIONS = 20
+const N_SUBDIV = 4
 const NOISE_RATIO = 0.08
 
 const SITE_IDS = ['site_1', 'site_2', 'site_3', 'site_4', 'site_5'] as const
@@ -23,8 +24,7 @@ const INITIAL_OWNERSHIP: Record<string, string> = {
   site_5: 'faction_blue',
 }
 
-type P = [number, number]
-
+// ─── Deterministic PRNG ──────────────────────────────────────────────────────
 function mulberry32(seed: number): () => number {
   let s = seed >>> 0
   return () => {
@@ -35,20 +35,15 @@ function mulberry32(seed: number): () => number {
   }
 }
 
-const rng = mulberry32(12345)
-const randRange = (min: number, max: number) => min + rng() * (max - min)
+const globalRng = mulberry32(12345)
+const randRange = (lo: number, hi: number) => lo + globalRng() * (hi - lo)
 
-function centroid(pts: P[]): P {
-  let cx = 0
-  let cy = 0
-  for (const [x, y] of pts) {
-    cx += x
-    cy += y
-  }
-  return [cx / pts.length, cy / pts.length]
-}
+// ─── Geometry helpers ─────────────────────────────────────────────────────────
+type P = [number, number]
+type EdgeEntry = { p1: P; p2: P; cells: number[] }
+type BoundaryRef = { edge: string; reverse: boolean }
 
-function edgeLength(a: P, b: P): number {
+function dist(a: P, b: P): number {
   return Math.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2)
 }
 
@@ -59,34 +54,95 @@ function perpUnit(a: P, b: P): P {
   return [-dy / len, dx / len]
 }
 
-function edgeHash(a: P, b: P): number {
-  const [p, q] = a[0] < b[0] || (a[0] === b[0] && a[1] < b[1]) ? [a, b] : [b, a]
-  return (
-    (Math.round(p[0] * 1000) * 73856093) ^
-    (Math.round(p[1] * 1000) * 19349663) ^
-    (Math.round(q[0] * 1000) * 83492791) ^
-    (Math.round(q[1] * 1000) * 59349677)
-  )
+function centroid(pts: ArrayLike<P | readonly number[]>): P {
+  let cx = 0
+  let cy = 0
+  let n = 0
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i]!
+    cx += p[0]
+    cy += p[1]
+    n++
+  }
+  return [cx / n, cy / n]
 }
 
-function perturbEdge(a: P, b: P): P[] {
-  const hash = edgeHash(a, b)
-  const edgeRng = mulberry32(Math.abs(hash) || 1)
-  const len = edgeLength(a, b)
-  const perp = perpUnit(a, b)
-  const result: P[] = [a]
+// ─── Canonical edge key (order-independent) ───────────────────────────────────
+function r3(n: number): number {
+  return Math.round(n * 1000) / 1000
+}
 
-  for (let j = 1; j < SUBDIVISIONS; j++) {
-    const t = j / SUBDIVISIONS
+function isLexicographicallyBeforeOrEqual(a: P, b: P): boolean {
+  return a[0] < b[0] || (a[0] === b[0] && a[1] <= b[1])
+}
+
+function canonicalKey(a: P, b: P): string {
+  const [p, q] = isLexicographicallyBeforeOrEqual(a, b) ? [a, b] : [b, a]
+  return `${r3(p[0])},${r3(p[1])};${r3(q[0])},${r3(q[1])}`
+}
+
+function canonicalEndpoints(a: P, b: P): [P, P] {
+  return isLexicographicallyBeforeOrEqual(a, b) ? [a, b] : [b, a]
+}
+
+// ─── Edge perturbation (canonical direction) ──────────────────────────────────
+function edgeRng(p1: P, p2: P): () => number {
+  const h =
+    (Math.round(p1[0] * 1000) * 73856093) ^
+    (Math.round(p1[1] * 1000) * 19349663) ^
+    (Math.round(p2[0] * 1000) * 83492791) ^
+    (Math.round(p2[1] * 1000) * 59349677)
+  return mulberry32(Math.abs(h) || 1)
+}
+
+function generateAnchors(canonP1: P, canonP2: P, isShared: boolean): P[] {
+  if (!isShared) return [canonP1, canonP2]
+
+  const rng = edgeRng(canonP1, canonP2)
+  const len = dist(canonP1, canonP2)
+  const perp = perpUnit(canonP1, canonP2)
+  const result: P[] = [canonP1]
+
+  for (let j = 1; j < N_SUBDIV; j++) {
+    const t = j / N_SUBDIV
+    const along: P = [canonP1[0] + (canonP2[0] - canonP1[0]) * t, canonP1[1] + (canonP2[1] - canonP1[1]) * t]
     const amplitude = Math.sin(t * Math.PI) * len * NOISE_RATIO
-    const noise = (edgeRng() - 0.5) * 2 * amplitude
-    result.push([
-      a[0] + (b[0] - a[0]) * t + perp[0] * noise,
-      a[1] + (b[1] - a[1]) * t + perp[1] * noise,
-    ])
+    const noise = (rng() - 0.5) * 2 * amplitude
+    result.push([along[0] + perp[0] * noise, along[1] + perp[1] * noise])
   }
 
+  result.push(canonP2)
   return result
+}
+
+// ─── Catmull-Rom → Cubic Bezier conversion ────────────────────────────────────
+function catmullRomToBezier(anchors: P[]): Array<[P, P]> {
+  const controls: Array<[P, P]> = []
+
+  for (let i = 0; i < anchors.length - 1; i++) {
+    const p0 = anchors[Math.max(0, i - 1)]!
+    const p1 = anchors[i]!
+    const p2 = anchors[i + 1]!
+    const p3 = anchors[Math.min(anchors.length - 1, i + 2)]!
+    const c1: P = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6]
+    const c2: P = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6]
+    controls.push([c1, c2])
+  }
+
+  return controls
+}
+
+// ─── Main generation ──────────────────────────────────────────────────────────
+function round2(n: number): number {
+  return Math.round(n * 100) / 100
+}
+
+function r2p(p: P): [number, number] {
+  return [round2(p[0]), round2(p[1])]
+}
+
+function r2pair(c: [P, P]): [[number, number], [number, number]] {
+  return [r2p(c[0]), r2p(c[1])]
 }
 
 function createRelaxedPoints(): P[] {
@@ -107,86 +163,145 @@ function createRelaxedPoints(): P[] {
   return pts
 }
 
-function getRawPolygons(pts: P[], delaunay: Delaunay<P>): P[][] {
+function getCellPolygons(pts: P[]): P[][] {
+  const delaunay = Delaunay.from(pts)
   const voronoi = delaunay.voronoi([0, 0, WIDTH, HEIGHT])
-  return pts.map((_, i) => {
-    const poly = voronoi.cellPolygon(i)
-    if (!poly) throw new Error(`Cell ${i} has no polygon`)
-    return (poly as P[]).slice(0, -1)
-  })
-}
+  const cellPolys: P[][] = []
 
-function perturbPolygon(poly: P[]): P[] {
-  const result: P[] = []
-  for (let i = 0; i < poly.length; i++) {
-    const a = poly[i]!
-    const b = poly[(i + 1) % poly.length]!
-    result.push(...perturbEdge(a, b))
-  }
-  return result
-}
-
-function buildAdjacency(delaunay: Delaunay<P>): Set<number>[] {
-  const adjSets: Set<number>[] = Array.from({ length: N_SITES }, () => new Set())
   for (let i = 0; i < N_SITES; i++) {
-    for (const j of delaunay.neighbors(i)) {
-      adjSets[i]!.add(j)
-      adjSets[j]!.add(i)
+    const poly = voronoi.cellPolygon(i)
+    if (!poly) throw new Error(`No polygon for cell ${i}`)
+    cellPolys.push((poly as P[]).slice(0, -1))
+  }
+
+  return cellPolys
+}
+
+function buildEdgeTable(cellPolys: P[][]): Map<string, EdgeEntry> {
+  const edgeTable = new Map<string, EdgeEntry>()
+  for (let ci = 0; ci < N_SITES; ci++) {
+    const poly = cellPolys[ci]!
+    for (let k = 0; k < poly.length; k++) {
+      const a = poly[k]!
+      const b = poly[(k + 1) % poly.length]!
+      const key = canonicalKey(a, b)
+      if (!edgeTable.has(key)) {
+        const [p1, p2] = canonicalEndpoints(a, b)
+        edgeTable.set(key, { p1, p2, cells: [] })
+      }
+      edgeTable.get(key)!.cells.push(ci)
     }
   }
-  return adjSets
+
+  return edgeTable
 }
 
-function round2(n: number): number {
-  return Math.round(n * 100) / 100
-}
+function buildEdges(edgeTable: Map<string, EdgeEntry>): { edges: Record<string, object>; keyToId: Map<string, string> } {
+  const edges: Record<string, object> = {}
+  const keyToId = new Map<string, string>()
+  let counter = 1
 
-function validateSites(sites: ReturnType<typeof buildSites>): void {
-  const minVerts = Math.min(...sites.map(s => s.polygon.length))
-  if (minVerts < 80) throw new Error(`Min polygon vertices = ${minVerts} (need ≥80)`)
+  for (const [key, entry] of edgeTable) {
+    const id = `e_${String(counter++).padStart(3, '0')}`
+    keyToId.set(key, id)
+    const isShared = entry.cells.length === 2
+    const anchors = generateAnchors(entry.p1, entry.p2, isShared)
+    const roundedAnchors = anchors.map(r2p)
 
-  for (const site of sites) {
-    for (const nId of site.adjacency) {
-      const nb = sites.find(s => s.id === nId)!
-      if (!nb.adjacency.includes(site.id)) {
-        throw new Error(`Adjacency not closed: ${site.id} ↔ ${nId}`)
+    if (isShared) {
+      edges[id] = {
+        id,
+        curveType: 'cubic-bezier',
+        anchors: roundedAnchors,
+        controls: catmullRomToBezier(anchors).map(r2pair),
+      }
+    } else {
+      edges[id] = {
+        id,
+        curveType: 'polyline',
+        anchors: roundedAnchors,
       }
     }
   }
+
+  return { edges, keyToId }
 }
 
-function buildSites(pts: P[], perturbedPolygons: P[][], adjSets: Set<number>[]) {
-  return pts.map((_, i) => {
-    const ctr = centroid(perturbedPolygons[i]!)
+function buildBoundary(poly: P[], keyToId: Map<string, string>): BoundaryRef[] {
+  const boundary: BoundaryRef[] = []
+
+  for (let k = 0; k < poly.length; k++) {
+    const a = poly[k]!
+    const b = poly[(k + 1) % poly.length]!
+    const key = canonicalKey(a, b)
+    const edgeId = keyToId.get(key)!
+    const [canonP1] = canonicalEndpoints(a, b)
+    const reverse = !(Math.abs(a[0] - canonP1[0]) < 0.01 && Math.abs(a[1] - canonP1[1]) < 0.01)
+    boundary.push({ edge: edgeId, reverse })
+  }
+
+  return boundary
+}
+
+function buildSites(cellPolys: P[][], keyToId: Map<string, string>) {
+  return cellPolys.map((poly, ci) => {
     return {
-      id: SITE_IDS[i]!,
-      name: SITE_NAMES[i]!,
-      position: [round2(ctr[0]), round2(ctr[1])] as [number, number],
-      polygon: perturbedPolygons[i]!.map(([x, y]) => [round2(x), round2(y)] as [number, number]),
-      adjacency: [...adjSets[i]!].map(j => SITE_IDS[j]!).sort(),
+      id: SITE_IDS[ci]!,
+      name: SITE_NAMES[ci]!,
+      position: r2p(centroid(poly)),
+      boundary: buildBoundary(poly, keyToId),
     }
   })
 }
 
-function generate(): void {
-  const pts = createRelaxedPoints()
-  const delaunay = Delaunay.from(pts)
-  const rawPolygons = getRawPolygons(pts, delaunay)
-  const perturbedPolygons = rawPolygons.map(perturbPolygon)
-  const adjSets = buildAdjacency(delaunay)
-  const sites = buildSites(pts, perturbedPolygons, adjSets)
+function validateEdgeCardinality(edgeTable: Map<string, EdgeEntry>, keyToId: Map<string, string>): void {
+  for (const [key, entry] of edgeTable) {
+    if (entry.cells.length > 2) {
+      throw new Error(`Edge ${keyToId.get(key)} referenced by ${entry.cells.length} cells`)
+    }
+  }
+}
 
-  validateSites(sites)
+function validateReverseFlags(sites: ReturnType<typeof buildSites>): void {
+  const edgeRefs = new Map<string, Array<{ site: number; reverse: boolean }>>()
+  for (let si = 0; si < sites.length; si++) {
+    for (const ref of sites[si]!.boundary) {
+      const list = edgeRefs.get(ref.edge) ?? []
+      list.push({ site: si, reverse: ref.reverse })
+      edgeRefs.set(ref.edge, list)
+    }
+  }
 
-  const output = { sites, factions: FACTIONS, initialOwnership: INITIAL_OWNERSHIP }
+  for (const [eid, refs] of edgeRefs) {
+    if (refs.length === 2 && refs[0]!.reverse === refs[1]!.reverse) {
+      throw new Error(`Edge ${eid}: both sites have same reverse flag (should be opposite)`)
+    }
+  }
+}
+
+function writeOutput(edges: Record<string, object>, sites: ReturnType<typeof buildSites>, edgeTable: Map<string, EdgeEntry>): void {
+  const output = { edges, sites, factions: FACTIONS, initialOwnership: INITIAL_OWNERSHIP }
   const outPath = path.join(process.cwd(), 'src', 'content', 'm0', 'sites.json')
   fs.mkdirSync(path.dirname(outPath), { recursive: true })
   fs.writeFileSync(outPath, JSON.stringify(output, null, 2), 'utf-8')
 
+  const sharedCount = [...edgeTable.values()].filter(e => e.cells.length === 2).length
+  const boundaryCount = edgeTable.size - sharedCount
   console.log(`✅ Generated ${outPath}`)
   console.log(`   Sites: ${sites.length}`)
-  console.log(`   Min polygon vertices: ${Math.min(...sites.map(s => s.polygon.length))}`)
-  console.log(`   Sites with ≥3 neighbors: ${sites.filter(s => s.adjacency.length >= 3).map(s => s.id).join(', ')}`)
+  console.log(`   Total edges: ${edgeTable.size} (${sharedCount} shared, ${boundaryCount} boundary)`)
+  console.log('   Invariants: ✓')
+}
+
+function generate(): void {
+  const cellPolys = getCellPolygons(createRelaxedPoints())
+  const edgeTable = buildEdgeTable(cellPolys)
+  const { edges, keyToId } = buildEdges(edgeTable)
+  const sites = buildSites(cellPolys, keyToId)
+
+  validateEdgeCardinality(edgeTable, keyToId)
+  validateReverseFlags(sites)
+  writeOutput(edges, sites, edgeTable)
 }
 
 generate()
