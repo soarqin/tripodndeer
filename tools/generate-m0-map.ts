@@ -207,11 +207,14 @@ function buildEdges(edgeTable: Map<string, EdgeEntry>): { edges: Record<string, 
     const isShared = entry.cells.length === 2
     const anchors = generateAnchors(entry.p1, entry.p2, isShared)
     const roundedAnchors = anchors.map(r2p)
+    const d = dist(entry.p1, entry.p2)
+    const travel_cost = Math.max(1, Math.round(d / 100))
 
     if (isShared) {
       edges[id] = {
         id,
         curveType: 'cubic-bezier',
+        travel_cost,
         anchors: roundedAnchors,
         controls: catmullRomToBezier(anchors).map(r2pair),
       }
@@ -219,6 +222,7 @@ function buildEdges(edgeTable: Map<string, EdgeEntry>): { edges: Record<string, 
       edges[id] = {
         id,
         curveType: 'polyline',
+        travel_cost,
         anchors: roundedAnchors,
       }
     }

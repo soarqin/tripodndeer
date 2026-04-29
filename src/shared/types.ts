@@ -20,6 +20,7 @@ export type CurveType = 'polyline' | 'cubic-bezier' | 'catmull-rom'
 export interface MapEdge {
   id: EdgeId
   curveType: CurveType
+  readonly travel_cost: number
   anchors: readonly Vec2[]
   /** cubic-bezier 时必填：length === anchors.length - 1；每对 [C1, C2] 为控制点 */
   controls?: readonly (readonly [Vec2, Vec2])[]

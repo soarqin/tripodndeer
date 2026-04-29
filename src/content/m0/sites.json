@@ -3,6 +3,7 @@
     "e_001": {
       "id": "e_001",
       "curveType": "polyline",
+      "travel_cost": 3,
       "anchors": [
         [
           800,
@@ -17,6 +18,7 @@
     "e_002": {
       "id": "e_002",
       "curveType": "cubic-bezier",
+      "travel_cost": 2,
       "anchors": [
         [
           582.57,
@@ -85,6 +87,7 @@
     "e_003": {
       "id": "e_003",
       "curveType": "cubic-bezier",
+      "travel_cost": 3,
       "anchors": [
         [
           544.21,
@@ -153,6 +156,7 @@
     "e_004": {
       "id": "e_004",
       "curveType": "polyline",
+      "travel_cost": 3,
       "anchors": [
         [
           544.21,
@@ -167,6 +171,7 @@
     "e_005": {
       "id": "e_005",
       "curveType": "cubic-bezier",
+      "travel_cost": 4,
       "anchors": [
         [
           46.94,
@@ -235,6 +240,7 @@
     "e_006": {
       "id": "e_006",
       "curveType": "cubic-bezier",
+      "travel_cost": 2,
       "anchors": [
         [
           269.13,
@@ -303,6 +309,7 @@
     "e_007": {
       "id": "e_007",
       "curveType": "cubic-bezier",
+      "travel_cost": 2,
       "anchors": [
         [
           457,
@@ -371,6 +378,7 @@
     "e_008": {
       "id": "e_008",
       "curveType": "polyline",
+      "travel_cost": 4,
       "anchors": [
         [
           46.94,
@@ -385,6 +393,7 @@
     "e_009": {
       "id": "e_009",
       "curveType": "cubic-bezier",
+      "travel_cost": 2,
       "anchors": [
         [
           457,
@@ -453,6 +462,7 @@
     "e_010": {
       "id": "e_010",
       "curveType": "cubic-bezier",
+      "travel_cost": 3,
       "anchors": [
         [
           107.06,
@@ -521,6 +531,7 @@
     "e_011": {
       "id": "e_011",
       "curveType": "polyline",
+      "travel_cost": 4,
       "anchors": [
         [
           107.06,
@@ -535,6 +546,7 @@
     "e_012": {
       "id": "e_012",
       "curveType": "polyline",
+      "travel_cost": 6,
       "anchors": [
         [
           0,
@@ -549,6 +561,7 @@
     "e_013": {
       "id": "e_013",
       "curveType": "polyline",
+      "travel_cost": 1,
       "anchors": [
         [
           0,
@@ -563,6 +576,7 @@
     "e_014": {
       "id": "e_014",
       "curveType": "polyline",
+      "travel_cost": 1,
       "anchors": [
         [
           0,
@@ -577,6 +591,7 @@
     "e_015": {
       "id": "e_015",
       "curveType": "polyline",
+      "travel_cost": 3,
       "anchors": [
         [
           477.98,
@@ -591,6 +606,7 @@
     "e_016": {
       "id": "e_016",
       "curveType": "polyline",
+      "travel_cost": 3,
       "anchors": [
         [
           800,

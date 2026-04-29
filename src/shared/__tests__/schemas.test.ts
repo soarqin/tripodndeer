@@ -4,11 +4,13 @@ import { M0DataSchema, MapEdgeSchema } from '../schemas'
 const validPolylineEdge = {
   id: 'e_001',
   curveType: 'polyline' as const,
+  travel_cost: 1,
   anchors: [[0, 0], [100, 50], [200, 0]] as const,
 }
 const validBezierEdge = {
   id: 'e_002',
   curveType: 'cubic-bezier' as const,
+  travel_cost: 2,
   anchors: [[0, 0], [100, 50], [200, 0]] as const,
   controls: [[[10, 10], [90, 40]], [[110, 60], [190, 10]]] as const,
 }
@@ -42,6 +44,10 @@ describe('MapEdgeSchema valid', () => {
   it('accepts cubic-bezier edge with correct controls', () => {
     expect(() => MapEdgeSchema.parse(validBezierEdge)).not.toThrow()
   })
+
+  it('accepts travel_cost in range', () => {
+    expect(() => MapEdgeSchema.parse({ ...validPolylineEdge, travel_cost: 10 })).not.toThrow()
+  })
 })
 
 describe('MapEdgeSchema invalid', () => {
@@ -52,6 +58,16 @@ describe('MapEdgeSchema invalid', () => {
 
   it('rejects cubic-bezier with wrong controls length', () => {
     const bad = { ...validBezierEdge, controls: [[[10, 10], [90, 40]]] }
+    expect(() => MapEdgeSchema.parse(bad)).toThrow()
+  })
+
+  it('rejects travel_cost below range', () => {
+    const bad = { ...validPolylineEdge, travel_cost: 0 }
+    expect(() => MapEdgeSchema.parse(bad)).toThrow()
+  })
+
+  it('rejects travel_cost above range', () => {
+    const bad = { ...validPolylineEdge, travel_cost: 11 }
     expect(() => MapEdgeSchema.parse(bad)).toThrow()
   })
 })

@@ -10,6 +10,7 @@ export const MapEdgeSchema = z
   .object({
     id: EdgeIdSchema,
     curveType: z.enum(['polyline', 'cubic-bezier', 'catmull-rom']),
+    travel_cost: z.number().int().min(1).max(10),
     anchors: z.array(Vec2Schema).min(2),
     controls: z.array(z.tuple([Vec2Schema, Vec2Schema])).optional(),
   })

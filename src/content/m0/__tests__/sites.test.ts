@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import sitesData from '../sites.json'
 import { M0DataSchema } from '@/shared/schemas'
 
-type JsonEdge = { curveType: string; anchors: unknown[]; controls?: unknown[] }
+type JsonEdge = { curveType: string; travel_cost: number; anchors: unknown[]; controls?: unknown[] }
 
 function edgeReferenceCounts(): Map<string, number> {
   const edgeRefs = new Map<string, number>()
@@ -62,6 +62,12 @@ describe('sites.json M0.2 edge-indexed validation', () => {
       if (edge.curveType === 'cubic-bezier') {
         expect(edge.controls?.length, `Edge ${eid} controls length mismatch`).toBe(edge.anchors.length - 1)
       }
+    }
+  })
+
+  it('all edges have travel_cost >= 1', () => {
+    for (const [eid, edge] of Object.entries(sitesData.edges) as Array<[string, JsonEdge]>) {
+      expect(edge.travel_cost, `Edge ${eid} travel_cost invalid`).toBeGreaterThanOrEqual(1)
     }
   })
 })

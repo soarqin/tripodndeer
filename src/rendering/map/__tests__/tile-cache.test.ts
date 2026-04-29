@@ -102,7 +102,7 @@ describe('buildSmoothPath', () => {
 describe('buildSitePathFromBoundary', () => {
   it('builds path with lineTo for polyline edges', () => {
     const edges = new Map<string, MapEdge>([
-      ['e1', { id: 'e1', curveType: 'polyline', anchors: [[0, 0], [100, 0]] }],
+      ['e1', { id: 'e1', curveType: 'polyline', travel_cost: 1, anchors: [[0, 0], [100, 0]] }],
     ])
     const site: Site = {
       id: 's1', name: 's1', position: [50, 50],
@@ -117,7 +117,7 @@ describe('buildSitePathFromBoundary', () => {
   it('builds path with bezierCurveTo for cubic-bezier edges', () => {
     const edges = new Map<string, MapEdge>([
       ['e1', {
-        id: 'e1', curveType: 'cubic-bezier',
+        id: 'e1', curveType: 'cubic-bezier', travel_cost: 1,
         anchors: [[0, 0], [100, 0]],
         controls: [[[25, 25], [75, -25]]],
       }],
@@ -137,7 +137,7 @@ describe('buildSitePathFromBoundary reverse', () => {
   it('reverses bezier controls correctly', () => {
     const edges = new Map<string, MapEdge>([
       ['e1', {
-        id: 'e1', curveType: 'cubic-bezier',
+        id: 'e1', curveType: 'cubic-bezier', travel_cost: 1,
         anchors: [[0, 0], [100, 0]],
         controls: [[[25, 25], [75, -25]]],
       }],
