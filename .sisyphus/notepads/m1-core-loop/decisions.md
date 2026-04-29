@@ -57,3 +57,6 @@
 3. march
 4. combat
 5. victoryCheck
+## T1.2 schema choices
+- Kept `WarKey` as a plain string alias with a minimal non-empty schema, matching the project’s string-opaque pattern.
+- Left `src/shared/index.ts` as star-exports because it already exposes all new shared types/schemas through the existing barrel.

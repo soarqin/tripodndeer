@@ -56,6 +56,29 @@ export interface ArmyTemplate {
   readonly location: SiteId
 }
 
+export type ArmyState = 'idle' | 'marching' | 'retreating'
+
+export interface Army {
+  readonly id: ArmyId
+  readonly realmId: RealmId
+  readonly manpower: number
+  readonly location: SiteId
+  readonly state: ArmyState
+  readonly destination: SiteId | null
+  readonly ticksRemaining: number
+  readonly source: SiteId | null
+}
+
+export type OrderType = 'march' | 'declareWarAndMarch'
+
+export interface Order {
+  readonly type: OrderType
+  readonly armyId: ArmyId
+  readonly targetSiteId: SiteId
+}
+
+export type WarKey = string
+
 // Realm definition (id=opaque, color=CSS string)
 export interface Realm {
   readonly id: RealmId

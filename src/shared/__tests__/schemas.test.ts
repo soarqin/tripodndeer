@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { M0DataSchema, MapEdgeSchema } from '../schemas'
+import {
+  ArmySchema,
+  ArmyStateSchema,
+  M0DataSchema,
+  MapEdgeSchema,
+  OrderSchema,
+} from '../schemas'
 
 const validPolylineEdge = {
   id: 'e_001',
@@ -39,6 +45,23 @@ const validData = {
   sites: [validSite],
   realms: [validRealm],
   initialOwnership: { site_1: 'realm_red' },
+}
+
+const validIdleArmy = {
+  id: 'army_001',
+  realmId: 'realm_red',
+  manpower: 120,
+  location: 'site_1',
+  state: 'idle' as const,
+  destination: null,
+  ticksRemaining: 0,
+  source: null,
+}
+
+const validMarchOrder = {
+  type: 'march' as const,
+  armyId: 'army_001',
+  targetSiteId: 'site_2',
 }
 
 describe('MapEdgeSchema valid', () => {
@@ -101,5 +124,49 @@ describe('M0DataSchema invalid', () => {
   it('rejects wrong types', () => {
     const bad = { ...validData, edges: 'not-an-object' }
     expect(() => M0DataSchema.parse(bad)).toThrow()
+  })
+})
+
+describe('ArmySchema', () => {
+  it('accepts a valid idle army', () => {
+    expect(() => ArmySchema.parse(validIdleArmy)).not.toThrow()
+  })
+
+  it('accepts a valid idle army with null destination', () => {
+    const result = ArmySchema.parse(validIdleArmy)
+    expect(result.destination).toBeNull()
+    expect(result.location).toBe('site_1')
+  })
+
+  it('rejects negative manpower', () => {
+    expect(() => ArmySchema.parse({ ...validIdleArmy, manpower: -1 })).toThrow()
+  })
+})
+
+describe('OrderSchema', () => {
+  it('accepts a valid march order', () => {
+    expect(() => OrderSchema.parse(validMarchOrder)).not.toThrow()
+  })
+
+  it("rejects invalid type 'attack'", () => {
+    expect(() => OrderSchema.parse({ ...validMarchOrder, type: 'attack' })).toThrow()
+  })
+
+  it('rejects missing armyId', () => {
+    expect(() => OrderSchema.parse({ type: 'march', targetSiteId: 'site_2' })).toThrow()
+  })
+})
+
+describe('ArmyStateSchema', () => {
+  it("accepts 'idle'", () => {
+    expect(() => ArmyStateSchema.parse('idle')).not.toThrow()
+  })
+
+  it("rejects 'engaged'", () => {
+    expect(() => ArmyStateSchema.parse('engaged')).toThrow()
+  })
+
+  it("rejects 'fighting'", () => {
+    expect(() => ArmyStateSchema.parse('fighting')).toThrow()
   })
 })

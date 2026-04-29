@@ -44,6 +44,29 @@ export const ArmyTemplateSchema = z.object({
   location: SiteIdSchema,
 })
 
+export const ArmyStateSchema = z.enum(['idle', 'marching', 'retreating'])
+
+export const ArmySchema = z.object({
+  id: ArmyIdSchema,
+  realmId: z.string().min(1),
+  manpower: z.number().int().nonnegative(),
+  location: SiteIdSchema,
+  state: ArmyStateSchema,
+  destination: SiteIdSchema.nullable(),
+  ticksRemaining: z.number().int().nonnegative(),
+  source: SiteIdSchema.nullable(),
+})
+
+export const OrderTypeSchema = z.enum(['march', 'declareWarAndMarch'])
+
+export const OrderSchema = z.object({
+  type: OrderTypeSchema,
+  armyId: ArmyIdSchema,
+  targetSiteId: SiteIdSchema,
+})
+
+export const WarKeySchema = z.string().min(1)
+
 export const RealmSchema = z.object({
   id: RealmIdSchema,
   displayName: z.string().min(1),

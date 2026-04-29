@@ -40,3 +40,6 @@
 ## demo-complete testid
 - MUST preserve `data-testid="demo-complete"` - used by existing e2e tests
 - Just change the text to "江山一统"
+## T1.2 verification note
+- TypeScript ESLint rejected an `as any` shortcut in the missing-armyId test; resolved by relying on `zod`'s `unknown` input and removing the cast.
+- Language-server diagnostics were unavailable in this environment because `typescript-language-server` is not installed.

@@ -48,3 +48,7 @@
 ## 2026-04-29 T1.1 realm rename
 - Realm data now carries `fullTitle`, `capital`, `initialSites`, `initialArmies`, and `aiPersonality`; keep the schema and committed JSON aligned.
 - `useFactions`/`world.factions` were renamed to `useRealms`/`world.realms` to keep terminology consistent across UI and engine.
+## T1.2 Army/order shared types
+- Added runtime `ArmyState`, `Army`, `OrderType`, `Order`, and `WarKey` shapes without expanding Army beyond the requested fields.
+- Zod schemas mirror the type layer closely; `ArmySchema` keeps `destination`/`source` nullable and `ticksRemaining` nonnegative.
+- Shared test file now covers valid/invalid cases for ArmySchema, OrderSchema, and ArmyStateSchema in one pass.
