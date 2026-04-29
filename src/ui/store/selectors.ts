@@ -1,13 +1,15 @@
 import type {
+  Army,
   EdgeId,
   GameDate,
   MapEdge,
   Realm,
-  RealmId,
   Site,
+  RealmId,
   SiteId,
   SpeedTier,
-} from '@/shared/types'
+} from '~/shared/types'
+import type { GameStoreState } from './game-store'
 import { useGameStore } from './game-store'
 
 /**
@@ -39,3 +41,25 @@ export function useRealms(): ReadonlyMap<RealmId, Realm> {
 export function useEdges(): ReadonlyMap<EdgeId, MapEdge> {
   return useGameStore((s) => s.world.edges)
 }
+
+export const selectSelectedArmy = (state: GameStoreState): Army | null => {
+  if (!state.selectedArmyId) return null
+  return state.world.armies.get(state.selectedArmyId) ?? null
+}
+
+export const selectContextMenu = (state: GameStoreState) => state.contextMenu
+
+export const selectActivePanel = (state: GameStoreState) => state.activePanel
+
+export const selectPlayerRealm = (state: GameStoreState): Realm | null =>
+  state.world.realms.get(state.playerRealmId) ?? null
+
+export const selectTransientBanner = (state: GameStoreState) => state.transientBanner
+
+export const selectAllPlayerArmies = (state: GameStoreState): Army[] =>
+  [...state.world.armies.values()].filter((a) => a.realmId === state.playerRealmId)
+
+export const selectIdlePlayerArmies = (state: GameStoreState): Army[] =>
+  [...state.world.armies.values()].filter(
+    (a) => a.realmId === state.playerRealmId && a.state === 'idle',
+  )

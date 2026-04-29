@@ -57,3 +57,5 @@
 ## 2026-04-29 Victory system
 
 - `pnpm typecheck` initially failed on `src/shared/__tests__/schemas.test.ts` because `delete` was used on a fully required inferred object; widened the local test object to `Partial<>`.
+- 2026-04-29: Current M0 runtime world does not expose `realm_qin`, so `selectPlayerRealm` needs synthetic-state coverage in tests rather than relying on the default store world.
+- 2026-04-29: ESLint `max-lines-per-function` forced splitting the store initializer and test suites into smaller helper functions/describe blocks.

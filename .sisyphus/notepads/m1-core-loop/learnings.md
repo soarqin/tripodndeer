@@ -89,3 +89,6 @@
 
 - Keep victory detection pure: read-only world inspection, no state mutation, no hidden side effects.
 - Use `playerRealmId` + full-site ownership as the M1 win condition; avoid adding elimination/capital rules early.
+- 2026-04-29: UI store can stay serializable while holding ephemeral UI state (`selectedArmyId`, `contextMenu`, `activePanel`, `transientBanner`) alongside world data.
+- 2026-04-29: `issueOrder` must replace `world.pendingOrders` immutably; spreading the world and appending to the readonly array was sufficient.
+- 2026-04-29: Selector tests are easier to keep stable when using synthetic store state for realm-specific selectors instead of depending on fixture-specific realm ids.

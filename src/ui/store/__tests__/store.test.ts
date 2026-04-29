@@ -1,5 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { useGameStore } from '../game-store'
+import {
+  selectActivePanel,
+  selectAllPlayerArmies,
+  selectContextMenu,
+  selectIdlePlayerArmies,
+  selectPlayerRealm,
+  selectSelectedArmy,
+  selectTransientBanner,
+} from '../selectors'
 
 beforeEach(() => {
   useGameStore.getState().reset()
@@ -70,5 +79,110 @@ describe('store consecutive ticks', () => {
     const after = useGameStore.getState()
     expect(after.world.tick).toBe(1)
     expect(after.clockState.realTimeAccum).toBe(500)
+  })
+})
+
+describe('ui store selection actions', () => {
+  it('selectArmy sets selectedArmyId', () => {
+    const armyId = [...useGameStore.getState().world.armies.keys()][0]!
+    useGameStore.getState().selectArmy(armyId)
+
+    expect(useGameStore.getState().selectedArmyId).toBe(armyId)
+  })
+
+  it('clearSelection clears selectedArmyId', () => {
+    const armyId = [...useGameStore.getState().world.armies.keys()][0]!
+    useGameStore.getState().selectArmy(armyId)
+    useGameStore.getState().clearSelection()
+
+    expect(useGameStore.getState().selectedArmyId).toBeNull()
+  })
+})
+
+describe('ui store context menu actions', () => {
+  it('openContextMenu sets contextMenu with correct coords', () => {
+    const payload = { siteId: [...useGameStore.getState().world.sites.keys()][0]!, x: 120, y: 240 }
+    useGameStore.getState().openContextMenu(payload)
+
+    expect(selectContextMenu(useGameStore.getState())).toEqual(payload)
+  })
+
+  it('closeContextMenu clears contextMenu', () => {
+    const payload = { siteId: [...useGameStore.getState().world.sites.keys()][0]!, x: 120, y: 240 }
+    useGameStore.getState().openContextMenu(payload)
+    useGameStore.getState().closeContextMenu()
+
+    expect(useGameStore.getState().contextMenu).toBeNull()
+  })
+})
+
+describe('ui store panel and banner actions', () => {
+  it('setActivePanel sets activePanel', () => {
+    useGameStore.getState().setActivePanel('junshi')
+
+    expect(selectActivePanel(useGameStore.getState())).toBe('junshi')
+  })
+
+  it('showBanner sets transientBanner with text', () => {
+    const state = useGameStore.getState()
+    state.showBanner('hello banner')
+
+    expect(selectTransientBanner(useGameStore.getState())).toEqual({
+      text: 'hello banner',
+      createdAt: useGameStore.getState().world.tick,
+    })
+  })
+})
+
+describe('ui store order actions', () => {
+  it('issueOrder adds order to world.pendingOrders', () => {
+    const armyId = [...useGameStore.getState().world.armies.keys()][0]!
+    const targetSiteId = [...useGameStore.getState().world.sites.keys()][0]!
+    const order = { type: 'march', armyId, targetSiteId } as const
+
+    useGameStore.getState().issueOrder(order)
+
+    expect(useGameStore.getState().world.pendingOrders).toEqual([order])
+  })
+})
+
+describe('ui store army selector', () => {
+  it('selectSelectedArmy returns correct army after selectArmy', () => {
+    const armyId = [...useGameStore.getState().world.armies.keys()][0]!
+    useGameStore.getState().selectArmy(armyId)
+
+    expect(selectSelectedArmy(useGameStore.getState())?.id).toBe(armyId)
+  })
+})
+
+describe('ui store realm selectors', () => {
+  it('selectPlayerRealm returns the configured player realm', () => {
+    const state = useGameStore.getState()
+    const realmId = [...state.world.realms.keys()][0]!
+    const testState = { ...state, playerRealmId: realmId }
+
+    expect(selectPlayerRealm(testState)?.id).toBe(realmId)
+  })
+
+  it('selectAllPlayerArmies returns only armies for the player realm', () => {
+    const state = useGameStore.getState()
+    const realmId = [...state.world.realms.keys()][0]!
+    const testState = { ...state, playerRealmId: realmId }
+
+    expect(selectAllPlayerArmies(testState)).toEqual(
+      [...state.world.armies.values()].filter((army) => army.realmId === realmId),
+    )
+  })
+
+  it('selectIdlePlayerArmies returns only idle player armies', () => {
+    const state = useGameStore.getState()
+    const realmId = [...state.world.realms.keys()][0]!
+    const testState = { ...state, playerRealmId: realmId }
+
+    expect(selectIdlePlayerArmies(testState)).toEqual(
+      [...state.world.armies.values()].filter(
+        (army) => army.realmId === realmId && army.state === 'idle',
+      ),
+    )
   })
 })

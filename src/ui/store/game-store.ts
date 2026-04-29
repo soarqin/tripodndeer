@@ -4,7 +4,15 @@ import { immer } from 'zustand/middleware/immer'
 import { advanceClock, setSpeed as engineSetSpeed } from '@/engine/clock'
 import type { ClockState } from '@/engine/clock'
 import { createInitialWorld, loadM0Data } from '@/engine/world'
-import type { GameEvent, SpeedTier, World } from '@/shared/types'
+import type {
+  ArmyId,
+  GameEvent,
+  Order,
+  RealmId,
+  SiteId,
+  SpeedTier,
+  World,
+} from '~/shared/types'
 
 // Vite 注入的 import.meta.env 类型增强（避免依赖 vite/client 全局类型）
 
@@ -12,15 +20,110 @@ interface GameState {
   world: World
   clockState: ClockState
   events: readonly GameEvent[]
+  playerRealmId: RealmId
+  selectedArmyId: ArmyId | null
+  contextMenu: { siteId: SiteId; x: number; y: number } | null
+  activePanel: 'wanggong' | 'junshi' | null
+  transientBanner: { text: string; createdAt: number } | null
 }
 
 interface GameActions {
   tick: (deltaMs: number) => void
   setSpeed: (speed: SpeedTier) => void
   reset: () => void
+  selectArmy: (armyId: ArmyId) => void
+  clearSelection: () => void
+  openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) => void
+  closeContextMenu: () => void
+  setActivePanel: (panel: 'wanggong' | 'junshi' | null) => void
+  issueOrder: (order: Order) => void
+  showBanner: (text: string) => void
 }
 
 type GameStore = GameState & GameActions
+
+export type GameStoreState = GameStore
+
+type StoreSet = (updater: (state: GameStore) => void) => void
+
+function createCoreActions(set: StoreSet): Pick<GameActions, 'tick' | 'setSpeed' | 'reset'> {
+  return {
+    tick: (deltaMs: number) =>
+      set((state) => {
+        const result = advanceClock(state.clockState, deltaMs, state.world)
+        state.world = castDraft(result.nextWorld)
+        state.clockState = result.clockState
+        state.events = castDraft(result.events)
+      }),
+    setSpeed: (speed: SpeedTier) =>
+      set((state) => {
+        state.clockState = engineSetSpeed(state.clockState, speed)
+      }),
+    reset: () =>
+      set((state) => {
+        const fresh = makeInitialState()
+        state.world = castDraft(fresh.world)
+        state.clockState = fresh.clockState
+        state.events = castDraft(fresh.events)
+        state.playerRealmId = fresh.playerRealmId
+        state.selectedArmyId = fresh.selectedArmyId
+        state.contextMenu = fresh.contextMenu
+        state.activePanel = fresh.activePanel
+        state.transientBanner = fresh.transientBanner
+      }),
+  }
+}
+
+function createSelectionActions(set: StoreSet): Pick<GameActions, 'selectArmy' | 'clearSelection'> {
+  return {
+    selectArmy: (armyId: ArmyId) =>
+      set((state) => {
+        state.selectedArmyId = armyId
+      }),
+    clearSelection: () =>
+      set((state) => {
+        state.selectedArmyId = null
+      }),
+  }
+}
+
+function createUiActions(
+  set: StoreSet,
+): Pick<GameActions, 'openContextMenu' | 'closeContextMenu' | 'setActivePanel'> {
+  return {
+    openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) =>
+      set((state) => {
+        state.contextMenu = payload
+      }),
+    closeContextMenu: () =>
+      set((state) => {
+        state.contextMenu = null
+      }),
+    setActivePanel: (panel: 'wanggong' | 'junshi' | null) =>
+      set((state) => {
+        state.activePanel = panel
+      }),
+  }
+}
+
+function createWorldActions(set: StoreSet): Pick<GameActions, 'issueOrder' | 'showBanner'> {
+  return {
+    issueOrder: (order: Order) =>
+      set((state) => {
+        state.world = castDraft({
+          ...state.world,
+          pendingOrders: [...state.world.pendingOrders, order],
+        })
+      }),
+    showBanner: (text: string) =>
+      set((state) => {
+        state.transientBanner = {
+          text,
+          createdAt: state.world.tick,
+        }
+      }),
+  }
+}
 
 function makeInitialState(): GameState {
   const data = loadM0Data()
@@ -28,6 +131,11 @@ function makeInitialState(): GameState {
     world: createInitialWorld(data, 42),
     clockState: { speed: 'pause', realTimeAccum: 0 },
     events: [],
+    playerRealmId: 'realm_qin',
+    selectedArmyId: null,
+    contextMenu: null,
+    activePanel: null,
+    transientBanner: null,
   }
 }
 
@@ -40,29 +148,10 @@ function makeInitialState(): GameState {
 export const useGameStore = create<GameStore>()(
   immer((set) => ({
     ...makeInitialState(),
-
-    tick: (deltaMs: number) =>
-      set((state) => {
-        const result = advanceClock(state.clockState, deltaMs, state.world)
-        // World 整体由 engine 重新构造（含 ReadonlyMap），用 castDraft 跳过 immer
-        // 的 WritableDraft 包装；events 同理。
-        state.world = castDraft(result.nextWorld)
-        state.clockState = result.clockState
-        state.events = castDraft(result.events)
-      }),
-
-    setSpeed: (speed: SpeedTier) =>
-      set((state) => {
-        state.clockState = engineSetSpeed(state.clockState, speed)
-      }),
-
-    reset: () =>
-      set((state) => {
-        const fresh = makeInitialState()
-        state.world = castDraft(fresh.world)
-        state.clockState = fresh.clockState
-        state.events = castDraft(fresh.events)
-      }),
+    ...createCoreActions(set),
+    ...createSelectionActions(set),
+    ...createUiActions(set),
+    ...createWorldActions(set),
   })),
 )
 

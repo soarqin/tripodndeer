@@ -79,3 +79,5 @@
 
 - Implemented victory as a standalone engine system under `src/engine/systems/victory/` with re-exports from `index.ts`.
 - Emit only `victoryAchieved` events when every site is owned by the player realm.
+- 2026-04-29: Added store-level `playerRealmId` as the UI's local notion of the player faction, separate from the world snapshot.
+- 2026-04-29: Kept transient banners as plain `{ text, createdAt }` data so they stay serializable and can be timed in selectors if needed.
