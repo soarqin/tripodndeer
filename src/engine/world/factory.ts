@@ -2,6 +2,11 @@ import m0Data from '@/content/m0/sites.json'
 import m1Data from '@/content/m1/scenario.json'
 import { INITIAL_DATE } from '@/shared/constants'
 import { M0DataSchema, M1DataSchema } from '@/shared/schemas'
+import { aiPlanStep } from '~/engine/systems/ai'
+import { combatStep } from '~/engine/systems/combat'
+import { marchStep } from '~/engine/systems/march'
+import { orderApplyStep } from '~/engine/systems/orders'
+import { victoryCheckStep } from '~/engine/systems/victory'
 import type {
   BoundaryRef,
   Army,
@@ -174,7 +179,7 @@ export function createWorldFromM1Data(
     wars,
     playerRealmId,
     rngState: { seed, counter: 0 },
-    phases: [],
+    phases: [aiPlanStep, orderApplyStep, marchStep, combatStep, victoryCheckStep],
     pendingOrders: [],
   }
 }

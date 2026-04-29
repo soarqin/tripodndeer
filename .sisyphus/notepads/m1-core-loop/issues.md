@@ -69,3 +69,7 @@
 ## 2026-04-29 T2.3 AI plan system
 - `lsp_diagnostics` remains unavailable (`typescript-language-server` not installed); verification used `pnpm typecheck`, `pnpm lint`, targeted AI tests, and architecture purity tests.
 - Multi-realm AI tests must account for every non-player realm rolling each monthly tick, even if it has no idle armies; use single-realm fixtures when asserting exact RNG counters or 80/20 distribution.
+
+## T3.1 verification notes
+- TypeScript LSP diagnostics could not run locally because `typescript-language-server` is not installed; `pnpm typecheck` passed instead.
+- Playwright browser console verification could not run because Chrome is not installed at the configured path; `pnpm dev` started and HTTP smoke returned 200.

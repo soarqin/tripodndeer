@@ -1,6 +1,23 @@
 import { describe, expect, it } from 'vitest'
 
+import { runTickPhases } from '@/engine/clock'
+import { PHASE_ORDER } from '@/engine/phases'
+import { aiPlanStep } from '@/engine/systems/ai'
+import { combatStep } from '@/engine/systems/combat'
+import { marchStep } from '@/engine/systems/march'
+import { orderApplyStep } from '@/engine/systems/orders'
+import { victoryCheckStep } from '@/engine/systems/victory'
 import { createInitialWorld, createWorldFromM1Data, loadM0Data, loadM1Data } from '../factory'
+import type { TickPhase } from '@/shared/types'
+
+function phaseName(phase: TickPhase): string {
+  if (phase === aiPlanStep) return 'aiPlan'
+  if (phase === orderApplyStep) return 'orderApply'
+  if (phase === marchStep) return 'march'
+  if (phase === combatStep) return 'combat'
+  if (phase === victoryCheckStep) return 'victoryCheck'
+  return 'unknown'
+}
 
 describe('loadM0Data', () => {
   it('loads and validates m0 data with edges', () => {
@@ -82,6 +99,23 @@ describe('createWorldFromM1Data — structure', () => {
     expect(world.playerRealmId).toBe('realm_qin')
     expect(world.tick).toBe(0)
     expect(world.date).toEqual({ yearBC: 260, season: 'spring', month: 1, xun: 'shang' })
+  })
+
+  it('createWorldFromM1Data has phases in correct order', () => {
+    const data = loadM1Data()
+    const world = createWorldFromM1Data(data, 42, 'realm_qin')
+
+    expect(world.phases).toEqual([
+      aiPlanStep,
+      orderApplyStep,
+      marchStep,
+      combatStep,
+      victoryCheckStep,
+    ])
+    expect(world.phases.map(phaseName)).toEqual(PHASE_ORDER)
+
+    const result = runTickPhases(world, world.rngState)
+    expect(result.world.tick).toBe(1)
   })
 
   it('builds populated sites and edges', () => {

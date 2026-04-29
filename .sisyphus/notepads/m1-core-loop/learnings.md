@@ -120,3 +120,8 @@
 - ESLint `max-lines-per-function: 50` is enforced as warning + `--max-warnings 0` ⇒ effectively an error.
   Extract handlers into module-level functions / dedicated hooks rather than inlining inside the component body.
 - Vitest mock pattern for store actions: combine `vi.hoisted` with `vi.mock('@/ui/store/game-store', ...)` returning an object with `getState: () => ({...mockActions, world: {armies}})`.
+
+## T3.1 phase chain wiring
+- `createWorldFromM1Data` now owns the M1 runtime phase chain: aiPlan -> orderApply -> march -> combat -> victoryCheck.
+- UI initial state is wired through `loadM1Data()` + `createWorldFromM1Data(..., 'realm_qin')`; app entry remains a pure React mount while the store creates the world.
+- `TickPhase` accepts readonly event arrays because all current phase implementations return readonly events.

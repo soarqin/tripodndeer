@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { advanceClock, setSpeed as engineSetSpeed } from '@/engine/clock'
 import type { ClockState } from '@/engine/clock'
-import { createInitialWorld, loadM0Data } from '@/engine/world'
+import { createWorldFromM1Data, loadM1Data } from '@/engine/world'
 import type {
   ArmyId,
   GameEvent,
@@ -126,12 +126,13 @@ function createWorldActions(set: StoreSet): Pick<GameActions, 'issueOrder' | 'sh
 }
 
 function makeInitialState(): GameState {
-  const data = loadM0Data()
+  const data = loadM1Data()
+  const playerRealmId = 'realm_qin'
   return {
-    world: createInitialWorld(data, 42),
+    world: createWorldFromM1Data(data, 42, playerRealmId),
     clockState: { speed: 'pause', realTimeAccum: 0 },
     events: [],
-    playerRealmId: 'realm_qin',
+    playerRealmId,
     selectedArmyId: null,
     contextMenu: null,
     activePanel: null,

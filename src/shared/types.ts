@@ -118,7 +118,7 @@ export type SpeedTier = 'pause' | '1x' | '2x' | '3x' | '4x' | '5x'
 export type TickPhase = (
   world: World,
   rng: RNGState,
-) => { world: World; nextRng: RNGState; events: GameEvent[] }
+) => { world: World; nextRng: RNGState; events: readonly GameEvent[] }
 
 // 世界状态（核心数据结构）
 export interface World {
