@@ -4,6 +4,7 @@ import { INITIAL_DATE } from '@/shared/constants'
 import { M0DataSchema, M1DataSchemaV2 } from '@/shared/schemas'
 import { aiPlanStep } from '~/engine/systems/ai'
 import { combatV2Step } from '~/engine/systems/combat-v2'
+import { diplomacyLifecycleStep } from '~/engine/systems/diplomacy'
 import { manpowerTick } from '~/engine/systems/manpower'
 import { marchStep } from '~/engine/systems/march'
 import { orderApplyStep } from '~/engine/systems/orders'
@@ -283,6 +284,7 @@ export function createWorldFromM1Data(
       combatV2Step,
       manpowerTick,
       victoryCheckStep,
+      diplomacyLifecycleStep,
     ],
     pendingOrders: [],
   }

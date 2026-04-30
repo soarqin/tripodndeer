@@ -7,6 +7,7 @@ export {
   scoreDiplomacyAcceptance,
   validateDiplomacyAction,
 } from './diplomacy-core'
+export { diplomacyLifecycleStep } from './lifecycle'
 export type {
   DiplomacyActionRequest,
   DiplomacyProposalOrOrder,

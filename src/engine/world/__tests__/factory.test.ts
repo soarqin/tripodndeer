@@ -4,6 +4,7 @@ import { runTickPhases } from '@/engine/clock'
 import { PHASE_ORDER } from '@/engine/phases'
 import { aiPlanStep } from '@/engine/systems/ai'
 import { combatV2Step } from '@/engine/systems/combat-v2'
+import { diplomacyLifecycleStep } from '@/engine/systems/diplomacy'
 import { manpowerTick } from '@/engine/systems/manpower'
 import { marchStep } from '@/engine/systems/march'
 import { orderApplyStep } from '@/engine/systems/orders'
@@ -20,6 +21,7 @@ function phaseName(phase: TickPhase): string {
   if (phase === combatV2Step) return 'combat-v2'
   if (phase === manpowerTick) return 'manpower'
   if (phase === victoryCheckStep) return 'victoryCheck'
+  if (phase === diplomacyLifecycleStep) return 'diplomacyLifecycle'
   return 'unknown'
 }
 
@@ -129,6 +131,7 @@ describe('createWorldFromM1Data — structure', () => {
       combatV2Step,
       manpowerTick,
       victoryCheckStep,
+      diplomacyLifecycleStep,
     ])
     expect(world.phases.map(phaseName)).toEqual(PHASE_ORDER)
 
