@@ -44,6 +44,7 @@ function makeWorld(armies: readonly Army[], sites: readonly Site[] = []): World 
     generals: new Map(),
     passes: new Map(),
     adjacencyEdges: new Map(),
+    sieges: new Map(),
     playerRealmId: 'realm_qin',
     rngState: rng,
     phases: [],

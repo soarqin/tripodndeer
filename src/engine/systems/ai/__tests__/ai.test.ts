@@ -98,6 +98,7 @@ function baseWorld(overrides: Partial<World> = {}): World {
     generals: new Map(),
     passes: new Map(),
     adjacencyEdges: new Map(),
+    sieges: new Map(),
     playerRealmId,
     rngState: createInitialRng(1),
     phases: [],

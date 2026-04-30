@@ -134,6 +134,18 @@ export interface SiteOccupation {
   controlLevel: number
 }
 
+export type SiegeId = string
+
+export interface Siege {
+  readonly id: SiegeId
+  readonly attackerArmyIds: readonly ArmyId[]
+  readonly defenderSiteId: SiteId
+  readonly startedAt: GameDate
+  readonly durationTicks: number
+  readonly fortification: number
+  readonly supplyRemaining: number
+}
+
 export interface CessionPayload { siteIds: SiteId[] }
 export interface IndemnityPayload { amount: number }
 export interface TributePayload { amountPerYear: number; years: number }
@@ -217,6 +229,7 @@ export interface World {
   generals: ReadonlyMap<GeneralId, General>
   passes: ReadonlyMap<PassId, Pass>
   adjacencyEdges: ReadonlyMap<AdjacencyEdgeId, AdjacencyEdge>
+  sieges: ReadonlyMap<SiegeId, Siege>
   playerRealmId: RealmId
   rngState: RNGState // PRNG 状态在 World，不在 module 闭包
   phases: readonly TickPhase[] // Tick 阶段数组（M0 仅 1 个，但形状必须是数组）

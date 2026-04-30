@@ -67,6 +67,7 @@ function makeWorld(
     generals: new Map(generals.map((general) => [general.id, general])),
     passes: new Map(),
     adjacencyEdges: new Map(),
+    sieges: new Map(),
     playerRealmId: 'realm_qin',
     rngState: rng,
     phases: [],

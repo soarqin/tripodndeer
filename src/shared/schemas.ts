@@ -229,6 +229,7 @@ export const WorldSchema = z.object({
   generals: z.instanceof(Map),
   passes: z.instanceof(Map),
   adjacencyEdges: z.instanceof(Map),
+  sieges: z.instanceof(Map),
   playerRealmId: z.string(),
   rngState: z.object({ seed: z.number(), counter: z.number() }),
   phases: z.array(z.function()),
