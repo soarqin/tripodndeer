@@ -16,9 +16,6 @@ export default defineConfig({
       ['src/rendering/**', 'jsdom'],
     ],
     environment: 'node',
-    // Playwright owns the e2e/ tree; Vitest must not collect those specs or
-    // it picks up @playwright/test globals and throws "did not expect
-    // test.describe() to be called here".
-    exclude: ['node_modules', 'dist', 'e2e/**', 'src/__tests__/perf.test.ts'],
+    exclude: ['node_modules', 'dist', 'e2e/**'],
   },
 })

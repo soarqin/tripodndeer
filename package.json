@@ -11,6 +11,7 @@
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "format": "prettier --write .",
     "test": "vitest run",
+    "test:perf": "vitest run --config vitest.perf.config.ts src/__tests__/perf.test.ts",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
