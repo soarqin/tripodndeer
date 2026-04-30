@@ -80,7 +80,14 @@ export interface Army {
   }
 }
 
-export type OrderType = 'march' | 'declareWarAndMarch' | 'declare-war'
+export type OrderType = 'march' | 'declareWarAndMarch' | 'declare-war' | 'propose-peace'
+
+export interface PeaceProposalOrderData {
+  readonly proposalId: string
+  readonly proposingRealmId: RealmId
+  readonly targetRealmId: RealmId
+  readonly terms: readonly PeaceTerm[]
+}
 
 export interface Order {
   readonly type: OrderType
@@ -88,6 +95,7 @@ export interface Order {
   readonly targetSiteId?: SiteId
   readonly targetRealmId?: RealmId
   readonly casusBelli?: CasusBelliId
+  readonly peaceProposalData?: PeaceProposalOrderData
 }
 
 export type WarKey = string

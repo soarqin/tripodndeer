@@ -70,7 +70,19 @@ export const ArmySchema = z.object({
   composition: CompositionSchema.optional(),
 })
 
-export const OrderTypeSchema = z.enum(['march', 'declareWarAndMarch', 'declare-war'])
+export const CessionPayloadSchema = z.object({ siteIds: z.array(SiteIdSchema) })
+export const IndemnityPayloadSchema = z.object({ amount: z.number().nonnegative() })
+export const TributePayloadSchema = z.object({
+  amountPerYear: z.number().nonnegative(),
+  years: z.number().int().positive(),
+})
+export const PeaceTermSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('cession'), payload: CessionPayloadSchema }),
+  z.object({ type: z.literal('indemnity'), payload: IndemnityPayloadSchema }),
+  z.object({ type: z.literal('tribute'), payload: TributePayloadSchema }),
+])
+
+export const OrderTypeSchema = z.enum(['march', 'declareWarAndMarch', 'declare-war', 'propose-peace'])
 
 const MarchOrderSchema = z.object({
   type: z.literal('march'),
@@ -90,10 +102,21 @@ const DeclareWarAndMarchOrderSchema = z.object({
   targetSiteId: SiteIdSchema,
 })
 
+const ProposePeaceOrderSchema = z.object({
+  type: z.literal('propose-peace'),
+  peaceProposalData: z.object({
+    proposalId: z.string().min(1),
+    proposingRealmId: RealmIdSchema,
+    targetRealmId: RealmIdSchema,
+    terms: z.array(PeaceTermSchema).max(3),
+  }),
+})
+
 export const OrderSchema = z.discriminatedUnion('type', [
   MarchOrderSchema,
   DeclareWarOrderSchema,
   DeclareWarAndMarchOrderSchema,
+  ProposePeaceOrderSchema,
 ])
 
 export const WarKeySchema = z.string().min(1)
@@ -126,18 +149,6 @@ export const SiteOccupationSchema = z.object({
   occupierId: RealmIdSchema,
   controlLevel: z.number().int().min(0).max(100),
 })
-
-export const CessionPayloadSchema = z.object({ siteIds: z.array(SiteIdSchema) })
-export const IndemnityPayloadSchema = z.object({ amount: z.number().nonnegative() })
-export const TributePayloadSchema = z.object({
-  amountPerYear: z.number().nonnegative(),
-  years: z.number().int().positive(),
-})
-export const PeaceTermSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('cession'), payload: CessionPayloadSchema }),
-  z.object({ type: z.literal('indemnity'), payload: IndemnityPayloadSchema }),
-  z.object({ type: z.literal('tribute'), payload: TributePayloadSchema }),
-])
 
 const GameDateSchema = z.object({
   yearBC: z.number().int(),

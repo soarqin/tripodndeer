@@ -1,6 +1,7 @@
 import type { Army, GameEvent, Order, RNGState, Site, SiteId, WarKey, WarState, World } from '~/shared/types'
 import { findTravelCost } from '~/engine/systems/march'
 import { declareWar, declareWarWithCasus, isAtWar } from '~/engine/wars'
+import { createPeaceProposal } from '~/engine/systems/peace'
 
 type OrderResult = { world: World; events: readonly GameEvent[] }
 
@@ -29,6 +30,24 @@ export function applyOrder(world: World, order: Order): OrderResult {
     return {
       world: { ...world, wars: nextWars, pendingOrders: [] },
       events: [{ type: 'warDeclared', payload: { byRealm: world.playerRealmId, againstRealm: order.targetRealmId, casusBelli } }],
+    }
+  }
+
+  if (order.type === 'propose-peace') {
+    if (!order.peaceProposalData) {
+      return rejected(world, order, 'targetNotFound')
+    }
+    const pd = order.peaceProposalData
+    const { world: newWorld, proposalId } = createPeaceProposal(world, {
+      id: pd.proposalId,
+      proposingRealmId: pd.proposingRealmId,
+      targetRealmId: pd.targetRealmId,
+      terms: pd.terms,
+      proposedAt: world.date,
+    })
+    return {
+      world: newWorld,
+      events: [{ type: 'peaceProposed', payload: { proposalId } }],
     }
   }
 
