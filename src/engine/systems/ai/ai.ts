@@ -1,8 +1,14 @@
 import type { Army, ArmyId, GameEvent, RealmId, RNGState, SiteId, WarKey, WarState, World } from '~/shared/types'
 import { findTravelCost } from '~/engine/systems/march'
 import { nextRng } from '~/engine/random'
+import { startSiege } from '~/engine/systems/siege'
 import { declareWar, isAtWar } from '~/engine/wars'
 import { getPersonality, pickAction, type AIOption } from './utility-scorer'
+import {
+  evaluateCutSupplyOption,
+  evaluateRetreatOption,
+  evaluateSiegeOption,
+} from './tactics'
 
 // IMPORTANT: realm and army iteration order is locked to lexicographic ID sort.
 // This is a contract — changing iteration order breaks RNG reproducibility.
@@ -10,7 +16,14 @@ import { getPersonality, pickAction, type AIOption } from './utility-scorer'
 /**
  * AI planning phase step.
  * Only executes every 3 ticks (monthly).
- * Each non-player realm has 20% chance to attack an adjacent enemy site.
+ * Each non-player realm has 20% chance to pick one tactical action.
+ *
+ * Options considered per realm:
+ *  - attack: march an idle army into an adjacent enemy site
+ *  - siege-continue: start a siege on the enemy site the army is parked at
+ *  - cut-supply: march to an adjacent enemy site to tighten an existing siege
+ *  - retreat: fall back to a friendly adjacent site when outmatched or starving
+ *  - idle: do nothing (always available, low score)
  */
 export function aiPlanStep(
   world: World,
@@ -22,7 +35,9 @@ export function aiPlanStep(
 
   const events: GameEvent[] = []
   let currentRng = rng
-  const armies = new Map(world.armies)
+  let armies = new Map(world.armies)
+  let sieges = new Map(world.sieges)
+  let sites = new Map(world.sites)
   let wars = world.wars
 
   for (const realm of [...world.realms.values()].sort((a, b) => a.id.localeCompare(b.id))) {
@@ -34,7 +49,6 @@ export function aiPlanStep(
     if (roll.value >= 0.2) continue
 
     const candidateTargets = findCandidateTargets(world, armies, realm.id)
-    if (candidateTargets.length === 0) continue
 
     const options: AIOption[] = candidateTargets.map(candidate => ({
       kind: 'attack',
@@ -44,22 +58,73 @@ export function aiPlanStep(
     }))
     options.push({ kind: 'idle', score: 10 })
 
+    const worldSnapshot: World = { ...world, armies, sieges, sites, wars }
+    for (const army of [...armies.values()]
+      .filter(a => a.realmId === realm.id)
+      .sort((a, b) => a.id.localeCompare(b.id))) {
+      const siegeOpt = evaluateSiegeOption(army, worldSnapshot)
+      if (siegeOpt) options.push(siegeOpt)
+      const cutSupplyOpt = evaluateCutSupplyOption(army, worldSnapshot)
+      if (cutSupplyOpt) options.push(cutSupplyOpt)
+      const retreatOpt = evaluateRetreatOption(army, worldSnapshot)
+      if (retreatOpt) options.push(retreatOpt)
+    }
+
+    // If there are no concrete options (only idle) skip the action entirely so
+    // we keep the historical "no candidate → no events / no extra rng draws" contract.
+    if (options.length === 1) continue
+
     const personality = getPersonality(realm.id)
     const { action, nextRng: pickRng } = pickAction(options, personality, currentRng)
     currentRng = pickRng
 
-    if (action.kind === 'idle' || !action.targetSiteId || !action.armyId) continue
+    if (action.kind === 'idle') continue
+    if (!action.targetSiteId || !action.armyId) continue
 
-    const dispatch = dispatchCandidate(world, armies, wars, realm.id, {
-      targetSiteId: action.targetSiteId,
-      armyId: action.armyId,
-    })
-    wars = dispatch.wars
-    events.push(...dispatch.events)
+    if (action.kind === 'attack' || action.kind === 'cut-supply') {
+      const dispatch = dispatchCandidate(world, armies, wars, realm.id, {
+        targetSiteId: action.targetSiteId,
+        armyId: action.armyId,
+      })
+      wars = dispatch.wars
+      events.push(...dispatch.events)
+    } else if (action.kind === 'siege-continue') {
+      const tempWorld: World = { ...world, armies, sieges, sites, wars }
+      const newWorld = startSiege(tempWorld, action.armyId, action.targetSiteId)
+      armies = new Map(newWorld.armies)
+      sieges = new Map(newWorld.sieges)
+      sites = new Map(newWorld.sites)
+      events.push({
+        type: 'aiStartedSiege',
+        payload: {
+          realmId: realm.id,
+          armyId: action.armyId,
+          siteId: action.targetSiteId,
+        },
+      })
+    } else if (action.kind === 'retreat') {
+      const army = armies.get(action.armyId)
+      if (!army) continue
+      armies.set(action.armyId, {
+        ...army,
+        state: 'retreating',
+        destination: action.targetSiteId,
+        ticksRemaining: findTravelCost(world, army.location, action.targetSiteId),
+        source: army.location,
+      })
+      events.push({
+        type: 'aiRetreatedArmy',
+        payload: {
+          realmId: realm.id,
+          armyId: action.armyId,
+          targetSiteId: action.targetSiteId,
+        },
+      })
+    }
   }
 
   return {
-    world: { ...world, armies, wars },
+    world: { ...world, armies, sieges, sites, wars },
     nextRng: currentRng,
     events,
   }
@@ -123,4 +188,3 @@ function dispatchCandidate(
 
   return { wars: nextWars, events }
 }
-
