@@ -11294,7 +11294,13 @@
   "initialArmies": [],
   "initialWars": [],
   "generals": [],
-  "adjacencyEdges": [],
+  "adjacencyEdges": [
+    { "id": "ae_pass_hangu", "fromSiteId": "site_008", "toSiteId": "site_021", "passId": "pass_hangu" },
+    { "id": "ae_pass_wu", "fromSiteId": "site_044", "toSiteId": "site_040", "passId": "pass_wu" },
+    { "id": "ae_pass_hulao", "fromSiteId": "site_012", "toSiteId": "site_018", "passId": "pass_hulao" },
+    { "id": "ae_pass_xiao", "fromSiteId": "site_038", "toSiteId": "site_006", "passId": "pass_xiao" },
+    { "id": "ae_pass_dasan", "fromSiteId": "site_030", "toSiteId": "site_047", "passId": "pass_dasan" }
+  ],
   "peaceProposals": [],
   "passes": [
     {
