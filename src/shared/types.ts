@@ -68,6 +68,7 @@ export interface Army {
   readonly destination: SiteId | null
   readonly ticksRemaining: number
   readonly source: SiteId | null
+  readonly generalId?: GeneralId
 }
 
 export type OrderType = 'march' | 'declareWarAndMarch'
