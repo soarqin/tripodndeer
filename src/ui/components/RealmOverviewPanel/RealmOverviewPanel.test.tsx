@@ -63,7 +63,10 @@ describe('RealmOverviewPanel', () => {
     }
     mockWorld = {
       sites: new Map([['s1', site1], ['s2', site2], ['s3', site3]]),
-      wars: new Map([['r1:r2', sampleWar]])
+      wars: new Map([['r1:r2', sampleWar]]),
+      generals: new Map(),
+      passes: new Map(),
+      adjacencyEdges: new Map(),
     }
   })
 

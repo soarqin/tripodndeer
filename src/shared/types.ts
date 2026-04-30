@@ -45,6 +45,7 @@ export interface Site extends RawSite {
   ownerId: RealmId | null
   polygon: Polygon
   adjacency: readonly SiteId[]
+  occupation?: SiteOccupation
 }
 
 // ArmyId/ArmyTemplate - placed BEFORE Realm so Realm can reference them
@@ -56,7 +57,7 @@ export interface ArmyTemplate {
   readonly location: SiteId
 }
 
-export type ArmyState = 'idle' | 'marching' | 'retreating'
+export type ArmyState = 'idle' | 'marching' | 'retreating' | 'besieging' | 'engaged' | 'blocked'
 
 export interface Army {
   readonly id: ArmyId
@@ -81,12 +82,72 @@ export type WarKey = string
 
 export type CasusBelliId = string
 export type PeaceProposalId = string
+export type AdjacencyEdgeId = string
+export type PassId = string
+export type GeneralId = string
 
 export interface WarState {
   casusBelli: CasusBelliId | null
   declaredAt: GameDate
   occupiedSites: ReadonlyMap<SiteId, RealmId>
   peaceProposalId: PeaceProposalId | null
+}
+
+export interface RealmStats {
+  manpowerPool: number
+  manpowerCap: number
+  warWeariness: number
+}
+
+export interface AdjacencyEdge {
+  id: AdjacencyEdgeId
+  fromSiteId: SiteId
+  toSiteId: SiteId
+  passId: PassId
+}
+
+export interface General {
+  id: GeneralId
+  realmId: RealmId
+  name: string
+  might: number
+  command: number
+  loyalty: number
+  strategy?: number
+  learning?: number
+}
+
+export interface SiteOccupation {
+  occupierId: RealmId
+  controlLevel: number
+}
+
+export interface CessionPayload { siteIds: SiteId[] }
+export interface IndemnityPayload { amount: number }
+export interface TributePayload { amountPerYear: number; years: number }
+
+export type PeaceTerm =
+  | { type: 'cession'; payload: CessionPayload }
+  | { type: 'indemnity'; payload: IndemnityPayload }
+  | { type: 'tribute'; payload: TributePayload }
+
+export interface PeaceProposal {
+  id: PeaceProposalId
+  proposingRealmId: RealmId
+  targetRealmId: RealmId
+  terms: ReadonlyArray<PeaceTerm>
+  proposedAt: GameDate
+  status: 'pending' | 'accepted' | 'rejected'
+  acknowledgedAt: GameDate | null
+}
+
+export interface Pass {
+  id: PassId
+  name: string
+  edgeId: AdjacencyEdgeId
+  defenseBonus: number
+  controllerId: RealmId
+  fortification: number
 }
 
 // Realm definition (id=opaque, color=CSS string)
@@ -99,11 +160,7 @@ export interface Realm {
   readonly initialSites: readonly SiteId[]
   readonly initialArmies: readonly ArmyTemplate[]
   readonly aiPersonality: 'aggressive_random'
-  readonly stats?: {
-    manpowerPool: number
-    manpowerCap: number
-    warWeariness: number
-  }
+  readonly stats?: RealmStats
 }
 
 // 游戏日期（旬为最小单位）
@@ -144,7 +201,10 @@ export interface World {
   armies: ReadonlyMap<ArmyId, Army>
   edges: ReadonlyMap<EdgeId, MapEdge>
   wars: ReadonlyMap<WarKey, WarState>
-  peaceProposals: ReadonlyMap<PeaceProposalId, unknown>
+  peaceProposals: ReadonlyMap<PeaceProposalId, PeaceProposal>
+  generals: ReadonlyMap<GeneralId, General>
+  passes: ReadonlyMap<PassId, Pass>
+  adjacencyEdges: ReadonlyMap<AdjacencyEdgeId, AdjacencyEdge>
   playerRealmId: RealmId
   rngState: RNGState // PRNG 状态在 World，不在 module 闭包
   phases: readonly TickPhase[] // Tick 阶段数组（M0 仅 1 个，但形状必须是数组）

@@ -44,7 +44,7 @@ export const ArmyTemplateSchema = z.object({
   location: SiteIdSchema,
 })
 
-export const ArmyStateSchema = z.enum(['idle', 'marching', 'retreating'])
+export const ArmyStateSchema = z.enum(['idle', 'marching', 'retreating', 'besieging', 'engaged', 'blocked'])
 
 export const ArmySchema = z.object({
   id: ArmyIdSchema,
@@ -66,6 +66,73 @@ export const OrderSchema = z.object({
 })
 
 export const WarKeySchema = z.string().min(1)
+
+export const RealmStatsSchema = z.object({
+  manpowerPool: z.number().int().nonnegative(),
+  manpowerCap: z.number().int().positive(),
+  warWeariness: z.number().int().nonnegative(),
+})
+
+export const AdjacencyEdgeSchema = z.object({
+  id: z.string().min(1),
+  fromSiteId: SiteIdSchema,
+  toSiteId: SiteIdSchema,
+  passId: z.string().min(1),
+})
+
+export const GeneralSchema = z.object({
+  id: z.string().min(1),
+  realmId: RealmIdSchema,
+  name: z.string().min(1),
+  might: z.number().int().min(1).max(30),
+  command: z.number().int().positive(),
+  loyalty: z.number().int().min(0).max(100),
+  strategy: z.number().optional(),
+  learning: z.number().optional(),
+})
+
+export const SiteOccupationSchema = z.object({
+  occupierId: RealmIdSchema,
+  controlLevel: z.number().int().min(0).max(100),
+})
+
+export const CessionPayloadSchema = z.object({ siteIds: z.array(SiteIdSchema) })
+export const IndemnityPayloadSchema = z.object({ amount: z.number().nonnegative() })
+export const TributePayloadSchema = z.object({
+  amountPerYear: z.number().nonnegative(),
+  years: z.number().int().positive(),
+})
+export const PeaceTermSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('cession'), payload: CessionPayloadSchema }),
+  z.object({ type: z.literal('indemnity'), payload: IndemnityPayloadSchema }),
+  z.object({ type: z.literal('tribute'), payload: TributePayloadSchema }),
+])
+
+const GameDateSchema = z.object({
+  yearBC: z.number().int(),
+  season: z.enum(['spring', 'summer', 'autumn', 'winter']),
+  month: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+  xun: z.enum(['shang', 'zhong', 'xia']),
+})
+
+export const PeaceProposalSchema = z.object({
+  id: z.string().min(1),
+  proposingRealmId: RealmIdSchema,
+  targetRealmId: RealmIdSchema,
+  terms: z.array(PeaceTermSchema).max(3),
+  proposedAt: GameDateSchema,
+  status: z.enum(['pending', 'accepted', 'rejected']),
+  acknowledgedAt: GameDateSchema.nullable(),
+})
+
+export const PassSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  edgeId: z.string().min(1),
+  defenseBonus: z.number().min(0).max(1),
+  controllerId: RealmIdSchema,
+  fortification: z.number().int().min(0).max(100),
+})
 
 export const RealmSchema = z.object({
   id: RealmIdSchema,
@@ -99,13 +166,7 @@ export const M1DataSchema = z.object({
 export type M1Data = z.infer<typeof M1DataSchema>
 
 export const RealmSchemaV2 = RealmSchema.extend({
-  stats: z
-    .object({
-      manpowerPool: z.number().int().nonnegative(),
-      manpowerCap: z.number().int().positive(),
-      warWeariness: z.number().int().nonnegative(),
-    })
-    .optional(),
+  stats: RealmStatsSchema.optional(),
 })
 
 export const M1DataSchemaV2 = M1DataSchema.extend({
@@ -134,6 +195,9 @@ export const WorldSchema = z.object({
   edges: z.instanceof(Map),
   wars: z.instanceof(Map),
   peaceProposals: z.instanceof(Map),
+  generals: z.instanceof(Map),
+  passes: z.instanceof(Map),
+  adjacencyEdges: z.instanceof(Map),
   playerRealmId: z.string(),
   rngState: z.object({ seed: z.number(), counter: z.number() }),
   phases: z.array(z.function()),

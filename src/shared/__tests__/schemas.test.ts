@@ -1,11 +1,18 @@
 import { describe, it, expect } from 'vitest'
 import {
+  AdjacencyEdgeSchema,
   ArmySchema,
   ArmyStateSchema,
+  GeneralSchema,
   M0DataSchema,
   M1DataSchema,
   MapEdgeSchema,
   OrderSchema,
+  PassSchema,
+  PeaceProposalSchema,
+  PeaceTermSchema,
+  RealmStatsSchema,
+  SiteOccupationSchema,
   WorldSchema,
 } from '../schemas'
 
@@ -187,6 +194,9 @@ describe('WorldSchema', () => {
           edges: new Map(),
           wars: new Map(),
           peaceProposals: new Map(),
+          generals: new Map(),
+          passes: new Map(),
+          adjacencyEdges: new Map(),
           playerRealmId: 'realm_red',
           rngState: { seed: 1, counter: 0 },
           phases: [],
@@ -231,11 +241,87 @@ describe('ArmyStateSchema', () => {
     expect(() => ArmyStateSchema.parse('idle')).not.toThrow()
   })
 
-  it("rejects 'engaged'", () => {
-    expect(() => ArmyStateSchema.parse('engaged')).toThrow()
+  it("accepts 'engaged'", () => {
+    expect(() => ArmyStateSchema.parse('engaged')).not.toThrow()
   })
 
-  it("rejects 'fighting'", () => {
+  it("accepts 'besieging'", () => {
+    expect(() => ArmyStateSchema.parse('besieging')).not.toThrow()
+  })
+
+  it("accepts 'blocked'", () => {
+    expect(() => ArmyStateSchema.parse('blocked')).not.toThrow()
+  })
+
+  it("rejects unknown state 'fighting'", () => {
     expect(() => ArmyStateSchema.parse('fighting')).toThrow()
+  })
+})
+
+describe('M2 contract schemas', () => {
+  const validDate = { yearBC: 260, season: 'spring' as const, month: 1 as const, xun: 'shang' as const }
+
+  it('accepts valid RealmStats', () => {
+    expect(() => RealmStatsSchema.parse({ manpowerPool: 1000, manpowerCap: 5000, warWeariness: 0 })).not.toThrow()
+  })
+
+  it('rejects RealmStats with negative manpowerPool', () => {
+    expect(() => RealmStatsSchema.parse({ manpowerPool: -1, manpowerCap: 5000, warWeariness: 0 })).toThrow()
+  })
+
+  it('accepts valid AdjacencyEdge', () => {
+    expect(() => AdjacencyEdgeSchema.parse({ id: 'ae_1', fromSiteId: 'site_1', toSiteId: 'site_2', passId: 'pass_1' })).not.toThrow()
+  })
+
+  it('rejects AdjacencyEdge missing passId', () => {
+    expect(() => AdjacencyEdgeSchema.parse({ id: 'ae_1', fromSiteId: 'site_1', toSiteId: 'site_2' })).toThrow()
+  })
+
+  it('accepts valid General', () => {
+    expect(() => GeneralSchema.parse({ id: 'general_1', realmId: 'realm_qin', name: '王翦', might: 20, command: 12000, loyalty: 100 })).not.toThrow()
+  })
+
+  it('rejects General with might above 30', () => {
+    expect(() => GeneralSchema.parse({ id: 'general_1', realmId: 'realm_qin', name: '王翦', might: 31, command: 12000, loyalty: 100 })).toThrow()
+  })
+
+  it('accepts valid SiteOccupation', () => {
+    expect(() => SiteOccupationSchema.parse({ occupierId: 'realm_qin', controlLevel: 50 })).not.toThrow()
+  })
+
+  it('rejects SiteOccupation with controlLevel above 100', () => {
+    expect(() => SiteOccupationSchema.parse({ occupierId: 'realm_qin', controlLevel: 101 })).toThrow()
+  })
+
+  it('accepts valid cession PeaceTerm', () => {
+    expect(() => PeaceTermSchema.parse({ type: 'cession', payload: { siteIds: ['site_1'] } })).not.toThrow()
+  })
+
+  it('rejects cession PeaceTerm missing payload', () => {
+    expect(() => PeaceTermSchema.parse({ type: 'cession' })).toThrow()
+  })
+
+  it('accepts valid indemnity PeaceTerm', () => {
+    expect(() => PeaceTermSchema.parse({ type: 'indemnity', payload: { amount: 100 } })).not.toThrow()
+  })
+
+  it('rejects indemnity PeaceTerm with negative amount', () => {
+    expect(() => PeaceTermSchema.parse({ type: 'indemnity', payload: { amount: -1 } })).toThrow()
+  })
+
+  it('accepts pending PeaceProposal', () => {
+    expect(() => PeaceProposalSchema.parse({ id: 'peace_1', proposingRealmId: 'realm_qin', targetRealmId: 'realm_han', terms: [{ type: 'cession', payload: { siteIds: ['site_1'] } }], proposedAt: validDate, status: 'pending', acknowledgedAt: null })).not.toThrow()
+  })
+
+  it('accepts accepted PeaceProposal with acknowledgedAt', () => {
+    expect(() => PeaceProposalSchema.parse({ id: 'peace_1', proposingRealmId: 'realm_qin', targetRealmId: 'realm_han', terms: [{ type: 'tribute', payload: { amountPerYear: 10, years: 2 } }], proposedAt: validDate, status: 'accepted', acknowledgedAt: validDate })).not.toThrow()
+  })
+
+  it('accepts valid Pass', () => {
+    expect(() => PassSchema.parse({ id: 'pass_1', name: '函谷关', edgeId: 'ae_1', defenseBonus: 0.6, controllerId: 'realm_qin', fortification: 50 })).not.toThrow()
+  })
+
+  it('rejects Pass with defenseBonus above 1', () => {
+    expect(() => PassSchema.parse({ id: 'pass_1', name: '函谷关', edgeId: 'ae_1', defenseBonus: 1.1, controllerId: 'realm_qin', fortification: 50 })).toThrow()
   })
 })
