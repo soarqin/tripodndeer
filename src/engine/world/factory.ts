@@ -3,9 +3,11 @@ import m1Data from '@/content/m1/scenario.json'
 import { INITIAL_DATE } from '@/shared/constants'
 import { M0DataSchema, M1DataSchemaV2 } from '@/shared/schemas'
 import { aiPlanStep } from '~/engine/systems/ai'
-import { combatStep } from '~/engine/systems/combat'
+import { combatV2Step } from '~/engine/systems/combat-v2'
+import { manpowerTick } from '~/engine/systems/manpower'
 import { marchStep } from '~/engine/systems/march'
 import { orderApplyStep } from '~/engine/systems/orders'
+import { siegeStep } from '~/engine/systems/siege'
 import { victoryCheckStep } from '~/engine/systems/victory'
 import type {
   AdjacencyEdge,
@@ -227,7 +229,15 @@ export function createWorldFromM1Data(
     sieges: new Map<SiegeId, Siege>(),
     playerRealmId,
     rngState: { seed, counter: 0 },
-    phases: [aiPlanStep, orderApplyStep, marchStep, combatStep, victoryCheckStep],
+    phases: [
+      aiPlanStep,
+      orderApplyStep,
+      marchStep,
+      siegeStep,
+      combatV2Step,
+      manpowerTick,
+      victoryCheckStep,
+    ],
     pendingOrders: [],
   }
 }

@@ -3,9 +3,11 @@ import { describe, expect, it } from 'vitest'
 import { runTickPhases } from '@/engine/clock'
 import { PHASE_ORDER } from '@/engine/phases'
 import { aiPlanStep } from '@/engine/systems/ai'
-import { combatStep } from '@/engine/systems/combat'
+import { combatV2Step } from '@/engine/systems/combat-v2'
+import { manpowerTick } from '@/engine/systems/manpower'
 import { marchStep } from '@/engine/systems/march'
 import { orderApplyStep } from '@/engine/systems/orders'
+import { siegeStep } from '@/engine/systems/siege'
 import { victoryCheckStep } from '@/engine/systems/victory'
 import { createInitialWorld, createWorldFromM1Data, loadM0Data, loadM1Data } from '../factory'
 import type { TickPhase } from '@/shared/types'
@@ -14,7 +16,9 @@ function phaseName(phase: TickPhase): string {
   if (phase === aiPlanStep) return 'aiPlan'
   if (phase === orderApplyStep) return 'orderApply'
   if (phase === marchStep) return 'march'
-  if (phase === combatStep) return 'combat'
+  if (phase === siegeStep) return 'siege'
+  if (phase === combatV2Step) return 'combat-v2'
+  if (phase === manpowerTick) return 'manpower'
   if (phase === victoryCheckStep) return 'victoryCheck'
   return 'unknown'
 }
@@ -109,7 +113,9 @@ describe('createWorldFromM1Data — structure', () => {
       aiPlanStep,
       orderApplyStep,
       marchStep,
-      combatStep,
+      siegeStep,
+      combatV2Step,
+      manpowerTick,
       victoryCheckStep,
     ])
     expect(world.phases.map(phaseName)).toEqual(PHASE_ORDER)
