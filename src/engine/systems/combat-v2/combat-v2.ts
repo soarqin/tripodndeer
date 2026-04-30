@@ -10,6 +10,7 @@ import {
 import type { TerrainType, UnitType } from '~/content/m2/balance'
 import { nextRng, pickWithVariance } from '~/engine/random'
 import type { Army, GameDate, General, GeneralId } from '~/shared/types'
+import { pickTactic } from './tactics'
 
 export interface Composition {
   infantry: number
@@ -138,7 +139,18 @@ export function resolveCombat(ctx: BattleContext): BattleResolution {
     steps.push({ name: 'might', attackerMultiplier: 1 + mightBonus, defenderMultiplier: 1 })
   }
 
-  // Tactic registry is introduced by Task 2.6. No tactic modifier is applied here.
+  // Step 7: tactic effect (Task 2.6)
+  const tacticEffect = pickTactic(ctx)
+  if (tacticEffect) {
+    if (tacticEffect.attackMultiplier) {
+      attackerPower *= tacticEffect.attackMultiplier
+      steps.push({ name: 'tactic', attackerMultiplier: tacticEffect.attackMultiplier, defenderMultiplier: 1 })
+    }
+    if (tacticEffect.defenseMultiplier) {
+      defenderPower *= tacticEffect.defenseMultiplier
+      steps.push({ name: 'tactic', attackerMultiplier: 1, defenderMultiplier: tacticEffect.defenseMultiplier })
+    }
+  }
 
   const beforeVariance = attackerPower
   const varianceRng = { seed: ctx.date.yearBC * 1000 + ctx.date.month, counter: ctx.attackerArmy.manpower }

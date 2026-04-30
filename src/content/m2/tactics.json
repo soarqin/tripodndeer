@@ -1,0 +1,9 @@
+[
+  { "id": "qi-zheng", "name": "奇正之策", "description": "倒转优劣形势" },
+  { "id": "sheng-dong", "name": "声东击西", "description": "迷惑对方减少防御" },
+  { "id": "you-di", "name": "诱敌深入", "description": "引诱后反扑" },
+  { "id": "bei-shui", "name": "背水一战", "description": "以弱敌强奋死一战" },
+  { "id": "wei-shi", "name": "围师必阙", "description": "给敌方逃路动摇士气" },
+  { "id": "yi-zhan", "name": "以战养战", "description": "战后从占领地获取兵源" },
+  { "id": "pi-di", "name": "疲敌之计", "description": "长期对峙消耗对方" }
+]

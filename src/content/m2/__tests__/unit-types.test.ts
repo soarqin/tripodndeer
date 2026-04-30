@@ -56,11 +56,12 @@ describe('unit type counter matrix', () => {
   })
 
   it('chariot vs crossbow: chariot is disadvantaged', () => {
+    // Use unequal manpower (ratio 0.667) to bypass tactic registry qi-zheng (active in [0.8, 1.2])
     const chariotCtx = ctx(
-      makeArmy(1000),
-      1000,
-      { infantry: 0, chariot: 1000, cavalry: 0, crossbow: 0 },
-      { infantry: 0, chariot: 0, cavalry: 0, crossbow: 1000 },
+      makeArmy(800),
+      1200,
+      { infantry: 0, chariot: 800, cavalry: 0, crossbow: 0 },
+      { infantry: 0, chariot: 0, cavalry: 0, crossbow: 1200 },
     )
     const result = resolveCombat(chariotCtx)
     expect(result.winner).toBe('defender')

@@ -122,7 +122,7 @@ describe('resolveCombat v2', () => {
 
   it('pass defense bonus increases defender power', () => {
     const result = resolveCombat(makeContext({
-      defenderArmies: [makeArmy({ id: 'army_defender', realmId: 'realm_han', manpower: 900 })],
+      defenderArmies: [makeArmy({ id: 'army_defender', realmId: 'realm_han', manpower: 1400 })],
       battleType: 'pass-assault',
       passDefenseBonus: 0.2,
     }))
@@ -134,7 +134,7 @@ describe('resolveCombat v2', () => {
   it('commits only attacker manpower within the general command cap', () => {
     const result = resolveCombat(makeContext({
       attackerArmy: makeArmy({ manpower: 8000 }),
-      defenderArmies: [makeArmy({ id: 'army_defender', realmId: 'realm_han', manpower: 6000 })],
+      defenderArmies: [makeArmy({ id: 'army_defender', realmId: 'realm_han', manpower: 8000 })],
       attackerGeneral: makeGeneral({ command: 5000 }),
     }))
 
@@ -195,6 +195,7 @@ describe('resolveCombat v2', () => {
       'counter',
       'terrain',
       'pass-defense',
+      'tactic',
       'variance',
     ])
   })
