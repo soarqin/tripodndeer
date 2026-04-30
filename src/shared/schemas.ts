@@ -133,6 +133,7 @@ export const WorldSchema = z.object({
   armies: z.instanceof(Map),
   edges: z.instanceof(Map),
   wars: z.instanceof(Map),
+  peaceProposals: z.instanceof(Map),
   playerRealmId: z.string(),
   rngState: z.object({ seed: z.number(), counter: z.number() }),
   phases: z.array(z.function()),

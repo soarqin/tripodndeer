@@ -1,4 +1,4 @@
-import type { Army, ArmyId, GameEvent, RealmId, RNGState, SiteId, WarKey, World } from '~/shared/types'
+import type { Army, ArmyId, GameEvent, RealmId, RNGState, SiteId, WarKey, WarState, World } from '~/shared/types'
 import { nextInt, nextRng } from '~/engine/random'
 import { declareWar, isAtWar } from '~/engine/wars'
 
@@ -77,10 +77,10 @@ function findCandidateTargets(
 function dispatchCandidate(
   world: World,
   armies: Map<ArmyId, Army>,
-  wars: ReadonlyMap<WarKey, true>,
+  wars: ReadonlyMap<WarKey, WarState>,
   realmId: RealmId,
   candidate: { targetSiteId: SiteId; armyId: ArmyId },
-): { wars: ReadonlyMap<WarKey, true>; events: GameEvent[] } {
+): { wars: ReadonlyMap<WarKey, WarState>; events: GameEvent[] } {
   const { targetSiteId, armyId } = candidate
   const targetSite = world.sites.get(targetSiteId)
   const army = armies.get(armyId)

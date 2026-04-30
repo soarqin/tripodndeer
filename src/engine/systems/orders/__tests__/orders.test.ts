@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import type { Army, MapEdge, Order, RNGState, Realm, Site, World } from '~/shared/types'
+import type { Army, MapEdge, Order, RNGState, Realm, Site, WarState, World } from '~/shared/types'
 import { warKey } from '~/engine/wars'
+
+function makeWarState(): WarState {
+  return {
+    casusBelli: null,
+    declaredAt: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
+    occupiedSites: new Map(),
+    peaceProposalId: null,
+  }
+}
 import { applyOrder, orderApplyStep } from '../index'
 
 const playerRealmId = 'realm_qin'
@@ -82,6 +91,7 @@ function baseWorld(overrides: Partial<World> = {}): World {
       ['edge_b_c', otherEdge],
     ]),
     wars: new Map(),
+    peaceProposals: new Map(),
     playerRealmId,
     rngState: { seed: 0, counter: 0 },
     phases: [],
@@ -115,7 +125,7 @@ describe('applyOrder declareWarAndMarch', () => {
 
   it('does not redeclare war when already at war', () => {
     const world = baseWorld({
-      wars: new Map([[warKey(playerRealmId, enemyRealmId), true]]),
+      wars: new Map([[warKey(playerRealmId, enemyRealmId), makeWarState()]]),
     })
     const order: Order = {
       type: 'declareWarAndMarch',
@@ -133,7 +143,7 @@ describe('applyOrder declareWarAndMarch', () => {
 describe('applyOrder march (already at war)', () => {
   it('army starts marching when realms are at war', () => {
     const world = baseWorld({
-      wars: new Map([[warKey(playerRealmId, enemyRealmId), true]]),
+      wars: new Map([[warKey(playerRealmId, enemyRealmId), makeWarState()]]),
     })
     const order: Order = {
       type: 'march',
@@ -231,7 +241,7 @@ describe('orderApplyStep batch processing', () => {
   it('applies multiple orders in sequence and clears pendingOrders', () => {
     const army2 = makeArmy({ id: 'army_2', location: 'site_b', realmId: enemyRealmId })
     const world = baseWorld({
-      wars: new Map([[warKey(playerRealmId, enemyRealmId), true]]),
+      wars: new Map([[warKey(playerRealmId, enemyRealmId), makeWarState()]]),
       armies: new Map([
         ['army_1', makeArmy()],
         ['army_2', army2],

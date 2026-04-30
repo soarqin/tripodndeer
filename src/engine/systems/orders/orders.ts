@@ -1,4 +1,4 @@
-import type { Army, GameEvent, Order, RNGState, Site, SiteId, WarKey, World } from '~/shared/types'
+import type { Army, GameEvent, Order, RNGState, Site, SiteId, WarKey, WarState, World } from '~/shared/types'
 import { declareWar, isAtWar } from '~/engine/wars'
 
 type OrderResult = { world: World; events: readonly GameEvent[] }
@@ -75,12 +75,12 @@ function validateOrder(world: World, order: Order): ValidationResult {
 }
 
 function maybeDeclareWar(
-  wars: ReadonlyMap<WarKey, true>,
+  wars: ReadonlyMap<WarKey, WarState>,
   order: Order,
   army: Army,
   targetSite: Site,
   events: GameEvent[],
-): ReadonlyMap<WarKey, true> {
+): ReadonlyMap<WarKey, WarState> {
   if (order.type !== 'declareWarAndMarch') return wars
   if (!targetSite.ownerId || targetSite.ownerId === army.realmId) return wars
   if (isAtWar(wars, army.realmId, targetSite.ownerId)) return wars

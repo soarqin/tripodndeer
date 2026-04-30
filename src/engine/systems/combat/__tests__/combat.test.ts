@@ -40,6 +40,7 @@ function makeWorld(armies: readonly Army[], sites: readonly Site[] = []): World 
     armies: new Map(armies.map((army) => [army.id, army])),
     edges: new Map(),
     wars: new Map(),
+    peaceProposals: new Map(),
     playerRealmId: 'realm_qin',
     rngState: rng,
     phases: [],

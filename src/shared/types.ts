@@ -79,6 +79,16 @@ export interface Order {
 
 export type WarKey = string
 
+export type CasusBelliId = string
+export type PeaceProposalId = string
+
+export interface WarState {
+  casusBelli: CasusBelliId | null
+  declaredAt: GameDate
+  occupiedSites: ReadonlyMap<SiteId, RealmId>
+  peaceProposalId: PeaceProposalId | null
+}
+
 // Realm definition (id=opaque, color=CSS string)
 export interface Realm {
   readonly id: RealmId
@@ -133,7 +143,8 @@ export interface World {
   realms: ReadonlyMap<RealmId, Realm>
   armies: ReadonlyMap<ArmyId, Army>
   edges: ReadonlyMap<EdgeId, MapEdge>
-  wars: ReadonlyMap<WarKey, true>
+  wars: ReadonlyMap<WarKey, WarState>
+  peaceProposals: ReadonlyMap<PeaceProposalId, unknown>
   playerRealmId: RealmId
   rngState: RNGState // PRNG 状态在 World，不在 module 闭包
   phases: readonly TickPhase[] // Tick 阶段数组（M0 仅 1 个，但形状必须是数组）

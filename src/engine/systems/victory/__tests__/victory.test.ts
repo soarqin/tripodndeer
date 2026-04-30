@@ -26,6 +26,7 @@ function makeWorld(siteOwners: Record<string, string>, playerRealmId: string): W
     armies: new Map(),
     edges: new Map(),
     wars: new Map(),
+    peaceProposals: new Map(),
     playerRealmId,
     rngState: { seed: 0, counter: 0 },
     phases: [],

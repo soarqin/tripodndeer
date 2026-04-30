@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { RealmOverviewPanel } from './RealmOverviewPanel'
-import type { Army, Realm, Site, World } from '~/shared/types'
+import type { Army, Realm, Site, WarState, World } from '~/shared/types'
 
 let mockActivePanel: 'wanggong' | 'junshi' | null = 'wanggong'
 let mockRealm: Realm | null = null
@@ -55,9 +55,15 @@ describe('RealmOverviewPanel', () => {
       { id: 'a2', realmId: 'r1', manpower: 5000, state: 'marching', location: 's1', destination: 's2', ticksRemaining: 10, source: 's1' }
     ]
 
+    const sampleWar: WarState = {
+      casusBelli: null,
+      declaredAt: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
+      occupiedSites: new Map(),
+      peaceProposalId: null,
+    }
     mockWorld = {
       sites: new Map([['s1', site1], ['s2', site2], ['s3', site3]]),
-      wars: new Map([['r1:r2', true]])
+      wars: new Map([['r1:r2', sampleWar]])
     }
   })
 

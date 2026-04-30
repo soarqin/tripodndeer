@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import type { Army, MapEdge, Realm, RNGState, Site, World } from '~/shared/types'
+import type { Army, MapEdge, Realm, RNGState, Site, WarState, World } from '~/shared/types'
 import { createInitialRng } from '~/engine/random'
 import { warKey } from '~/engine/wars'
 import { aiPlanStep } from '../index'
+
+function makeWarState(): WarState {
+  return {
+    casusBelli: null,
+    declaredAt: { yearBC: 300, season: 'spring', month: 1, xun: 'shang' },
+    occupiedSites: new Map(),
+    peaceProposalId: null,
+  }
+}
 
 const playerRealmId = 'realm_player'
 const aiRealmId = 'realm_ai'
@@ -84,6 +93,7 @@ function baseWorld(overrides: Partial<World> = {}): World {
       ['edge_enemy_distant', distantEdge],
     ]),
     wars: new Map(),
+    peaceProposals: new Map(),
     playerRealmId,
     rngState: createInitialRng(1),
     phases: [],
@@ -199,7 +209,7 @@ describe('aiPlanStep war and dispatch effects', () => {
   })
 
   it('does not redeclare war when already at war', () => {
-    const world = baseWorld({ wars: new Map([[warKey(aiRealmId, enemyRealmId), true]]) })
+    const world = baseWorld({ wars: new Map([[warKey(aiRealmId, enemyRealmId), makeWarState()]]) })
 
     const result = aiPlanStep(world, createInitialRng(1))
 

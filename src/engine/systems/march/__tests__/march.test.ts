@@ -12,6 +12,7 @@ function makeWorld(armies: Army[]): World {
     armies: new Map(armies.map((army) => [army.id, army])),
     edges: new Map(),
     wars: new Map(),
+    peaceProposals: new Map(),
     playerRealmId: 'realm_qin',
     rngState: { seed: 0, counter: 0 },
     phases: [],

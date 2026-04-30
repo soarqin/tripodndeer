@@ -20,6 +20,7 @@ import type {
   SiteId,
   Vec2,
   WarKey,
+  WarState,
   World,
 } from '@/shared/types'
 import type { M1DataV2 } from '@/shared/schemas'
@@ -134,7 +135,8 @@ export function createInitialWorld(data: M0Data, seed: number): World {
     realms,
     edges: edgesMap,
     armies: new Map(),
-    wars: new Map(),
+    wars: new Map<WarKey, WarState>(),
+    peaceProposals: new Map<string, unknown>(),
     playerRealmId: data.realms[0]?.id ?? '',
     rngState: { seed, counter: 0 },
     phases: [],
@@ -169,10 +171,15 @@ export function createWorldFromM1Data(
     }
   }
 
-  const wars = new Map<WarKey, true>()
+  const wars = new Map<WarKey, WarState>()
   for (const war of data.initialWars) {
     const key = [war.a, war.b].sort().join(':')
-    wars.set(key, true)
+    wars.set(key, {
+      casusBelli: null,
+      declaredAt: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
+      occupiedSites: new Map(),
+      peaceProposalId: null,
+    })
   }
 
   return {
@@ -183,6 +190,7 @@ export function createWorldFromM1Data(
     armies,
     edges,
     wars,
+    peaceProposals: new Map<string, unknown>(),
     playerRealmId,
     rngState: { seed, counter: 0 },
     phases: [aiPlanStep, orderApplyStep, marchStep, combatStep, victoryCheckStep],

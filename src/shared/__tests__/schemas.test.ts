@@ -186,6 +186,7 @@ describe('WorldSchema', () => {
           armies: new Map(),
           edges: new Map(),
           wars: new Map(),
+          peaceProposals: new Map(),
           playerRealmId: 'realm_red',
           rngState: { seed: 1, counter: 0 },
           phases: [],
