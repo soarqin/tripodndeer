@@ -10,6 +10,8 @@ const {
   mockOpenContextMenu,
   mockSites,
   mockArmies,
+  mockPasses,
+  mockAdjacencyEdges,
 } = vi.hoisted(() => {
   const polygon: Polygon = [
     [0, 0],
@@ -17,7 +19,7 @@ const {
     [100, 100],
     [0, 100],
   ]
-  const site: Partial<Site> & { id: string; polygon: Polygon } = {
+  const siteA: Partial<Site> & { id: string; polygon: Polygon } = {
     id: 'site_a',
     name: 'Site A',
     polygon,
@@ -26,11 +28,26 @@ const {
     ownerId: null,
     adjacency: [],
   }
-  const sites = new Map<string, typeof site>([['site_a', site]])
+  const siteB: Partial<Site> & { id: string; polygon: Polygon } = {
+    id: 'site_b',
+    name: 'Site B',
+    polygon,
+    boundary: [],
+    position: [150, 50],
+    ownerId: null,
+    adjacency: [],
+  }
+  const sites = new Map<string, any>([['site_a', siteA], ['site_b', siteB]])
   // Two armies — only player's qualifies for hit.
   const armies = new Map<string, { id: string; realmId: string; location: string }>([
     ['army_enemy', { id: 'army_enemy', realmId: 'realm_chu', location: 'site_a' }],
     ['army_player', { id: 'army_player', realmId: 'realm_qin', location: 'site_a' }],
+  ])
+  const passes = new Map<string, any>([
+    ['pass_1', { id: 'pass_1', name: 'Hangu Pass', edgeId: 'ae_1', defenseBonus: 0.5, controllerId: 'realm_qin', fortification: 0 }]
+  ])
+  const adjacencyEdges = new Map<string, any>([
+    ['ae_1', { id: 'ae_1', fromSiteId: 'site_a', toSiteId: 'site_b', passId: 'pass_1' }]
   ])
   return {
     mockSelectArmy: vi.fn(),
@@ -38,6 +55,8 @@ const {
     mockOpenContextMenu: vi.fn(),
     mockSites: sites,
     mockArmies: armies,
+    mockPasses: passes,
+    mockAdjacencyEdges: adjacencyEdges,
   }
 })
 
@@ -55,7 +74,11 @@ vi.mock('@/ui/store/game-store', () => {
     clearSelection: mockClearSelection,
     openContextMenu: mockOpenContextMenu,
     playerRealmId: 'realm_qin',
-    world: { armies: mockArmies },
+    world: { 
+      armies: mockArmies,
+      passes: mockPasses,
+      adjacencyEdges: mockAdjacencyEdges,
+    },
     selectedArmyId: null,
   }
   const useGameStore = vi.fn((selector) => selector(storeState))
@@ -76,6 +99,7 @@ beforeEach(() => {
   mockOpenContextMenu.mockClear()
   const mockCtx = {
     fillRect: vi.fn(),
+    strokeRect: vi.fn(),
     drawImage: vi.fn(),
     clearRect: vi.fn(),
     save: vi.fn(),
@@ -116,6 +140,16 @@ describe('MapCanvas (rendering)', () => {
     const canvas = renderCanvas()
     expect(canvas.width).toBe(800)
     expect(canvas.height).toBe(600)
+  })
+
+  it('renders pass icons at the midpoint of adjacency edges', () => {
+    const canvas = renderCanvas()
+    const ctx = canvas.getContext('2d') as any
+    
+    // Midpoint of site A (50, 50) and site B (150, 50) is (100, 50)
+    // The pass icon is drawn with fillRect(cx - 4, cy - 2, 8, 6)
+    expect(ctx.fillRect).toHaveBeenCalledWith(100 - 4, 50 - 2, 8, 6)
+    expect(ctx.strokeRect).toHaveBeenCalledWith(100 - 4, 50 - 2, 8, 6)
   })
 })
 

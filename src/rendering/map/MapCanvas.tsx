@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useCallback, useMemo } from 'react'
+import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react'
 import { useSites, useRealms, useEdges } from '@/ui/store/selectors'
 import { useGameStore } from '@/ui/store/game-store'
-import type { Site, Vec2 } from '@/shared/types'
+import type { Site, Vec2, Pass, AdjacencyEdge, Realm } from '@/shared/types'
 import { buildTileCache } from './tile-cache'
 import { findHitSite } from './hit-test'
 import { drawArmies } from './army-render'
@@ -129,6 +129,72 @@ function findPlayerArmyAtSite(
   return null
 }
 
+function drawArmiesAndPasses(
+  ctx: CanvasRenderingContext2D,
+  armies: ReadonlyMap<string, any>,
+  sites: ReadonlyMap<string, Site>,
+  realms: ReadonlyMap<string, Realm>,
+  selectedArmyId: string | null,
+  passes: ReadonlyMap<string, Pass>,
+  adjacencyEdges: ReadonlyMap<string, AdjacencyEdge>,
+) {
+  drawArmies(ctx, armies, sites, realms, selectedArmyId)
+
+  ctx.save()
+  for (const pass of passes.values()) {
+    const ae = adjacencyEdges.get(pass.edgeId)
+    if (!ae) continue
+    const site1 = sites.get(ae.fromSiteId)
+    const site2 = sites.get(ae.toSiteId)
+    if (!site1 || !site2) continue
+
+    const cx = (site1.position[0] + site2.position[0]) / 2
+    const cy = (site1.position[1] + site2.position[1]) / 2
+
+    const realm = realms.get(pass.controllerId)
+    const color = realm?.color ?? '#888888'
+
+    ctx.fillStyle = color
+    ctx.strokeStyle = '#333'
+    ctx.lineWidth = 1
+
+    // Padlock body
+    ctx.fillRect(cx - 4, cy - 2, 8, 6)
+    ctx.strokeRect(cx - 4, cy - 2, 8, 6)
+
+    // Padlock shackle
+    ctx.beginPath()
+    ctx.arc(cx, cy - 2, 2.5, Math.PI, 0)
+    ctx.stroke()
+  }
+  ctx.restore()
+}
+
+function findHitPass(
+  point: Vec2,
+  passes: ReadonlyMap<string, Pass>,
+  adjacencyEdges: ReadonlyMap<string, AdjacencyEdge>,
+  sites: ReadonlyMap<string, Site>,
+): string | null {
+  for (const pass of passes.values()) {
+    const ae = adjacencyEdges.get(pass.edgeId)
+    if (!ae) continue
+    const site1 = sites.get(ae.fromSiteId)
+    const site2 = sites.get(ae.toSiteId)
+    if (!site1 || !site2) continue
+
+    const cx = (site1.position[0] + site2.position[0]) / 2
+    const cy = (site1.position[1] + site2.position[1]) / 2
+
+    const dx = point[0] - cx
+    const dy = point[1] - cy
+    if (dx * dx + dy * dy <= 64) { // radius 8
+      return pass.id
+    }
+  }
+  return null
+}
+
 function dispatchLeftClick(hitSiteId: string | null): void {
   const store = useGameStore.getState()
   if (hitSiteId === null) {
@@ -150,7 +216,36 @@ function dispatchLeftClick(hitSiteId: string | null): void {
 function useCanvasInteractionHandlers(
   canvasRef: React.RefObject<HTMLCanvasElement>,
   sites: ReadonlyMap<string, Site>,
+  passes: ReadonlyMap<string, Pass>,
+  adjacencyEdges: ReadonlyMap<string, AdjacencyEdge>,
 ) {
+  const [hoveredPassId, setHoveredPassId] = useState<string | null>(null)
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
+
+  const handleMouseMove = useCallback(
+    (event: React.MouseEvent<HTMLCanvasElement>) => {
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const point = getCanvasPoint(canvas, event)
+      const hitPassId = findHitPass(point, passes, adjacencyEdges, sites)
+      
+      if (hitPassId !== hoveredPassId) {
+        setHoveredPassId(hitPassId)
+      }
+      if (hitPassId) {
+        setTooltipPos({ x: event.clientX, y: event.clientY })
+      } else {
+        setTooltipPos(null)
+      }
+    },
+    [canvasRef, sites, passes, adjacencyEdges, hoveredPassId],
+  )
+
+  const handleMouseLeave = useCallback(() => {
+    setHoveredPassId(null)
+    setTooltipPos(null)
+  }, [])
+
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement>) => {
       const canvas = canvasRef.current
@@ -178,7 +273,7 @@ function useCanvasInteractionHandlers(
     [canvasRef, sites],
   )
 
-  return { handleClick, handleContextMenu }
+  return { handleClick, handleContextMenu, handleMouseMove, handleMouseLeave, hoveredPassId, tooltipPos }
 }
 
 export function MapCanvas(): React.JSX.Element {
@@ -188,6 +283,8 @@ export function MapCanvas(): React.JSX.Element {
   const realms = useRealms()
   const edges = useEdges()
   const armies = useGameStore(s => s.world.armies)
+  const passes = useGameStore(s => s.world.passes)
+  const adjacencyEdges = useGameStore(s => s.world.adjacencyEdges)
   const selectedArmyId = useGameStore(s => s.selectedArmyId)
 
   // Build tile cache once (or when sites/realms change — rare)
@@ -201,22 +298,48 @@ export function MapCanvas(): React.JSX.Element {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
     drawMap(ctx, sites, tileCache, transitionsRef.current, performance.now())
-    drawArmies(ctx, armies, sites, realms, selectedArmyId)
-  }, [sites, tileCache, armies, realms, selectedArmyId])
+    drawArmiesAndPasses(ctx, armies, sites, realms, selectedArmyId, passes, adjacencyEdges)
+  }, [sites, tileCache, armies, realms, selectedArmyId, passes, adjacencyEdges])
 
   useCanvasAnimation(draw, transitionsRef)
 
-  const { handleClick, handleContextMenu } = useCanvasInteractionHandlers(canvasRef, sites)
+  const { handleClick, handleContextMenu, handleMouseMove, handleMouseLeave, hoveredPassId, tooltipPos } = useCanvasInteractionHandlers(canvasRef, sites, passes, adjacencyEdges)
+
+  const hoveredPass = hoveredPassId ? passes.get(hoveredPassId) : null
+  const hoveredPassController = hoveredPass ? realms.get(hoveredPass.controllerId) : null
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={CANVAS_WIDTH}
-      height={CANVAS_HEIGHT}
-      style={{ display: 'block' }}
-      data-testid="map-canvas"
-      onClick={handleClick}
-      onContextMenu={handleContextMenu}
-    />
+    <div style={{ position: 'relative', width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}>
+      <canvas
+        ref={canvasRef}
+        width={CANVAS_WIDTH}
+        height={CANVAS_HEIGHT}
+        style={{ display: 'block' }}
+        data-testid="map-canvas"
+        onClick={handleClick}
+        onContextMenu={handleContextMenu}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      />
+      {hoveredPass && tooltipPos && (
+        <div
+          style={{
+            position: 'fixed',
+            left: tooltipPos.x + 10,
+            top: tooltipPos.y + 10,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            color: 'white',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            fontSize: '12px',
+            pointerEvents: 'none',
+            zIndex: 1000,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {hoveredPass.name} | 控制：{hoveredPassController?.displayName ?? '无'} | 防御：+{Math.round(hoveredPass.defenseBonus * 100)}%
+        </div>
+      )}
+    </div>
   )
 }
