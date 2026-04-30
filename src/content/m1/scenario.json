@@ -1,4 +1,5 @@
 {
+  "schema_version": 2,
   "edges": {
     "e_001": {
       "id": "e_001",
@@ -11003,6 +11004,11 @@
           "location": "site_003"
         }
       ],
+      "stats": {
+        "manpowerPool": 50000,
+        "manpowerCap": 80000,
+        "warWeariness": 0
+      },
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11034,6 +11040,11 @@
           "location": "site_009"
         }
       ],
+      "stats": {
+        "manpowerPool": 50000,
+        "manpowerCap": 80000,
+        "warWeariness": 0
+      },
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11062,6 +11073,11 @@
           "location": "site_007"
         }
       ],
+      "stats": {
+        "manpowerPool": 50000,
+        "manpowerCap": 80000,
+        "warWeariness": 0
+      },
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11089,6 +11105,11 @@
           "location": "site_013"
         }
       ],
+      "stats": {
+        "manpowerPool": 50000,
+        "manpowerCap": 80000,
+        "warWeariness": 0
+      },
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11116,6 +11137,11 @@
           "location": "site_031"
         }
       ],
+      "stats": {
+        "manpowerPool": 50000,
+        "manpowerCap": 80000,
+        "warWeariness": 0
+      },
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11145,6 +11171,11 @@
           "location": "site_021"
         }
       ],
+      "stats": {
+        "manpowerPool": 50000,
+        "manpowerCap": 80000,
+        "warWeariness": 0
+      },
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11172,6 +11203,11 @@
           "location": "site_010"
         }
       ],
+      "stats": {
+        "manpowerPool": 50000,
+        "manpowerCap": 80000,
+        "warWeariness": 0
+      },
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11195,6 +11231,11 @@
           "location": "site_012"
         }
       ],
+      "stats": {
+        "manpowerPool": 50000,
+        "manpowerCap": 80000,
+        "warWeariness": 0
+      },
       "aiPersonality": "aggressive_random"
     }
   ],
@@ -11251,5 +11292,50 @@
     "site_050": "realm_qin"
   },
   "initialArmies": [],
-  "initialWars": []
+  "initialWars": [],
+  "generals": [],
+  "adjacencyEdges": [],
+  "peaceProposals": [],
+  "passes": [
+    {
+      "id": "pass_hangu",
+      "name": "函谷关",
+      "edgeId": "ae_pass_hangu",
+      "defenseBonus": 0.6,
+      "controllerId": "realm_qin",
+      "fortification": 80
+    },
+    {
+      "id": "pass_wu",
+      "name": "武关",
+      "edgeId": "ae_pass_wu",
+      "defenseBonus": 0.5,
+      "controllerId": "realm_qin",
+      "fortification": 70
+    },
+    {
+      "id": "pass_hulao",
+      "name": "虎牢关",
+      "edgeId": "ae_pass_hulao",
+      "defenseBonus": 0.65,
+      "controllerId": "realm_han",
+      "fortification": 75
+    },
+    {
+      "id": "pass_xiao",
+      "name": "萧关",
+      "edgeId": "ae_pass_xiao",
+      "defenseBonus": 0.5,
+      "controllerId": "realm_qin",
+      "fortification": 60
+    },
+    {
+      "id": "pass_dasan",
+      "name": "大散关",
+      "edgeId": "ae_pass_dasan",
+      "defenseBonus": 0.55,
+      "controllerId": "realm_qin",
+      "fortification": 70
+    }
+  ]
 }
