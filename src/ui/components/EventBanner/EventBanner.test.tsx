@@ -35,6 +35,20 @@ describe('EventBanner', () => {
     expect(screen.getByTestId('event-banner').textContent).toBe('Test Banner Text')
   })
 
+  it.each([
+    ['siegeStarted', '围城开始'],
+    ['peaceProposed', '提议议和'],
+    ['passCaptured', '关隘易主'],
+  ])('maps new event type %s to %s', (eventType, expectedText) => {
+    act(() => {
+      useGameStore.getState().showBanner(eventType)
+    })
+
+    render(<EventBanner />)
+
+    expect(screen.getByTestId('event-banner').textContent).toBe(expectedText)
+  })
+
   it('auto-hides after 3 seconds', () => {
     act(() => {
       useGameStore.getState().showBanner('Test Banner')
