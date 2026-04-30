@@ -11,6 +11,8 @@ import type {
   RNGState,
   Treaty,
   TreatyId,
+  WarKey,
+  WarState,
   World,
 } from '~/shared/types'
 import {
@@ -21,11 +23,13 @@ import {
   DIPLOMACY_RELATION_NEUTRAL_TRUST,
   DIPLOMACY_TRUCE_DURATION_TICKS,
 } from '~/content/m2/balance'
+import { endWar, warKey } from '~/engine/wars'
 import { clampRelation, relationKey, scoreDiplomacyAcceptance } from './diplomacy-core'
 
 interface LifecycleState {
   readonly proposals: Map<string, DiplomaticProposal>
   readonly treaties: Map<string, Treaty>
+  wars: Map<WarKey, WarState>
   readonly relations: Map<RelationKey, DiplomaticRelation>
   readonly history: DiplomacyEvent[]
   readonly events: GameEvent[]
@@ -40,6 +44,7 @@ export function diplomacyLifecycleStep(
   const state: LifecycleState = {
     proposals: new Map(world.diplomaticProposals),
     treaties: new Map(world.treaties),
+    wars: new Map(world.wars),
     relations: new Map(world.relations),
     history: [...world.diplomacyHistory],
     events: [],
@@ -53,6 +58,7 @@ export function diplomacyLifecycleStep(
     ...world,
     diplomaticProposals: state.proposals,
     treaties: state.treaties,
+    wars: state.wars,
     relations: state.relations,
     diplomacyHistory: state.history,
   }
@@ -138,10 +144,16 @@ function driftRelations(world: World, state: LifecycleState): void {
 
 function acceptProposal(world: World, state: LifecycleState, proposal: DiplomaticProposal): void {
   const treatyKind = treatyKindForProposal(proposal.kind)
-  const treatyId = createTreatyId(proposal, treatyKind, world.tick)
-  const treaty = createTreaty(world, proposal, treatyKind, treatyId)
+  const treaty = proposal.kind === 'peace'
+    ? createOrRefreshTruce(world, state, proposal)
+    : createTreaty(world, proposal, treatyKind, createTreatyId(proposal, treatyKind, world.tick))
   state.treaties.set(treaty.id, treaty)
   state.proposals.delete(proposal.id)
+
+  if (proposal.kind === 'peace') {
+    const key = warKey(proposal.proposingRealmId, proposal.targetRealmId)
+    state.wars = new Map(endWar(state.wars, key))
+  }
 
   pushHistory(world, state, {
     kind: 'proposal_resolved',
@@ -156,6 +168,24 @@ function acceptProposal(world: World, state: LifecycleState, proposal: Diplomati
     proposalId: proposal.id,
     treatyId: treaty.id,
   })
+}
+
+function createOrRefreshTruce(world: World, state: LifecycleState, proposal: DiplomaticProposal): Treaty {
+  const existing = sortedTreaties(state.treaties).find(treaty => treaty.kind === 'truce'
+    && treaty.status === 'active'
+    && relationKey(treaty.realmAId, treaty.realmBId) === relationKey(proposal.proposingRealmId, proposal.targetRealmId))
+  if (!existing) return createTreaty(world, proposal, 'truce', createTreatyId(proposal, 'truce', world.tick))
+
+  return {
+    ...existing,
+    signedAt: world.date,
+    signedAtTick: world.tick,
+    expiresAt: world.date,
+    expiresAtTick: world.tick + DIPLOMACY_TRUCE_DURATION_TICKS,
+    endedAt: null,
+    endedAtTick: null,
+    sourceProposalId: proposal.id,
+  }
 }
 
 function removeProposal(

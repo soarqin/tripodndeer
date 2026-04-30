@@ -116,7 +116,7 @@ export type DiplomaticActionKind = 'alliance' | 'non_aggression' | 'tribute' | '
 export type DiplomaticProposalStatus = 'pending' | 'accepted' | 'rejected' | 'expired' | 'cancelled'
 export type DiplomaticTreatyKind = 'alliance' | 'non_aggression' | 'tribute' | 'marriage' | 'truce'
 export type DiplomaticTreatyStatus = 'active' | 'expired' | 'cancelled' | 'broken'
-export type DiplomacyEventKind = 'proposal_created' | 'proposal_resolved' | 'treaty_created' | 'treaty_ended' | 'relation_changed' | 'coalition_changed' | 'zhou_investiture_changed'
+export type DiplomacyEventKind = 'proposal_created' | 'proposal_resolved' | 'treaty_created' | 'treaty_ended' | 'war_declared' | 'relation_changed' | 'coalition_changed' | 'zhou_investiture_changed'
 export type CoalitionStatus = 'forming' | 'active' | 'dissolved'
 
 export interface DiplomaticRelation {

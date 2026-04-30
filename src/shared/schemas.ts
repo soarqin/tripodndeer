@@ -192,7 +192,7 @@ export const DiplomaticActionKindSchema = z.enum(['alliance', 'non_aggression', 
 export const DiplomaticProposalStatusSchema = z.enum(['pending', 'accepted', 'rejected', 'expired', 'cancelled'])
 export const DiplomaticTreatyKindSchema = z.enum(['alliance', 'non_aggression', 'tribute', 'marriage', 'truce'])
 export const DiplomaticTreatyStatusSchema = z.enum(['active', 'expired', 'cancelled', 'broken'])
-export const DiplomacyEventKindSchema = z.enum(['proposal_created', 'proposal_resolved', 'treaty_created', 'treaty_ended', 'relation_changed', 'coalition_changed', 'zhou_investiture_changed'])
+export const DiplomacyEventKindSchema = z.enum(['proposal_created', 'proposal_resolved', 'treaty_created', 'treaty_ended', 'war_declared', 'relation_changed', 'coalition_changed', 'zhou_investiture_changed'])
 export const CoalitionStatusSchema = z.enum(['forming', 'active', 'dissolved'])
 
 export const DiplomaticRelationSchema = z.object({

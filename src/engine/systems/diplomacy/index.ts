@@ -8,6 +8,7 @@ export {
   validateDiplomacyAction,
 } from './diplomacy-core'
 export { diplomacyLifecycleStep } from './lifecycle'
+export { applyDiplomacyAction } from './integration'
 export type {
   DiplomacyActionRequest,
   DiplomacyProposalOrOrder,
