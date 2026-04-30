@@ -72,7 +72,7 @@ describe('SiteContextMenu', () => {
     expect((button as HTMLButtonElement).disabled).toBe(true)
   })
 
-  it('enemy site with war shows "进军" option', () => {
+  it('enemy site with war shows "派兵攻击" option', () => {
     mockState.contextMenu = { siteId: 'site_2', x: 100, y: 200 }
     ;(mockState.world as { sites: Map<string, unknown> }).sites.set('site_2', { id: 'site_2', ownerId: 'realm_zhao', adjacency: ['site_1'] })
     ;(mockState.world as { sites: Map<string, unknown> }).sites.set('site_1', { id: 'site_1', ownerId: 'realm_qin', adjacency: ['site_2'] })
@@ -89,7 +89,7 @@ describe('SiteContextMenu', () => {
     expect(mockCloseContextMenu).toHaveBeenCalled()
   })
 
-  it('enemy site without war shows "宣战并进军" option', () => {
+  it('shows 宣战 button for enemy site not at war', () => {
     mockState.contextMenu = { siteId: 'site_2', x: 100, y: 200 }
     ;(mockState.world as { sites: Map<string, unknown> }).sites.set('site_2', { id: 'site_2', ownerId: 'realm_zhao', adjacency: ['site_1'] })
     ;(mockState.world as { sites: Map<string, unknown> }).sites.set('site_1', { id: 'site_1', ownerId: 'realm_qin', adjacency: ['site_2'] })
@@ -97,11 +97,35 @@ describe('SiteContextMenu', () => {
     ;(mockState.world as { wars: unknown[] }).wars = []
     
     render(<SiteContextMenu />)
-    expect(screen.getByTestId('menu-declare-war')).toBeTruthy()
-    const armyBtn = screen.getByTestId('menu-army-army_1')
+    const declareWarBtn = screen.getByTestId('menu-declare-war-btn')
+    expect(declareWarBtn).toBeTruthy()
+    expect(declareWarBtn.textContent).toBe('宣战')
+  })
+
+  it('clicking casus belli dispatches declare-war order', () => {
+    mockState.contextMenu = { siteId: 'site_2', x: 100, y: 200 }
+    ;(mockState.world as { sites: Map<string, unknown> }).sites.set('site_2', { id: 'site_2', ownerId: 'realm_zhao', adjacency: ['site_1'] })
+    ;(mockState.world as { sites: Map<string, unknown> }).sites.set('site_1', { id: 'site_1', ownerId: 'realm_qin', adjacency: ['site_2'] })
+    mockState.idleArmies = [{ id: 'army_1', location: 'site_1', manpower: 1000 }]
+    ;(mockState.world as { wars: unknown[] }).wars = []
     
-    fireEvent.click(armyBtn)
-    expect(mockIssueOrder).toHaveBeenCalledWith({ type: 'declareWarAndMarch', armyId: 'army_1', targetSiteId: 'site_2' })
+    render(<SiteContextMenu />)
+    
+    // Click 宣战
+    fireEvent.click(screen.getByTestId('menu-declare-war-btn'))
+    
+    // Picker should be visible
+    expect(screen.getByTestId('casus-belli-picker')).toBeTruthy()
+    
+    // Click a casus belli (e.g. 复仇)
+    const revengeBtn = screen.getByText('复仇')
+    fireEvent.click(revengeBtn)
+    
+    expect(mockIssueOrder).toHaveBeenCalledWith({
+      type: 'declare-war',
+      targetRealmId: 'realm_zhao',
+      casusBelli: 'revenge'
+    })
     expect(mockCloseContextMenu).toHaveBeenCalled()
   })
 })
