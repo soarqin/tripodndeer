@@ -7,6 +7,8 @@ import type {
 } from '~/shared/types'
 import { declareWarWithCasus } from '~/engine/wars'
 import { relationKey, type DiplomacyActionRequest, type DiplomacyValidationReason, validateDiplomacyAction } from './diplomacy-core'
+import { updateCoalitionPressure } from './coalitions'
+import { applyThirdPartyReactions } from './reactions'
 
 type DiplomacyIntegrationResult =
   | { readonly ok: true; readonly world: World; readonly events: readonly GameEvent[] }
@@ -60,10 +62,16 @@ export function applyDiplomacyAction(world: World, request: DiplomacyActionReque
   history = declared.history
 
   const cancellation = cancelBelligerentTreaties({ ...nextWorld, diplomacyHistory: history }, request, declared.events)
+  const reactions = applyThirdPartyReactions(cancellation.world, {
+    kind: 'war_declared',
+    actorRealmId: request.proposingRealmId,
+    targetRealmId: request.targetRealmId,
+  })
+  const coalitions = updateCoalitionPressure(reactions.world)
   return {
     ok: true,
-    world: cancellation.world,
-    events: cancellation.events,
+    world: coalitions.world,
+    events: [...cancellation.events, ...reactions.events, ...coalitions.events],
   }
 }
 

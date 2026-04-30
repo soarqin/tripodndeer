@@ -165,33 +165,33 @@ test.describe('M1 SiteContextMenu — visibility', () => {
 })
 
 test.describe('M1 SiteContextMenu — own / unreachable sites', () => {
-  test('state 2 — right-click own site: shows disabled "驻军详情"', async ({ page }) => {
+  test('state 2 — right-click own site: shows disabled "己方邑"', async ({ page }) => {
     const sites = await findRelevantSites(page)
     await openMenuForSite(page, sites.ownSite)
 
     const menu = page.locator('[data-testid="site-context-menu"]')
     await expect(menu).toBeVisible()
-    await expect(menu).toContainText('驻军详情')
-    await expect(menu.getByRole('button', { name: /驻军详情/ })).toBeDisabled()
+    await expect(menu).toContainText('己方邑')
+    await expect(menu.getByRole('button', { name: /己方邑/ })).toBeDisabled()
     await expect(menu.locator('[data-testid^="menu-army-"]')).toHaveCount(0)
     await page.screenshot({ path: path.join(EVIDENCE_DIR, 'm1-task-4.1-state-2.png') })
   })
 
-  test('state 4 — right-click non-adjacent enemy: shows "无空闲军团" disabled', async ({ page }) => {
+  test('state 4 — right-click non-adjacent enemy: shows diplomacy options without army buttons', async ({ page }) => {
     const sites = await findRelevantSites(page)
     await openMenuForSite(page, sites.nonAdjacent)
 
     const menu = page.locator('[data-testid="site-context-menu"]')
     await expect(menu).toBeVisible()
-    await expect(menu).toContainText('无空闲军团')
-    await expect(menu.getByRole('button', { name: /无空闲军团/ })).toBeDisabled()
+    await expect(menu.locator('[data-testid="menu-declare-war-btn"]')).toContainText('宣战')
+    await expect(menu.locator('[data-testid="menu-diplomacy-btn"]')).toContainText('外交')
     await expect(menu.locator('[data-testid^="menu-army-"]')).toHaveCount(0)
     await page.screenshot({ path: path.join(EVIDENCE_DIR, 'm1-task-4.1-state-4.png') })
   })
 })
 
 test.describe('M1 SiteContextMenu — actionable enemy sites', () => {
-  test('state 3 — adjacent enemy (not at war): shows "宣战并进军" + army buttons', async ({
+  test('state 3 — adjacent enemy (not at war): shows "宣战" + "外交" entry points', async ({
     page,
   }) => {
     const sites = await findRelevantSites(page)
@@ -199,15 +199,18 @@ test.describe('M1 SiteContextMenu — actionable enemy sites', () => {
 
     const menu = page.locator('[data-testid="site-context-menu"]')
     await expect(menu).toBeVisible()
-    const declareLabel = menu.locator('[data-testid="menu-declare-war"]')
-    await expect(declareLabel).toBeVisible()
-    await expect(declareLabel).toContainText('宣战并进军')
+    const declareButton = menu.locator('[data-testid="menu-declare-war-btn"]')
+    await expect(declareButton).toBeVisible()
+    await expect(declareButton).toContainText('宣战')
+    const diplomacyButton = menu.locator('[data-testid="menu-diplomacy-btn"]')
+    await expect(diplomacyButton).toBeVisible()
+    await expect(diplomacyButton).toContainText('外交')
     await expect(menu.locator('[data-testid="menu-march"]')).toHaveCount(0)
-    expect(await menu.locator('[data-testid^="menu-army-"]').count()).toBeGreaterThan(0)
+    await expect(menu.locator('[data-testid^="menu-army-"]')).toHaveCount(0)
     await page.screenshot({ path: path.join(EVIDENCE_DIR, 'm1-task-4.1-state-3.png') })
   })
 
-  test('state 5 — adjacent enemy (already at war): shows "进军" + army buttons', async ({
+  test('state 5 — adjacent enemy (already at war): shows "派兵攻击" + army buttons', async ({
     page,
   }) => {
     const sites = await findRelevantSites(page)
@@ -218,7 +221,7 @@ test.describe('M1 SiteContextMenu — actionable enemy sites', () => {
     await expect(menu).toBeVisible()
     const marchLabel = menu.locator('[data-testid="menu-march"]')
     await expect(marchLabel).toBeVisible()
-    await expect(marchLabel).toContainText('进军')
+    await expect(marchLabel).toContainText('派兵攻击')
     await expect(menu.locator('[data-testid="menu-declare-war"]')).toHaveCount(0)
     expect(await menu.locator('[data-testid^="menu-army-"]').count()).toBeGreaterThan(0)
     await page.screenshot({ path: path.join(EVIDENCE_DIR, 'm1-task-4.1-state-5.png') })

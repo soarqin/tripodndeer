@@ -5,6 +5,7 @@ import { TimeControlBar } from '@/ui/components/TimeControlBar'
 import { BottomBar } from '@/ui/components/BottomBar'
 import { ArmyListPanel } from '@/ui/components/ArmyListPanel'
 import { RealmOverviewPanel } from '@/ui/components/RealmOverviewPanel'
+import { DiplomacyPanel } from '@/ui/components/DiplomacyPanel'
 import { EventBanner } from '@/ui/components/EventBanner'
 import { SiteContextMenu } from '@/ui/components/SiteContextMenu'
 import { useRafDriver } from '@/ui/store/raf-driver'
@@ -30,6 +31,7 @@ export function App(): React.JSX.Element {
         <SiteContextMenu />
         <RealmOverviewPanel />
         <ArmyListPanel />
+        <DiplomacyPanel />
         {victorious && (
           <div className={styles.demoComplete} data-testid="demo-complete">
             江山一统

@@ -28,6 +28,7 @@ import {
   DIPLOMACY_THREAT_SITE_POWER,
   DIPLOMACY_TRUST_MAX,
   DIPLOMACY_TRUST_MIN,
+  DIPLOMACY_ZHOU_INVESTITURE_ACCEPTANCE_MODIFIER,
 } from '~/content/m2/balance'
 import { isAtWar } from '~/engine/wars'
 
@@ -151,16 +152,20 @@ export function scoreDiplomacyAcceptance(world: World, request: DiplomacyActionR
     ? DIPLOMACY_ACCEPTANCE_TREATY_CONFLICT_MODIFIER
     : 0
   const threatModifier = getThreatModifier(world, request)
+  const investitureModifier = hasActiveZhouInvestiture(world, request.proposingRealmId)
+    ? DIPLOMACY_ZHOU_INVESTITURE_ACCEPTANCE_MODIFIER
+    : 0
   const actionCost = DIPLOMACY_ACTION_COSTS[request.kind]
 
-  return DIPLOMACY_ACCEPTANCE_BASE
+  return roundScore(DIPLOMACY_ACCEPTANCE_BASE
     + (attitude - DIPLOMACY_ACCEPTANCE_ATTITUDE_THRESHOLD) * DIPLOMACY_ACCEPTANCE_ATTITUDE_WEIGHT
     + (trust - DIPLOMACY_ACCEPTANCE_TRUST_THRESHOLD) * DIPLOMACY_ACCEPTANCE_TRUST_WEIGHT
     + warModifier
     + truceModifier
     + treatyConflictModifier
     + threatModifier
-    - actionCost
+    + investitureModifier
+    - actionCost)
 }
 
 function createDiplomaticProposal(world: World, request: DiplomacyActionRequest): DiplomaticProposal {
@@ -233,6 +238,16 @@ function getRealmThreatPower(world: World, realmId: RealmId): number {
   return sitePower + armyPower + manpowerPower
 }
 
+function hasActiveZhouInvestiture(world: World, realmId: RealmId): boolean {
+  const investiture = world.zhouInvestiture.get(realmId)
+  if (!investiture || investiture.source !== 'zhou') return false
+  return investiture.expiresAtTick === null || investiture.expiresAtTick > world.tick
+}
+
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value))
+}
+
+function roundScore(value: number): number {
+  return Math.round(value * 1_000_000) / 1_000_000
 }

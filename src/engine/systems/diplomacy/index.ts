@@ -9,6 +9,8 @@ export {
 } from './diplomacy-core'
 export { diplomacyLifecycleStep } from './lifecycle'
 export { applyDiplomacyAction } from './integration'
+export { createCoalitionId, updateCoalitionPressure } from './coalitions'
+export { applyThirdPartyReactions } from './reactions'
 export type {
   DiplomacyActionRequest,
   DiplomacyProposalOrOrder,

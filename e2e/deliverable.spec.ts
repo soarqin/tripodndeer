@@ -41,9 +41,9 @@ test.describe('QA-DELIVERABLE-1: All testids present + screenshots', () => {
   })
 
   test('after-30s screenshot at 5x speed', async ({ page }) => {
-    // Bump the per-test timeout above Playwright's 30s default so we can run
-    // a ≥35s session and produce a long-form demo video as a deliverable.
-    test.setTimeout(60000)
+    // Allow enough headroom for app startup, a 35s capture window, and the
+    // final screenshot write without making the long-form deliverable flaky.
+    test.setTimeout(90000)
 
     await waitForApp(page)
     await clickSpeed(page, '5x')

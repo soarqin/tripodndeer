@@ -1,0 +1,1 @@
+export { DiplomacyPanel } from './DiplomacyPanel'

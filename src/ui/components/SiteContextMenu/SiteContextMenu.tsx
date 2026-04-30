@@ -11,6 +11,7 @@ export function SiteContextMenu() {
   const playerRealm = useGameStore(selectPlayerRealm)
   const world = useGameStore(state => state.world)
   const closeContextMenu = useGameStore(state => state.closeContextMenu)
+  const openDiplomacyPanel = useGameStore(state => state.openDiplomacyPanel)
   const issueOrder = useGameStore(state => state.issueOrder)
   const menuRef = useRef<HTMLDivElement>(null)
   const [showCasusBelliPicker, setShowCasusBelliPicker] = useState(false)
@@ -119,6 +120,16 @@ export function SiteContextMenu() {
                 onClick={() => setShowCasusBelliPicker(true)}
               >
                 宣战
+              </button>
+              <button
+                className={styles.item}
+                data-testid="menu-diplomacy-btn"
+                onClick={() => {
+                  openDiplomacyPanel(site.ownerId!)
+                  closeContextMenu()
+                }}
+              >
+                外交
               </button>
             </div>
           )}

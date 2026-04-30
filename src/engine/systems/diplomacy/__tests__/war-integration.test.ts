@@ -190,6 +190,8 @@ describe('diplomacy war declaration integration', () => {
       'treaty_ended',
       'treaty_ended',
       'treaty_ended',
+      'relation_changed',
+      'relation_changed',
     ])
   })
 })

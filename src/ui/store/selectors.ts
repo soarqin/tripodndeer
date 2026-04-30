@@ -1,17 +1,24 @@
 import type {
   Army,
+  CoalitionState,
+  DiplomaticProposal,
+  DiplomaticTreatyStatus,
   EdgeId,
   GameDate,
+  RelationKey,
   MapEdge,
   Realm,
-  Site,
   RealmId,
+  Site,
   SiteId,
   SpeedTier,
   GeneralId,
   General,
+  Treaty,
+  ZhouInvestitureState,
 } from '~/shared/types'
-import type { GameStoreState } from './game-store'
+import { isAtWar } from '~/engine/wars'
+import type { DiplomacyActionFeedback, GameStoreState } from './game-store'
 import { useGameStore } from './game-store'
 
 /**
@@ -57,6 +64,8 @@ export const selectContextMenu = (state: GameStoreState) => state.contextMenu
 
 export const selectActivePanel = (state: GameStoreState) => state.activePanel
 
+export const selectDiplomacyTargetRealmId = (state: GameStoreState) => state.diplomacyTargetRealmId
+
 export const selectPlayerRealm = (state: GameStoreState): Realm | null =>
   state.world.realms.get(state.playerRealmId) ?? null
 
@@ -69,3 +78,96 @@ export const selectIdlePlayerArmies = (state: GameStoreState): Army[] =>
   [...state.world.armies.values()].filter(
     (a) => a.realmId === state.playerRealmId && a.state === 'idle',
   )
+
+export interface DiplomacyRelationSummary {
+  readonly relationKey: RelationKey
+  readonly counterpartRealmId: RealmId
+  readonly counterpartRealmName: string
+  readonly attitude: number
+  readonly trust: number
+  readonly atWar: boolean
+  readonly activeTreatyIds: readonly string[]
+  readonly pendingProposalIds: readonly string[]
+  readonly hasActiveTruce: boolean
+}
+
+export const selectDiplomacyRelationSummaries = (state: GameStoreState): DiplomacyRelationSummary[] => {
+  const activeTreaties = selectActiveDiplomaticTreaties(state)
+  const pendingProposals = selectPendingDiplomaticProposals(state)
+
+  return [...state.world.relations.values()]
+    .filter(
+      (relation) => relation.realmAId === state.playerRealmId || relation.realmBId === state.playerRealmId,
+    )
+    .map((relation) => {
+      const counterpartRealmId = relation.realmAId === state.playerRealmId ? relation.realmBId : relation.realmAId
+      const counterpartRealmName = state.world.realms.get(counterpartRealmId)?.displayName ?? counterpartRealmId
+      const relationTreaties = activeTreaties.filter(
+        (treaty) => includesRealmPair(treaty, state.playerRealmId, counterpartRealmId),
+      )
+      const relationProposals = pendingProposals.filter(
+        (proposal) => includesRealmPair(proposal, state.playerRealmId, counterpartRealmId),
+      )
+
+      return {
+        relationKey: relation.key,
+        counterpartRealmId,
+        counterpartRealmName,
+        attitude: relation.attitude,
+        trust: relation.trust,
+        atWar: isAtWar(state.world.wars, state.playerRealmId, counterpartRealmId),
+        activeTreatyIds: relationTreaties.map((treaty) => treaty.id),
+        pendingProposalIds: relationProposals.map((proposal) => proposal.id),
+        hasActiveTruce: relationTreaties.some((treaty) => treaty.kind === 'truce'),
+      }
+    })
+    .sort((left, right) => left.counterpartRealmId.localeCompare(right.counterpartRealmId))
+}
+
+export const selectActiveDiplomaticTreaties = (state: GameStoreState): Treaty[] =>
+  [...state.world.treaties.values()]
+    .filter((treaty) => isActiveTreaty(treaty, state.world.tick))
+    .filter((treaty) => treaty.realmAId === state.playerRealmId || treaty.realmBId === state.playerRealmId)
+    .sort((left, right) => left.id.localeCompare(right.id))
+
+export const selectPendingDiplomaticProposals = (state: GameStoreState): DiplomaticProposal[] =>
+  [...state.world.diplomaticProposals.values()]
+    .filter((proposal) => proposal.status === 'pending')
+    .filter(
+      (proposal) => proposal.proposingRealmId === state.playerRealmId || proposal.targetRealmId === state.playerRealmId,
+    )
+    .sort((left, right) => left.id.localeCompare(right.id))
+
+export const selectDiplomacyFeedback = (state: GameStoreState): DiplomacyActionFeedback[] =>
+  [...state.diplomacyFeedback].sort((left, right) => left.id.localeCompare(right.id))
+
+export const selectCoalitionPressure = (state: GameStoreState): CoalitionState[] =>
+  [...state.world.coalitions.values()]
+    .filter((coalition) => coalition.targetRealmId === state.playerRealmId)
+    .filter((coalition) => coalition.status !== 'dissolved')
+    .sort((left, right) => left.id.localeCompare(right.id))
+
+export const selectPlayerZhouInvestiture = (state: GameStoreState): ZhouInvestitureState | null => {
+  const investiture = state.world.zhouInvestiture.get(state.playerRealmId)
+  if (!investiture || investiture.source !== 'zhou') return null
+  if (investiture.expiresAtTick !== null && investiture.expiresAtTick <= state.world.tick) return null
+  return investiture
+}
+
+function includesRealmPair(
+  item: Pick<Treaty, 'realmAId' | 'realmBId'> | Pick<DiplomaticProposal, 'proposingRealmId' | 'targetRealmId'>,
+  playerRealmId: RealmId,
+  counterpartRealmId: RealmId,
+): boolean {
+  if ('realmAId' in item) {
+    return (item.realmAId === playerRealmId && item.realmBId === counterpartRealmId)
+      || (item.realmAId === counterpartRealmId && item.realmBId === playerRealmId)
+  }
+
+  return (item.proposingRealmId === playerRealmId && item.targetRealmId === counterpartRealmId)
+    || (item.proposingRealmId === counterpartRealmId && item.targetRealmId === playerRealmId)
+}
+
+function isActiveTreaty(treaty: Treaty, tick: number): treaty is Treaty & { status: Exclude<DiplomaticTreatyStatus, 'expired' | 'cancelled' | 'broken'> } {
+  return treaty.status === 'active' && (treaty.expiresAtTick === null || treaty.expiresAtTick > tick)
+}

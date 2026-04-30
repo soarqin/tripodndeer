@@ -24,6 +24,7 @@ import {
   DIPLOMACY_TRUCE_DURATION_TICKS,
 } from '~/content/m2/balance'
 import { endWar, warKey } from '~/engine/wars'
+import { updateCoalitionPressure } from './coalitions'
 import { clampRelation, relationKey, scoreDiplomacyAcceptance } from './diplomacy-core'
 
 interface LifecycleState {
@@ -62,8 +63,9 @@ export function diplomacyLifecycleStep(
     relations: state.relations,
     diplomacyHistory: state.history,
   }
+  const coalitionResult = updateCoalitionPressure(nextWorld)
 
-  return { world: nextWorld, nextRng: rng, events: state.events }
+  return { world: coalitionResult.world, nextRng: rng, events: [...state.events, ...coalitionResult.events] }
 }
 
 function resolveProposals(world: World, state: LifecycleState): void {

@@ -3,12 +3,16 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { advanceClock, setSpeed as engineSetSpeed } from '@/engine/clock'
 import type { ClockState } from '@/engine/clock'
+import { applyDiplomacyAction, relationKey, validateDiplomacyAction, type DiplomacyActionRequest, type DiplomacyValidationReason } from '~/engine/systems/diplomacy'
 import { createWorldFromM1Data, loadM1Data } from '@/engine/world'
 import type {
   ArmyId,
+  DiplomaticActionKind,
+  DiplomaticProposalId,
   GameEvent,
   Order,
   RealmId,
+  RelationKey,
   SiteId,
   SpeedTier,
   World,
@@ -20,12 +24,33 @@ interface GameState {
   world: World
   clockState: ClockState
   events: readonly GameEvent[]
+  diplomacyFeedback: readonly DiplomacyActionFeedback[]
   playerRealmId: RealmId
   selectedArmyId: ArmyId | null
   contextMenu: { siteId: SiteId; x: number; y: number } | null
   activePanel: 'wanggong' | 'junshi' | null
+  diplomacyTargetRealmId: RealmId | null
   transientBanner: { text: string; createdAt: number } | null
 }
+
+export interface DiplomacyActionFeedback {
+  readonly id: string
+  readonly kind: DiplomaticActionKind
+  readonly proposingRealmId: RealmId
+  readonly targetRealmId: RealmId
+  readonly relationKey: RelationKey
+  readonly createdAtTick: number
+  readonly status: 'submitted' | 'rejected'
+  readonly reason: DiplomacyValidationReason | null
+  readonly proposalId: DiplomaticProposalId | null
+  readonly acceptanceScore: number | null
+}
+
+export type SubmitPlayerDiplomacyActionPayload = Omit<DiplomacyActionRequest, 'proposingRealmId'>
+
+export type SubmitPlayerDiplomacyActionResult =
+  | { readonly ok: true; readonly feedback: DiplomacyActionFeedback }
+  | { readonly ok: false; readonly reason: DiplomacyValidationReason; readonly feedback: DiplomacyActionFeedback }
 
 interface GameActions {
   tick: (deltaMs: number) => void
@@ -36,7 +61,10 @@ interface GameActions {
   openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) => void
   closeContextMenu: () => void
   setActivePanel: (panel: 'wanggong' | 'junshi' | null) => void
+  openDiplomacyPanel: (realmId: RealmId) => void
+  closeDiplomacyPanel: () => void
   issueOrder: (order: Order) => void
+  submitPlayerDiplomacyAction: (payload: SubmitPlayerDiplomacyActionPayload) => SubmitPlayerDiplomacyActionResult
   showBanner: (text: string) => void
   clearBanner: () => void
 }
@@ -66,10 +94,12 @@ function createCoreActions(set: StoreSet): Pick<GameActions, 'tick' | 'setSpeed'
         state.world = castDraft(fresh.world)
         state.clockState = fresh.clockState
         state.events = castDraft(fresh.events)
+        state.diplomacyFeedback = castDraft(fresh.diplomacyFeedback)
         state.playerRealmId = fresh.playerRealmId
         state.selectedArmyId = fresh.selectedArmyId
         state.contextMenu = fresh.contextMenu
         state.activePanel = fresh.activePanel
+        state.diplomacyTargetRealmId = fresh.diplomacyTargetRealmId
         state.transientBanner = fresh.transientBanner
       }),
   }
@@ -90,7 +120,7 @@ function createSelectionActions(set: StoreSet): Pick<GameActions, 'selectArmy' |
 
 function createUiActions(
   set: StoreSet,
-): Pick<GameActions, 'openContextMenu' | 'closeContextMenu' | 'setActivePanel'> {
+): Pick<GameActions, 'openContextMenu' | 'closeContextMenu' | 'setActivePanel' | 'openDiplomacyPanel' | 'closeDiplomacyPanel'> {
   return {
     openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) =>
       set((state) => {
@@ -104,10 +134,20 @@ function createUiActions(
       set((state) => {
         state.activePanel = panel
       }),
+    openDiplomacyPanel: (realmId: RealmId) =>
+      set((state) => {
+        state.diplomacyTargetRealmId = realmId
+      }),
+    closeDiplomacyPanel: () =>
+      set((state) => {
+        state.diplomacyTargetRealmId = null
+      }),
   }
 }
 
-function createWorldActions(set: StoreSet): Pick<GameActions, 'issueOrder' | 'showBanner' | 'clearBanner'> {
+function createWorldActions(
+  set: StoreSet,
+): Pick<GameActions, 'issueOrder' | 'submitPlayerDiplomacyAction' | 'showBanner' | 'clearBanner'> {
   return {
     issueOrder: (order: Order) =>
       set((state) => {
@@ -116,6 +156,48 @@ function createWorldActions(set: StoreSet): Pick<GameActions, 'issueOrder' | 'sh
           pendingOrders: [...state.world.pendingOrders, order],
         })
       }),
+    submitPlayerDiplomacyAction: (payload: SubmitPlayerDiplomacyActionPayload) => {
+      let outcome: SubmitPlayerDiplomacyActionResult | null = null
+
+      set((state) => {
+        const request: DiplomacyActionRequest = {
+          ...payload,
+          proposingRealmId: state.playerRealmId,
+        }
+        const validation = validateDiplomacyAction(state.world, request)
+        const nextFeedback = createDiplomacyActionFeedback(state.world, request, state.diplomacyFeedback.length, validation)
+
+        state.diplomacyFeedback = castDraft([...state.diplomacyFeedback, nextFeedback])
+
+        if (!validation.ok) {
+          state.events = castDraft([])
+          outcome = { ok: false, reason: validation.reason, feedback: nextFeedback }
+          return
+        }
+
+        const integration = applyDiplomacyAction(state.world, request)
+        if (!integration.ok) {
+          state.events = castDraft(integration.events)
+          const rejectedFeedback: DiplomacyActionFeedback = {
+            ...nextFeedback,
+            status: 'rejected',
+            reason: integration.reason,
+          }
+          state.diplomacyFeedback = castDraft([
+            ...state.diplomacyFeedback.slice(0, -1),
+            rejectedFeedback,
+          ])
+          outcome = { ok: false, reason: integration.reason, feedback: rejectedFeedback }
+          return
+        }
+
+        state.world = castDraft(integration.world)
+        state.events = castDraft(integration.events)
+        outcome = { ok: true, feedback: nextFeedback }
+      })
+
+      return outcome!
+    },
     showBanner: (text: string) =>
       set((state) => {
         state.transientBanner = {
@@ -137,11 +219,35 @@ function makeInitialState(): GameState {
     world: createWorldFromM1Data(data, 42, playerRealmId),
     clockState: { speed: 'pause', realTimeAccum: 0 },
     events: [],
+    diplomacyFeedback: [],
     playerRealmId,
     selectedArmyId: null,
     contextMenu: null,
     activePanel: null,
+    diplomacyTargetRealmId: null,
     transientBanner: null,
+  }
+}
+
+function createDiplomacyActionFeedback(
+  world: World,
+  request: DiplomacyActionRequest,
+  index: number,
+  validation: ReturnType<typeof validateDiplomacyAction>,
+): DiplomacyActionFeedback {
+  return {
+    id: `diplomacy_feedback_${world.tick}_${request.kind}_${relationKey(request.proposingRealmId, request.targetRealmId)}_${index}`,
+    kind: request.kind,
+    proposingRealmId: request.proposingRealmId,
+    targetRealmId: request.targetRealmId,
+    relationKey: relationKey(request.proposingRealmId, request.targetRealmId),
+    createdAtTick: world.tick,
+    status: validation.ok ? 'submitted' : 'rejected',
+    reason: validation.ok ? null : validation.reason,
+    proposalId: validation.ok && validation.proposalOrOrder.type === 'proposal'
+      ? validation.proposalOrOrder.proposal.id
+      : null,
+    acceptanceScore: validation.ok ? validation.proposalOrOrder.acceptanceScore : null,
   }
 }
 
