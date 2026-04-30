@@ -13,9 +13,9 @@ export const UNIT_BASE_POWER: Record<UnitType, number> = {
 // Values > 1.0 mean attacker advantage, < 1.0 mean disadvantage
 export const UNIT_COUNTER_MATRIX: Record<UnitType, Record<UnitType, number>> = {
   infantry: { infantry: 1.0, chariot: 0.8, cavalry: 1.2, crossbow: 1.3 },
-  chariot: { infantry: 1.2, chariot: 1.0, cavalry: 1.1, crossbow: 0.7 },
+  chariot: { infantry: 1.2, chariot: 1.0, cavalry: 1.1, crossbow: 0.6 },
   cavalry: { infantry: 0.9, chariot: 0.9, cavalry: 1.0, crossbow: 1.1 },
-  crossbow: { infantry: 0.8, chariot: 1.3, cavalry: 0.9, crossbow: 1.0 },
+  crossbow: { infantry: 0.8, chariot: 1.4, cavalry: 0.9, crossbow: 1.0 },
 }
 
 export const TERRAIN_DEFENSE: Record<TerrainType, number> = {

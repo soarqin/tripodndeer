@@ -46,6 +46,15 @@ export const ArmyTemplateSchema = z.object({
 
 export const ArmyStateSchema = z.enum(['idle', 'marching', 'retreating', 'besieging', 'engaged', 'blocked'])
 
+export const UnitTypeSchema = z.enum(['infantry', 'chariot', 'cavalry', 'crossbow'])
+
+export const CompositionSchema = z.object({
+  infantry: z.number().int().nonnegative(),
+  chariot: z.number().int().nonnegative(),
+  cavalry: z.number().int().nonnegative(),
+  crossbow: z.number().int().nonnegative(),
+})
+
 export const ArmySchema = z.object({
   id: ArmyIdSchema,
   realmId: z.string().min(1),
@@ -55,6 +64,7 @@ export const ArmySchema = z.object({
   destination: SiteIdSchema.nullable(),
   ticksRemaining: z.number().int().nonnegative(),
   source: SiteIdSchema.nullable(),
+  composition: CompositionSchema.optional(),
 })
 
 export const OrderTypeSchema = z.enum(['march', 'declareWarAndMarch'])

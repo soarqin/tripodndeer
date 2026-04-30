@@ -82,8 +82,8 @@ export function combatV2Step(
       battleType: 'field',
       passDefenseBonus: 0,
       siegeBonus: 0,
-      attackerComposition: DEFAULT_COMPOSITION,
-      defenderComposition: DEFAULT_COMPOSITION,
+      attackerComposition: army.composition ?? DEFAULT_COMPOSITION,
+      defenderComposition: defenders[0]?.composition ?? DEFAULT_COMPOSITION,
       date: world.date,
     }
 

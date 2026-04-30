@@ -69,6 +69,12 @@ export interface Army {
   readonly ticksRemaining: number
   readonly source: SiteId | null
   readonly generalId?: GeneralId
+  readonly composition?: {
+    infantry: number
+    chariot: number
+    cavalry: number
+    crossbow: number
+  }
 }
 
 export type OrderType = 'march' | 'declareWarAndMarch'

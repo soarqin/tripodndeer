@@ -1,0 +1,6 @@
+[
+  { "id": "infantry", "name": "步兵", "basePower": 10, "costManpower": 1000 },
+  { "id": "chariot", "name": "车兵", "basePower": 15, "costManpower": 2000 },
+  { "id": "cavalry", "name": "骑兵", "basePower": 12, "costManpower": 1500 },
+  { "id": "crossbow", "name": "弩兵", "basePower": 11, "costManpower": 1200 }
+]
