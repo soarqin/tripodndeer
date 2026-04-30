@@ -9,7 +9,7 @@ export function computeMarchTicks(travelCost: number, speedFactor = 1): number {
   return Math.max(1, Math.ceil(travelCost / speedFactor))
 }
 
-export function findTravelCost(world: World, fromSiteId: SiteId, toSiteId: SiteId): number {
+export function findTravelCost(world: World, fromSiteId: SiteId, toSiteId: SiteId, realmId?: string): number {
   const fromSite = world.sites.get(fromSiteId)
   const toSite = world.sites.get(toSiteId)
   if (!fromSite || !toSite) return 3
@@ -24,7 +24,24 @@ export function findTravelCost(world: World, fromSiteId: SiteId, toSiteId: SiteI
   }
 
   const terrainMultiplier = TERRAIN_TRAVEL_COST[toSite.terrainType ?? 'plains'] ?? 1.0
-  return Math.ceil(baseCost * terrainMultiplier)
+
+  let passMultiplier = 1.0
+  if (realmId) {
+    for (const ae of world.adjacencyEdges.values()) {
+      if (
+        (ae.fromSiteId === fromSiteId && ae.toSiteId === toSiteId) ||
+        (ae.fromSiteId === toSiteId && ae.toSiteId === fromSiteId)
+      ) {
+        const pass = world.passes.get(ae.passId)
+        if (pass && pass.controllerId === realmId) {
+          passMultiplier = 0.8
+        }
+        break
+      }
+    }
+  }
+
+  return Math.ceil(baseCost * terrainMultiplier * passMultiplier)
 }
 
 /**

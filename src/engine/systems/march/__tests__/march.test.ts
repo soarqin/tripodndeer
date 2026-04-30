@@ -95,6 +95,57 @@ describe('findTravelCost', () => {
 
     expect(findTravelCost(world, 'site_a', 'site_b')).toBe(6)
   })
+
+  it('friendly-controlled pass reduces travel cost by 20%', () => {
+    const world: World = {
+      date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
+      tick: 0,
+      sites: new Map([
+        ['site_a', makeSite('site_a', 'plains')],
+        ['site_b', makeSite('site_b', 'plains')],
+      ]),
+      realms: new Map(),
+      armies: new Map(),
+      edges: new Map([
+        ['edge_1', { id: 'edge_1', curveType: 'polyline', travel_cost: 5, anchors: [[0, 0], [1, 0]] }],
+      ]),
+      wars: new Map(),
+      peaceProposals: new Map(),
+      generals: new Map(),
+      passes: new Map([
+        [
+          'pass_1',
+          {
+            id: 'pass_1',
+            name: 'Pass 1',
+            edgeId: 'edge_1',
+            defenseBonus: 0,
+            controllerId: 'realm_qin',
+            fortification: 0,
+          },
+        ],
+      ]),
+      adjacencyEdges: new Map([
+        [
+          'ae_1',
+          {
+            id: 'ae_1',
+            fromSiteId: 'site_a',
+            toSiteId: 'site_b',
+            passId: 'pass_1',
+          },
+        ],
+      ]),
+      sieges: new Map(),
+      playerRealmId: 'realm_qin',
+      rngState: { seed: 0, counter: 0 },
+      phases: [],
+      pendingOrders: [],
+    }
+
+    expect(findTravelCost(world, 'site_a', 'site_b')).toBe(5)
+    expect(findTravelCost(world, 'site_a', 'site_b', 'realm_qin')).toBe(4)
+  })
 })
 
 describe('marchStep marching armies', () => {

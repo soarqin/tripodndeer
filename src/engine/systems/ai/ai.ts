@@ -109,7 +109,7 @@ export function aiPlanStep(
         ...army,
         state: 'retreating',
         destination: action.targetSiteId,
-        ticksRemaining: findTravelCost(world, army.location, action.targetSiteId),
+        ticksRemaining: findTravelCost(world, army.location, action.targetSiteId, realm.id),
         source: army.location,
       })
       events.push({
@@ -181,7 +181,7 @@ function dispatchCandidate(
     ...army,
     state: 'marching',
     destination: targetSiteId,
-    ticksRemaining: findTravelCost(world, army.location, targetSiteId),
+      ticksRemaining: findTravelCost(world, army.location, targetSiteId, realmId),
     source: army.location,
   })
   events.push({ type: 'aiDispatchedArmy', payload: { realmId, armyId, targetSiteId } })
