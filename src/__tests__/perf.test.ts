@@ -30,6 +30,7 @@ describe('performance budget', () => {
     fs.writeFileSync(
       path.join(evidenceDir, 'm2-perf-baseline.json'),
       JSON.stringify({ p50, p95, p99, timestamp: new Date().toISOString() }, null, 2),
+      'utf-8',
     )
 
     expect(p95, `p95 tick time ${p95.toFixed(2)}ms should be < 200ms`).toBeLessThan(200)

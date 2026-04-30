@@ -18,7 +18,6 @@ function makeArmy(overrides: Partial<Army> = {}): Army {
 
 function makeSite(overrides: Partial<Site> & { id: string }): Site {
   return {
-    id: overrides.id,
     name: overrides.id,
     position: [0, 0],
     boundary: [],
@@ -31,7 +30,6 @@ function makeSite(overrides: Partial<Site> & { id: string }): Site {
 
 function makeSiege(overrides: Partial<Siege> & { id: string }): Siege {
   return {
-    id: overrides.id,
     attackerArmyIds: ['army_attacker'],
     defenderSiteId: 'site_target',
     startedAt: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },

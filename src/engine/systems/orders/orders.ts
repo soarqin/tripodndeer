@@ -64,8 +64,8 @@ export function applyOrder(world: World, order: Order): OrderResult {
   armies.set(army.id, {
     ...army,
     state: 'marching',
-    destination: order.targetSiteId,
-     ticksRemaining: findTravelCost(world, army.location, order.targetSiteId, army.realmId),
+    destination: order.targetSiteId ?? null,
+    ticksRemaining: findTravelCost(world, army.location, order.targetSiteId ?? '', army.realmId),
     source: army.location,
   })
 
