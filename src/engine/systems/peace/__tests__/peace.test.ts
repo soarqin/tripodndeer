@@ -3,6 +3,7 @@ import type {
   GameDate,
   General,
   PeaceProposal,
+  PeaceTerm,
   Realm,
   Site,
   WarState,
@@ -156,6 +157,10 @@ describe('applyIndemnity / applyTribute', () => {
       payload: { amount: 1000 },
     })
     expect(result).toBe(world)
+    expect(result.realms).toBe(world.realms)
+    expect(result.sites).toBe(world.sites)
+    expect(result.armies).toBe(world.armies)
+    expect(result.peaceProposals).toBe(world.peaceProposals)
   })
 
   it('applyTribute is a record-only no-op on world state', () => {
@@ -165,21 +170,31 @@ describe('applyIndemnity / applyTribute', () => {
       payload: { amountPerYear: 500, years: 3 },
     })
     expect(result).toBe(world)
+    expect(result.realms).toBe(world.realms)
+    expect(result.sites).toBe(world.sites)
+    expect(result.armies).toBe(world.armies)
+    expect(result.peaceProposals).toBe(world.peaceProposals)
   })
 })
 
 describe('acceptProposal', () => {
-  it('marks proposal accepted, applies cession, and ends the war', () => {
+  it('marks proposal accepted, applies cession, and keeps indemnity/tribute recorded only', () => {
     const occupiedSite = makeSite('site_x', targetRealmId, {
       occupation: { occupierId: proposingRealmId, controlLevel: 50 },
     })
     let world = baseWorld({ sites: new Map([['site_x', occupiedSite]]) })
 
+    const terms: PeaceTerm[] = [
+      { type: 'cession', payload: { siteIds: ['site_x'] } },
+      { type: 'indemnity', payload: { amount: 100 } },
+      { type: 'tribute', payload: { amountPerYear: 10, years: 3 } },
+    ]
+
     const created = createPeaceProposal(world, {
       id: 'prop_1',
       proposingRealmId,
       targetRealmId,
-      terms: [{ type: 'cession', payload: { siteIds: ['site_x'] } }],
+      terms,
       proposedAt: DATE,
     })
     world = created.world
@@ -190,7 +205,12 @@ describe('acceptProposal', () => {
     const proposal = accepted.peaceProposals.get('prop_1')!
     expect(proposal.status).toBe('accepted')
     expect(proposal.acknowledgedAt).toEqual(next)
+    expect(proposal.terms).toEqual(terms)
     expect(accepted.sites.get('site_x')!.ownerId).toBe(proposingRealmId)
+    expect(accepted.realms).toBe(world.realms)
+    expect(accepted.armies).toBe(world.armies)
+    expect(accepted.peaceProposals).not.toBe(world.peaceProposals)
+    expect(accepted.sites).not.toBe(world.sites)
     expect(accepted.wars.has(warKey(proposingRealmId, targetRealmId))).toBe(false)
   })
 

@@ -176,6 +176,8 @@ export const PassSchema = z.object({
   fortification: z.number().int().min(0).max(100),
 })
 
+export const AIPersonalitySchema = z.enum(['aggressive_random', 'aggressive', 'cautious'] as const)
+
 export const RealmSchema = z.object({
   id: RealmIdSchema,
   displayName: z.string().min(1),
@@ -184,7 +186,7 @@ export const RealmSchema = z.object({
   capital: SiteIdSchema,
   initialSites: z.array(SiteIdSchema),
   initialArmies: z.array(ArmyTemplateSchema),
-  aiPersonality: z.literal('aggressive_random'),
+  aiPersonality: AIPersonalitySchema,
 })
 
 export const M0DataSchema = z.object({
@@ -214,10 +216,10 @@ export const RealmSchemaV2 = RealmSchema.extend({
 export const M1DataSchemaV2 = M1DataSchema.extend({
   schema_version: z.literal(2),
   realms: z.array(RealmSchemaV2),
-  generals: z.array(z.any()).default([]),
-  passes: z.array(z.any()).default([]),
-  adjacencyEdges: z.array(z.any()).default([]),
-  peaceProposals: z.array(z.any()).default([]),
+  generals: z.array(GeneralSchema).default([]),
+  passes: z.array(PassSchema).default([]),
+  adjacencyEdges: z.array(AdjacencyEdgeSchema).default([]),
+  peaceProposals: z.array(PeaceProposalSchema).default([]),
 })
 
 export type M1DataV2 = z.infer<typeof M1DataSchemaV2>

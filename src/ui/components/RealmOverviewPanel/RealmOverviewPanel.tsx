@@ -1,8 +1,6 @@
 import { useGameStore } from '~/ui/store'
 import { selectPlayerRealm, selectAllPlayerArmies, selectActivePanel } from '~/ui/store/selectors'
 import styles from './RealmOverviewPanel.module.css'
-
-/* eslint-disable max-lines-per-function */
 export function RealmOverviewPanel() {
   const activePanel = useGameStore(selectActivePanel)
   const realm = useGameStore(selectPlayerRealm)

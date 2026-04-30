@@ -1,4 +1,4 @@
-import type { RealmId, RNGState } from '~/shared/types'
+import type { AIPersonality, RealmId, RNGState } from '~/shared/types'
 import { nextRng } from '~/engine/random'
 
 export type Personality = 'aggressive' | 'cautious'
@@ -15,7 +15,11 @@ const PERSONALITY_WEIGHTS: Record<Personality, Partial<Record<AIOption['kind'], 
   cautious: { attack: -10, retreat: 20, 'siege-continue': 0 },
 }
 
-export function getPersonality(realmId: RealmId): Personality {
+export function getPersonality(configured: AIPersonality, realmId: RealmId): Personality {
+  if (configured === 'aggressive' || configured === 'cautious') {
+    return configured
+  }
+
   const sum = [...realmId].reduce((acc, c) => acc + c.charCodeAt(0), 0)
   return sum % 2 === 0 ? 'aggressive' : 'cautious'
 }

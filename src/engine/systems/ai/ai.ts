@@ -74,7 +74,7 @@ export function aiPlanStep(
     // we keep the historical "no candidate → no events / no extra rng draws" contract.
     if (options.length === 1) continue
 
-    const personality = getPersonality(realm.id)
+    const personality = getPersonality(realm.aiPersonality, realm.id)
     const { action, nextRng: pickRng } = pickAction(options, personality, currentRng)
     currentRng = pickRng
 

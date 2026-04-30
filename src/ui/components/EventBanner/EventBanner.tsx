@@ -12,7 +12,6 @@ const BANNER_TEXT_BY_EVENT_TYPE: Record<string, string> = {
   peaceProposed: '提议议和',
   peaceAccepted: '议和达成',
   peaceRejected: '议和被拒',
-  passBreak: '关隘被攻破',
   generalDied: '将领阵亡',
   passCaptured: '关隘易主',
   warDeclared: '宣战',

@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { useState, useMemo } from 'react'
 import { useGameStore } from '~/ui/store'
 import { selectPlayerRealm } from '~/ui/store/selectors'

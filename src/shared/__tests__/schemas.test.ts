@@ -1,17 +1,20 @@
 import { describe, it, expect } from 'vitest'
 import {
   AdjacencyEdgeSchema,
+  AIPersonalitySchema,
   ArmySchema,
   ArmyStateSchema,
   GeneralSchema,
   M0DataSchema,
   M1DataSchema,
+  M1DataSchemaV2,
   MapEdgeSchema,
   OrderSchema,
   PassSchema,
   PeaceProposalSchema,
   PeaceTermSchema,
   RealmStatsSchema,
+  RealmSchema,
   SiteOccupationSchema,
   WorldSchema,
 } from '../schemas'
@@ -207,6 +210,37 @@ describe('WorldSchema', () => {
   })
 })
 
+describe('GeneralSchema', () => {
+  const baseGeneral = {
+    id: 'general_qin',
+    realmId: 'realm_red',
+    name: 'Qin General',
+    might: 18,
+    command: 5000,
+    loyalty: 80,
+  }
+
+  it('accepts a general without strategy or learning', () => {
+    const result = GeneralSchema.parse(baseGeneral)
+
+    expect(result.strategy).toBeUndefined()
+    expect(result.learning).toBeUndefined()
+    expect('strategy' in result).toBe(false)
+    expect('learning' in result).toBe(false)
+  })
+
+  it('accepts a general with strategy and learning', () => {
+    const result = GeneralSchema.parse({
+      ...baseGeneral,
+      strategy: 12,
+      learning: 9,
+    })
+
+    expect(result.strategy).toBe(12)
+    expect(result.learning).toBe(9)
+  })
+})
+
 describe('ArmySchema', () => {
   it('accepts a valid idle army', () => {
     expect(() => ArmySchema.parse(validIdleArmy)).not.toThrow()
@@ -261,9 +295,44 @@ describe('ArmyStateSchema', () => {
 
 describe('M2 contract schemas', () => {
   const validDate = { yearBC: 260, season: 'spring' as const, month: 1 as const, xun: 'shang' as const }
+  const validGeneral = { id: 'general_1', realmId: 'realm_qin', name: '王翦', might: 20, command: 12000, loyalty: 100 }
+  const validPass = { id: 'pass_1', name: '函谷关', edgeId: 'ae_1', defenseBonus: 0.6, controllerId: 'realm_qin', fortification: 50 }
+  const validAdjacencyEdge = { id: 'ae_1', fromSiteId: 'site_1', toSiteId: 'site_2', passId: 'pass_1' }
+  const validPeaceProposal = {
+    id: 'peace_1',
+    proposingRealmId: 'realm_qin',
+    targetRealmId: 'realm_han',
+    terms: [{ type: 'cession' as const, payload: { siteIds: ['site_1'] } }],
+    proposedAt: validDate,
+    status: 'pending' as const,
+    acknowledgedAt: null,
+  }
+  const validM1DataV2 = {
+    edges: validData.edges,
+    sites: validData.sites,
+    realms: [
+      {
+        ...validRealm,
+        stats: { manpowerPool: 1000, manpowerCap: 5000, warWeariness: 0 },
+      },
+    ],
+    schema_version: 2 as const,
+    initialOwnership: { site_1: 'realm_red' },
+    initialArmies: [],
+    initialWars: [],
+    generals: [validGeneral],
+    passes: [validPass],
+    adjacencyEdges: [validAdjacencyEdge],
+    peaceProposals: [validPeaceProposal],
+  }
 
   it('accepts valid RealmStats', () => {
     expect(() => RealmStatsSchema.parse({ manpowerPool: 1000, manpowerCap: 5000, warWeariness: 0 })).not.toThrow()
+  })
+
+  it.each(['aggressive_random', 'aggressive', 'cautious'] as const)('accepts AI personality %s', personality => {
+    expect(() => AIPersonalitySchema.parse(personality)).not.toThrow()
+    expect(() => RealmSchema.parse({ ...validRealm, aiPersonality: personality })).not.toThrow()
   })
 
   it('rejects RealmStats with negative manpowerPool', () => {
@@ -324,5 +393,40 @@ describe('M2 contract schemas', () => {
 
   it('rejects Pass with defenseBonus above 1', () => {
     expect(() => PassSchema.parse({ id: 'pass_1', name: '函谷关', edgeId: 'ae_1', defenseBonus: 1.1, controllerId: 'realm_qin', fortification: 50 })).toThrow()
+  })
+
+  it('accepts valid M1DataSchemaV2 data with concrete M2 arrays', () => {
+    const result = M1DataSchemaV2.safeParse(validM1DataV2)
+
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.generals).toHaveLength(1)
+      expect(result.data.passes).toHaveLength(1)
+      expect(result.data.adjacencyEdges).toHaveLength(1)
+      expect(result.data.peaceProposals).toHaveLength(1)
+    }
+  })
+
+  it.each([
+    [
+      'general missing realmId',
+      { ...validM1DataV2, generals: [{ id: 'general_1', name: '王翦', might: 20, command: 12000, loyalty: 100 }] },
+    ],
+    [
+      'pass missing edgeId',
+      { ...validM1DataV2, passes: [{ id: 'pass_1', name: '函谷关', defenseBonus: 0.6, controllerId: 'realm_qin', fortification: 50 }] },
+    ],
+    [
+      'adjacency edge missing passId',
+      { ...validM1DataV2, adjacencyEdges: [{ id: 'ae_1', fromSiteId: 'site_1', toSiteId: 'site_2' }] },
+    ],
+    [
+      'peace proposal with invalid status',
+      { ...validM1DataV2, peaceProposals: [{ ...validPeaceProposal, status: 'archived' }] },
+    ],
+  ])('rejects malformed M2 array items: %s', (_, invalid) => {
+    const result = M1DataSchemaV2.safeParse(invalid as unknown)
+
+    expect(result.success).toBe(false)
   })
 })

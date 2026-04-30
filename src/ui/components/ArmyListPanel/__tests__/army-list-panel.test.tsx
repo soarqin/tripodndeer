@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { ArmyListPanel } from '../ArmyListPanel'

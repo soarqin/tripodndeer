@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { SiteContextMenu } from '../SiteContextMenu'
@@ -63,13 +62,15 @@ describe('SiteContextMenu', () => {
     expect(menu.style.top).toBe('200px')
   })
 
-  it('own site shows "驻军详情" disabled', () => {
+  it('own site shows "己方邑" disabled', () => {
     mockState.contextMenu = { siteId: 'site_1', x: 100, y: 200 }
     ;(mockState.world as { sites: Map<string, unknown> }).sites.set('site_1', { id: 'site_1', ownerId: 'realm_qin', adjacency: [] })
     
     render(<SiteContextMenu />)
-    const button = screen.getByText('驻军详情（未来功能）')
+    const button = screen.getByText('己方邑')
     expect((button as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.queryByText(/驻军详情/)).toBeNull()
+    expect(screen.queryByText(/未来功能/)).toBeNull()
   })
 
   it('enemy site with war shows "派兵攻击" option', () => {

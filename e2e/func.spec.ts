@@ -1,5 +1,23 @@
 import { test, expect } from '@playwright/test'
 
+type TestGameStore = typeof import('~/ui/store')['useGameStore']
+type TestStoreState = ReturnType<TestGameStore['getState']>
+type TestWorld = TestStoreState['world']
+
+type TestGame = {
+  world: () => TestWorld
+  store: TestGameStore
+}
+
+type TestArmyKey = TestWorld['armies'] extends ReadonlyMap<infer Key, unknown> ? Key : never
+type TestArmyValue = TestWorld['armies'] extends ReadonlyMap<unknown, infer Army> ? Army : never
+
+declare global {
+  interface Window {
+    __game?: TestGame
+  }
+}
+
 // M1: Victory requires player-agency conquest (not auto-conquest like M0).
 // This spec verifies the demo-complete banner appears after player conquers all sites.
 // Uses the same near-victory fixture pattern as m1-victory.spec.ts.
@@ -11,7 +29,7 @@ test.describe('QA-FUNC-1: Victory banner appears after player conquers all sites
     await page.waitForSelector('[data-testid="bottom-bar-wanggong"]', { timeout: 10000 })
     await page.waitForFunction(
       () => {
-        const game = (window as any).__game
+        const game = window.__game
         return Boolean(game && game.world && game.world().sites && game.world().sites.size > 0)
       },
       null,
@@ -20,12 +38,13 @@ test.describe('QA-FUNC-1: Victory banner appears after player conquers all sites
 
     // Arrange near-victory: flip all sites to player except one undefended adjacent enemy
     const setup = await page.evaluate(() => {
-      const game = (window as any).__game
+      const game = window.__game
+      if (!game) throw new Error('Game not ready')
       const world = game.world()
       const playerRealmId = world.playerRealmId
       const armies = [...world.armies.values()]
-      let armyId = null
-      let targetSiteId = null
+      let armyId: string | null = null
+      let targetSiteId: string | null = null
       outer: for (const army of armies) {
         if (army.realmId !== playerRealmId || army.state !== 'idle') continue
         const armySite = world.sites.get(army.location)
@@ -33,9 +52,7 @@ test.describe('QA-FUNC-1: Victory banner appears after player conquers all sites
         for (const adjId of armySite.adjacency) {
           const adjSite = world.sites.get(adjId)
           if (!adjSite || !adjSite.ownerId || adjSite.ownerId === playerRealmId) continue
-          const hasDefender = armies.some(
-            (a: any) => a.location === adjId && a.realmId === adjSite.ownerId,
-          )
+          const hasDefender = armies.some(a => a.location === adjId && a.realmId === adjSite.ownerId)
           if (!hasDefender) {
             armyId = army.id
             targetSiteId = adjId
@@ -43,25 +60,28 @@ test.describe('QA-FUNC-1: Victory banner appears after player conquers all sites
           }
         }
       }
-      if (!armyId || !targetSiteId) throw new Error('No idle army adjacent to undefended enemy')
-      game.store.setState((state: any) => {
-        const newSites = new Map()
+      const confirmedArmyId = armyId
+      const confirmedTargetSiteId = targetSiteId
+      if (!confirmedArmyId || !confirmedTargetSiteId) throw new Error('No idle army adjacent to undefended enemy')
+      game.store.setState(state => {
+        const newSites = new Map(state.world.sites)
         for (const [id, site] of state.world.sites) {
-          newSites.set(id, id === targetSiteId ? site : { ...(site as object), ownerId: playerRealmId })
+          newSites.set(id, id === confirmedTargetSiteId ? site : { ...site, ownerId: playerRealmId })
         }
-        const newArmies = new Map()
+        const newArmies = new Map<TestArmyKey, TestArmyValue>()
         for (const [id, army] of state.world.armies) {
-          if ((army as any).realmId === playerRealmId) newArmies.set(id, army)
+          if (army.realmId === playerRealmId) newArmies.set(id, army)
         }
         state.world = { ...state.world, sites: newSites, armies: newArmies }
       })
-      return { armyId, targetSiteId, playerRealmId }
+      return { armyId: confirmedArmyId, targetSiteId: confirmedTargetSiteId, playerRealmId }
     })
 
     // Issue conquest order
     await page.evaluate(
       ({ aId, tId }) => {
-        const game = (window as any).__game
+        const game = window.__game
+        if (!game) throw new Error('Game not ready')
         game.store.getState().issueOrder({ type: 'declareWarAndMarch', armyId: aId, targetSiteId: tId })
       },
       { aId: setup.armyId, tId: setup.targetSiteId },
@@ -73,7 +93,7 @@ test.describe('QA-FUNC-1: Victory banner appears after player conquers all sites
     // Wait for conquest
     await page.waitForFunction(
       ({ siteId, playerRealmId }) => {
-        const game = (window as any).__game
+        const game = window.__game
         if (!game) return false
         const site = game.world().sites.get(siteId)
         return site?.ownerId === playerRealmId

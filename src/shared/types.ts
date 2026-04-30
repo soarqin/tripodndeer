@@ -106,6 +106,8 @@ export type AdjacencyEdgeId = string
 export type PassId = string
 export type GeneralId = string
 
+export type AIPersonality = 'aggressive_random' | 'aggressive' | 'cautious'
+
 export interface WarState {
   casusBelli: CasusBelliId | null
   declaredAt: GameDate
@@ -191,7 +193,7 @@ export interface Realm {
   readonly capital: SiteId
   readonly initialSites: readonly SiteId[]
   readonly initialArmies: readonly ArmyTemplate[]
-  readonly aiPersonality: 'aggressive_random'
+  readonly aiPersonality: AIPersonality
   readonly stats?: RealmStats
 }
 

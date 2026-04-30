@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { useEffect, useRef, useState } from 'react'
 import { useGameStore } from '~/ui/store'
 import { selectContextMenu, selectIdlePlayerArmies, selectPlayerRealm } from '~/ui/store/selectors'
@@ -66,7 +65,7 @@ export function SiteContextMenu() {
     >
       {isOwnSite ? (
         <button className={styles.itemDisabled} disabled>
-          驻军详情（未来功能）
+          己方邑
         </button>
       ) : (
         <>

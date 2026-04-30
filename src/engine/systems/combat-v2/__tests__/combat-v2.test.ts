@@ -187,6 +187,36 @@ describe('resolveCombat v2', () => {
     expect(result.steps.find((step) => step.name === 'might')?.attackerMultiplier).toBe(1.12)
   })
 
+  it('ignores general strategy and learning when selecting tactics and resolving combat', () => {
+    const baseContext = makeContext({
+      attackerArmy: makeArmy({ manpower: 500 }),
+      defenderArmies: [makeArmy({ id: 'army_defender', realmId: 'realm_han', manpower: 2000 })],
+      attackerGeneral: makeGeneral({ might: 20 }),
+      defenderGeneral: makeGeneral({ id: 'general_han', realmId: 'realm_han', name: 'Han General', might: 10 }),
+    })
+    const tunedContext = makeContext({
+      attackerArmy: makeArmy({ manpower: 500 }),
+      defenderArmies: [makeArmy({ id: 'army_defender', realmId: 'realm_han', manpower: 2000 })],
+      attackerGeneral: makeGeneral({ might: 20, strategy: 12, learning: 9 }),
+      defenderGeneral: makeGeneral({
+        id: 'general_han',
+        realmId: 'realm_han',
+        name: 'Han General',
+        might: 10,
+        strategy: 7,
+        learning: 4,
+      }),
+    })
+
+    const baseResult = resolveCombat(baseContext)
+    const tunedResult = resolveCombat(tunedContext)
+
+    expect(baseResult.steps.find((step) => step.name === 'tactic')).toEqual(
+      tunedResult.steps.find((step) => step.name === 'tactic'),
+    )
+    expect(tunedResult).toEqual(baseResult)
+  })
+
   it('records modifier steps in pipeline order', () => {
     const result = resolveCombat(makeContext({ battleType: 'pass-assault', passDefenseBonus: 0.1 }))
 

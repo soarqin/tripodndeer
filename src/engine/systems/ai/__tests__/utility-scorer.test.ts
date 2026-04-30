@@ -42,7 +42,16 @@ describe('utility scorer', () => {
     expect(scoreOption({ kind: 'retreat', score: 0 }, 'cautious')).toBe(20)
   })
 
-  it('derives personality deterministically from realm id', () => {
-    expect(getPersonality('realm_ai')).toBe(getPersonality('realm_ai'))
+  it('resolves configured aggressive personality directly', () => {
+    expect(getPersonality('aggressive', 'realm_qin')).toBe('aggressive')
+  })
+
+  it('resolves configured cautious personality directly', () => {
+    expect(getPersonality('cautious', 'realm_chu')).toBe('cautious')
+  })
+
+  it('keeps aggressive_random deterministic by realm id', () => {
+    expect(getPersonality('aggressive_random', 'realm_qin')).toBe('aggressive')
+    expect(getPersonality('aggressive_random', 'realm_chu')).toBe('aggressive')
   })
 })

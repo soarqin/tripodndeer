@@ -1,7 +1,6 @@
-/* eslint-disable max-lines-per-function */
 import { render, screen, act } from '@testing-library/react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { EventBanner } from './EventBanner'
+import { EventBanner } from '../EventBanner'
 import { useGameStore } from '~/ui/store'
 
 describe('EventBanner', () => {
@@ -39,6 +38,8 @@ describe('EventBanner', () => {
     ['siegeStarted', '围城开始'],
     ['peaceProposed', '提议议和'],
     ['passCaptured', '关隘易主'],
+    ['generalDied', '将领阵亡'],
+    ['customEvent', 'customEvent'],
   ])('maps new event type %s to %s', (eventType, expectedText) => {
     act(() => {
       useGameStore.getState().showBanner(eventType)

@@ -193,6 +193,56 @@ describe('AI determinism', () => {
   })
 })
 
+describe('aiPlanStep personality resolution', () => {
+  it('uses the configured realm personality when choosing actions', () => {
+    const world = baseWorld({
+      sites: new Map([
+        ['site_player', makeSite('site_player', playerRealmId, [], [])],
+        ['site_ai', makeSite('site_ai', aiRealmId, ['site_enemy', 'site_friend'], ['edge_ai_enemy'])],
+        ['site_enemy', makeSite('site_enemy', enemyRealmId, ['site_ai'], ['edge_ai_enemy'])],
+        ['site_friend', makeSite('site_friend', aiRealmId, ['site_ai'], ['edge_enemy_distant'])],
+      ]),
+      armies: new Map([
+        ['army_player', makeArmy('army_player', playerRealmId, 'site_player')],
+        ['army_ai', { ...makeArmy('army_ai', aiRealmId, 'site_ai'), manpower: 45 }],
+        ['army_enemy', { ...makeArmy('army_enemy', enemyRealmId, 'site_ai'), manpower: 70 }],
+      ]),
+      realms: new Map([
+        [playerRealmId, makeRealm(playerRealmId, 'site_player')],
+        [aiRealmId, { ...makeRealm(aiRealmId, 'site_ai'), aiPersonality: 'cautious' }],
+        [enemyRealmId, makeRealm(enemyRealmId, 'site_enemy')],
+      ]),
+    })
+
+    const cautiousResult = aiPlanStep(world, createInitialRng(1))
+
+    expect(cautiousResult.events[0]).toEqual({
+      type: 'aiRetreatedArmy',
+      payload: { realmId: aiRealmId, armyId: 'army_ai', targetSiteId: 'site_friend' },
+    })
+
+    const aggressiveWorld: World = {
+      ...world,
+      realms: new Map([
+        [playerRealmId, makeRealm(playerRealmId, 'site_player')],
+        [aiRealmId, { ...makeRealm(aiRealmId, 'site_ai'), aiPersonality: 'aggressive' as const }],
+        [enemyRealmId, makeRealm(enemyRealmId, 'site_enemy')],
+      ]),
+    }
+
+    const aggressiveResult = aiPlanStep(aggressiveWorld, createInitialRng(1))
+
+    expect(aggressiveResult.events[0]).toEqual({
+      type: 'aiDeclaredWar',
+      payload: { byRealm: aiRealmId, againstRealm: enemyRealmId },
+    })
+    expect(aggressiveResult.events[1]).toEqual({
+      type: 'aiDispatchedArmy',
+      payload: { realmId: aiRealmId, armyId: 'army_ai', targetSiteId: 'site_enemy' },
+    })
+  })
+})
+
 describe('aiPlanStep target selection', () => {
   it('keeps the action rate near 20 percent over 100 monthly opportunities', () => {
     let rng: RNGState = createInitialRng(2)
