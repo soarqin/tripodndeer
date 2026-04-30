@@ -1,4 +1,0 @@
-Command: pnpm vitest run src/engine/wars/__tests__/wars.test.ts -t "does not mutate the input map"
-
-Output:
-✓ src/engine/wars/__tests__/wars.test.ts (10 tests | 9 skipped)

@@ -1,4 +1,0 @@
-pnpm typecheck && pnpm lint && pnpm test src/shared
-
-✓ src/shared/__tests__/schemas.test.ts (20 tests)
-ArmyStateSchema coverage passed.

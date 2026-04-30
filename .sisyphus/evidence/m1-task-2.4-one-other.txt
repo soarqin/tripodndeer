@@ -1,6 +1,0 @@
-> tripodndeer@ test C:\Projects\tripodndeer
-> vitest run "src/engine/systems/victory"
-
-✓ src/engine/systems/victory/__tests__/victory.test.ts (9 tests)
-Test Files 1 passed (1)
-Tests 9 passed (9)

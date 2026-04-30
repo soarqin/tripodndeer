@@ -4,4 +4,4 @@ dist/
 playwright-report/
 test-results/
 artifacts/
-.sisyphus/evidence/*
+/.sisyphus/

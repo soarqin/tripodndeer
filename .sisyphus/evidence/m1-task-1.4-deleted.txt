@@ -1,1 +1,0 @@
-ls : Cannot find path 'src/engine/systems/painting' because it does not exist.
