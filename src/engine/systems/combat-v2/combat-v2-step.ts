@@ -1,4 +1,15 @@
-import type { Army, GameEvent, General, GeneralId, RNGState, Site, World } from '~/shared/types'
+import type {
+  Army,
+  GameEvent,
+  General,
+  GeneralId,
+  Pass,
+  PassId,
+  RNGState,
+  Site,
+  SiteId,
+  World,
+} from '~/shared/types'
 import { resolveCombat } from './combat-v2'
 import type { BattleContext, Composition } from './combat-v2'
 
@@ -18,6 +29,19 @@ function findDefenders(
       candidate.location === destination &&
       candidate.realmId === destinationOwner,
   )
+}
+
+function findPassOnEdge(world: World, fromSiteId: SiteId | null, toSiteId: SiteId): Pass | null {
+  if (!fromSiteId) return null
+  for (const ae of world.adjacencyEdges.values()) {
+    if (
+      (ae.fromSiteId === fromSiteId && ae.toSiteId === toSiteId) ||
+      (ae.fromSiteId === toSiteId && ae.toSiteId === fromSiteId)
+    ) {
+      return world.passes.get(ae.passId) ?? null
+    }
+  }
+  return null
 }
 
 function applyGeneralDeaths(
@@ -59,6 +83,7 @@ export function combatV2Step(
   const events: GameEvent[] = []
   const sites = new Map(world.sites)
   const armies = new Map(world.armies)
+  const passes = new Map<PassId, Pass>(world.passes)
   let generals = world.generals
 
   for (const army of world.armies.values()) {
@@ -73,14 +98,19 @@ export function combatV2Step(
     const attackerGeneral = army.generalId ? generals.get(army.generalId) ?? null : null
     const defenderGeneral = defenders[0]?.generalId ? generals.get(defenders[0].generalId) ?? null : null
 
+    const passOnEdge = findPassOnEdge(world, army.source, destination)
+    const isPassAssault = passOnEdge !== null && passOnEdge.controllerId !== army.realmId
+    const battleType: BattleContext['battleType'] = isPassAssault ? 'pass-assault' : 'field'
+    const passDefenseBonus = isPassAssault && passOnEdge ? passOnEdge.defenseBonus : 0
+
     const ctx: BattleContext = {
       attackerArmy: army,
       defenderArmies: defenders,
       attackerGeneral,
       defenderGeneral,
       terrain: (destSite as TerrainSite).terrainType ?? 'plains',
-      battleType: 'field',
-      passDefenseBonus: 0,
+      battleType,
+      passDefenseBonus,
       siegeBonus: 0,
       attackerComposition: army.composition ?? DEFAULT_COMPOSITION,
       defenderComposition: defenders[0]?.composition ?? DEFAULT_COMPOSITION,
@@ -109,6 +139,23 @@ export function combatV2Step(
         type: 'siteConquered',
         payload: { siteId: destination, byRealm: currentAttacker.realmId, fromRealm: prevOwner },
       })
+
+      if (isPassAssault && passOnEdge) {
+        const prevController = passOnEdge.controllerId
+        passes.set(passOnEdge.id, {
+          ...passOnEdge,
+          controllerId: currentAttacker.realmId,
+          fortification: 50,
+        })
+        events.push({
+          type: 'passCaptured',
+          payload: {
+            passId: passOnEdge.id,
+            byRealm: currentAttacker.realmId,
+            fromRealm: prevController,
+          },
+        })
+      }
     } else {
       if (!currentAttacker.source) {
         armies.delete(currentAttacker.id)
@@ -125,5 +172,5 @@ export function combatV2Step(
     }
   }
 
-  return { world: { ...world, sites, armies, generals }, nextRng: rng, events }
+  return { world: { ...world, sites, armies, generals, passes }, nextRng: rng, events }
 }

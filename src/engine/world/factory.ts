@@ -201,6 +201,16 @@ export function createWorldFromM1Data(
     generals.set(gen.id, gen)
   }
 
+  const adjacencyEdges = new Map<AdjacencyEdgeId, AdjacencyEdge>()
+  for (const ae of data.adjacencyEdges as AdjacencyEdge[]) {
+    adjacencyEdges.set(ae.id, ae)
+  }
+
+  const passes = new Map<PassId, Pass>()
+  for (const pass of data.passes as Pass[]) {
+    passes.set(pass.id, pass)
+  }
+
   return {
     date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
     tick: 0,
@@ -211,8 +221,8 @@ export function createWorldFromM1Data(
     wars,
     peaceProposals: new Map<PeaceProposalId, PeaceProposal>(),
     generals,
-    passes: new Map<PassId, Pass>(),
-    adjacencyEdges: new Map<AdjacencyEdgeId, AdjacencyEdge>(),
+    passes,
+    adjacencyEdges,
     sieges: new Map<SiegeId, Siege>(),
     playerRealmId,
     rngState: { seed, counter: 0 },
