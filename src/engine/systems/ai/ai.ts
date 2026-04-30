@@ -2,6 +2,9 @@ import type { Army, ArmyId, GameEvent, RealmId, RNGState, SiteId, WarKey, WarSta
 import { nextInt, nextRng } from '~/engine/random'
 import { declareWar, isAtWar } from '~/engine/wars'
 
+// IMPORTANT: realm and army iteration order is locked to lexicographic ID sort.
+// This is a contract — changing iteration order breaks RNG reproducibility.
+
 /**
  * AI planning phase step.
  * Only executes every 3 ticks (monthly).
@@ -20,7 +23,7 @@ export function aiPlanStep(
   const armies = new Map(world.armies)
   let wars = world.wars
 
-  for (const realm of world.realms.values()) {
+  for (const realm of [...world.realms.values()].sort((a, b) => a.id.localeCompare(b.id))) {
     if (realm.id === world.playerRealmId) continue
 
     const roll = nextRng(currentRng)
@@ -55,9 +58,9 @@ function findCandidateTargets(
   realmId: RealmId,
 ): Array<{ targetSiteId: SiteId; armyId: ArmyId }> {
   const candidateTargets: Array<{ targetSiteId: SiteId; armyId: ArmyId }> = []
-  const idleArmies = [...armies.values()].filter(
-    army => army.realmId === realmId && army.state === 'idle',
-  )
+  const idleArmies = [...armies.values()]
+    .filter(army => army.realmId === realmId && army.state === 'idle')
+    .sort((a, b) => a.id.localeCompare(b.id))
 
   for (const army of idleArmies) {
     const armySite = world.sites.get(army.location)

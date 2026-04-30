@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Army, MapEdge, Realm, RNGState, Site, WarState, World } from '~/shared/types'
 import { createInitialRng } from '~/engine/random'
 import { warKey } from '~/engine/wars'
+import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
 import { aiPlanStep } from '../index'
 
 function makeWarState(): WarState {
@@ -167,6 +168,27 @@ describe('aiPlanStep skip conditions', () => {
     const second = aiPlanStep(world, rng)
 
     expect(second).toEqual(first)
+  })
+})
+
+describe('AI determinism', () => {
+  it('produces identical orders across 3 runs with same seed and world', () => {
+    const data = loadM1Data()
+    const world = createWorldFromM1Data(data, 42, 'realm_qin')
+    const rng: RNGState = { seed: 42, counter: 0 }
+
+    const result1 = aiPlanStep(world, rng)
+    const result2 = aiPlanStep(world, rng)
+    const result3 = aiPlanStep(world, rng)
+
+    const armies1 = [...result1.world.armies.values()].map(army => `${army.state}:${army.destination ?? ''}`)
+    const armies2 = [...result2.world.armies.values()].map(army => `${army.state}:${army.destination ?? ''}`)
+    const armies3 = [...result3.world.armies.values()].map(army => `${army.state}:${army.destination ?? ''}`)
+
+    expect(armies1).toEqual(armies2)
+    expect(armies1).toEqual(armies3)
+    expect(result1.nextRng).toEqual(result2.nextRng)
+    expect(result1.nextRng).toEqual(result3.nextRng)
   })
 })
 
