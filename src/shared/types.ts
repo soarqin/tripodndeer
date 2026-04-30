@@ -1,3 +1,5 @@
+import type { TerrainType } from '~/content/m2/balance'
+
 // 邑的 ID 类型（opaque string，如 'site_1'）
 export type SiteId = string
 
@@ -38,6 +40,7 @@ export interface RawSite {
   name: string
   position: Vec2
   boundary: readonly BoundaryRef[]
+  terrainType?: TerrainType
 }
 
 /** 运行时形态的邑（含 ownerId + polygon + adjacency，均由 factory 派发） */

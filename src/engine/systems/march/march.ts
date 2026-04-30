@@ -1,4 +1,5 @@
-import type { GameEvent, RNGState, World } from '~/shared/types'
+import { TERRAIN_TRAVEL_COST } from '~/content/m2/balance'
+import type { GameEvent, RNGState, SiteId, World } from '~/shared/types'
 
 /**
  * Compute march ticks from a MapEdge travel_cost and speed factor.
@@ -6,6 +7,24 @@ import type { GameEvent, RNGState, World } from '~/shared/types'
  */
 export function computeMarchTicks(travelCost: number, speedFactor = 1): number {
   return Math.max(1, Math.ceil(travelCost / speedFactor))
+}
+
+export function findTravelCost(world: World, fromSiteId: SiteId, toSiteId: SiteId): number {
+  const fromSite = world.sites.get(fromSiteId)
+  const toSite = world.sites.get(toSiteId)
+  if (!fromSite || !toSite) return 3
+
+  let baseCost = 3
+  const fromEdgeIds = new Set(fromSite.boundary.map(ref => ref.edge))
+  for (const ref of toSite.boundary) {
+    if (fromEdgeIds.has(ref.edge)) {
+      baseCost = world.edges.get(ref.edge)?.travel_cost ?? 3
+      break
+    }
+  }
+
+  const terrainMultiplier = TERRAIN_TRAVEL_COST[toSite.terrainType ?? 'plains'] ?? 1.0
+  return Math.ceil(baseCost * terrainMultiplier)
 }
 
 /**

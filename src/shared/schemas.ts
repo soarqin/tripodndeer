@@ -31,11 +31,14 @@ export const BoundaryRefSchema = z.object({
   reverse: z.boolean(),
 })
 
+export const TerrainTypeSchema = z.enum(['plains', 'hills', 'mountains', 'forest', 'swamp', 'grassland', 'desert'])
+
 export const RawSiteSchema = z.object({
   id: SiteIdSchema,
   name: z.string().min(1),
   position: Vec2Schema,
   boundary: z.array(BoundaryRefSchema).min(3),
+  terrainType: TerrainTypeSchema.optional(),
 })
 
 export const ArmyTemplateSchema = z.object({

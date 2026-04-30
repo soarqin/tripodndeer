@@ -1,4 +1,5 @@
 import type { Army, ArmyId, GameEvent, RealmId, RNGState, SiteId, WarKey, WarState, World } from '~/shared/types'
+import { findTravelCost } from '~/engine/systems/march'
 import { nextInt, nextRng } from '~/engine/random'
 import { declareWar, isAtWar } from '~/engine/wars'
 
@@ -111,17 +112,3 @@ function dispatchCandidate(
   return { wars: nextWars, events }
 }
 
-function findTravelCost(world: World, fromSiteId: SiteId, toSiteId: SiteId): number {
-  const fromSite = world.sites.get(fromSiteId)
-  const toSite = world.sites.get(toSiteId)
-  if (!fromSite || !toSite) return 3
-
-  const fromEdgeIds = new Set(fromSite.boundary.map(ref => ref.edge))
-  for (const ref of toSite.boundary) {
-    if (fromEdgeIds.has(ref.edge)) {
-      return world.edges.get(ref.edge)?.travel_cost ?? 3
-    }
-  }
-
-  return 3
-}

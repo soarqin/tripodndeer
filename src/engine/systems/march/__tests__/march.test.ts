@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { computeMarchTicks, marchStep } from '../march'
-import type { Army, RNGState, World } from '~/shared/types'
+import { computeMarchTicks, findTravelCost, marchStep } from '../march'
+import type { Army, RNGState, Site, World } from '~/shared/types'
 
 function makeWorld(armies: Army[]): World {
   return {
@@ -37,6 +37,19 @@ function makeArmy(overrides: Partial<Army> = {}): Army {
   }
 }
 
+function makeSite(id: string, terrainType: Site['terrainType']): Site {
+  return {
+    id,
+    name: id,
+    position: [0, 0],
+    boundary: [{ edge: 'edge_1', reverse: false }],
+    terrainType,
+    ownerId: null,
+    polygon: [],
+    adjacency: [],
+  }
+}
+
 const rng: RNGState = { seed: 0, counter: 0 }
 
 describe('computeMarchTicks', () => {
@@ -50,6 +63,35 @@ describe('computeMarchTicks', () => {
 
   it('minimum is 1', () => {
     expect(computeMarchTicks(0, 1)).toBe(1)
+  })
+})
+
+describe('findTravelCost', () => {
+  it('doubles mountain march cost', () => {
+    const world: World = {
+      date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
+      tick: 0,
+      sites: new Map([
+        ['site_a', makeSite('site_a', 'plains')],
+        ['site_b', makeSite('site_b', 'mountains')],
+      ]),
+      realms: new Map(),
+      armies: new Map(),
+      edges: new Map([
+        ['edge_1', { id: 'edge_1', curveType: 'polyline', travel_cost: 3, anchors: [[0, 0], [1, 0]] }],
+      ]),
+      wars: new Map(),
+      peaceProposals: new Map(),
+      generals: new Map(),
+      passes: new Map(),
+      adjacencyEdges: new Map(),
+      playerRealmId: 'realm_qin',
+      rngState: { seed: 0, counter: 0 },
+      phases: [],
+      pendingOrders: [],
+    }
+
+    expect(findTravelCost(world, 'site_a', 'site_b')).toBe(6)
   })
 })
 

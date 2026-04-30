@@ -1,1 +1,1 @@
-export { computeMarchTicks, marchStep } from './march'
+export { computeMarchTicks, findTravelCost, marchStep } from './march'

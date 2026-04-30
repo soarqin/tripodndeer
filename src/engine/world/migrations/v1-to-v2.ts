@@ -5,6 +5,10 @@ export function migrateScenarioV1ToV2(rawData: unknown): M1DataV2 {
   const migrated = {
     ...v1,
     schema_version: 2 as const,
+    sites: v1.sites.map(site => ({
+      ...site,
+      terrainType: (site as { terrainType?: string }).terrainType ?? 'plains',
+    })),
     realms: v1.realms.map(realm => ({
       ...realm,
       stats: { manpowerPool: 50000, manpowerCap: 80000, warWeariness: 0 },
