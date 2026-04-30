@@ -18,7 +18,8 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/ban-ts-comment': 'error',
-    'max-lines-per-function': ['warn', 50],
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    'max-lines-per-function': ['warn', { max: 200, skipBlankLines: true, skipComments: true }],
     'react/react-in-jsx-scope': 'off',
   },
   settings: {

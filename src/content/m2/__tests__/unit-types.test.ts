@@ -1,7 +1,7 @@
 import { beforeEach, afterEach, describe, it, expect } from 'vitest'
 import { setCombatVarianceEnabled } from '~/engine/random'
 import { resolveCombat } from '~/engine/systems/combat-v2'
-import type { BattleContext } from '~/engine/systems/combat-v2'
+import type { BattleContext, Composition } from '~/engine/systems/combat-v2'
 
 const makeArmy = (
   manpower: number,
@@ -24,8 +24,8 @@ const gameDate = { yearBC: 260, season: 'spring' as const, month: 1 as const, xu
 const ctx = (
   attacker: ReturnType<typeof makeArmy>,
   defenderManpower: number,
-  aComp: any,
-  dComp: any,
+  aComp: Composition,
+  dComp: Composition,
 ): BattleContext => ({
   attackerArmy: attacker,
   defenderArmies: [makeArmy(defenderManpower, dComp)],

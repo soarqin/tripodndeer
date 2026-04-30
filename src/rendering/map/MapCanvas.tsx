@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react'
 import { useSites, useRealms, useEdges } from '@/ui/store/selectors'
 import { useGameStore } from '@/ui/store/game-store'
-import type { Site, Vec2, Pass, AdjacencyEdge, Realm } from '@/shared/types'
+import type { Site, Vec2, Pass, AdjacencyEdge, Realm, Army } from '@/shared/types'
 import { buildTileCache } from './tile-cache'
 import { findHitSite } from './hit-test'
 import { drawArmies } from './army-render'
@@ -131,7 +131,7 @@ function findPlayerArmyAtSite(
 
 function drawArmiesAndPasses(
   ctx: CanvasRenderingContext2D,
-  armies: ReadonlyMap<string, any>,
+  armies: ReadonlyMap<string, Army>,
   sites: ReadonlyMap<string, Site>,
   realms: ReadonlyMap<string, Realm>,
   selectedArmyId: string | null,

@@ -1,4 +1,4 @@
-import type { Army, GameEvent, Order, RNGState, Site, SiteId, WarKey, WarState, World } from '~/shared/types'
+import type { Army, GameEvent, Order, RNGState, Site, WarKey, WarState, World } from '~/shared/types'
 import { findTravelCost } from '~/engine/systems/march'
 import { declareWar, declareWarWithCasus, isAtWar } from '~/engine/wars'
 import { createPeaceProposal } from '~/engine/systems/peace'

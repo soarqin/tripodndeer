@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { Mock } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import { MapCanvas } from '../MapCanvas'
-import type { Polygon, Site } from '@/shared/types'
+import type { AdjacencyEdge, Pass, Polygon, Site } from '@/shared/types'
+
+type SiteMock = Partial<Site> & { id: string; polygon: Polygon }
 
 // Hoisted mocks so vi.mock factory can reference them.
 const {
@@ -19,7 +22,7 @@ const {
     [100, 100],
     [0, 100],
   ]
-  const siteA: Partial<Site> & { id: string; polygon: Polygon } = {
+  const siteA: SiteMock = {
     id: 'site_a',
     name: 'Site A',
     polygon,
@@ -28,7 +31,7 @@ const {
     ownerId: null,
     adjacency: [],
   }
-  const siteB: Partial<Site> & { id: string; polygon: Polygon } = {
+  const siteB: SiteMock = {
     id: 'site_b',
     name: 'Site B',
     polygon,
@@ -37,17 +40,17 @@ const {
     ownerId: null,
     adjacency: [],
   }
-  const sites = new Map<string, any>([['site_a', siteA], ['site_b', siteB]])
+  const sites = new Map<string, SiteMock>([['site_a', siteA], ['site_b', siteB]])
   // Two armies — only player's qualifies for hit.
   const armies = new Map<string, { id: string; realmId: string; location: string }>([
     ['army_enemy', { id: 'army_enemy', realmId: 'realm_chu', location: 'site_a' }],
     ['army_player', { id: 'army_player', realmId: 'realm_qin', location: 'site_a' }],
   ])
-  const passes = new Map<string, any>([
-    ['pass_1', { id: 'pass_1', name: 'Hangu Pass', edgeId: 'ae_1', defenseBonus: 0.5, controllerId: 'realm_qin', fortification: 0 }]
+  const passes = new Map<string, Pass>([
+    ['pass_1', { id: 'pass_1', name: 'Hangu Pass', edgeId: 'ae_1', defenseBonus: 0.5, controllerId: 'realm_qin', fortification: 0 } as Pass]
   ])
-  const adjacencyEdges = new Map<string, any>([
-    ['ae_1', { id: 'ae_1', fromSiteId: 'site_a', toSiteId: 'site_b', passId: 'pass_1' }]
+  const adjacencyEdges = new Map<string, AdjacencyEdge>([
+    ['ae_1', { id: 'ae_1', fromSiteId: 'site_a', toSiteId: 'site_b', passId: 'pass_1' } as AdjacencyEdge]
   ])
   return {
     mockSelectArmy: vi.fn(),
@@ -144,7 +147,7 @@ describe('MapCanvas (rendering)', () => {
 
   it('renders pass icons at the midpoint of adjacency edges', () => {
     const canvas = renderCanvas()
-    const ctx = canvas.getContext('2d') as any
+    const ctx = canvas.getContext('2d') as unknown as { fillRect: Mock; strokeRect: Mock }
     
     // Midpoint of site A (50, 50) and site B (150, 50) is (100, 50)
     // The pass icon is drawn with fillRect(cx - 4, cy - 2, 8, 6)

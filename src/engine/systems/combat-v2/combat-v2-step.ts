@@ -51,7 +51,7 @@ function applyGeneralDeaths(
   battleSiteId: string,
   events: GameEvent[],
 ): ReadonlyMap<GeneralId, General> {
-  let nextGenerals = new Map(generals)
+  const nextGenerals = new Map(generals)
 
   for (const deadGeneralId of deadGeneralIds) {
     const deadGeneral = nextGenerals.get(deadGeneralId)
