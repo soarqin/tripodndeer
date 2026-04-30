@@ -1,0 +1,1 @@
+export { manpowerTick } from './manpower'
