@@ -1,6 +1,6 @@
 import type { Army, GameEvent, Order, RNGState, Site, SiteId, WarKey, WarState, World } from '~/shared/types'
 import { findTravelCost } from '~/engine/systems/march'
-import { declareWar, isAtWar } from '~/engine/wars'
+import { declareWar, declareWarWithCasus, isAtWar } from '~/engine/wars'
 
 type OrderResult = { world: World; events: readonly GameEvent[] }
 
@@ -20,6 +20,18 @@ type ValidationResult =
  * Validation order: armyNotFound -> armyNotIdle -> notAdjacent -> targetNotFound -> notAtWar (march only).
  */
 export function applyOrder(world: World, order: Order): OrderResult {
+  if (order.type === 'declare-war') {
+    if (!order.targetRealmId) {
+      return rejected(world, order, 'targetNotFound')
+    }
+    const casusBelli = order.casusBelli ?? null
+    const nextWars = declareWarWithCasus(world.wars, world.playerRealmId, order.targetRealmId, casusBelli, world.date)
+    return {
+      world: { ...world, wars: nextWars, pendingOrders: [] },
+      events: [{ type: 'warDeclared', payload: { byRealm: world.playerRealmId, againstRealm: order.targetRealmId, casusBelli } }],
+    }
+  }
+
   const validation = validateOrder(world, order)
   if (validation.kind === 'rejected') {
     return rejected(world, order, validation.reason)
@@ -54,16 +66,16 @@ function rejected(world: World, order: Order, reason: OrderRejectionReason): Ord
 }
 
 function validateOrder(world: World, order: Order): ValidationResult {
-  const army = world.armies.get(order.armyId)
+  const army = world.armies.get(order.armyId!)
   if (!army) return { kind: 'rejected', reason: 'armyNotFound' }
   if (army.state !== 'idle') return { kind: 'rejected', reason: 'armyNotIdle' }
 
   const armySite = world.sites.get(army.location)
-  if (!armySite || !armySite.adjacency.includes(order.targetSiteId)) {
+  if (!armySite || !armySite.adjacency.includes(order.targetSiteId!)) {
     return { kind: 'rejected', reason: 'notAdjacent' }
   }
 
-  const targetSite = world.sites.get(order.targetSiteId)
+  const targetSite = world.sites.get(order.targetSiteId!)
   if (!targetSite) return { kind: 'rejected', reason: 'targetNotFound' }
 
   if (order.type === 'march' && targetSite.ownerId && targetSite.ownerId !== army.realmId) {

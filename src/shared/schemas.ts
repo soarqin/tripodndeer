@@ -70,13 +70,31 @@ export const ArmySchema = z.object({
   composition: CompositionSchema.optional(),
 })
 
-export const OrderTypeSchema = z.enum(['march', 'declareWarAndMarch'])
+export const OrderTypeSchema = z.enum(['march', 'declareWarAndMarch', 'declare-war'])
 
-export const OrderSchema = z.object({
-  type: OrderTypeSchema,
+const MarchOrderSchema = z.object({
+  type: z.literal('march'),
   armyId: ArmyIdSchema,
   targetSiteId: SiteIdSchema,
 })
+
+const DeclareWarOrderSchema = z.object({
+  type: z.literal('declare-war'),
+  targetRealmId: RealmIdSchema,
+  casusBelli: z.string().optional(),
+})
+
+const DeclareWarAndMarchOrderSchema = z.object({
+  type: z.literal('declareWarAndMarch'),
+  armyId: ArmyIdSchema,
+  targetSiteId: SiteIdSchema,
+})
+
+export const OrderSchema = z.discriminatedUnion('type', [
+  MarchOrderSchema,
+  DeclareWarOrderSchema,
+  DeclareWarAndMarchOrderSchema,
+])
 
 export const WarKeySchema = z.string().min(1)
 

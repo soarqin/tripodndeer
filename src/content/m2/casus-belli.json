@@ -1,0 +1,7 @@
+[
+  { "id": "revenge", "name": "复仇", "description": "因敌方过去侵略而复仇", "peaceModifier": 10 },
+  { "id": "succession", "name": "争位", "description": "争夺政治继承权", "peaceModifier": 5 },
+  { "id": "rescue_ally", "name": "救援盟友", "description": "援助盟友抵抗入侵", "peaceModifier": 15 },
+  { "id": "righteous", "name": "救济伐暴", "description": "以义伐不义", "peaceModifier": 8 },
+  { "id": "inheritance", "name": "争夺继承", "description": "主张领土继承权", "peaceModifier": 6 }
+]
