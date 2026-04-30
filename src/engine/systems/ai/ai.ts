@@ -1,7 +1,8 @@
 import type { Army, ArmyId, GameEvent, RealmId, RNGState, SiteId, WarKey, WarState, World } from '~/shared/types'
 import { findTravelCost } from '~/engine/systems/march'
-import { nextInt, nextRng } from '~/engine/random'
+import { nextRng } from '~/engine/random'
 import { declareWar, isAtWar } from '~/engine/wars'
+import { getPersonality, pickAction, type AIOption } from './utility-scorer'
 
 // IMPORTANT: realm and army iteration order is locked to lexicographic ID sort.
 // This is a contract — changing iteration order breaks RNG reproducibility.
@@ -35,13 +36,24 @@ export function aiPlanStep(
     const candidateTargets = findCandidateTargets(world, armies, realm.id)
     if (candidateTargets.length === 0) continue
 
-    const targetPick = nextInt(currentRng, 0, candidateTargets.length - 1)
-    currentRng = targetPick.nextState
+    const options: AIOption[] = candidateTargets.map(candidate => ({
+      kind: 'attack',
+      targetSiteId: candidate.targetSiteId,
+      armyId: candidate.armyId,
+      score: 50,
+    }))
+    options.push({ kind: 'idle', score: 10 })
 
-    const candidate = candidateTargets[targetPick.value]
-    if (!candidate) continue
+    const personality = getPersonality(realm.id)
+    const { action, nextRng: pickRng } = pickAction(options, personality, currentRng)
+    currentRng = pickRng
 
-    const dispatch = dispatchCandidate(world, armies, wars, realm.id, candidate)
+    if (action.kind === 'idle' || !action.targetSiteId || !action.armyId) continue
+
+    const dispatch = dispatchCandidate(world, armies, wars, realm.id, {
+      targetSiteId: action.targetSiteId,
+      armyId: action.armyId,
+    })
     wars = dispatch.wars
     events.push(...dispatch.events)
   }
