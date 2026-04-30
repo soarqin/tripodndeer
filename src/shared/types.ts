@@ -89,6 +89,11 @@ export interface Realm {
   readonly initialSites: readonly SiteId[]
   readonly initialArmies: readonly ArmyTemplate[]
   readonly aiPersonality: 'aggressive_random'
+  readonly stats?: {
+    manpowerPool: number
+    manpowerCap: number
+    warWeariness: number
+  }
 }
 
 // 游戏日期（旬为最小单位）

@@ -90,12 +90,34 @@ export const M1DataSchema = z.object({
   edges: z.record(z.string(), MapEdgeSchema),
   sites: z.array(RawSiteSchema),
   realms: z.array(RealmSchema),
+  schema_version: z.number().optional(),
   initialOwnership: z.record(z.string(), z.string()),
   initialArmies: z.array(ArmySchema),
   initialWars: z.array(z.object({ a: z.string(), b: z.string() })),
 })
 
 export type M1Data = z.infer<typeof M1DataSchema>
+
+export const RealmSchemaV2 = RealmSchema.extend({
+  stats: z
+    .object({
+      manpowerPool: z.number().int().nonnegative(),
+      manpowerCap: z.number().int().positive(),
+      warWeariness: z.number().int().nonnegative(),
+    })
+    .optional(),
+})
+
+export const M1DataSchemaV2 = M1DataSchema.extend({
+  schema_version: z.literal(2),
+  realms: z.array(RealmSchemaV2),
+  generals: z.array(z.any()).default([]),
+  passes: z.array(z.any()).default([]),
+  adjacencyEdges: z.array(z.any()).default([]),
+  peaceProposals: z.array(z.any()).default([]),
+})
+
+export type M1DataV2 = z.infer<typeof M1DataSchemaV2>
 
 // World Schema (for runtime World validation)
 export const WorldSchema = z.object({

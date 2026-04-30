@@ -1,7 +1,7 @@
 import m0Data from '@/content/m0/sites.json'
 import m1Data from '@/content/m1/scenario.json'
 import { INITIAL_DATE } from '@/shared/constants'
-import { M0DataSchema, M1DataSchema } from '@/shared/schemas'
+import { M0DataSchema, M1DataSchemaV2 } from '@/shared/schemas'
 import { aiPlanStep } from '~/engine/systems/ai'
 import { combatStep } from '~/engine/systems/combat'
 import { marchStep } from '~/engine/systems/march'
@@ -22,7 +22,8 @@ import type {
   WarKey,
   World,
 } from '@/shared/types'
-import type { M1Data } from '@/shared/schemas'
+import type { M1DataV2 } from '@/shared/schemas'
+import { migrateScenarioV1ToV2 } from './migrations/v1-to-v2'
 
 /** 将一个 site 的 boundary 引用展开为具体的 polygon 顶点列表 */
 function expandPolygon(
@@ -108,8 +109,13 @@ export function loadM0Data(): M0Data {
 }
 
 /** 加载并验证 M1 场景数据（静态 import + Zod 校验） */
-export function loadM1Data(): M1Data {
-  return M1DataSchema.parse(m1Data)
+export function loadM1Data(): M1DataV2 {
+  const raw = m1Data as unknown
+  const version = (raw as { schema_version?: number }).schema_version
+  if (version === undefined || version < 2) {
+    return migrateScenarioV1ToV2(raw)
+  }
+  return M1DataSchemaV2.parse(raw)
 }
 
 /** 构造初始 World（含 Zod 校验 + ownership 引用完整性 + polygon/adjacency 派发） */
@@ -137,11 +143,11 @@ export function createInitialWorld(data: M0Data, seed: number): World {
 }
 
 export function createWorldFromM1Data(
-  data: M1Data,
+  data: M1DataV2,
   seed: number,
   playerRealmId: RealmId,
 ): World {
-  M1DataSchema.parse(data)
+  M1DataSchemaV2.parse(data)
 
   const realms = buildRealmMap(data.realms)
   const sites = buildSites(data.sites, data.edges, data.initialOwnership, realms)
