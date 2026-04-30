@@ -104,6 +104,7 @@ function buildSites(
       ownerId,
       polygon,
       adjacency,
+      occupation: ownerId !== null ? { occupierId: ownerId, controlLevel: 100 } : undefined,
     })
   }
 

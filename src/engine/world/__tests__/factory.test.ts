@@ -129,4 +129,32 @@ describe('createWorldFromM1Data — structure', () => {
       expect(Array.isArray(site.adjacency)).toBe(true)
     }
   })
+
+  it('all owned sites have occupation initialized', () => {
+    const data = loadM1Data()
+    const world = createWorldFromM1Data(data, 99, 'realm_qin')
+
+    let ownedCount = 0
+    for (const site of world.sites.values()) {
+      if (site.ownerId) {
+        expect(site.occupation?.occupierId).toBe(site.ownerId)
+        expect(site.occupation?.controlLevel).toBe(100)
+        ownedCount++
+      }
+    }
+
+    expect(ownedCount).toBeGreaterThan(0)
+  })
+
+  it('world loads generals, passes, adjacencyEdges', () => {
+    const world = createWorldFromM1Data(loadM1Data(), 99, 'realm_qin')
+
+    expect(world.generals.size).toBeGreaterThanOrEqual(17)
+    expect(world.passes.size).toBe(5)
+    expect(world.adjacencyEdges.size).toBe(5)
+
+    for (const pass of world.passes.values()) {
+      expect(world.adjacencyEdges.has(pass.edgeId)).toBe(true)
+    }
+  })
 })
