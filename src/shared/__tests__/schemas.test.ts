@@ -4,6 +4,9 @@ import {
   AIPersonalitySchema,
   ArmySchema,
   ArmyStateSchema,
+  CoalitionStateSchema,
+  DiplomaticProposalSchema,
+  DiplomaticRelationSchema,
   GeneralSchema,
   M0DataSchema,
   M1DataSchema,
@@ -16,7 +19,9 @@ import {
   RealmStatsSchema,
   RealmSchema,
   SiteOccupationSchema,
+  TreatySchema,
   WorldSchema,
+  ZhouInvestitureStateSchema,
 } from '../schemas'
 
 const validPolylineEdge = {
@@ -197,6 +202,12 @@ describe('WorldSchema', () => {
           edges: new Map(),
           wars: new Map(),
           peaceProposals: new Map(),
+          relations: new Map(),
+          diplomaticProposals: new Map(),
+          treaties: new Map(),
+          diplomacyHistory: [],
+          coalitions: new Map(),
+          zhouInvestiture: new Map(),
           generals: new Map(),
           passes: new Map(),
           adjacencyEdges: new Map(),
@@ -207,6 +218,86 @@ describe('WorldSchema', () => {
           pendingOrders: [],
         }),
     ).not.toThrow()
+  })
+})
+
+describe('M3 diplomacy contract schemas', () => {
+  const validDate = { yearBC: 260, season: 'spring' as const, month: 1 as const, xun: 'shang' as const }
+  const validRelation = {
+    key: 'realm_han__realm_qin',
+    realmAId: 'realm_han',
+    realmBId: 'realm_qin',
+    attitude: 0,
+    trust: 50,
+    updatedAt: validDate,
+  }
+  const validProposal = {
+    id: 'diplomatic_proposal_1',
+    kind: 'alliance' as const,
+    proposingRealmId: 'realm_han',
+    targetRealmId: 'realm_qin',
+    status: 'pending' as const,
+    proposedAt: validDate,
+    proposedAtTick: 3,
+    expiresAt: validDate,
+    expiresAtTick: 12,
+    resolvedAt: null,
+    resolvedAtTick: null,
+    treatyId: null,
+  }
+  const validTreaty = {
+    id: 'treaty_1',
+    kind: 'truce' as const,
+    realmAId: 'realm_han',
+    realmBId: 'realm_qin',
+    status: 'active' as const,
+    signedAt: validDate,
+    signedAtTick: 6,
+    expiresAt: validDate,
+    expiresAtTick: 42,
+    endedAt: null,
+    endedAtTick: null,
+    sourceProposalId: 'diplomatic_proposal_1',
+  }
+
+  it('accepts bounded relation, proposal, treaty, coalition, and investiture records', () => {
+    expect(() => DiplomaticRelationSchema.parse(validRelation)).not.toThrow()
+    expect(() => DiplomaticProposalSchema.parse(validProposal)).not.toThrow()
+    expect(() => TreatySchema.parse(validTreaty)).not.toThrow()
+    expect(() => CoalitionStateSchema.parse({ id: 'coalition_1', targetRealmId: 'realm_qin', memberRealmIds: ['realm_han'], status: 'forming', formedAt: validDate, dissolvedAt: null })).not.toThrow()
+    expect(() => ZhouInvestitureStateSchema.parse({ realmId: 'realm_zhou', recognizedTitle: '王', grantedAtTick: 0, expiresAtTick: null, source: 'zhou' })).not.toThrow()
+  })
+
+  it('documents RelationKey as a canonical sorted pair with double underscore separator', () => {
+    expect(() => DiplomaticRelationSchema.parse(validRelation)).not.toThrow()
+    expect(() => DiplomaticRelationSchema.parse({ ...validRelation, key: 'realm_qin:realm_han' })).toThrow()
+  })
+
+  it('rejects out-of-bounds relation values and malformed proposal/treaty records', () => {
+    expect(() => DiplomaticRelationSchema.parse({ ...validRelation, attitude: 101 })).toThrow()
+    expect(() => DiplomaticRelationSchema.parse({ ...validRelation, trust: -1 })).toThrow()
+    expect(() => DiplomaticProposalSchema.parse({ ...validProposal, kind: 'trade' })).toThrow()
+    expect(() => DiplomaticProposalSchema.parse({ ...validProposal, expiresAtTick: -1 })).toThrow()
+    expect(() => TreatySchema.parse({ ...validTreaty, kind: 'peace' })).toThrow()
+    expect(() => TreatySchema.parse({ ...validTreaty, signedAtTick: 1.5 })).toThrow()
+    expect(() => ZhouInvestitureStateSchema.parse({ realmId: 'realm_zhou', recognizedTitle: '王', grantedAtTick: 0, expiresAtTick: null, source: 'qin' })).toThrow()
+  })
+
+  it('defaults serializable M3 scenario arrays to empty collections', () => {
+    const parsed = M1DataSchemaV2.parse({
+      ...validData,
+      schema_version: 2,
+      realms: [{ ...validRealm, stats: { manpowerPool: 1000, manpowerCap: 5000, warWeariness: 0 } }],
+      initialArmies: [],
+      initialWars: [],
+    })
+
+    expect(parsed.relations).toEqual([])
+    expect(parsed.diplomaticProposals).toEqual([])
+    expect(parsed.treaties).toEqual([])
+    expect(parsed.diplomacyHistory).toEqual([])
+    expect(parsed.coalitions).toEqual([])
+    expect(parsed.zhouInvestiture).toEqual([])
   })
 })
 
@@ -324,6 +415,12 @@ describe('M2 contract schemas', () => {
     passes: [validPass],
     adjacencyEdges: [validAdjacencyEdge],
     peaceProposals: [validPeaceProposal],
+    relations: [],
+    diplomaticProposals: [],
+    treaties: [],
+    diplomacyHistory: [],
+    coalitions: [],
+    zhouInvestiture: [],
   }
 
   it('accepts valid RealmStats', () => {

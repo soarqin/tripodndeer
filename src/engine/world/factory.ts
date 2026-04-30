@@ -15,6 +15,15 @@ import type {
   BoundaryRef,
   Army,
   ArmyId,
+  CoalitionId,
+  CoalitionState,
+  DiplomaticProposal,
+  DiplomaticProposalId,
+  DiplomaticRelation,
+  ZhouInvestitureState,
+  RelationKey,
+  Treaty,
+  TreatyId,
   EdgeId,
   General,
   GeneralId,
@@ -150,6 +159,12 @@ export function createInitialWorld(data: M0Data, seed: number): World {
     armies: new Map(),
     wars: new Map<WarKey, WarState>(),
     peaceProposals: new Map<PeaceProposalId, PeaceProposal>(),
+    relations: new Map<RelationKey, DiplomaticRelation>(),
+    diplomaticProposals: new Map<DiplomaticProposalId, DiplomaticProposal>(),
+    treaties: new Map<TreatyId, Treaty>(),
+    diplomacyHistory: [],
+    coalitions: new Map<CoalitionId, CoalitionState>(),
+    zhouInvestiture: new Map(),
     generals: new Map<GeneralId, General>(),
     passes: new Map<PassId, Pass>(),
     adjacencyEdges: new Map<AdjacencyEdgeId, AdjacencyEdge>(),
@@ -214,6 +229,31 @@ export function createWorldFromM1Data(
     passes.set(pass.id, pass)
   }
 
+  const relations = new Map<RelationKey, DiplomaticRelation>()
+  for (const relation of data.relations) {
+    relations.set(relation.key, relation)
+  }
+
+  const diplomaticProposals = new Map<DiplomaticProposalId, DiplomaticProposal>()
+  for (const proposal of data.diplomaticProposals) {
+    diplomaticProposals.set(proposal.id, proposal)
+  }
+
+  const treaties = new Map<TreatyId, Treaty>()
+  for (const treaty of data.treaties) {
+    treaties.set(treaty.id, treaty)
+  }
+
+  const coalitions = new Map<CoalitionId, CoalitionState>()
+  for (const coalition of data.coalitions) {
+    coalitions.set(coalition.id, coalition)
+  }
+
+  const zhouInvestiture = new Map<RealmId, ZhouInvestitureState>()
+  for (const investiture of data.zhouInvestiture) {
+    zhouInvestiture.set(investiture.realmId, investiture)
+  }
+
   return {
     date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
     tick: 0,
@@ -223,6 +263,12 @@ export function createWorldFromM1Data(
     edges,
     wars,
     peaceProposals: new Map<PeaceProposalId, PeaceProposal>(),
+    relations,
+    diplomaticProposals,
+    treaties,
+    diplomacyHistory: data.diplomacyHistory,
+    coalitions,
+    zhouInvestiture,
     generals,
     passes,
     adjacencyEdges,

@@ -14,6 +14,12 @@ describe('migrateScenarioV1ToV2', () => {
     expect(migrated.passes).toEqual([])
     expect(migrated.adjacencyEdges).toEqual([])
     expect(migrated.peaceProposals).toEqual([])
+    expect(migrated.relations).toEqual([])
+    expect(migrated.diplomaticProposals).toEqual([])
+    expect(migrated.treaties).toEqual([])
+    expect(migrated.diplomacyHistory).toEqual([])
+    expect(migrated.coalitions).toEqual([])
+    expect(migrated.zhouInvestiture).toEqual([])
     expect(migrated.realms).toHaveLength(8)
     for (const realm of migrated.realms) {
       expect(realm.stats).toEqual({ manpowerPool: 50000, manpowerCap: 80000, warWeariness: 0 })
@@ -23,6 +29,12 @@ describe('migrateScenarioV1ToV2', () => {
     expect(world.sites.size).toBe(50)
     expect(world.realms.size).toBe(8)
     expect(world.armies.size).toBe(16)
+    expect(world.relations.size).toBe(0)
+    expect(world.diplomaticProposals.size).toBe(0)
+    expect(world.treaties.size).toBe(0)
+    expect(world.diplomacyHistory).toEqual([])
+    expect(world.coalitions.size).toBe(0)
+    expect(world.zhouInvestiture.size).toBe(0)
   })
 
   it('migrates v1 data with explicit schema_version 1', () => {
@@ -45,6 +57,12 @@ describe('migrateScenarioV1ToV2', () => {
       passes: [],
       adjacencyEdges: [],
       peaceProposals: [],
+      relations: [],
+      diplomaticProposals: [],
+      treaties: [],
+      diplomacyHistory: [],
+      coalitions: [],
+      zhouInvestiture: [],
     })
 
     expect(v2.schema_version).toBe(2)

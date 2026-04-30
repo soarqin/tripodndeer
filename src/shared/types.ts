@@ -105,6 +105,87 @@ export type PeaceProposalId = string
 export type AdjacencyEdgeId = string
 export type PassId = string
 export type GeneralId = string
+// Canonical sorted pair `${lowerRealmId}__${higherRealmId}`.
+export type RelationKey = string
+export type DiplomaticProposalId = string
+export type TreatyId = string
+export type DiplomacyEventId = string
+export type CoalitionId = string
+
+export type DiplomaticActionKind = 'alliance' | 'non_aggression' | 'tribute' | 'marriage' | 'envoy' | 'declare_war' | 'peace'
+export type DiplomaticProposalStatus = 'pending' | 'accepted' | 'rejected' | 'expired' | 'cancelled'
+export type DiplomaticTreatyKind = 'alliance' | 'non_aggression' | 'tribute' | 'marriage' | 'truce'
+export type DiplomaticTreatyStatus = 'active' | 'expired' | 'cancelled' | 'broken'
+export type DiplomacyEventKind = 'proposal_created' | 'proposal_resolved' | 'treaty_created' | 'treaty_ended' | 'relation_changed' | 'coalition_changed' | 'zhou_investiture_changed'
+export type CoalitionStatus = 'forming' | 'active' | 'dissolved'
+
+export interface DiplomaticRelation {
+  readonly key: RelationKey
+  readonly realmAId: RealmId
+  readonly realmBId: RealmId
+  readonly attitude: number
+  readonly trust: number
+  readonly updatedAt: GameDate
+}
+
+export interface DiplomaticProposal {
+  readonly id: DiplomaticProposalId
+  readonly kind: DiplomaticActionKind
+  readonly proposingRealmId: RealmId
+  readonly targetRealmId: RealmId
+  readonly status: DiplomaticProposalStatus
+  readonly proposedAt: GameDate
+  readonly proposedAtTick: number
+  readonly expiresAt: GameDate
+  readonly expiresAtTick: number
+  readonly resolvedAt: GameDate | null
+  readonly resolvedAtTick: number | null
+  readonly treatyId: TreatyId | null
+}
+
+export interface Treaty {
+  readonly id: TreatyId
+  readonly kind: DiplomaticTreatyKind
+  readonly realmAId: RealmId
+  readonly realmBId: RealmId
+  readonly status: DiplomaticTreatyStatus
+  readonly signedAt: GameDate
+  readonly signedAtTick: number
+  readonly expiresAt: GameDate | null
+  readonly expiresAtTick: number | null
+  readonly endedAt: GameDate | null
+  readonly endedAtTick: number | null
+  readonly sourceProposalId: DiplomaticProposalId | null
+}
+
+export interface DiplomacyEvent {
+  readonly id: DiplomacyEventId
+  readonly kind: DiplomacyEventKind
+  readonly occurredAt: GameDate
+  readonly actorRealmId: RealmId | null
+  readonly targetRealmId: RealmId | null
+  readonly proposalId?: DiplomaticProposalId
+  readonly treatyId?: TreatyId
+  readonly relationKey?: RelationKey
+  readonly coalitionId?: CoalitionId
+}
+
+export interface CoalitionState {
+  readonly id: CoalitionId
+  readonly targetRealmId: RealmId
+  readonly memberRealmIds: readonly RealmId[]
+  readonly status: CoalitionStatus
+  readonly formedAt: GameDate
+  readonly dissolvedAt: GameDate | null
+}
+
+export interface ZhouInvestitureState {
+  readonly realmId: RealmId
+  readonly recognizedTitle: string
+  readonly grantedAtTick: number
+  readonly expiresAtTick: number | null
+  readonly source: 'zhou'
+}
 
 export type AIPersonality = 'aggressive_random' | 'aggressive' | 'cautious'
 
@@ -236,6 +317,12 @@ export interface World {
   edges: ReadonlyMap<EdgeId, MapEdge>
   wars: ReadonlyMap<WarKey, WarState>
   peaceProposals: ReadonlyMap<PeaceProposalId, PeaceProposal>
+  relations: ReadonlyMap<RelationKey, DiplomaticRelation>
+  diplomaticProposals: ReadonlyMap<DiplomaticProposalId, DiplomaticProposal>
+  treaties: ReadonlyMap<TreatyId, Treaty>
+  diplomacyHistory: readonly DiplomacyEvent[]
+  coalitions: ReadonlyMap<CoalitionId, CoalitionState>
+  zhouInvestiture: ReadonlyMap<RealmId, ZhouInvestitureState>
   generals: ReadonlyMap<GeneralId, General>
   passes: ReadonlyMap<PassId, Pass>
   adjacencyEdges: ReadonlyMap<AdjacencyEdgeId, AdjacencyEdge>

@@ -43,6 +43,12 @@ describe('createInitialWorld — structure', () => {
     expect(world.tick).toBe(0)
     expect(world.date.yearBC).toBe(453)
     expect(world.date.season).toBe('spring')
+    expect(world.relations.size).toBe(0)
+    expect(world.diplomaticProposals.size).toBe(0)
+    expect(world.treaties.size).toBe(0)
+    expect(world.diplomacyHistory).toEqual([])
+    expect(world.coalitions.size).toBe(0)
+    expect(world.zhouInvestiture.size).toBe(0)
   })
 
   it('each site has polygon (expanded from boundary)', () => {
@@ -103,6 +109,12 @@ describe('createWorldFromM1Data — structure', () => {
     expect(world.playerRealmId).toBe('realm_qin')
     expect(world.tick).toBe(0)
     expect(world.date).toEqual({ yearBC: 260, season: 'spring', month: 1, xun: 'shang' })
+    expect(world.relations.size).toBe(0)
+    expect(world.diplomaticProposals.size).toBe(0)
+    expect(world.treaties.size).toBe(0)
+    expect(world.diplomacyHistory).toEqual([])
+    expect(world.coalitions.size).toBe(0)
+    expect(world.zhouInvestiture.size).toBe(0)
   })
 
   it('createWorldFromM1Data has phases in correct order', () => {

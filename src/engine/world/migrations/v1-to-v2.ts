@@ -17,6 +17,12 @@ export function migrateScenarioV1ToV2(rawData: unknown): M1DataV2 {
     passes: [] as unknown[],
     adjacencyEdges: [] as unknown[],
     peaceProposals: [] as unknown[],
+    relations: [] as unknown[],
+    diplomaticProposals: [] as unknown[],
+    treaties: [] as unknown[],
+    diplomacyHistory: [] as unknown[],
+    coalitions: [] as unknown[],
+    zhouInvestiture: [] as unknown[],
   }
   return M1DataSchemaV2.parse(migrated)
 }
