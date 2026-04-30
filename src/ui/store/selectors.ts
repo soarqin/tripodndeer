@@ -8,6 +8,8 @@ import type {
   RealmId,
   SiteId,
   SpeedTier,
+  GeneralId,
+  General,
 } from '~/shared/types'
 import type { GameStoreState } from './game-store'
 import { useGameStore } from './game-store'
@@ -40,6 +42,10 @@ export function useRealms(): ReadonlyMap<RealmId, Realm> {
 
 export function useEdges(): ReadonlyMap<EdgeId, MapEdge> {
   return useGameStore((s) => s.world.edges)
+}
+
+export function useGenerals(): ReadonlyMap<GeneralId, General> {
+  return useGameStore((s) => s.world.generals)
 }
 
 export const selectSelectedArmy = (state: GameStoreState): Army | null => {

@@ -93,3 +93,17 @@
   color: #aaa;
   font-size: 12px;
 }
+
+.generalInfo {
+  width: 100%;
+  color: #e0e0e0;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.compositionInfo {
+  width: 100%;
+  color: #aaa;
+  font-size: 12px;
+  margin-top: 2px;
+}
