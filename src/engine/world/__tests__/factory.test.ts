@@ -9,6 +9,7 @@ import { economyPhase } from '@/engine/systems/economy'
 import { manpowerTick } from '@/engine/systems/manpower'
 import { marchStep } from '@/engine/systems/march'
 import { orderApplyStep } from '@/engine/systems/orders'
+import { rulerLifecyclePhase } from '@/engine/systems/ruler'
 import { siegeStep } from '@/engine/systems/siege'
 import { victoryCheckStep } from '@/engine/systems/victory'
 import {
@@ -43,6 +44,7 @@ function phaseName(phase: TickPhase): string {
   if (phase === siegeStep) return 'siege'
   if (phase === combatV2Step) return 'combat-v2'
   if (phase === manpowerTick) return 'manpower'
+  if (phase === rulerLifecyclePhase) return 'rulerLifecycle'
   if (phase === victoryCheckStep) return 'victoryCheck'
   if (phase === diplomacyLifecycleStep) return 'diplomacyLifecycle'
   if (phase === economyPhase) return 'economy'
@@ -196,6 +198,7 @@ describe('createWorldFromM1Data — structure', () => {
       siegeStep,
       combatV2Step,
       manpowerTick,
+      rulerLifecyclePhase,
       victoryCheckStep,
       diplomacyLifecycleStep,
       economyPhase,

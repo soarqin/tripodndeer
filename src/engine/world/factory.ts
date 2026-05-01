@@ -9,6 +9,7 @@ import { economyPhase } from '~/engine/systems/economy'
 import { manpowerTick } from '~/engine/systems/manpower'
 import { marchStep } from '~/engine/systems/march'
 import { orderApplyStep } from '~/engine/systems/orders'
+import { rulerLifecyclePhase } from '~/engine/systems/ruler'
 import { siegeStep } from '~/engine/systems/siege'
 import { victoryCheckStep } from '~/engine/systems/victory'
 import {
@@ -319,6 +320,7 @@ export function createWorldFromM1Data(
       siegeStep,
       combatV2Step,
       manpowerTick,
+      rulerLifecyclePhase,
       victoryCheckStep,
       diplomacyLifecycleStep,
       economyPhase,

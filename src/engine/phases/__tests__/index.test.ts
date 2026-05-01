@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { PHASE_NAMES, PHASE_ORDER } from '../index'
 
 describe('phase chain constants', () => {
-  it('PHASE_ORDER has exactly 9 phases', () => {
-    expect(PHASE_ORDER.length).toBe(9)
+  it('PHASE_ORDER has exactly 10 phases', () => {
+    expect(PHASE_ORDER.length).toBe(10)
   })
 
   it('PHASE_ORDER is in correct order', () => {
@@ -13,8 +13,9 @@ describe('phase chain constants', () => {
     expect(PHASE_ORDER[3]).toBe(PHASE_NAMES.SIEGE)
     expect(PHASE_ORDER[4]).toBe(PHASE_NAMES.COMBAT_V2)
     expect(PHASE_ORDER[5]).toBe(PHASE_NAMES.MANPOWER)
-    expect(PHASE_ORDER[6]).toBe(PHASE_NAMES.VICTORY_CHECK)
-    expect(PHASE_ORDER[7]).toBe(PHASE_NAMES.DIPLOMACY_LIFECYCLE)
-    expect(PHASE_ORDER[8]).toBe(PHASE_NAMES.ECONOMY)
+    expect(PHASE_ORDER[6]).toBe(PHASE_NAMES.RULER_LIFECYCLE)
+    expect(PHASE_ORDER[7]).toBe(PHASE_NAMES.VICTORY_CHECK)
+    expect(PHASE_ORDER[8]).toBe(PHASE_NAMES.DIPLOMACY_LIFECYCLE)
+    expect(PHASE_ORDER[9]).toBe(PHASE_NAMES.ECONOMY)
   })
 })

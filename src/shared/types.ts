@@ -452,6 +452,17 @@ export interface EconomySettlementEvent {
   }
 }
 
+export type RulerDeathCause = 'natural'
+
+export interface RulerDiedEvent {
+  readonly type: 'rulerDied'
+  readonly payload: {
+    readonly realmId: RealmId
+    readonly generalId: GeneralId
+    readonly cause: RulerDeathCause
+  }
+}
+
 // 时间速度档位
 export type SpeedTier = 'pause' | '1x' | '2x' | '3x' | '4x' | '5x'
 
