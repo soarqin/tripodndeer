@@ -502,6 +502,14 @@ export const M1DataSchemaV2 = M1DataSchema.extend({
 
 export type M1DataV2 = z.infer<typeof M1DataSchemaV2>
 
+export const M1DataSchemaV3 = M1DataSchemaV2.extend({
+  schema_version: z.literal(3),
+  rulers: z.array(RulerStateSchema).default([]),
+  eventChainStates: z.array(EventChainStateSchema).default([]),
+})
+
+export type M1DataV3 = z.infer<typeof M1DataSchemaV3>
+
 // World Schema (for runtime World validation)
 export const WorldSchema = z.object({
   date: z.object({
