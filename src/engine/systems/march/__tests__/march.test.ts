@@ -32,6 +32,7 @@ function makeSite(id: string, terrainType: Site['terrainType']): Site {
     ownerId: null,
     polygon: [],
     adjacency: [],
+    economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 },
   }
 }
 

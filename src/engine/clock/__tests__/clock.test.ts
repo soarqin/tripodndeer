@@ -23,6 +23,8 @@ function makeTestWorld(): World {
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),
+    edicts: new Map(),
+    governorAssignments: new Map(),
     playerRealmId: 'realm_red',
     rngState: { seed: 42, counter: 0 },
     phases: [],

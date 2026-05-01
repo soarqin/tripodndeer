@@ -1,4 +1,5 @@
-import type { PeaceTerm, World } from '~/shared/types'
+import type { GameDate, PeaceProposal, PeaceTerm, RealmId, World } from '~/shared/types'
+import { M4_MONTHS_PER_SEASON, M4_MONTHS_PER_YEAR } from '~/content/m2/balance'
 
 /**
  * Apply a 'cession' peace term: transfer ownership of ceded sites to the
@@ -24,29 +25,97 @@ export function applyCession(
   return { ...world, sites }
 }
 
-/**
- * Apply an 'indemnity' peace term.
- *
- * M2: record only — no treasury / gold field exists yet. The PeaceProposal
- * carries the term and `acknowledgedAt`; the M3 economic system will read
- * accepted proposals and act on them.
- */
 export function applyIndemnity(
   world: World,
-  _term: Extract<PeaceTerm, { type: 'indemnity' }>,
+  term: Extract<PeaceTerm, { type: 'indemnity' }>,
+  payerRealmId?: RealmId,
+  receiverRealmId?: RealmId,
 ): World {
-  return world
+  if (!payerRealmId || !receiverRealmId) return world
+  return transferTreasury(world, payerRealmId, receiverRealmId, term.payload.amount)
 }
 
-/**
- * Apply a 'tribute' peace term.
- *
- * M2: record only. M3 will schedule yearly payments based on
- * `acknowledgedAt` and `payload.years`.
- */
 export function applyTribute(
   world: World,
   _term: Extract<PeaceTerm, { type: 'tribute' }>,
 ): World {
   return world
+}
+
+export function settlePeaceTributes(world: World): World {
+  let nextWorld = world
+
+  for (const proposal of sortedAcceptedProposals(world.peaceProposals)) {
+    if (!proposal.acknowledgedAt) continue
+    for (const term of proposal.terms) {
+      if (term.type !== 'tribute') continue
+      if (!isTributeActive(proposal.acknowledgedAt, world.date, term.payload.years)) continue
+
+      const monthlyAmount = Math.floor(term.payload.amountPerYear / M4_MONTHS_PER_YEAR)
+      nextWorld = transferTreasury(
+        nextWorld,
+        proposal.targetRealmId,
+        proposal.proposingRealmId,
+        monthlyAmount,
+      )
+    }
+  }
+
+  return nextWorld
+}
+
+function transferTreasury(
+  world: World,
+  payerRealmId: RealmId,
+  receiverRealmId: RealmId,
+  requestedAmount: number,
+): World {
+  if (payerRealmId === receiverRealmId || requestedAmount <= 0) return world
+
+  const payer = world.realms.get(payerRealmId)
+  const receiver = world.realms.get(receiverRealmId)
+  if (!payer || !receiver) return world
+
+  const paidAmount = Math.min(requestedAmount, payer.economy.treasury)
+  if (paidAmount <= 0) return world
+
+  const realms = new Map(world.realms)
+  realms.set(payerRealmId, {
+    ...payer,
+    economy: {
+      ...payer.economy,
+      treasury: payer.economy.treasury - paidAmount,
+    },
+  })
+  realms.set(receiverRealmId, {
+    ...receiver,
+    economy: {
+      ...receiver.economy,
+      treasury: receiver.economy.treasury + paidAmount,
+    },
+  })
+
+  return { ...world, realms }
+}
+
+function sortedAcceptedProposals(
+  peaceProposals: ReadonlyMap<string, PeaceProposal>,
+): readonly PeaceProposal[] {
+  return [...peaceProposals.values()]
+    .filter(proposal => proposal.status === 'accepted')
+    .sort((a, b) => a.id.localeCompare(b.id))
+}
+
+function isTributeActive(acknowledgedAt: GameDate, currentDate: GameDate, years: number): boolean {
+  const elapsedMonths = toMonthOrdinal(currentDate) - toMonthOrdinal(acknowledgedAt)
+  return elapsedMonths >= 0 && elapsedMonths < years * M4_MONTHS_PER_YEAR
+}
+
+function toMonthOrdinal(date: GameDate): number {
+  return -date.yearBC * M4_MONTHS_PER_YEAR + seasonOffset(date.season) + date.month - 1
+}
+
+function seasonOffset(season: GameDate['season']): number {
+  const seasonIndex = ['spring', 'summer', 'autumn', 'winter'].indexOf(season)
+  return seasonIndex * M4_MONTHS_PER_SEASON
 }

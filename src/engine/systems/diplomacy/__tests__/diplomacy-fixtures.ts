@@ -26,6 +26,7 @@ export function makeRealm(id: string, manpowerPool = 1000): Realm {
     initialSites: [],
     initialArmies: [],
     aiPersonality: 'aggressive_random',
+    economy: { treasury: 0, foodStores: 0, taxRate: 10 },
     stats: { manpowerPool, manpowerCap: Math.max(manpowerPool, 5000), warWeariness: 0 },
   }
 }
@@ -39,6 +40,7 @@ export function makeSite(id: string, ownerId: string | null): Site {
     ownerId,
     polygon: [],
     adjacency: [],
+    economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 },
   }
 }
 
@@ -144,6 +146,8 @@ export function baseWorld(overrides: Partial<World> = {}): World {
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),
+    edicts: new Map(),
+    governorAssignments: new Map(),
     playerRealmId: qin,
     rngState: { seed: 42, counter: 0 },
     phases: [],

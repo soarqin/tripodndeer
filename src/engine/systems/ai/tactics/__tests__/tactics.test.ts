@@ -26,6 +26,7 @@ function makeSite(overrides: Partial<Site> & { id: string }): Site {
     adjacency: [],
     ownerId: null,
     ...overrides,
+    economy: overrides.economy ?? { population: 0, households: 0, taxBase: 0, foodProduction: 0 },
   }
 }
 

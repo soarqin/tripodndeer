@@ -5,13 +5,36 @@ import { PHASE_ORDER } from '@/engine/phases'
 import { aiPlanStep } from '@/engine/systems/ai'
 import { combatV2Step } from '@/engine/systems/combat-v2'
 import { diplomacyLifecycleStep } from '@/engine/systems/diplomacy'
+import { economyPhase } from '@/engine/systems/economy'
 import { manpowerTick } from '@/engine/systems/manpower'
 import { marchStep } from '@/engine/systems/march'
 import { orderApplyStep } from '@/engine/systems/orders'
 import { siegeStep } from '@/engine/systems/siege'
 import { victoryCheckStep } from '@/engine/systems/victory'
+import {
+  M4_BASE_FOOD_PRODUCTION_PER_HOUSEHOLD,
+  M4_DEFAULT_REALM_FOOD_STORES,
+  M4_DEFAULT_REALM_TREASURY,
+  M4_DEFAULT_SITE_POPULATION,
+  M4_DEFAULT_TAX_RATE,
+  M4_HOUSEHOLD_DIVISOR,
+} from '@/content/m2/balance'
 import { createInitialWorld, createWorldFromM1Data, loadM0Data, loadM1Data } from '../factory'
 import type { TickPhase } from '@/shared/types'
+
+const expectedSiteHouseholds = Math.floor(M4_DEFAULT_SITE_POPULATION / M4_HOUSEHOLD_DIVISOR)
+const expectedSiteEconomy = {
+  population: M4_DEFAULT_SITE_POPULATION,
+  households: expectedSiteHouseholds,
+  taxBase: expectedSiteHouseholds,
+  foodProduction: expectedSiteHouseholds * M4_BASE_FOOD_PRODUCTION_PER_HOUSEHOLD,
+}
+
+const expectedRealmEconomy = {
+  treasury: M4_DEFAULT_REALM_TREASURY,
+  foodStores: M4_DEFAULT_REALM_FOOD_STORES,
+  taxRate: M4_DEFAULT_TAX_RATE,
+}
 
 function phaseName(phase: TickPhase): string {
   if (phase === aiPlanStep) return 'aiPlan'
@@ -22,6 +45,7 @@ function phaseName(phase: TickPhase): string {
   if (phase === manpowerTick) return 'manpower'
   if (phase === victoryCheckStep) return 'victoryCheck'
   if (phase === diplomacyLifecycleStep) return 'diplomacyLifecycle'
+  if (phase === economyPhase) return 'economy'
   return 'unknown'
 }
 
@@ -43,6 +67,8 @@ describe('loadM0Data', () => {
     expect(world.peaceProposals.size).toBe(0)
     expect(world.sieges.size).toBe(0)
     expect(world.relations.size).toBe(0)
+    expect(world.edicts.size).toBe(0)
+    expect(world.governorAssignments.size).toBe(0)
   })
 })
 
@@ -63,6 +89,19 @@ describe('createInitialWorld — structure', () => {
     expect(world.diplomacyHistory).toEqual([])
     expect(world.coalitions.size).toBe(0)
     expect(world.zhouInvestiture.size).toBe(0)
+    expect(world.edicts).toEqual(new Map())
+    expect(world.governorAssignments).toEqual(new Map())
+  })
+
+  it('initializes deterministic M4 economy defaults for M0 realms and sites', () => {
+    const world = createInitialWorld(loadM0Data(), 42)
+
+    for (const realm of world.realms.values()) {
+      expect(realm.economy).toEqual(expectedRealmEconomy)
+    }
+    for (const site of world.sites.values()) {
+      expect(site.economy).toEqual(expectedSiteEconomy)
+    }
   })
 
   it('each site has polygon (expanded from boundary)', () => {
@@ -129,6 +168,21 @@ describe('createWorldFromM1Data — structure', () => {
     expect(world.diplomacyHistory).toEqual([])
     expect(world.coalitions.size).toBe(0)
     expect(world.zhouInvestiture.size).toBe(0)
+    expect(world.edicts.size).toBe(0)
+    expect(world.governorAssignments.size).toBe(0)
+  })
+
+  it('initializes deterministic M4 economy defaults for every M1 realm and site', () => {
+    const world = createWorldFromM1Data(loadM1Data(), 99, 'realm_qin')
+
+    expect(world.realms.size).toBeGreaterThan(0)
+    expect(world.sites.size).toBeGreaterThan(0)
+    for (const realm of world.realms.values()) {
+      expect(realm.economy).toEqual(expectedRealmEconomy)
+    }
+    for (const site of world.sites.values()) {
+      expect(site.economy).toEqual(expectedSiteEconomy)
+    }
   })
 
   it('createWorldFromM1Data has phases in correct order', () => {
@@ -144,6 +198,7 @@ describe('createWorldFromM1Data — structure', () => {
       manpowerTick,
       victoryCheckStep,
       diplomacyLifecycleStep,
+      economyPhase,
     ])
     expect(world.phases.map(phaseName)).toEqual(PHASE_ORDER)
 
@@ -210,6 +265,8 @@ describe('createWorldFromM1Data — structure', () => {
       passes: expect.any(Map),
       adjacencyEdges: expect.any(Map),
       sieges: expect.any(Map),
+      edicts: expect.any(Map),
+      governorAssignments: expect.any(Map),
     })
   })
 })

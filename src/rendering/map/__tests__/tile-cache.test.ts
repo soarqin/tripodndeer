@@ -41,14 +41,14 @@ function makeSites(): ReadonlyMap<string, Site> {
   const ids = ['site_1', 'site_2', 'site_3', 'site_4', 'site_5']
   return new Map(ids.map(id => [
     id,
-    { id, name: id, position: [50, 50] as const, boundary: [], polygon: poly, adjacency: [], ownerId: 'realm_blue' } satisfies Site,
+    { id, name: id, position: [50, 50] as const, boundary: [], polygon: poly, adjacency: [], ownerId: 'realm_blue', economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 } } satisfies Site,
   ]))
 }
 
 function makeRealms(): ReadonlyMap<string, Realm> {
   return new Map([
-    ['realm_red', { id: 'realm_red', displayName: '红', fullTitle: '红方', color: '#dc2626', capital: 'site_1', initialSites: ['site_1'], initialArmies: [], aiPersonality: 'aggressive_random' }],
-    ['realm_blue', { id: 'realm_blue', displayName: '蓝', fullTitle: '蓝方', color: '#2563eb', capital: 'site_2', initialSites: ['site_2'], initialArmies: [], aiPersonality: 'aggressive_random' }],
+    ['realm_red', { id: 'realm_red', displayName: '红', fullTitle: '红方', color: '#dc2626', capital: 'site_1', initialSites: ['site_1'], initialArmies: [], aiPersonality: 'aggressive_random', economy: { treasury: 0, foodStores: 0, taxRate: 10 } }],
+    ['realm_blue', { id: 'realm_blue', displayName: '蓝', fullTitle: '蓝方', color: '#2563eb', capital: 'site_2', initialSites: ['site_2'], initialArmies: [], aiPersonality: 'aggressive_random', economy: { treasury: 0, foodStores: 0, taxRate: 10 } }],
   ])
 }
 
@@ -108,6 +108,7 @@ describe('buildSitePathFromBoundary', () => {
       id: 's1', name: 's1', position: [50, 50],
       boundary: [{ edge: 'e1', reverse: false }],
       polygon: [], adjacency: [], ownerId: null,
+      economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 },
     }
     const path = buildSitePathFromBoundary(site, edges) as unknown as MockPath2D
     expect(path.moveTo).toHaveBeenCalledWith(0, 0)
@@ -126,6 +127,7 @@ describe('buildSitePathFromBoundary', () => {
       id: 's1', name: 's1', position: [50, 50],
       boundary: [{ edge: 'e1', reverse: false }],
       polygon: [], adjacency: [], ownerId: null,
+      economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 },
     }
     const path = buildSitePathFromBoundary(site, edges) as unknown as MockPath2D
     expect(path.moveTo).toHaveBeenCalledWith(0, 0)
@@ -146,6 +148,7 @@ describe('buildSitePathFromBoundary reverse', () => {
       id: 's1', name: 's1', position: [50, 50],
       boundary: [{ edge: 'e1', reverse: true }],
       polygon: [], adjacency: [], ownerId: null,
+      economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 },
     }
     const path = buildSitePathFromBoundary(site, edges) as unknown as MockPath2D
     expect(path.moveTo).toHaveBeenCalledWith(100, 0)

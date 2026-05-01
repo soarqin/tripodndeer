@@ -68,7 +68,7 @@ export function acceptProposal(
 
   for (const term of proposal.terms) {
     if (term.type === 'cession') w = applyCession(w, term)
-    else if (term.type === 'indemnity') w = applyIndemnity(w, term)
+    else if (term.type === 'indemnity') w = applyIndemnity(w, term, proposal.targetRealmId, proposal.proposingRealmId)
     else if (term.type === 'tribute') w = applyTribute(w, term)
   }
 

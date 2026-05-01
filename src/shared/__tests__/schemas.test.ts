@@ -7,7 +7,9 @@ import {
   CoalitionStateSchema,
   DiplomaticProposalSchema,
   DiplomaticRelationSchema,
+  EdictStateSchema,
   GeneralSchema,
+  GovernorAssignmentSchema,
   M0DataSchema,
   M1DataSchema,
   M1DataSchemaV2,
@@ -16,8 +18,10 @@ import {
   PassSchema,
   PeaceProposalSchema,
   PeaceTermSchema,
+  RealmEconomySchema,
   RealmStatsSchema,
   RealmSchema,
+  SiteEconomySchema,
   SiteOccupationSchema,
   TreatySchema,
   WorldSchema,
@@ -56,6 +60,7 @@ const validRealm = {
   initialSites: ['site_1'],
   initialArmies: [],
   aiPersonality: 'aggressive_random' as const,
+  economy: { treasury: 1000, foodStores: 2000, taxRate: 10 },
 }
 const validData = {
   edges: { e_001: validPolylineEdge, e_002: validBezierEdge, e_003: validPolylineEdge },
@@ -209,6 +214,8 @@ describe('WorldSchema', () => {
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),
+    edicts: new Map(),
+    governorAssignments: new Map(),
     playerRealmId: 'realm_red',
     rngState: { seed: 1, counter: 0 },
     phases: [],
@@ -219,8 +226,8 @@ describe('WorldSchema', () => {
     expect(() => WorldSchema.parse(runtimeWorldShape)).not.toThrow()
   })
 
-  it.each(['peaceProposals', 'generals', 'passes', 'adjacencyEdges', 'sieges'] as const)(
-    'requires M2 world field %s',
+  it.each(['peaceProposals', 'generals', 'passes', 'adjacencyEdges', 'sieges', 'edicts', 'governorAssignments'] as const)(
+    'requires runtime world field %s',
     (field) => {
       const { [field]: _omitted, ...missingFieldWorld } = runtimeWorldShape
 
@@ -380,12 +387,77 @@ describe('OrderSchema', () => {
     expect(() => OrderSchema.parse(validMarchOrder)).not.toThrow()
   })
 
+  it('accepts M4 economy/statecraft orders', () => {
+    expect(() => OrderSchema.parse({
+      type: 'activate-edict',
+      edictId: 'edict_1',
+      realmId: 'realm_qin',
+      kind: 'edict_tax_relief',
+      durationMonths: 3,
+    })).not.toThrow()
+    expect(() => OrderSchema.parse({
+      type: 'assign-governor',
+      siteId: 'site_1',
+      generalId: 'general_1',
+    })).not.toThrow()
+  })
+
   it("rejects invalid type 'attack'", () => {
     expect(() => OrderSchema.parse({ ...validMarchOrder, type: 'attack' })).toThrow()
   })
 
   it('rejects missing armyId', () => {
     expect(() => OrderSchema.parse({ type: 'march', targetSiteId: 'site_2' })).toThrow()
+  })
+})
+
+describe('M4 economy contract schemas', () => {
+  const validRealmEconomy = { treasury: 1000, foodStores: 2000, taxRate: 10 }
+  const validSiteEconomy = { population: 30000, households: 6000, taxBase: 6000, foodProduction: 12000 }
+  const validEdict = {
+    id: 'edict_1',
+    realmId: 'realm_qin',
+    kind: 'edict_grain_reserve' as const,
+    startedAtTick: 12,
+    durationMonths: 6,
+    remainingMonths: 4,
+    status: 'active' as const,
+  }
+  const validGovernorAssignment = {
+    siteId: 'site_1',
+    realmId: 'realm_qin',
+    generalId: 'general_1',
+    assignedAtTick: 12,
+    modifierKind: 'tax_efficiency' as const,
+  }
+
+  it('accepts canonical valid M4 economy data', () => {
+    expect(() => RealmEconomySchema.parse(validRealmEconomy)).not.toThrow()
+    expect(() => SiteEconomySchema.parse(validSiteEconomy)).not.toThrow()
+    expect(() => EdictStateSchema.parse(validEdict)).not.toThrow()
+    expect(() => GovernorAssignmentSchema.parse(validGovernorAssignment)).not.toThrow()
+    expect(() => RealmSchema.parse(validRealm)).not.toThrow()
+  })
+
+  it.each([
+    ['population', SiteEconomySchema, { ...validSiteEconomy, population: -1 }],
+    ['households', SiteEconomySchema, { ...validSiteEconomy, households: -1 }],
+    ['treasury', RealmEconomySchema, { ...validRealmEconomy, treasury: -1 }],
+    ['foodStores', RealmEconomySchema, { ...validRealmEconomy, foodStores: -1 }],
+  ])('rejects negative M4 resource/count field %s', (_, schema, value) => {
+    expect(() => schema.parse(value)).toThrow()
+  })
+
+  it('rejects non-integer M4 resource/count values', () => {
+    expect(() => SiteEconomySchema.parse({ ...validSiteEconomy, population: 1.5 })).toThrow()
+    expect(() => RealmEconomySchema.parse({ ...validRealmEconomy, foodStores: 1.5 })).toThrow()
+  })
+
+  it('rejects out-of-contract M4 tax rate and governor assignment shapes', () => {
+    expect(() => RealmEconomySchema.parse({ ...validRealmEconomy, taxRate: -1 })).toThrow()
+    expect(() => RealmEconomySchema.parse({ ...validRealmEconomy, taxRate: 51 })).toThrow()
+    expect(() => GovernorAssignmentSchema.parse({ ...validGovernorAssignment, modifierKind: 'strategy_bonus' })).toThrow()
+    expect(() => GovernorAssignmentSchema.parse({ ...validGovernorAssignment, modifiers: [{ kind: 'tax_efficiency', value: 5 }] })).toThrow()
   })
 })
 

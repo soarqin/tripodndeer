@@ -63,6 +63,34 @@ describe('performance budget', () => {
 
     expect(p95, `diplomacy-loaded p95 tick time ${p95.toFixed(2)}ms should be < 200ms`).toBeLessThan(200)
   }, { timeout: 60000 })
+
+  it('100 M4 economy-loaded ticks complete under 200ms p95', () => {
+    const world = createM4EconomyPerfWorld()
+    const times: number[] = []
+
+    let currentWorld = world
+    for (let i = 0; i < 100; i++) {
+      const start = performance.now()
+      const result = runTickPhases(currentWorld, currentWorld.rngState)
+      times.push(performance.now() - start)
+      currentWorld = result.world
+    }
+
+    times.sort((a, b) => a - b)
+    const p50 = times[Math.floor(times.length * 0.5)]!
+    const p95 = times[Math.floor(times.length * 0.95)]!
+    const p99 = times[Math.floor(times.length * 0.99)]!
+
+    const evidenceDir = path.resolve(process.cwd(), '.sisyphus/evidence')
+    if (!fs.existsSync(evidenceDir)) fs.mkdirSync(evidenceDir, { recursive: true })
+    fs.writeFileSync(
+      path.join(evidenceDir, 'task-10-perf.json'),
+      JSON.stringify({ scenario: 'm4-economy-loaded-tick-path', p50, p95, p99, timestamp: new Date().toISOString() }, null, 2),
+      'utf-8',
+    )
+
+    expect(p95, `M4 economy-loaded p95 tick time ${p95.toFixed(2)}ms should be < 200ms`).toBeLessThan(200)
+  }, { timeout: 60000 })
 })
 
 function createDiplomacyPerfWorld(): World {
@@ -130,4 +158,53 @@ function applyAcceptedAction(
     throw new Error(`Expected diplomacy action ${request.kind} to succeed for perf coverage, got ${result.reason}`)
   }
   return result.world
+}
+
+function createM4EconomyPerfWorld(): World {
+  const baseWorld = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
+  const playerSite = [...baseWorld.sites.values()]
+    .filter((site) => site.ownerId === baseWorld.playerRealmId)
+    .sort((left, right) => left.id.localeCompare(right.id))[0]
+  const playerGeneral = [...baseWorld.generals.values()]
+    .filter((general) => general.realmId === baseWorld.playerRealmId)
+    .sort((left, right) => left.id.localeCompare(right.id))[0]
+
+  if (!playerSite || !playerGeneral) {
+    throw new Error('Expected at least one owned site and one player general for M4 perf coverage')
+  }
+
+  const edicts = new Map(baseWorld.edicts)
+  edicts.set('edict_perf_tax_relief', {
+    id: 'edict_perf_tax_relief',
+    realmId: baseWorld.playerRealmId,
+    kind: 'edict_tax_relief',
+    startedAtTick: baseWorld.tick,
+    durationMonths: 100,
+    remainingMonths: 100,
+    status: 'active',
+  })
+  edicts.set('edict_perf_grain_reserve', {
+    id: 'edict_perf_grain_reserve',
+    realmId: baseWorld.playerRealmId,
+    kind: 'edict_grain_reserve',
+    startedAtTick: baseWorld.tick,
+    durationMonths: 100,
+    remainingMonths: 100,
+    status: 'active',
+  })
+
+  const governorAssignments = new Map(baseWorld.governorAssignments)
+  governorAssignments.set(playerSite.id, {
+    siteId: playerSite.id,
+    realmId: baseWorld.playerRealmId,
+    generalId: playerGeneral.id,
+    assignedAtTick: baseWorld.tick,
+    modifierKind: 'tax_efficiency',
+  })
+
+  return {
+    ...baseWorld,
+    edicts,
+    governorAssignments,
+  }
 }

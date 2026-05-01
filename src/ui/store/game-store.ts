@@ -9,7 +9,10 @@ import type {
   ArmyId,
   DiplomaticActionKind,
   DiplomaticProposalId,
+  EdictId,
+  EdictKind,
   GameEvent,
+  GeneralId,
   Order,
   RealmId,
   RelationKey,
@@ -28,7 +31,7 @@ interface GameState {
   playerRealmId: RealmId
   selectedArmyId: ArmyId | null
   contextMenu: { siteId: SiteId; x: number; y: number } | null
-  activePanel: 'wanggong' | 'junshi' | null
+  activePanel: 'wanggong' | 'junshi' | 'neizheng' | null
   diplomacyTargetRealmId: RealmId | null
   transientBanner: { text: string; createdAt: number } | null
 }
@@ -60,13 +63,26 @@ interface GameActions {
   clearSelection: () => void
   openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) => void
   closeContextMenu: () => void
-  setActivePanel: (panel: 'wanggong' | 'junshi' | null) => void
+  setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | null) => void
   openDiplomacyPanel: (realmId: RealmId) => void
   closeDiplomacyPanel: () => void
   issueOrder: (order: Order) => void
+  activatePlayerEdict: (payload: ActivatePlayerEdictPayload) => void
+  assignPlayerGovernor: (payload: AssignPlayerGovernorPayload) => void
   submitPlayerDiplomacyAction: (payload: SubmitPlayerDiplomacyActionPayload) => SubmitPlayerDiplomacyActionResult
   showBanner: (text: string) => void
   clearBanner: () => void
+}
+
+export interface ActivatePlayerEdictPayload {
+  readonly edictId: EdictId
+  readonly kind: EdictKind
+  readonly durationMonths: number
+}
+
+export interface AssignPlayerGovernorPayload {
+  readonly siteId: SiteId
+  readonly generalId: GeneralId
 }
 
 type GameStore = GameState & GameActions
@@ -130,7 +146,7 @@ function createUiActions(
       set((state) => {
         state.contextMenu = null
       }),
-    setActivePanel: (panel: 'wanggong' | 'junshi' | null) =>
+    setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | null) =>
       set((state) => {
         state.activePanel = panel
       }),
@@ -147,10 +163,36 @@ function createUiActions(
 
 function createWorldActions(
   set: StoreSet,
-): Pick<GameActions, 'issueOrder' | 'submitPlayerDiplomacyAction' | 'showBanner' | 'clearBanner'> {
+): Pick<GameActions, 'issueOrder' | 'activatePlayerEdict' | 'assignPlayerGovernor' | 'submitPlayerDiplomacyAction' | 'showBanner' | 'clearBanner'> {
   return {
     issueOrder: (order: Order) =>
       set((state) => {
+        state.world = castDraft({
+          ...state.world,
+          pendingOrders: [...state.world.pendingOrders, order],
+        })
+      }),
+    activatePlayerEdict: (payload: ActivatePlayerEdictPayload) =>
+      set((state) => {
+        const order: Order = {
+          type: 'activate-edict',
+          edictId: payload.edictId,
+          realmId: state.playerRealmId,
+          kind: payload.kind,
+          durationMonths: payload.durationMonths,
+        }
+        state.world = castDraft({
+          ...state.world,
+          pendingOrders: [...state.world.pendingOrders, order],
+        })
+      }),
+    assignPlayerGovernor: (payload: AssignPlayerGovernorPayload) =>
+      set((state) => {
+        const order: Order = {
+          type: 'assign-governor',
+          siteId: payload.siteId,
+          generalId: payload.generalId,
+        }
         state.world = castDraft({
           ...state.world,
           pendingOrders: [...state.world.pendingOrders, order],

@@ -1,4 +1,4 @@
-export { applyCession, applyIndemnity, applyTribute } from './peace-terms'
+export { applyCession, applyIndemnity, applyTribute, settlePeaceTributes } from './peace-terms'
 export {
   createPeaceProposal,
   acceptProposal,

@@ -14,6 +14,7 @@ function makeWorld(siteOwners: Record<string, string>, playerRealmId: string): W
         ownerId,
         polygon: [],
         adjacency: [],
+        economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 },
       } as Site,
     ]),
   )
@@ -37,6 +38,8 @@ function makeWorld(siteOwners: Record<string, string>, playerRealmId: string): W
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),
+    edicts: new Map(),
+    governorAssignments: new Map(),
     playerRealmId,
     rngState: { seed: 0, counter: 0 },
     phases: [],

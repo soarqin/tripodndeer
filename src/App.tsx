@@ -8,6 +8,7 @@ import { RealmOverviewPanel } from '@/ui/components/RealmOverviewPanel'
 import { DiplomacyPanel } from '@/ui/components/DiplomacyPanel'
 import { EventBanner } from '@/ui/components/EventBanner'
 import { SiteContextMenu } from '@/ui/components/SiteContextMenu'
+import { EconomyPanel } from '@/ui/components/EconomyPanel'
 import { useRafDriver } from '@/ui/store/raf-driver'
 import { useGameStore } from '@/ui/store/game-store'
 import { isVictorious } from '@/engine/systems/victory'
@@ -30,6 +31,7 @@ export function App(): React.JSX.Element {
         <MapCanvas />
         <SiteContextMenu />
         <RealmOverviewPanel />
+        <EconomyPanel />
         <ArmyListPanel />
         <DiplomacyPanel />
         {victorious && (
@@ -41,6 +43,7 @@ export function App(): React.JSX.Element {
       <BottomBar 
         onWanggong={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'wanggong' ? null : 'wanggong')}
         onJunshi={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'junshi' ? null : 'junshi')}
+        onNeizheng={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'neizheng' ? null : 'neizheng')}
       />
       <TimeControlBar />
     </div>

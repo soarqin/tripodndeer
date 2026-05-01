@@ -27,6 +27,8 @@ export function makeTestWorld(overrides: Partial<World> = {}): World {
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),
+    edicts: new Map(),
+    governorAssignments: new Map(),
     playerRealmId: 'realm_qin',
     rngState: { seed: 0, counter: 0 },
     phases: [],

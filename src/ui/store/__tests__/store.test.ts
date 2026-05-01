@@ -1,6 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { relationKey } from '~/engine/systems/diplomacy'
-import type { CoalitionState, DiplomaticProposal, DiplomaticRelation, Treaty, ZhouInvestitureState } from '~/shared/types'
+import type {
+  CoalitionState,
+  DiplomaticProposal,
+  DiplomaticRelation,
+  EdictState,
+  GovernorAssignment,
+  Treaty,
+  ZhouInvestitureState,
+} from '~/shared/types'
 import { useGameStore } from '../game-store'
 import {
   selectActivePanel,
@@ -11,8 +19,15 @@ import {
   selectDiplomacyFeedback,
   selectDiplomacyRelationSummaries,
   selectIdlePlayerArmies,
+  selectPlayerActiveEdicts,
+  selectPlayerFoodStores,
+  selectPlayerGovernorAssignments,
+  selectPlayerMonthlyEconomyDeltas,
   selectPendingDiplomaticProposals,
   selectPlayerRealm,
+  selectPlayerOwnedSiteEconomyTotals,
+  selectPlayerTaxRate,
+  selectPlayerTreasury,
   selectPlayerZhouInvestiture,
   selectSelectedArmy,
   selectTransientBanner,
@@ -167,6 +182,60 @@ describe('ui store order actions', () => {
 
     expect(useGameStore.getState().world.pendingOrders).toEqual([order])
   })
+
+  it('activatePlayerEdict enqueues a typed M4 order without mutating world economy state', () => {
+    const before = useGameStore.getState()
+    const originalRealms = before.world.realms
+    const originalSites = before.world.sites
+    const originalEdicts = before.world.edicts
+    const originalGovernorAssignments = before.world.governorAssignments
+
+    before.activatePlayerEdict({
+      edictId: 'edict_player_tax_relief',
+      kind: 'edict_tax_relief',
+      durationMonths: 3,
+    })
+
+    const after = useGameStore.getState()
+    expect(after.world.pendingOrders).toEqual([
+      {
+        type: 'activate-edict',
+        edictId: 'edict_player_tax_relief',
+        realmId: before.playerRealmId,
+        kind: 'edict_tax_relief',
+        durationMonths: 3,
+      },
+    ])
+    expect(after.world.realms).toBe(originalRealms)
+    expect(after.world.sites).toBe(originalSites)
+    expect(after.world.edicts).toBe(originalEdicts)
+    expect(after.world.governorAssignments).toBe(originalGovernorAssignments)
+  })
+
+  it('assignPlayerGovernor enqueues a typed M4 order without mutating world economy state', () => {
+    const before = useGameStore.getState()
+    const siteId = [...before.world.sites.keys()][0]!
+    const generalId = [...before.world.generals.keys()][0] ?? 'general_player_1'
+    const originalRealms = before.world.realms
+    const originalSites = before.world.sites
+    const originalEdicts = before.world.edicts
+    const originalGovernorAssignments = before.world.governorAssignments
+
+    before.assignPlayerGovernor({ siteId, generalId })
+
+    const after = useGameStore.getState()
+    expect(after.world.pendingOrders).toEqual([
+      {
+        type: 'assign-governor',
+        siteId,
+        generalId,
+      },
+    ])
+    expect(after.world.realms).toBe(originalRealms)
+    expect(after.world.sites).toBe(originalSites)
+    expect(after.world.edicts).toBe(originalEdicts)
+    expect(after.world.governorAssignments).toBe(originalGovernorAssignments)
+  })
 })
 
 describe('ui store army selector', () => {
@@ -207,6 +276,152 @@ describe('ui store realm selectors', () => {
         (army) => army.realmId === realmId && army.state === 'idle',
       ),
     )
+  })
+})
+
+describe('ui store M4 economy selectors', () => {
+  it('returns exact player economy, site totals, active edicts, governor assignments, and recent monthly deltas', () => {
+    const state = useGameStore.getState()
+    const playerRealmId = state.playerRealmId
+    const enemyRealmId = [...state.world.realms.keys()].find((realmId) => realmId !== playerRealmId)!
+    const [siteA, siteB, siteC] = [...state.world.sites.values()]
+    const playerRealm = state.world.realms.get(playerRealmId)!
+    const enemyRealm = state.world.realms.get(enemyRealmId)!
+
+    const sites = new Map(
+      [...state.world.sites].map(([siteId, site]) => [
+        siteId,
+        {
+          ...site,
+          ownerId: enemyRealmId,
+          economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 },
+        },
+      ]),
+    )
+    sites.set(siteA!.id, {
+      ...siteA!,
+      ownerId: playerRealmId,
+      economy: { population: 1200, households: 240, taxBase: 240, foodProduction: 500 },
+    })
+    sites.set(siteB!.id, {
+      ...siteB!,
+      ownerId: playerRealmId,
+      economy: { population: 800, households: 160, taxBase: 160, foodProduction: 350 },
+    })
+    sites.set(siteC!.id, {
+      ...siteC!,
+      ownerId: enemyRealmId,
+      economy: { population: 9999, households: 999, taxBase: 999, foodProduction: 999 },
+    })
+
+    const activeEdict: EdictState = {
+      id: 'edict_active_player',
+      realmId: playerRealmId,
+      kind: 'edict_tax_relief',
+      startedAtTick: state.world.tick,
+      durationMonths: 3,
+      remainingMonths: 3,
+      status: 'active',
+    }
+    const expiredEdict: EdictState = {
+      ...activeEdict,
+      id: 'edict_expired_player',
+      status: 'expired',
+    }
+    const enemyEdict: EdictState = {
+      ...activeEdict,
+      id: 'edict_active_enemy',
+      realmId: enemyRealmId,
+    }
+    const assignmentA: GovernorAssignment = {
+      siteId: siteB!.id,
+      realmId: playerRealmId,
+      generalId: 'general_player_b',
+      assignedAtTick: state.world.tick,
+      modifierKind: 'food_efficiency',
+    }
+    const assignmentB: GovernorAssignment = {
+      siteId: siteA!.id,
+      realmId: playerRealmId,
+      generalId: 'general_player_a',
+      assignedAtTick: state.world.tick,
+      modifierKind: 'tax_efficiency',
+    }
+    const enemyAssignment: GovernorAssignment = {
+      siteId: siteC!.id,
+      realmId: enemyRealmId,
+      generalId: 'general_enemy',
+      assignedAtTick: state.world.tick,
+      modifierKind: 'tax_efficiency',
+    }
+
+    useGameStore.setState({
+      world: {
+        ...state.world,
+        realms: new Map([
+          [playerRealmId, { ...playerRealm, economy: { treasury: 12345, foodStores: 6789, taxRate: 17 } }],
+          [enemyRealmId, enemyRealm],
+        ]),
+        sites,
+        edicts: new Map([
+          [activeEdict.id, activeEdict],
+          [expiredEdict.id, expiredEdict],
+          [enemyEdict.id, enemyEdict],
+        ]),
+        governorAssignments: new Map([
+          [assignmentA.siteId, assignmentA],
+          [assignmentB.siteId, assignmentB],
+          [enemyAssignment.siteId, enemyAssignment],
+        ]),
+      },
+      events: [
+        { type: 'economySettlement', payload: { realmId: playerRealmId, treasuryDelta: 25, foodStoresDelta: -10, populationDelta: 3, householdsDelta: 1, settledAtTick: state.world.tick } },
+        { type: 'economySettlement', payload: { realmId: playerRealmId, treasuryDelta: 5, foodStoresDelta: 2, populationDelta: 7, householdsDelta: 2, settledAtTick: state.world.tick } },
+        { type: 'economySettlement', payload: { realmId: enemyRealmId, treasuryDelta: 999, foodStoresDelta: 999, populationDelta: 999, householdsDelta: 999, settledAtTick: state.world.tick } },
+      ],
+    })
+
+    const nextState = useGameStore.getState()
+    expect(selectPlayerTreasury(nextState)).toBe(12345)
+    expect(selectPlayerFoodStores(nextState)).toBe(6789)
+    expect(selectPlayerTaxRate(nextState)).toBe(17)
+    expect(selectPlayerMonthlyEconomyDeltas(nextState)).toEqual({
+      treasuryDelta: 30,
+      foodStoresDelta: -8,
+      populationDelta: 10,
+      householdsDelta: 3,
+    })
+    expect(selectPlayerOwnedSiteEconomyTotals(nextState)).toEqual({ population: 2000, households: 400 })
+    expect(selectPlayerActiveEdicts(nextState)).toEqual([activeEdict])
+    expect(selectPlayerGovernorAssignments(nextState)).toEqual([assignmentB, assignmentA])
+  })
+
+  it('returns zero/default M4 selector values when the player realm is absent', () => {
+    const state = useGameStore.getState()
+    const realms = new Map(state.world.realms)
+    realms.delete(state.playerRealmId)
+    useGameStore.setState({
+      world: {
+        ...state.world,
+        realms,
+        edicts: new Map(),
+        governorAssignments: new Map(),
+      },
+      events: [],
+    })
+
+    const nextState = useGameStore.getState()
+    expect(selectPlayerTreasury(nextState)).toBe(0)
+    expect(selectPlayerFoodStores(nextState)).toBe(0)
+    expect(selectPlayerTaxRate(nextState)).toBe(0)
+    expect(selectPlayerMonthlyEconomyDeltas(nextState)).toEqual({
+      treasuryDelta: 0,
+      foodStoresDelta: 0,
+      populationDelta: 0,
+      householdsDelta: 0,
+    })
+    expect(selectPlayerActiveEdicts(nextState)).toEqual([])
+    expect(selectPlayerGovernorAssignments(nextState)).toEqual([])
   })
 })
 

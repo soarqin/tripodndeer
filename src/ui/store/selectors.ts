@@ -4,7 +4,9 @@ import type {
   DiplomaticProposal,
   DiplomaticTreatyStatus,
   EdgeId,
+  EdictState,
   GameDate,
+  GovernorAssignment,
   RelationKey,
   MapEdge,
   Realm,
@@ -68,6 +70,70 @@ export const selectDiplomacyTargetRealmId = (state: GameStoreState) => state.dip
 
 export const selectPlayerRealm = (state: GameStoreState): Realm | null =>
   state.world.realms.get(state.playerRealmId) ?? null
+
+export const selectPlayerTreasury = (state: GameStoreState): number =>
+  finiteInteger(selectPlayerRealm(state)?.economy.treasury ?? 0)
+
+export const selectPlayerFoodStores = (state: GameStoreState): number =>
+  finiteInteger(selectPlayerRealm(state)?.economy.foodStores ?? 0)
+
+export const selectPlayerTaxRate = (state: GameStoreState): number =>
+  finiteInteger(selectPlayerRealm(state)?.economy.taxRate ?? 0)
+
+export interface MonthlyEconomyDeltas {
+  readonly treasuryDelta: number
+  readonly foodStoresDelta: number
+  readonly populationDelta: number
+  readonly householdsDelta: number
+}
+
+export const selectPlayerMonthlyEconomyDeltas = (state: GameStoreState): MonthlyEconomyDeltas => {
+  let treasuryDelta = 0
+  let foodStoresDelta = 0
+  let populationDelta = 0
+  let householdsDelta = 0
+
+  for (const event of state.events) {
+    if (event.type !== 'economySettlement') continue
+    const payload = event.payload
+    if (!isEconomySettlementPayload(payload)) continue
+    if (payload.realmId !== state.playerRealmId) continue
+    treasuryDelta += finiteInteger(payload.treasuryDelta)
+    foodStoresDelta += finiteInteger(payload.foodStoresDelta)
+    populationDelta += finiteInteger(payload.populationDelta ?? 0)
+    householdsDelta += finiteInteger(payload.householdsDelta ?? 0)
+  }
+
+  return { treasuryDelta, foodStoresDelta, populationDelta, householdsDelta }
+}
+
+export interface PlayerOwnedSiteEconomyTotals {
+  readonly population: number
+  readonly households: number
+}
+
+export const selectPlayerOwnedSiteEconomyTotals = (state: GameStoreState): PlayerOwnedSiteEconomyTotals => {
+  let population = 0
+  let households = 0
+
+  for (const site of state.world.sites.values()) {
+    if (site.ownerId !== state.playerRealmId) continue
+    population += finiteInteger(site.economy.population)
+    households += finiteInteger(site.economy.households)
+  }
+
+  return { population, households }
+}
+
+export const selectPlayerActiveEdicts = (state: GameStoreState): EdictState[] =>
+  [...state.world.edicts.values()]
+    .filter((edict) => edict.realmId === state.playerRealmId && edict.status === 'active')
+    .sort((left, right) => left.id.localeCompare(right.id))
+
+export const selectPlayerGovernorAssignments = (state: GameStoreState): GovernorAssignment[] =>
+  [...state.world.governorAssignments.values()]
+    .filter((assignment) => assignment.realmId === state.playerRealmId)
+    .sort((left, right) => left.siteId.localeCompare(right.siteId) || left.generalId.localeCompare(right.generalId))
 
 export const selectTransientBanner = (state: GameStoreState) => state.transientBanner
 
@@ -170,4 +236,33 @@ function includesRealmPair(
 
 function isActiveTreaty(treaty: Treaty, tick: number): treaty is Treaty & { status: Exclude<DiplomaticTreatyStatus, 'expired' | 'cancelled' | 'broken'> } {
   return treaty.status === 'active' && (treaty.expiresAtTick === null || treaty.expiresAtTick > tick)
+}
+
+function finiteInteger(value: number): number {
+  if (!Number.isFinite(value)) return 0
+  return Math.trunc(value)
+}
+
+function isEconomySettlementPayload(
+  payload: unknown,
+): payload is {
+  realmId: RealmId
+  treasuryDelta: number
+  foodStoresDelta: number
+  populationDelta?: number
+  householdsDelta?: number
+} {
+  if (typeof payload !== 'object' || payload === null) return false
+  const candidate = payload as {
+    realmId?: unknown
+    treasuryDelta?: unknown
+    foodStoresDelta?: unknown
+    populationDelta?: unknown
+    householdsDelta?: unknown
+  }
+  return typeof candidate.realmId === 'string'
+    && typeof candidate.treasuryDelta === 'number'
+    && typeof candidate.foodStoresDelta === 'number'
+    && (candidate.populationDelta === undefined || typeof candidate.populationDelta === 'number')
+    && (candidate.householdsDelta === undefined || typeof candidate.householdsDelta === 'number')
 }

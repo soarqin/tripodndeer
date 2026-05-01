@@ -32,6 +32,7 @@ function makeSite(id: string): Site {
   return {
     id, name: id, position: [100, 200] as [number, number],
     boundary: [], ownerId: null, polygon: [], adjacency: [],
+    economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 },
   } as Site
 }
 
@@ -39,6 +40,7 @@ function makeRealm(id: string, color: string): Realm {
   return {
     id, displayName: '秦', fullTitle: '秦国', color,
     capital: 'site_1', initialSites: [], initialArmies: [], aiPersonality: 'aggressive_random',
+    economy: { treasury: 0, foodStores: 0, taxRate: 10 },
   } as Realm
 }
 

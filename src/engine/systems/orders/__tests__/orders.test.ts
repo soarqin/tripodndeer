@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Army, MapEdge, Order, RNGState, Realm, Site, WarState, World } from '~/shared/types'
+import type { Army, General, MapEdge, Order, RNGState, Realm, Site, WarState, World } from '~/shared/types'
 import { warKey } from '~/engine/wars'
 
 function makeWarState(): WarState {
@@ -25,6 +25,7 @@ function makeRealm(id: string, capital: string): Realm {
     initialSites: [capital],
     initialArmies: [],
     aiPersonality: 'aggressive_random',
+    economy: { treasury: 0, foodStores: 0, taxRate: 10 },
   }
 }
 
@@ -42,6 +43,7 @@ function makeSite(
     ownerId,
     polygon: [],
     adjacency,
+    economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 },
   }
 }
 
@@ -55,6 +57,18 @@ function makeArmy(overrides: Partial<Army> = {}): Army {
     destination: null,
     ticksRemaining: 0,
     source: null,
+    ...overrides,
+  }
+}
+
+function makeGeneral(overrides: Partial<General> = {}): General {
+  return {
+    id: 'general_1',
+    realmId: playerRealmId,
+    name: 'General 1',
+    might: 50,
+    command: 50,
+    loyalty: 50,
     ...overrides,
   }
 }
@@ -102,6 +116,8 @@ function baseWorld(overrides: Partial<World> = {}): World {
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),
+    edicts: new Map(),
+    governorAssignments: new Map(),
     playerRealmId,
     rngState: { seed: 0, counter: 0 },
     phases: [],
@@ -281,6 +297,119 @@ describe('orderApplyStep batch processing', () => {
     expect(events).toEqual([
       { type: 'orderRejected', payload: { reason: 'armyNotFound', order } },
     ])
+  })
+})
+
+describe('applyOrder M4 economy orders', () => {
+  it('activates an edict immutably through applyOrder', () => {
+    const world = baseWorld()
+    const originalEdicts = world.edicts
+    const order: Order = {
+      type: 'activate-edict',
+      edictId: 'edict_tax_relief_1',
+      realmId: playerRealmId,
+      kind: 'edict_tax_relief',
+      durationMonths: 3,
+    }
+
+    const { world: newWorld, events } = applyOrder(world, order)
+
+    expect(world.edicts).toBe(originalEdicts)
+    expect(world.edicts.size).toBe(0)
+    expect(newWorld.edicts).not.toBe(originalEdicts)
+    expect(newWorld.edicts.get('edict_tax_relief_1')).toEqual({
+      id: 'edict_tax_relief_1',
+      realmId: playerRealmId,
+      kind: 'edict_tax_relief',
+      startedAtTick: world.tick,
+      durationMonths: 3,
+      remainingMonths: 3,
+      status: 'active',
+    })
+    expect(events).toEqual([
+      { type: 'orderApplied', payload: { edictId: 'edict_tax_relief_1', realmId: playerRealmId } },
+    ])
+  })
+
+  it('assigns a governor immutably through orderApplyStep and clears pending orders', () => {
+    const order: Order = {
+      type: 'assign-governor',
+      siteId: 'site_a',
+      generalId: 'general_1',
+    }
+    const world = baseWorld({
+      generals: new Map([['general_1', makeGeneral()]]),
+      pendingOrders: [order],
+    })
+    const originalAssignments = world.governorAssignments
+
+    const { world: newWorld, events } = orderApplyStep(world, rng)
+
+    expect(world.governorAssignments).toBe(originalAssignments)
+    expect(world.governorAssignments.size).toBe(0)
+    expect(newWorld.governorAssignments).not.toBe(originalAssignments)
+    expect(newWorld.governorAssignments.get('site_a')).toEqual({
+      siteId: 'site_a',
+      realmId: playerRealmId,
+      generalId: 'general_1',
+      assignedAtTick: world.tick,
+      modifierKind: 'tax_efficiency',
+    })
+    expect(newWorld.pendingOrders).toEqual([])
+    expect(events).toEqual([
+      { type: 'orderApplied', payload: { siteId: 'site_a', generalId: 'general_1' } },
+    ])
+  })
+
+  it('rejects invalid edict duration without mutating edicts', () => {
+    const world = baseWorld()
+    const order: Order = {
+      type: 'activate-edict',
+      edictId: 'edict_bad_duration',
+      realmId: playerRealmId,
+      kind: 'edict_grain_reserve',
+      durationMonths: 0,
+    }
+
+    const { world: newWorld, events } = applyOrder(world, order)
+
+    expect(newWorld).toBe(world)
+    expect(world.edicts.size).toBe(0)
+    expect(events).toEqual([{ type: 'orderRejected', payload: { reason: 'invalidDuration', order } }])
+  })
+
+  it('rejects governor assignment when the site is not owned by the player realm', () => {
+    const world = baseWorld({
+      generals: new Map([['general_1', makeGeneral()]]),
+    })
+    const order: Order = {
+      type: 'assign-governor',
+      siteId: 'site_b',
+      generalId: 'general_1',
+    }
+
+    const { world: newWorld, events } = applyOrder(world, order)
+
+    expect(newWorld).toBe(world)
+    expect(world.governorAssignments.size).toBe(0)
+    expect(events).toEqual([{ type: 'orderRejected', payload: { reason: 'siteNotOwned', order } }])
+  })
+
+  it('rejects governor assignment when general data belongs to another realm', () => {
+    const world = baseWorld({
+      generals: new Map([['general_enemy', makeGeneral({ id: 'general_enemy', realmId: enemyRealmId })]]),
+    })
+    const order: Order = {
+      type: 'assign-governor',
+      siteId: 'site_a',
+      generalId: 'general_enemy',
+    }
+
+    const { world: newWorld, events } = applyOrder(world, order)
+
+    expect(newWorld).toBe(world)
+    expect(world.governorAssignments.size).toBe(0)
+    expect(events).toEqual([{ type: 'orderRejected', payload: { reason: 'generalWrongRealm', order } }])
   })
 })
 

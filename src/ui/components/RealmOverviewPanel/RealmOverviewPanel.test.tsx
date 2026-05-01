@@ -42,12 +42,13 @@ describe('RealmOverviewPanel', () => {
       capital: 's1',
       initialSites: [],
       initialArmies: [],
-      aiPersonality: 'aggressive_random'
+      aiPersonality: 'aggressive_random',
+      economy: { treasury: 0, foodStores: 0, taxRate: 10 }
     }
 
-    const site1: Site = { id: 's1', name: '许昌', position: [0, 0], ownerId: 'r1', polygon: [], adjacency: [], boundary: [] }
-    const site2: Site = { id: 's2', name: '洛阳', position: [0, 0], ownerId: 'r1', polygon: [], adjacency: [], boundary: [] }
-    const site3: Site = { id: 's3', name: '建业', position: [0, 0], ownerId: 'r2', polygon: [], adjacency: [], boundary: [] }
+    const site1: Site = { id: 's1', name: '许昌', position: [0, 0], ownerId: 'r1', polygon: [], adjacency: [], boundary: [], economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 } }
+    const site2: Site = { id: 's2', name: '洛阳', position: [0, 0], ownerId: 'r1', polygon: [], adjacency: [], boundary: [], economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 } }
+    const site3: Site = { id: 's3', name: '建业', position: [0, 0], ownerId: 'r2', polygon: [], adjacency: [], boundary: [], economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 } }
 
     mockArmies = [
       { id: 'a1', realmId: 'r1', manpower: 10000, state: 'idle', location: 's1', destination: null, ticksRemaining: 0, source: null },

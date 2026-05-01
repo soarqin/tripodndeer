@@ -8,6 +8,7 @@ import {
 
 export const SiteIdSchema = z.string().min(1)
 export const RealmIdSchema = z.string().min(1)
+export const EdictIdSchema = z.string().min(1)
 export const ArmyIdSchema = z.string().min(1)
 export const Vec2Schema = z.tuple([z.number(), z.number()]) as z.ZodType<readonly [number, number]>
 export const PolygonSchema = z.array(Vec2Schema).min(3)
@@ -46,6 +47,41 @@ export const RawSiteSchema = z.object({
   boundary: z.array(BoundaryRefSchema).min(3),
   terrainType: TerrainTypeSchema.optional(),
 })
+
+export const RealmEconomySchema = z.object({
+  treasury: z.number().int().nonnegative(),
+  foodStores: z.number().int().nonnegative(),
+  taxRate: z.number().int().min(0).max(50),
+})
+
+export const SiteEconomySchema = z.object({
+  population: z.number().int().nonnegative(),
+  households: z.number().int().nonnegative(),
+  taxBase: z.number().int().nonnegative(),
+  foodProduction: z.number().int().nonnegative(),
+})
+
+export const EdictKindSchema = z.enum(['edict_tax_relief', 'edict_grain_reserve'])
+export const EdictStatusSchema = z.enum(['active', 'expired'])
+export const GovernorModifierKindSchema = z.enum(['tax_efficiency', 'food_efficiency'])
+
+export const EdictStateSchema = z.object({
+  id: EdictIdSchema,
+  realmId: RealmIdSchema,
+  kind: EdictKindSchema,
+  startedAtTick: z.number().int().nonnegative(),
+  durationMonths: z.number().int().positive(),
+  remainingMonths: z.number().int().nonnegative(),
+  status: EdictStatusSchema,
+})
+
+export const GovernorAssignmentSchema = z.object({
+  siteId: SiteIdSchema,
+  realmId: RealmIdSchema,
+  generalId: z.string().min(1),
+  assignedAtTick: z.number().int().nonnegative(),
+  modifierKind: GovernorModifierKindSchema,
+}).strict()
 
 export const ArmyTemplateSchema = z.object({
   id: ArmyIdSchema,
@@ -88,7 +124,14 @@ export const PeaceTermSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('tribute'), payload: TributePayloadSchema }),
 ])
 
-export const OrderTypeSchema = z.enum(['march', 'declareWarAndMarch', 'declare-war', 'propose-peace'])
+export const OrderTypeSchema = z.enum([
+  'march',
+  'declareWarAndMarch',
+  'declare-war',
+  'propose-peace',
+  'activate-edict',
+  'assign-governor',
+])
 
 const MarchOrderSchema = z.object({
   type: z.literal('march'),
@@ -118,11 +161,27 @@ const ProposePeaceOrderSchema = z.object({
   }),
 })
 
+const ActivateEdictOrderSchema = z.object({
+  type: z.literal('activate-edict'),
+  edictId: EdictIdSchema,
+  realmId: RealmIdSchema,
+  kind: EdictKindSchema,
+  durationMonths: z.number().int().positive(),
+})
+
+const AssignGovernorOrderSchema = z.object({
+  type: z.literal('assign-governor'),
+  siteId: SiteIdSchema,
+  generalId: z.string().min(1),
+})
+
 export const OrderSchema = z.discriminatedUnion('type', [
   MarchOrderSchema,
   DeclareWarOrderSchema,
   DeclareWarAndMarchOrderSchema,
   ProposePeaceOrderSchema,
+  ActivateEdictOrderSchema,
+  AssignGovernorOrderSchema,
 ])
 
 export const WarKeySchema = z.string().min(1)
@@ -276,6 +335,7 @@ export const RealmSchema = z.object({
   initialSites: z.array(SiteIdSchema),
   initialArmies: z.array(ArmyTemplateSchema),
   aiPersonality: AIPersonalitySchema,
+  economy: RealmEconomySchema.default({ treasury: 0, foodStores: 0, taxRate: 10 }),
 })
 
 export const M0DataSchema = z.object({
@@ -344,6 +404,8 @@ export const WorldSchema = z.object({
   passes: z.instanceof(Map),
   adjacencyEdges: z.instanceof(Map),
   sieges: z.instanceof(Map),
+  edicts: z.instanceof(Map),
+  governorAssignments: z.instanceof(Map),
   playerRealmId: z.string(),
   rngState: z.object({ seed: z.number(), counter: z.number() }),
   phases: z.array(z.function()),

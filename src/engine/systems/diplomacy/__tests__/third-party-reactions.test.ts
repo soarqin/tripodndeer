@@ -19,12 +19,13 @@ function makeRealm(id: string): Realm {
     initialSites: [],
     initialArmies: [],
     aiPersonality: 'aggressive_random',
+    economy: { treasury: 0, foodStores: 0, taxRate: 10 },
     stats: { manpowerPool: 1000, manpowerCap: 5000, warWeariness: 0 },
   }
 }
 
 function makeSite(id: string, ownerId: string | null): Site {
-  return { id, name: id, position: [0, 0], boundary: [], ownerId, polygon: [], adjacency: [] }
+  return { id, name: id, position: [0, 0], boundary: [], ownerId, polygon: [], adjacency: [], economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 } }
 }
 
 function makeArmy(id: string, realmId: string): Army {
@@ -99,6 +100,8 @@ function baseWorld(overrides: Partial<World> = {}): World {
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),
+    edicts: new Map(),
+    governorAssignments: new Map(),
     playerRealmId: qin,
     rngState: { seed: 42, counter: 0 },
     phases: [],

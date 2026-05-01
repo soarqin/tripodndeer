@@ -7,6 +7,8 @@ export type SiteId = string
 // CRITICAL: 绝对不用 'red' | 'blue' 字面量联合类型
 export type RealmId = string
 
+export type EdictId = string
+
 // 2D 坐标（只读 tuple）
 export type Vec2 = readonly [number, number]
 
@@ -48,6 +50,7 @@ export interface Site extends RawSite {
   ownerId: RealmId | null
   polygon: Polygon
   adjacency: readonly SiteId[]
+  economy: SiteEconomy
   occupation?: SiteOccupation
 }
 
@@ -80,7 +83,62 @@ export interface Army {
   }
 }
 
-export type OrderType = 'march' | 'declareWarAndMarch' | 'declare-war' | 'propose-peace'
+export type EdictKind = 'edict_tax_relief' | 'edict_grain_reserve'
+export type EdictStatus = 'active' | 'expired'
+export type GovernorModifierKind = 'tax_efficiency' | 'food_efficiency'
+
+export interface RealmEconomy {
+  readonly treasury: number
+  readonly foodStores: number
+  readonly taxRate: number
+}
+
+export interface SiteEconomy {
+  readonly population: number
+  readonly households: number
+  readonly taxBase: number
+  readonly foodProduction: number
+}
+
+export interface EdictState {
+  readonly id: EdictId
+  readonly realmId: RealmId
+  readonly kind: EdictKind
+  readonly startedAtTick: number
+  readonly durationMonths: number
+  readonly remainingMonths: number
+  readonly status: EdictStatus
+}
+
+export interface GovernorAssignment {
+  readonly siteId: SiteId
+  readonly realmId: RealmId
+  readonly generalId: GeneralId
+  readonly assignedAtTick: number
+  readonly modifierKind: GovernorModifierKind
+}
+
+export type OrderType =
+  | 'march'
+  | 'declareWarAndMarch'
+  | 'declare-war'
+  | 'propose-peace'
+  | 'activate-edict'
+  | 'assign-governor'
+
+export interface ActivateEdictOrder {
+  readonly type: 'activate-edict'
+  readonly edictId: EdictId
+  readonly realmId: RealmId
+  readonly kind: EdictKind
+  readonly durationMonths: number
+}
+
+export interface AssignGovernorOrder {
+  readonly type: 'assign-governor'
+  readonly siteId: SiteId
+  readonly generalId: GeneralId
+}
 
 export interface PeaceProposalOrderData {
   readonly proposalId: string
@@ -93,9 +151,15 @@ export interface Order {
   readonly type: OrderType
   readonly armyId?: ArmyId
   readonly targetSiteId?: SiteId
+  readonly siteId?: SiteId
   readonly targetRealmId?: RealmId
+  readonly realmId?: RealmId
   readonly casusBelli?: CasusBelliId
   readonly peaceProposalData?: PeaceProposalOrderData
+  readonly edictId?: EdictId
+  readonly kind?: EdictKind
+  readonly durationMonths?: number
+  readonly generalId?: GeneralId
 }
 
 export type WarKey = string
@@ -277,6 +341,7 @@ export interface Realm {
   readonly initialSites: readonly SiteId[]
   readonly initialArmies: readonly ArmyTemplate[]
   readonly aiPersonality: AIPersonality
+  readonly economy: RealmEconomy
   readonly stats?: RealmStats
 }
 
@@ -298,6 +363,18 @@ export interface RNGState {
 export interface GameEvent {
   type: string
   payload: unknown
+}
+
+export interface EconomySettlementEvent {
+  readonly type: 'economySettlement'
+  readonly payload: {
+    readonly realmId: RealmId
+    readonly treasuryDelta: number
+    readonly foodStoresDelta: number
+    readonly populationDelta: number
+    readonly householdsDelta: number
+    readonly settledAtTick: number
+  }
 }
 
 // 时间速度档位
@@ -329,6 +406,8 @@ export interface World {
   passes: ReadonlyMap<PassId, Pass>
   adjacencyEdges: ReadonlyMap<AdjacencyEdgeId, AdjacencyEdge>
   sieges: ReadonlyMap<SiegeId, Siege>
+  edicts: ReadonlyMap<EdictId, EdictState>
+  governorAssignments: ReadonlyMap<SiteId, GovernorAssignment>
   playerRealmId: RealmId
   rngState: RNGState // PRNG 状态在 World，不在 module 闭包
   phases: readonly TickPhase[] // Tick 阶段数组（M0 仅 1 个，但形状必须是数组）

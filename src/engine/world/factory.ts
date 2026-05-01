@@ -5,11 +5,20 @@ import { M0DataSchema, M1DataSchemaV2 } from '@/shared/schemas'
 import { aiPlanStep } from '~/engine/systems/ai'
 import { combatV2Step } from '~/engine/systems/combat-v2'
 import { diplomacyLifecycleStep } from '~/engine/systems/diplomacy'
+import { economyPhase } from '~/engine/systems/economy'
 import { manpowerTick } from '~/engine/systems/manpower'
 import { marchStep } from '~/engine/systems/march'
 import { orderApplyStep } from '~/engine/systems/orders'
 import { siegeStep } from '~/engine/systems/siege'
 import { victoryCheckStep } from '~/engine/systems/victory'
+import {
+  M4_BASE_FOOD_PRODUCTION_PER_HOUSEHOLD,
+  M4_DEFAULT_REALM_FOOD_STORES,
+  M4_DEFAULT_REALM_TREASURY,
+  M4_DEFAULT_SITE_POPULATION,
+  M4_DEFAULT_TAX_RATE,
+  M4_HOUSEHOLD_DIVISOR,
+} from '~/content/m2/balance'
 import type {
   AdjacencyEdge,
   AdjacencyEdgeId,
@@ -21,6 +30,9 @@ import type {
   DiplomaticProposal,
   DiplomaticProposalId,
   DiplomaticRelation,
+  EdictId,
+  EdictState,
+  GovernorAssignment,
   ZhouInvestitureState,
   RelationKey,
   Treaty,
@@ -91,7 +103,16 @@ function deriveAdjacency(sites: readonly M0Data['sites'][number][]): Map<SiteId,
 
 function buildRealmMap(realms: readonly Realm[]): Map<RealmId, Realm> {
   const realmMap = new Map<RealmId, Realm>()
-  for (const realm of realms) realmMap.set(realm.id, realm)
+  for (const realm of realms) {
+    realmMap.set(realm.id, {
+      ...realm,
+      economy: {
+        treasury: M4_DEFAULT_REALM_TREASURY,
+        foodStores: M4_DEFAULT_REALM_FOOD_STORES,
+        taxRate: M4_DEFAULT_TAX_RATE,
+      },
+    })
+  }
   return realmMap
 }
 
@@ -111,11 +132,18 @@ function buildSites(
     }
     const polygon = expandPolygon(rawSite.boundary, edges)
     const adjacency = adjacencyMap.get(rawSite.id) ?? []
+    const households = Math.floor(M4_DEFAULT_SITE_POPULATION / M4_HOUSEHOLD_DIVISOR)
     sites.set(rawSite.id, {
       ...rawSite,
       ownerId,
       polygon,
       adjacency,
+      economy: {
+        population: M4_DEFAULT_SITE_POPULATION,
+        households,
+        taxBase: households,
+        foodProduction: households * M4_BASE_FOOD_PRODUCTION_PER_HOUSEHOLD,
+      },
       occupation: ownerId !== null ? { occupierId: ownerId, controlLevel: 100 } : undefined,
     })
   }
@@ -170,6 +198,8 @@ export function createInitialWorld(data: M0Data, seed: number): World {
     passes: new Map<PassId, Pass>(),
     adjacencyEdges: new Map<AdjacencyEdgeId, AdjacencyEdge>(),
     sieges: new Map<SiegeId, Siege>(),
+    edicts: new Map<EdictId, EdictState>(),
+    governorAssignments: new Map<SiteId, GovernorAssignment>(),
     playerRealmId: data.realms[0]?.id ?? '',
     rngState: { seed, counter: 0 },
     phases: [],
@@ -274,6 +304,8 @@ export function createWorldFromM1Data(
     passes,
     adjacencyEdges,
     sieges: new Map<SiegeId, Siege>(),
+    edicts: new Map<EdictId, EdictState>(),
+    governorAssignments: new Map<SiteId, GovernorAssignment>(),
     playerRealmId,
     rngState: { seed, counter: 0 },
     phases: [
@@ -285,6 +317,7 @@ export function createWorldFromM1Data(
       manpowerTick,
       victoryCheckStep,
       diplomacyLifecycleStep,
+      economyPhase,
     ],
     pendingOrders: [],
   }

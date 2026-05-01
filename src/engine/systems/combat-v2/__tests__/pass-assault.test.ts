@@ -37,6 +37,7 @@ function makeSite(id: string, ownerId: string | null): Site {
     ownerId,
     polygon: [],
     adjacency: [],
+    economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 },
   }
 }
 
@@ -88,6 +89,8 @@ function makeWorld(
     passes: new Map(passes.map((pass) => [pass.id, pass])),
     adjacencyEdges: new Map(adjacencyEdges.map((ae) => [ae.id, ae])),
     sieges: new Map(),
+    edicts: new Map(),
+    governorAssignments: new Map(),
     playerRealmId: 'realm_qin',
     rngState: rng,
     phases: [],
