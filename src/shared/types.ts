@@ -324,6 +324,20 @@ export interface General {
   loyalty: number
   strategy?: number
   learning?: number
+  attrs?: {
+    wu: number
+    zheng: number
+    jiao: number
+    mou: number
+    xue: number
+    po: number
+  }
+  specialty?: Specialty
+  ambition?: Ambition
+  faction?: FactionId
+  age?: number
+  posts?: readonly Post[]
+  loyaltyState?: LoyaltyState
 }
 
 export interface SiteOccupation {

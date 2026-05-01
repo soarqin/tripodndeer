@@ -199,6 +199,48 @@ export const AdjacencyEdgeSchema = z.object({
   passId: z.string().min(1),
 })
 
+export const SpecialtySchema = z.enum([
+  'commander',
+  'warrior',
+  'strategist',
+  'administrator',
+  'reformer',
+  'diplomat',
+  'spy',
+  'scholar',
+  'engineer',
+])
+
+export const AmbitionSchema = z.enum(['low', 'mid', 'high'])
+
+export const LoyaltyStateSchema = z.enum([
+  'loyal',
+  'shirking',
+  'seeking_departure',
+  'secret_contact',
+  'defected',
+])
+
+export const FactionIdSchema = z.enum([
+  'royal_kin',
+  'noble_clans',
+  'military_meritocracy',
+  'reformists',
+  'conservatives',
+  'foreign_clients',
+])
+
+export const PostSchema = z.enum(['ruler', 'chancellor', 'general', 'governor'])
+
+export const GeneralAttrsSchema = z.object({
+  wu: z.number().int().min(0).max(20),
+  zheng: z.number().int().min(0).max(20),
+  jiao: z.number().int().min(0).max(20),
+  mou: z.number().int().min(0).max(20),
+  xue: z.number().int().min(0).max(20),
+  po: z.number().int().min(0).max(20),
+})
+
 export const GeneralSchema = z.object({
   id: z.string().min(1),
   realmId: RealmIdSchema,
@@ -208,6 +250,13 @@ export const GeneralSchema = z.object({
   loyalty: z.number().int().min(0).max(100),
   strategy: z.number().optional(),
   learning: z.number().optional(),
+  attrs: GeneralAttrsSchema.optional(),
+  specialty: SpecialtySchema.optional(),
+  ambition: AmbitionSchema.optional(),
+  faction: FactionIdSchema.optional(),
+  age: z.number().int().nonnegative().optional(),
+  posts: z.array(PostSchema).optional(),
+  loyaltyState: LoyaltyStateSchema.optional(),
 })
 
 export const SiteOccupationSchema = z.object({
