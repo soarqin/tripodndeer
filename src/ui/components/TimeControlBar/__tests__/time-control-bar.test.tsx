@@ -14,11 +14,14 @@ vi.mock('@/ui/store/game-store', () => ({
 }))
 
 describe('TimeControlBar', () => {
-  it('renders 6 buttons', () => {
+  it('renders localized pause plus exact visible speed notation', () => {
     render(<TimeControlBar />)
-    const tiers = ['pause', '1x', '2x', '3x', '4x', '5x']
-    for (const tier of tiers) {
-      expect(screen.getByTestId(`time-control-${tier}`)).toBeTruthy()
+
+    expect(screen.getByText(/暂停/)).toBeTruthy()
+    expect(screen.queryByText(/^pause$/)).toBeNull()
+
+    for (const tier of ['1x', '2x', '3x', '4x', '5x']) {
+      expect(screen.getByRole('button', { name: new RegExp(tier) })).toBeTruthy()
     }
   })
 

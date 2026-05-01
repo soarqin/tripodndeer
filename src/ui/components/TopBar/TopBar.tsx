@@ -46,7 +46,7 @@ export const TopBar = React.memo(function TopBar() {
         <span className={styles.separator}>|</span>
         <span data-testid="top-bar-speed">速度: {speedLabel(speed)}</span>
         <span className={styles.separator}>|</span>
-        <span data-testid="top-bar-tick-count">Tick: {tick}</span>
+        <span data-testid="top-bar-tick-count">时步：{tick}</span>
       </div>
       <span className={styles.manpowerBadge}>总兵 {totalManpower}</span>
     </div>

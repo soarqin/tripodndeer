@@ -71,12 +71,19 @@ vi.mock('@/ui/store/game-store', () => ({
 }))
 
 describe('TopBar', () => {
-  it('renders realm name, manpower, date, speed, and tick', () => {
+  it('renders realm name, manpower, date, localized speed, and localized tick label', () => {
     render(<TopBar />)
     expect(screen.getByText('秦 秦国')).toBeTruthy()
     expect(screen.getByText('总兵 150')).toBeTruthy()
     expect(screen.getByTestId('top-bar-date').textContent).toBe('公元前 453 年 春 上旬')
-    expect(screen.getByTestId('top-bar-speed').textContent).toContain('暂停')
-    expect(screen.getByTestId('top-bar-tick-count').textContent).toBe('Tick: 0')
+
+    const speed = screen.getByTestId('top-bar-speed')
+    expect(speed.textContent).toContain('速度:')
+    expect(speed.textContent).toContain('暂停')
+    expect(screen.queryByText(/^pause$/)).toBeNull()
+
+    const tick = screen.getByTestId('top-bar-tick-count')
+    expect(tick.textContent).toBe('时步：0')
+    expect(screen.queryByText(/^Tick:/)).toBeNull()
   })
 })
