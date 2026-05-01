@@ -280,6 +280,58 @@ export const RulerStateSchema = z.object({
   successionLawId: z.literal('primogeniture'),
 })
 
+export const EffectSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('realm.treasury'), realmId: RealmIdSchema, delta: z.number() }),
+  z.object({ type: z.literal('character.create'), generalId: z.string().min(1), realmId: RealmIdSchema, name: z.string().min(1) }),
+  z.object({ type: z.literal('character.kill'), generalId: z.string().min(1) }),
+  z.object({ type: z.literal('character.loyalty'), generalId: z.string().min(1), delta: z.number() }),
+  z.object({ type: z.literal('realm.trait.add'), realmId: RealmIdSchema, trait: z.string().min(1) }),
+])
+
+export type Effect = z.infer<typeof EffectSchema>
+
+export const EventChainChoiceSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1),
+  effects: z.array(EffectSchema),
+  nextStageId: z.string().min(1).optional(),
+})
+
+export const EventChainStageSchema = z.object({
+  id: z.string().min(1),
+  text: z.string().min(1),
+  choices: z.array(EventChainChoiceSchema),
+})
+
+export const EventChainTriggerSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('date'),
+    between: z.tuple([
+      z.object({ yearBC: z.number().int() }),
+      z.object({ yearBC: z.number().int() }),
+    ]),
+    realmId: RealmIdSchema.optional(),
+  }),
+  z.object({
+    type: z.literal('state'),
+    predicate: z.string().min(1),
+  }),
+])
+
+export const EventChainSchema = z.object({
+  id: z.string().min(1),
+  trigger: EventChainTriggerSchema,
+  oneShot: z.boolean(),
+  stages: z.array(EventChainStageSchema).min(1),
+})
+
+export const EventChainStateSchema = z.object({
+  id: z.string().min(1),
+  currentStageId: z.string().min(1),
+  completed: z.boolean(),
+  startedAtTick: z.number().int().nonnegative(),
+})
+
 export const SiteOccupationSchema = z.object({
   occupierId: RealmIdSchema,
   controlLevel: z.number().int().min(0).max(100),
