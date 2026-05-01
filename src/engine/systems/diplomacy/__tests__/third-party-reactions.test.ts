@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Army, DiplomaticRelation, GameDate, Realm, Site, World } from '~/shared/types'
+import type { Army, DiplomaticRelation, GameDate, Realm, Site, Treaty, World } from '~/shared/types'
 import { applyDiplomacyAction, applyThirdPartyReactions, relationKey } from '../index'
 
 const DATE: GameDate = { yearBC: 260, season: 'spring', month: 1, xun: 'shang' }
@@ -44,6 +44,24 @@ function makeRelation(a: string, b: string, attitude: number, trust: number): Di
   const realmAId = a.localeCompare(b) <= 0 ? a : b
   const realmBId = realmAId === a ? b : a
   return { key: relationKey(a, b), realmAId, realmBId, attitude, trust, updatedAt: DATE }
+}
+
+function makeTreaty(overrides: Partial<Treaty> = {}): Treaty {
+  return {
+    id: 'alliance_qin_han',
+    kind: 'alliance',
+    realmAId: qin,
+    realmBId: han,
+    status: 'active',
+    signedAt: DATE,
+    signedAtTick: 2,
+    expiresAt: null,
+    expiresAtTick: null,
+    endedAt: null,
+    endedAtTick: null,
+    sourceProposalId: null,
+    ...overrides,
+  }
 }
 
 function baseWorld(overrides: Partial<World> = {}): World {
@@ -127,5 +145,24 @@ describe('third-party diplomacy reactions', () => {
 
     expect(result.world.relations.get(eliminatedRelation.key)).toEqual(eliminatedRelation)
     expect(result.world.diplomacyHistory.every(event => event.targetRealmId !== chu && event.actorRealmId !== chu)).toBe(true)
+  })
+
+  it('keeps betrayal observable before existing third-party reactions run', () => {
+    const treaty = makeTreaty()
+    const world = baseWorld({ treaties: new Map([[treaty.id, treaty]]) })
+
+    const result = applyDiplomacyAction(world, { kind: 'declare_war', proposingRealmId: qin, targetRealmId: han })
+
+    expect(result.ok).toBe(true)
+    expect(result.world.diplomacyHistory.map(event => [event.kind, event.relationKey ?? null])).toEqual([
+      ['war_declared', relationKey(qin, han)],
+      ['treaty_ended', relationKey(qin, han)],
+      ['betrayal', relationKey(qin, han)],
+      ['relation_changed', relationKey(qin, han)],
+      ['relation_changed', relationKey(qin, wei)],
+      ['relation_changed', relationKey(han, wei)],
+      ['relation_changed', relationKey(qin, zhao)],
+      ['relation_changed', relationKey(han, zhao)],
+    ])
   })
 })

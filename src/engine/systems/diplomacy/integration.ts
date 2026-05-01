@@ -1,12 +1,19 @@
 import type {
   DiplomacyEvent,
   DiplomacyEventId,
+  DiplomaticRelation,
   DiplomaticTreatyKind,
   GameEvent,
+  RealmId,
   World,
 } from '~/shared/types'
+import {
+  DIPLOMACY_BETRAYAL_TRUST_DELTA,
+  DIPLOMACY_RELATION_NEUTRAL_ATTITUDE,
+  DIPLOMACY_RELATION_NEUTRAL_TRUST,
+} from '~/content/m2/balance'
 import { declareWarWithCasus } from '~/engine/wars'
-import { relationKey, type DiplomacyActionRequest, type DiplomacyValidationReason, validateDiplomacyAction } from './diplomacy-core'
+import { clampRelation, relationKey, type DiplomacyActionRequest, type DiplomacyValidationReason, validateDiplomacyAction } from './diplomacy-core'
 import { updateCoalitionPressure } from './coalitions'
 import { applyThirdPartyReactions } from './reactions'
 
@@ -82,7 +89,9 @@ function cancelBelligerentTreaties(
 ): { readonly world: World; readonly events: readonly GameEvent[] } {
   const key = relationKey(request.proposingRealmId, request.targetRealmId)
   const treaties = new Map(world.treaties)
+  const relations = new Map(world.relations)
   let history = [...world.diplomacyHistory]
+  let betrayalTreatyId: string | null = null
 
   for (const treaty of [...world.treaties.values()].sort((a, b) => a.id.localeCompare(b.id))) {
     if (treaty.status !== 'active') continue
@@ -95,6 +104,7 @@ function cancelBelligerentTreaties(
       endedAt: world.date,
       endedAtTick: world.tick,
     })
+    betrayalTreatyId ??= treaty.id
     const pushed = pushHistory({ ...world, treaties, diplomacyHistory: history }, history, events, {
       kind: 'treaty_ended',
       actorRealmId: request.proposingRealmId,
@@ -105,7 +115,48 @@ function cancelBelligerentTreaties(
     history = pushed.history
   }
 
-  return { world: { ...world, treaties, diplomacyHistory: history }, events }
+  if (betrayalTreatyId !== null) {
+    const current = relations.get(key) ?? createNeutralRelation(world, request.proposingRealmId, request.targetRealmId)
+    const next = clampRelation({
+      ...current,
+      trust: current.trust + DIPLOMACY_BETRAYAL_TRUST_DELTA,
+      updatedAt: world.date,
+    })
+    relations.set(key, next)
+
+    const betrayed = pushHistory({ ...world, treaties, relations, diplomacyHistory: history }, history, events, {
+      kind: 'betrayal',
+      reason: 'war_declaration_against_treaty',
+      actorRealmId: request.proposingRealmId,
+      targetRealmId: request.targetRealmId,
+      treatyId: betrayalTreatyId,
+      relationKey: key,
+    })
+    history = betrayed.history
+
+    const changed = pushHistory({ ...world, treaties, relations, diplomacyHistory: history }, history, events, {
+      kind: 'relation_changed',
+      actorRealmId: request.proposingRealmId,
+      targetRealmId: request.targetRealmId,
+      relationKey: key,
+    })
+    history = changed.history
+  }
+
+  return { world: { ...world, treaties, relations, diplomacyHistory: history }, events }
+}
+
+function createNeutralRelation(world: World, realmAId: RealmId, realmBId: RealmId): DiplomaticRelation {
+  const lowerRealmId = realmAId.localeCompare(realmBId) <= 0 ? realmAId : realmBId
+  const higherRealmId = lowerRealmId === realmAId ? realmBId : realmAId
+  return {
+    key: relationKey(realmAId, realmBId),
+    realmAId: lowerRealmId,
+    realmBId: higherRealmId,
+    attitude: DIPLOMACY_RELATION_NEUTRAL_ATTITUDE,
+    trust: DIPLOMACY_RELATION_NEUTRAL_TRUST,
+    updatedAt: world.date,
+  }
 }
 
 function pushHistory(

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DIPLOMACY_TRUCE_DURATION_TICKS } from '~/content/m2/balance'
+import { DIPLOMACY_BETRAYAL_TRUST_DELTA, DIPLOMACY_TRUCE_DURATION_TICKS } from '~/content/m2/balance'
 import { warKey } from '~/engine/wars'
 import type {
   Army,
@@ -190,9 +190,49 @@ describe('diplomacy war declaration integration', () => {
       'treaty_ended',
       'treaty_ended',
       'treaty_ended',
+      'betrayal',
+      'relation_changed',
       'relation_changed',
       'relation_changed',
     ])
+  })
+
+  it('records betrayal reason and clamps trust when declaring war through a positive treaty', () => {
+    const alliance = makeTreaty({ id: 'alliance_qin_han', kind: 'alliance' })
+    const world = baseWorld({
+      relations: new Map([[relationKey(qin, han), makeRelation({ trust: 20 })]]),
+      treaties: new Map([[alliance.id, alliance]]),
+    })
+
+    const result = applyDiplomacyAction(world, { kind: 'declare_war', proposingRealmId: qin, targetRealmId: han })
+
+    expect(result.ok).toBe(true)
+    expect(result.world.treaties.get(alliance.id)).toMatchObject({ status: 'cancelled', endedAtTick: 10 })
+    expect(result.world.relations.get(relationKey(qin, han))).toMatchObject({
+      trust: Math.max(0, 20 + DIPLOMACY_BETRAYAL_TRUST_DELTA),
+      updatedAt: DATE,
+    })
+    expect(result.world.diplomacyHistory).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: 'betrayal',
+        reason: 'war_declaration_against_treaty',
+        actorRealmId: qin,
+        targetRealmId: han,
+        treatyId: alliance.id,
+        relationKey: relationKey(qin, han),
+      }),
+    ]))
+  })
+
+  it('keeps active truce as truce_active without betrayal or treaty cancellation', () => {
+    const truce = makeTreaty({ id: 'truce_qin_han', kind: 'truce', expiresAtTick: 20 })
+    const world = baseWorld({ treaties: new Map([[truce.id, truce]]) })
+
+    const result = applyDiplomacyAction(world, { kind: 'declare_war', proposingRealmId: qin, targetRealmId: han })
+
+    expect(result).toEqual({ ok: false, world, reason: 'truce_active', events: [] })
+    expect(result.world.treaties.get(truce.id)).toEqual(truce)
+    expect(result.world.diplomacyHistory).toEqual([])
   })
 })
 
