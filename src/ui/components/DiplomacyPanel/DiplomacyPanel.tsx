@@ -10,6 +10,30 @@ import {
 import styles from './DiplomacyPanel.module.css'
 import { useState } from 'react'
 
+const ACTION_LABELS: Record<string, string> = {
+  envoy: '遣使',
+  alliance: '盟约',
+  non_aggression: '互不侵犯',
+  tribute: '朝贡',
+  marriage: '联姻',
+  declare_war: '宣战',
+  peace: '议和',
+}
+
+const REJECTION_REASONS: Record<string, string> = {
+  truce_active: '停战期内不可宣战',
+  current_war: '正在交战',
+  duplicate_proposal: '已有同类提案',
+  already_allied: '已缔结盟约',
+  missing_casus_belli: '缺少战争借口',
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  submitted: '已提交',
+  accepted: '已接受',
+  rejected: '已拒绝',
+}
+
 export function DiplomacyPanel() {
   const targetRealmId = useGameStore(selectDiplomacyTargetRealmId)
   const playerRealm = useGameStore(selectPlayerRealm)
@@ -41,16 +65,17 @@ export function DiplomacyPanel() {
   const targetFeedback = feedbackList.filter(f => f.targetRealmId === targetRealmId)
   const latestFeedback = targetFeedback[targetFeedback.length - 1]
 
-  const handleAction = (kind: 'envoy' | 'alliance' | 'peace') => {
+  const handleAction = (kind: 'envoy' | 'alliance' | 'non_aggression' | 'tribute' | 'marriage' | 'declare_war' | 'peace') => {
     const result = submitPlayerDiplomacyAction({
       kind,
       targetRealmId,
     })
     
     if (result.ok) {
-      setLocalFeedback({ ok: true, message: `Action submitted: ${kind}` })
+      setLocalFeedback({ ok: true, message: `行动已提交：${ACTION_LABELS[kind] || kind}` })
     } else {
-      setLocalFeedback({ ok: false, message: `Rejected: ${result.reason}` })
+      const reasonText = result.reason ? (REJECTION_REASONS[result.reason] || '行动暂不可用') : '行动暂不可用'
+      setLocalFeedback({ ok: false, message: `已拒绝：${reasonText}` })
     }
   }
 
@@ -93,19 +118,43 @@ export function DiplomacyPanel() {
                 data-testid="diplomacy-action-envoy"
                 onClick={() => handleAction('envoy')}
               >
-                派遣使节
+                遣使
               </button>
               <button 
                 data-testid="diplomacy-action-alliance"
                 onClick={() => handleAction('alliance')}
               >
-                提议结盟
+                盟约
+              </button>
+              <button 
+                data-testid="diplomacy-action-non_aggression"
+                onClick={() => handleAction('non_aggression')}
+              >
+                互不侵犯
+              </button>
+              <button 
+                data-testid="diplomacy-action-tribute"
+                onClick={() => handleAction('tribute')}
+              >
+                朝贡
+              </button>
+              <button 
+                data-testid="diplomacy-action-marriage"
+                onClick={() => handleAction('marriage')}
+              >
+                联姻
+              </button>
+              <button 
+                data-testid="diplomacy-action-declare_war"
+                onClick={() => handleAction('declare_war')}
+              >
+                宣战
               </button>
               <button 
                 data-testid="diplomacy-action-peace"
                 onClick={() => handleAction('peace')}
               >
-                提议议和
+                议和
               </button>
             </div>
           </div>
@@ -119,8 +168,14 @@ export function DiplomacyPanel() {
             )}
             {latestFeedback && (
               <div className={styles.latestFeedback}>
-                <p>最新状态: {latestFeedback.status}</p>
-                {latestFeedback.reason && <p>原因: {latestFeedback.reason}</p>}
+                {latestFeedback.status === 'rejected' ? (
+                  <p>已拒绝：{latestFeedback.reason ? (REJECTION_REASONS[latestFeedback.reason] || '行动暂不可用') : '行动暂不可用'}</p>
+                ) : (
+                  <>
+                    <p>最新状态: {STATUS_LABELS[latestFeedback.status] || '处理中'}</p>
+                    {latestFeedback.reason && <p>原因: {REJECTION_REASONS[latestFeedback.reason] || '行动暂不可用'}</p>}
+                  </>
+                )}
               </div>
             )}
           </div>
