@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
 import { runTickPhases } from '~/engine/clock'
-import type { World } from '~/shared/types'
+
 import * as fs from 'fs'
 import * as path from 'path'
 import { PHASE_NAMES } from '~/engine/phases'

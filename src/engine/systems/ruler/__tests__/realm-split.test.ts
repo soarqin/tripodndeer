@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { describe, expect, it } from 'vitest'
 
 import { splitRealm } from '../realm-split'

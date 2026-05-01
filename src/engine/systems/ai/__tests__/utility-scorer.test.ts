@@ -34,7 +34,7 @@ describe('utility scorer', () => {
 
   it('steward: economy scores higher than attack', () => {
     const attackScore = scoreOption({ kind: 'attack', score: 10 }, 'steward')
-    const economyScore = scoreOption({ kind: 'economy' as any, score: 10 }, 'steward')
+    const economyScore = scoreOption({ kind: 'economy', score: 10 }, 'steward')
     
     expect(economyScore).toBeGreaterThan(attackScore)
   })
@@ -42,7 +42,7 @@ describe('utility scorer', () => {
   it('tyrant: attack scores highest', () => {
     const attackScore = scoreOption({ kind: 'attack', score: 10 }, 'tyrant')
     const retreatScore = scoreOption({ kind: 'retreat', score: 10 }, 'tyrant')
-    const diplomacyScore = scoreOption({ kind: 'diplomacy' as any, score: 10 }, 'tyrant')
+    const diplomacyScore = scoreOption({ kind: 'diplomacy', score: 10 }, 'tyrant')
     
     expect(attackScore).toBeGreaterThan(retreatScore)
     expect(attackScore).toBeGreaterThan(diplomacyScore)
@@ -50,8 +50,8 @@ describe('utility scorer', () => {
 
   it('benevolent: diplomacy/economy scores higher than attack', () => {
     const attackScore = scoreOption({ kind: 'attack', score: 10 }, 'benevolent')
-    const diplomacyScore = scoreOption({ kind: 'diplomacy' as any, score: 10 }, 'benevolent')
-    const economyScore = scoreOption({ kind: 'economy' as any, score: 10 }, 'benevolent')
+    const diplomacyScore = scoreOption({ kind: 'diplomacy', score: 10 }, 'benevolent')
+    const economyScore = scoreOption({ kind: 'economy', score: 10 }, 'benevolent')
     
     expect(diplomacyScore).toBeGreaterThan(attackScore)
     expect(economyScore).toBeGreaterThan(attackScore)

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import scenarioRaw from '~/content/m1/scenario.json'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 

@@ -3,7 +3,7 @@ import { nextRng } from '~/engine/random'
 import { M5_PERSONALITY_WEIGHTS } from '~/content/m2/balance'
 
 export interface AIOption {
-  kind: 'attack' | 'siege-continue' | 'cut-supply' | 'retreat' | 'idle'
+  kind: 'attack' | 'siege-continue' | 'cut-supply' | 'retreat' | 'idle' | 'economy' | 'diplomacy' | 'recruit'
   targetSiteId?: string
   armyId?: string
   score?: number
