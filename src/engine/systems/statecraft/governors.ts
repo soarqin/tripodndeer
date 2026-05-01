@@ -1,7 +1,7 @@
-import type { GovernorAssignment, Site, SiteId } from '~/shared/types'
+import type { General, GeneralId, GovernorAssignment, Site, SiteId } from '~/shared/types'
 import {
-  M4_GOVERNOR_FOOD_MODIFIER,
-  M4_GOVERNOR_TAX_MODIFIER,
+  M5_GOVERNOR_FOOD_BONUS_PER_ZHENG,
+  M5_GOVERNOR_TAX_BONUS_PER_ZHENG,
 } from '~/content/m2/balance'
 
 export interface GovernorSettlementModifiers {
@@ -11,6 +11,7 @@ export interface GovernorSettlementModifiers {
 
 export function getGovernorSettlementModifiers(
   assignments: ReadonlyMap<SiteId, GovernorAssignment>,
+  generals: ReadonlyMap<GeneralId, General>,
   site: Site,
 ): GovernorSettlementModifiers {
   const assignment = assignments.get(site.id)
@@ -18,11 +19,24 @@ export function getGovernorSettlementModifiers(
     return { taxBaseDelta: 0, foodProductionDelta: 0 }
   }
 
-  if (assignment.modifierKind === 'tax_efficiency') {
-    return { taxBaseDelta: M4_GOVERNOR_TAX_MODIFIER, foodProductionDelta: 0 }
+  const general = generals.get(assignment.generalId)
+  if (general === undefined || general.attrs === undefined) {
+    return { taxBaseDelta: 0, foodProductionDelta: 0 }
   }
 
-  return { taxBaseDelta: 0, foodProductionDelta: M4_GOVERNOR_FOOD_MODIFIER }
+  const zheng = general.attrs.zheng
+
+  if (assignment.modifierKind === 'tax_efficiency') {
+    return {
+      taxBaseDelta: Math.floor(M5_GOVERNOR_TAX_BONUS_PER_ZHENG * zheng),
+      foodProductionDelta: 0,
+    }
+  }
+
+  return {
+    taxBaseDelta: 0,
+    foodProductionDelta: Math.floor(M5_GOVERNOR_FOOD_BONUS_PER_ZHENG * zheng),
+  }
 }
 
 function isAssignmentForOwnedSite(assignment: GovernorAssignment, site: Site): boolean {

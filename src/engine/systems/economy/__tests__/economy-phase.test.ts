@@ -17,9 +17,9 @@ import {
   M4_BASIS_POINTS_DIVISOR,
   M4_EDICT_GRAIN_RESERVE_FOOD_PRODUCTION_BASIS_POINTS,
   M4_EDICT_GRAIN_RESERVE_TREASURY_COST,
-  M4_GOVERNOR_FOOD_MODIFIER,
-  M4_GOVERNOR_TAX_MODIFIER,
   M4_HOUSEHOLD_DIVISOR,
+  M5_GOVERNOR_FOOD_BONUS_PER_ZHENG,
+  M5_GOVERNOR_TAX_BONUS_PER_ZHENG,
 } from '~/content/m2/balance'
 
 const shangDate: GameDate = { yearBC: 260, season: 'spring', month: 1, xun: 'shang' }
@@ -91,6 +91,18 @@ function makeGeneral(id: string, realmId: string, might: number, command: number
     loyalty,
     strategy: might,
     learning: command,
+  }
+}
+
+function makeGovernorGeneral(id: string, realmId: string, zheng: number): General {
+  return {
+    id,
+    realmId,
+    name: id,
+    might: 50,
+    command: 50,
+    loyalty: 50,
+    attrs: { wu: 0, zheng, jiao: 0, mou: 0, xue: 0, po: 0 },
   }
 }
 
@@ -330,26 +342,30 @@ describe('economyPhase edicts', () => {
 })
 
 describe('economyPhase governors', () => {
-  it('applies tax governor fixed modifier to owned site tax base and settlement income', () => {
+  it('applies tax governor attrs.zheng-based modifier to owned site tax base and settlement income', () => {
     const world = makeWorld()
     const sites = new Map(world.sites)
     sites.set('site_qin_a', makeSite('site_qin_a', 'realm_qin', 10000))
     const governorAssignments = new Map([
       ['site_qin_a', makeGovernorAssignment('site_qin_a', 'realm_qin', 'general_qin', 'tax_efficiency')],
     ])
+    const generals = new Map([
+      ['general_qin', makeGovernorGeneral('general_qin', 'realm_qin', 10)],
+    ])
+    const taxBonus = Math.floor(M5_GOVERNOR_TAX_BONUS_PER_ZHENG * 10)
 
-    const result = economyPhase({ ...world, sites, governorAssignments }, rng)
+    const result = economyPhase({ ...world, sites, governorAssignments, generals }, rng)
 
     expect(result.world.sites.get('site_qin_a')?.economy).toEqual({
       population: 10100,
       households: 2020,
-      taxBase: 2020 + M4_GOVERNOR_TAX_MODIFIER,
+      taxBase: 2020 + taxBonus,
       foodProduction: 4040,
     })
     expect(result.world.realms.get('realm_qin')?.economy.treasury).toBe(1015)
   })
 
-  it('applies food governor fixed modifier to owned site food production only', () => {
+  it('applies food governor attrs.zheng-based modifier to owned site food production only', () => {
     const world = makeWorld()
     const sites = new Map(world.sites)
     sites.set('site_qin_a', makeSite('site_qin_a', 'realm_qin', 10000))
@@ -358,14 +374,18 @@ describe('economyPhase governors', () => {
     const governorAssignments = new Map([
       ['site_qin_a', makeGovernorAssignment('site_qin_a', 'realm_qin', 'general_qin', 'food_efficiency')],
     ])
+    const generals = new Map([
+      ['general_qin', makeGovernorGeneral('general_qin', 'realm_qin', 10)],
+    ])
+    const foodBonus = Math.floor(M5_GOVERNOR_FOOD_BONUS_PER_ZHENG * 10)
 
-    const result = economyPhase({ ...world, realms, sites, governorAssignments }, rng)
+    const result = economyPhase({ ...world, realms, sites, governorAssignments, generals }, rng)
 
     expect(result.world.sites.get('site_qin_a')?.economy).toEqual({
       population: 10100,
       households: 2020,
       taxBase: 2020,
-      foodProduction: 4040 + M4_GOVERNOR_FOOD_MODIFIER,
+      foodProduction: 4040 + foodBonus,
     })
     expect(result.world.realms.get('realm_qin')?.economy.foodStores).toBe(7985)
   })
@@ -388,22 +408,22 @@ describe('economyPhase governors', () => {
     expect(result.world.sites.get('site_unowned')?.economy).toEqual(world.sites.get('site_unowned')?.economy)
   })
 
-  it('does not change governor output when assigned general stats change', () => {
+  it('governor output depends on attrs.zheng only, not on might/command/loyalty', () => {
     const world = makeWorld()
     const sites = new Map(world.sites)
     sites.set('site_qin_a', makeSite('site_qin_a', 'realm_qin', 10000))
     const governorAssignments = new Map([
       ['site_qin_a', makeGovernorAssignment('site_qin_a', 'realm_qin', 'general_qin', 'tax_efficiency')],
     ])
-    const lowStatsGenerals = new Map([
-      ['general_qin', makeGeneral('general_qin', 'realm_qin', 1, 2, 3)],
+    const lowOtherStatsGenerals = new Map([
+      ['general_qin', { ...makeGeneral('general_qin', 'realm_qin', 1, 2, 3), attrs: { wu: 0, zheng: 10, jiao: 0, mou: 0, xue: 0, po: 0 } }],
     ])
-    const highStatsGenerals = new Map([
-      ['general_qin', makeGeneral('general_qin', 'realm_qin', 99, 98, 97)],
+    const highOtherStatsGenerals = new Map([
+      ['general_qin', { ...makeGeneral('general_qin', 'realm_qin', 99, 98, 97), attrs: { wu: 0, zheng: 10, jiao: 0, mou: 0, xue: 0, po: 0 } }],
     ])
 
-    const lowStats = economyPhase({ ...world, sites, governorAssignments, generals: lowStatsGenerals }, rng)
-    const highStats = economyPhase({ ...world, sites, governorAssignments, generals: highStatsGenerals }, rng)
+    const lowStats = economyPhase({ ...world, sites, governorAssignments, generals: lowOtherStatsGenerals }, rng)
+    const highStats = economyPhase({ ...world, sites, governorAssignments, generals: highOtherStatsGenerals }, rng)
 
     expect(lowStats.world.realms.get('realm_qin')?.economy).toEqual(highStats.world.realms.get('realm_qin')?.economy)
     expect(lowStats.world.sites.get('site_qin_a')?.economy).toEqual(highStats.world.sites.get('site_qin_a')?.economy)

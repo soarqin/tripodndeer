@@ -99,7 +99,9 @@ export const M4_EDICT_TAX_RELIEF_TAX_INCOME_BASIS_POINTS = -2500
 export const M4_EDICT_TAX_RELIEF_POPULATION_GROWTH_BASIS_POINTS = 5
 export const M4_EDICT_GRAIN_RESERVE_FOOD_PRODUCTION_BASIS_POINTS = 1000
 export const M4_EDICT_GRAIN_RESERVE_TREASURY_COST = 10
+/** @deprecated since M5 — replaced by attrs.zheng-based calculation (M5_GOVERNOR_TAX_BONUS_PER_ZHENG × zheng) */
 export const M4_GOVERNOR_TAX_MODIFIER = 5
+/** @deprecated since M5 — replaced by attrs.zheng-based calculation (M5_GOVERNOR_FOOD_BONUS_PER_ZHENG × zheng) */
 export const M4_GOVERNOR_FOOD_MODIFIER = 5
 export const M4_TRIBUTE_AMOUNT_MIN = 0
 export const M4_TRIBUTE_AMOUNT_MAX = 5000

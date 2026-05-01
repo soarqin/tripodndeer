@@ -39,6 +39,7 @@ export function economyPhase(
       sites,
       edictModifiers,
       world.governorAssignments,
+      world.generals,
     )
     realms.set(realm.id, settlement.realm)
     edicts = settleRealmEdictsAfterMonthlySettlement(edicts, realm.id)
@@ -56,13 +57,14 @@ function settleRealm(
   sites: Map<string, Site>,
   edictModifiers: EdictSettlementModifiers,
   governorAssignments: World['governorAssignments'],
+  generals: World['generals'],
 ): { realm: Realm; treasuryDelta: number; foodStoresDelta: number } {
   let taxIncome = 0
   let foodProduction = 0
   let foodConsumption = 0
 
   for (const site of realmSites) {
-    const governorModifiers = getGovernorSettlementModifiers(governorAssignments, site)
+    const governorModifiers = getGovernorSettlementModifiers(governorAssignments, generals, site)
     const nextSite = growSiteEconomy(site, edictModifiers, governorModifiers)
     sites.set(site.id, nextSite)
     taxIncome += Math.floor(
