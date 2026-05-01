@@ -74,14 +74,20 @@ describe('PeacePanel', () => {
     })
   })
 
-  it('renders with no occupied sites (empty cession list)', () => {
+  it('renders localized peace proposal copy without legacy english peace term suffixes', () => {
     render(<PeacePanel targetRealmId="realm_zhao" onClose={mockOnClose} />)
-    
+
     expect(screen.getByText('向 Zhao 提议和平')).toBeTruthy()
+    expect(screen.getByText('割让邑')).toBeTruthy()
+    expect(screen.getByText('赔款')).toBeTruthy()
+    expect(screen.getByText('朝贡')).toBeTruthy()
     expect(screen.getByText('没有占领的邑')).toBeTruthy()
     expect(screen.getByTestId('indemnity-input')).toBeTruthy()
     expect(screen.getByTestId('tribute-amount-input')).toBeTruthy()
     expect(screen.getByTestId('tribute-years-input')).toBeTruthy()
+    expect(screen.queryByText(/\(Cession\)/)).toBeNull()
+    expect(screen.queryByText(/\(Indemnity\)/)).toBeNull()
+    expect(screen.queryByText(/\(Tribute\)/)).toBeNull()
   })
 
   it('shows occupied sites and allows selection', () => {
@@ -143,6 +149,12 @@ describe('PeacePanel', () => {
     }))
     
     expect(mockOnClose).toHaveBeenCalled()
+  })
+
+  it('keeps the send action label localized', () => {
+    render(<PeacePanel targetRealmId="realm_zhao" onClose={mockOnClose} />)
+
+    expect(screen.getByRole('button', { name: /议和/ })).toBeTruthy()
   })
 
   it('acceptance score displays', () => {

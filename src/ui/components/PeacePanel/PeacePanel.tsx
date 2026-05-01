@@ -102,7 +102,7 @@ export function PeacePanel({ targetRealmId, onClose }: PeacePanelProps) {
 
       <form onSubmit={handleSubmit} className={styles.content}>
         <div className={styles.section}>
-          <div className={styles.sectionTitle}>割让邑 (Cession)</div>
+          <div className={styles.sectionTitle}>割让邑</div>
           {occupiedSites.length === 0 ? (
             <div className={styles.emptyText}>没有占领的邑</div>
           ) : (
@@ -123,7 +123,7 @@ export function PeacePanel({ targetRealmId, onClose }: PeacePanelProps) {
         </div>
 
         <div className={styles.section}>
-          <div className={styles.sectionTitle}>战争赔款 (Indemnity)</div>
+          <div className={styles.sectionTitle}>赔款</div>
           <div className={styles.field}>
             <label className={styles.label}>金额 (0 - 100000)</label>
             <input
@@ -139,7 +139,7 @@ export function PeacePanel({ targetRealmId, onClose }: PeacePanelProps) {
         </div>
 
         <div className={styles.section}>
-          <div className={styles.sectionTitle}>朝贡 (Tribute)</div>
+          <div className={styles.sectionTitle}>朝贡</div>
           <div className={styles.field}>
             <label className={styles.label}>每年金额 (0 - 5000)</label>
             <input
@@ -180,7 +180,7 @@ export function PeacePanel({ targetRealmId, onClose }: PeacePanelProps) {
           onClick={handleSubmit}
           data-testid="submit-btn"
         >
-          发送提议
+          提议议和
         </button>
       </div>
     </div>
