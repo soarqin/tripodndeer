@@ -8,7 +8,9 @@ AI agent behavioral guidelines for this codebase. Read before making any changes
 
 战国策略游戏引擎原型。Vite + React + TypeScript strict，纯函数引擎 + Zustand UI 层。
 
-**当前里程碑**: M2（战争系统）已交付。M3 为经济系统。
+**当前里程碑**: M0/M1/M2/M3/M4(v1) 已交付。M5（人物与人才）为下一里程碑。
+
+**实施顺序**: M4(已) → M5 人物 → M4.1 变法 → M4.2 灾害·贸易·派系 → M6 文化 → M7 谍报
 
 ---
 
@@ -226,15 +228,14 @@ const world: World = {
 
 ---
 
-## M3+ Deferred Items
+## M5+ Deferred Items
 
-以下功能明确延后，**不要在 M3 之前实现**：
+以下功能明确延后，**不要在对应里程碑之前实现**：
 
-- `popularMorale` / `prestige` / `legitimacy`（M3 国家维度）
-- `marchMode` / `forceMarch`（M3 行军模式）
-- `navy` / `engineer` / `heavyInfantry`（M3 兵种扩展）
-- 多 tick 野战（M3；M2 仅围城多 tick）
-- 补给线路由几何（M3；M2 用包围比例简化）
-- 募兵 UI（M3）
 - 将领学/谋维度实际效果（M5）
 - 8 种 AI 性格 archetype（M5）
+- 变法系统（M4.1，依赖 M5 革新者人才）
+- 灾害 / 贸易 / 派系（M4.2，依赖 M5 人物）
+- `prestige` / `legitimacy` 文化威望字段（M6）
+- 学宫 / 百家 / 文化扩散（M6，依赖 M5 学宫产人才）
+- 谍报行动（M7，依赖 M5 间者人才）
