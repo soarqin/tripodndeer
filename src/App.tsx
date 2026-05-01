@@ -9,6 +9,7 @@ import { DiplomacyPanel } from '@/ui/components/DiplomacyPanel'
 import { EventBanner } from '@/ui/components/EventBanner'
 import { SiteContextMenu } from '@/ui/components/SiteContextMenu'
 import { EconomyPanel } from '@/ui/components/EconomyPanel'
+import { Modal } from '@/ui/components/Modal'
 import { useRafDriver } from '@/ui/store/raf-driver'
 import { useGameStore } from '@/ui/store/game-store'
 import { isVictorious } from '@/engine/systems/victory'
@@ -22,11 +23,43 @@ function useVictory(): boolean {
 export function App(): React.JSX.Element {
   useRafDriver()
   const victorious = useVictory()
+  const modal = useGameStore((state) => state.modal)
+  const closeModal = useGameStore((state) => state.closeModal)
+  const openModal = useGameStore((state) => state.openModal)
+
+  React.useEffect(() => {
+    if (import.meta.env.DEV) {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('test-modal') === 'basic') {
+        openModal({
+          title: 'Test Modal',
+          content: 'This is a test modal triggered by URL param.',
+          actions: [
+            {
+              id: 'confirm',
+              label: 'Confirm',
+              primary: true,
+              onClick: () => closeModal(),
+            },
+          ],
+        })
+      }
+    }
+  }, [openModal, closeModal])
 
   return (
     <div className={styles.app}>
       <TopBar />
       <EventBanner />
+      {modal && (
+        <Modal
+          title={modal.title}
+          content={modal.content}
+          actions={modal.actions}
+          dismissable={modal.dismissable}
+          onClose={closeModal}
+        />
+      )}
       <div className={styles.mapContainer}>
         <MapCanvas />
         <SiteContextMenu />
@@ -46,6 +79,28 @@ export function App(): React.JSX.Element {
         onNeizheng={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'neizheng' ? null : 'neizheng')}
       />
       <TimeControlBar />
+      {import.meta.env.DEV && (
+        <button
+          data-testid="trigger-test-modal"
+          style={{ position: 'fixed', bottom: 10, right: 10, zIndex: 9999 }}
+          onClick={() => {
+            openModal({
+              title: 'Test Modal',
+              content: 'This is a test modal triggered by button.',
+              actions: [
+                {
+                  id: 'confirm',
+                  label: 'Confirm',
+                  primary: true,
+                  onClick: () => closeModal(),
+                },
+              ],
+            })
+          }}
+        >
+          Test Modal
+        </button>
+      )}
     </div>
   )
 }

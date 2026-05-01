@@ -1,3 +1,4 @@
+import React from 'react'
 import { castDraft } from 'immer'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
@@ -23,6 +24,8 @@ import type {
 
 // Vite 注入的 import.meta.env 类型增强（避免依赖 vite/client 全局类型）
 
+import type { ModalAction } from '@/ui/components/Modal'
+
 interface GameState {
   world: World
   clockState: ClockState
@@ -34,6 +37,12 @@ interface GameState {
   activePanel: 'wanggong' | 'junshi' | 'neizheng' | null
   diplomacyTargetRealmId: RealmId | null
   transientBanner: { text: string; createdAt: number } | null
+  modal: {
+    title: string
+    content: React.ReactNode
+    actions: ModalAction[]
+    dismissable: boolean
+  } | null
 }
 
 export interface DiplomacyActionFeedback {
@@ -72,6 +81,8 @@ interface GameActions {
   submitPlayerDiplomacyAction: (payload: SubmitPlayerDiplomacyActionPayload) => SubmitPlayerDiplomacyActionResult
   showBanner: (text: string) => void
   clearBanner: () => void
+  openModal: (modal: { title: string; content: React.ReactNode; actions: ModalAction[]; dismissable?: boolean }) => void
+  closeModal: () => void
 }
 
 export interface ActivatePlayerEdictPayload {
@@ -136,7 +147,7 @@ function createSelectionActions(set: StoreSet): Pick<GameActions, 'selectArmy' |
 
 function createUiActions(
   set: StoreSet,
-): Pick<GameActions, 'openContextMenu' | 'closeContextMenu' | 'setActivePanel' | 'openDiplomacyPanel' | 'closeDiplomacyPanel'> {
+): Pick<GameActions, 'openContextMenu' | 'closeContextMenu' | 'setActivePanel' | 'openDiplomacyPanel' | 'closeDiplomacyPanel' | 'openModal' | 'closeModal'> {
   return {
     openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) =>
       set((state) => {
@@ -157,6 +168,15 @@ function createUiActions(
     closeDiplomacyPanel: () =>
       set((state) => {
         state.diplomacyTargetRealmId = null
+      }),
+    openModal: (modal) =>
+      set((state) => {
+        state.modal = { ...modal, dismissable: modal.dismissable ?? true }
+        state.clockState = engineSetSpeed(state.clockState, 'pause')
+      }),
+    closeModal: () =>
+      set((state) => {
+        state.modal = null
       }),
   }
 }
@@ -268,6 +288,7 @@ function makeInitialState(): GameState {
     activePanel: null,
     diplomacyTargetRealmId: null,
     transientBanner: null,
+    modal: null,
   }
 }
 
