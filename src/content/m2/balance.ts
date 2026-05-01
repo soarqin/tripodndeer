@@ -167,3 +167,44 @@ export const DIPLOMACY_ACTION_COSTS = {
   declare_war: 30,
   peace: 10,
 }
+
+export const M5_RULER_BASE_LIFESPAN = 65
+export const M5_RULER_LIFESPAN_VARIANCE = 5
+export const M5_HEALTH_DECREASE_PER_YEAR = 1
+export const M5_HEALTH_DEATH_THRESHOLD = 0
+
+export const M5_LOYALTY_SHIRKING_THRESHOLD = 60
+export const M5_LOYALTY_DEPARTURE_THRESHOLD = 40
+export const M5_LOYALTY_SECRET_CONTACT_THRESHOLD = 25
+export const M5_LOYALTY_DEFECTION_THRESHOLD = 10
+
+export const M5_RECRUITMENT_PER_REALM_PER_YEAR = 1
+export const M5_RECRUITMENT_NAMING_POOL_SIZE = 60
+
+export const M5_GOVERNOR_TAX_BONUS_PER_ZHENG = 0.5
+export const M5_GOVERNOR_FOOD_BONUS_PER_ZHENG = 0.5
+
+export const M5_ARMY_CAP_BONUS_PER_WU = 100
+
+export const M5_PERSONALITY_WEIGHTS: Record<string, Record<string, number>> = {
+  conqueror:   { attack: 3.0, retreat: 0.5, 'siege-continue': 2.0, recruit: 1.5, diplomacy: 0.5, economy: 0.5 },
+  steward:     { attack: 0.5, retreat: 1.5, 'siege-continue': 0.5, recruit: 1.0, diplomacy: 1.5, economy: 3.0 },
+  schemer:     { attack: 1.5, retreat: 1.0, 'siege-continue': 1.5, recruit: 1.0, diplomacy: 2.0, economy: 1.0 },
+  learned:     { attack: 0.5, retreat: 1.0, 'siege-continue': 0.5, recruit: 1.0, diplomacy: 2.0, economy: 2.5 },
+  tyrant:      { attack: 2.5, retreat: 0.3, 'siege-continue': 2.5, recruit: 1.5, diplomacy: 0.3, economy: 0.5 },
+  incompetent: { attack: 1.0, retreat: 1.5, 'siege-continue': 0.5, recruit: 0.5, diplomacy: 1.0, economy: 1.0 },
+  benevolent:  { attack: 0.3, retreat: 2.0, 'siege-continue': 0.3, recruit: 1.0, diplomacy: 2.5, economy: 2.0 },
+  builder:     { attack: 0.5, retreat: 1.0, 'siege-continue': 0.5, recruit: 1.5, diplomacy: 1.5, economy: 3.0 },
+}
+
+export const M5_SPECIALTY_WEIGHTS_RECRUITMENT: Record<string, number> = {
+  commander:     0.10,
+  warrior:       0.20,
+  strategist:    0.15,
+  administrator: 0.20,
+  reformer:      0.05,
+  diplomat:      0.10,
+  spy:           0.08,
+  scholar:       0.07,
+  engineer:      0.05,
+}
