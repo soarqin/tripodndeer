@@ -508,6 +508,14 @@ export interface CharacterRecruitedEvent {
   }
 }
 
+export interface RealmSplitEvent {
+  readonly type: 'realmSplit'
+  readonly payload: {
+    readonly oldRealmId: RealmId
+    readonly newRealmIds: readonly RealmId[]
+  }
+}
+
 export interface GovernorAssignmentRevokedEvent {
   readonly type: 'governorAssignmentRevoked'
   readonly payload: {
