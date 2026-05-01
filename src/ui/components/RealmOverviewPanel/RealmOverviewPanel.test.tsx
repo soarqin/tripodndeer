@@ -67,6 +67,7 @@ describe('RealmOverviewPanel', () => {
       generals: new Map(),
       passes: new Map(),
       adjacencyEdges: new Map(),
+      rulers: new Map(),
     }
   })
 

@@ -1,5 +1,6 @@
 import { useGameStore } from '~/ui/store'
 import { selectPlayerRealm, selectAllPlayerArmies, selectActivePanel } from '~/ui/store/selectors'
+import { RulerPanel } from '../RulerPanel'
 import styles from './RealmOverviewPanel.module.css'
 export function RealmOverviewPanel() {
   const activePanel = useGameStore(selectActivePanel)
@@ -56,6 +57,7 @@ export function RealmOverviewPanel() {
           <span className={styles.value}>{warCount} 国</span>
         </div>
       </div>
+      {world.rulers.has(realm.id) && <RulerPanel />}
     </div>
   )
 }
