@@ -1,0 +1,49 @@
+{
+  "id": "event_fan_ju_strategy",
+  "trigger": {
+    "type": "date",
+    "between": [{ "yearBC": 268 }, { "yearBC": 264 }],
+    "realmId": "realm_qin"
+  },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage1",
+      "text": "范雎觐见秦昭襄王，献远交近攻之策。",
+      "choices": [
+        {
+          "id": "adopt_strategy",
+          "label": "采纳远交近攻",
+          "effects": [
+            { "type": "realm.trait.add", "realmId": "realm_qin", "trait": "far_ally_close_attack" },
+            { "type": "character.loyalty", "generalId": "gen_fanju", "delta": 20 }
+          ],
+          "nextStageId": "stage2"
+        },
+        {
+          "id": "keep_old",
+          "label": "保留旧策",
+          "effects": []
+        },
+        {
+          "id": "expel_fan",
+          "label": "驱逐范雎",
+          "effects": [
+            { "type": "character.kill", "generalId": "gen_fanju" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stage2",
+      "text": "远交近攻之策施行，秦国外交局面大为改观。",
+      "choices": [
+        {
+          "id": "continue",
+          "label": "继续",
+          "effects": []
+        }
+      ]
+    }
+  ]
+}

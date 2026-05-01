@@ -1,0 +1,40 @@
+{
+  "id": "event_lian_po_elder",
+  "trigger": {
+    "type": "date",
+    "between": [{ "yearBC": 261 }, { "yearBC": 258 }],
+    "realmId": "realm_zhao"
+  },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage1",
+      "text": "廉颇老矣，赵王欲换帅。",
+      "choices": [
+        {
+          "id": "trust_lian",
+          "label": "信任老将廉颇",
+          "effects": [
+            { "type": "realm.trait.add", "realmId": "realm_zhao", "trait": "lian_po_command" },
+            { "type": "character.loyalty", "generalId": "gen_lianpo", "delta": 15 }
+          ]
+        },
+        {
+          "id": "replace_zhao_kuo",
+          "label": "换帅赵括",
+          "effects": [
+            { "type": "realm.trait.add", "realmId": "realm_zhao", "trait": "paper_general" },
+            { "type": "character.create", "generalId": "gen_zhaokuo", "realmId": "realm_zhao", "name": "赵括" }
+          ]
+        },
+        {
+          "id": "negotiate",
+          "label": "议和",
+          "effects": [
+            { "type": "realm.treasury", "realmId": "realm_zhao", "delta": -1000 }
+          ]
+        }
+      ]
+    }
+  ]
+}
