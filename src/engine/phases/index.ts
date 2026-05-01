@@ -11,6 +11,7 @@ export const PHASE_NAMES = {
   VICTORY_CHECK: 'victoryCheck',
   DIPLOMACY_LIFECYCLE: 'diplomacyLifecycle',
   ECONOMY: 'economy',
+  HISTORICAL_EVENTS: 'historicalEvents',
 } as const
 
 export const PHASE_ORDER: readonly string[] = [
@@ -26,6 +27,7 @@ export const PHASE_ORDER: readonly string[] = [
   PHASE_NAMES.VICTORY_CHECK,
   PHASE_NAMES.DIPLOMACY_LIFECYCLE,
   PHASE_NAMES.ECONOMY,
+  PHASE_NAMES.HISTORICAL_EVENTS,
 ]
 
 // Legacy phase name (kept for reference/regression testing)

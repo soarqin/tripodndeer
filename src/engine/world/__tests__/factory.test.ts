@@ -7,6 +7,7 @@ import { characterLifecyclePhase } from '@/engine/systems/character'
 import { combatV2Step } from '@/engine/systems/combat-v2'
 import { diplomacyLifecycleStep } from '@/engine/systems/diplomacy'
 import { economyPhase } from '@/engine/systems/economy'
+import { historicalEventsPhase } from '@/engine/systems/events'
 import { manpowerTick } from '@/engine/systems/manpower'
 import { marchStep } from '@/engine/systems/march'
 import { orderApplyStep } from '@/engine/systems/orders'
@@ -52,6 +53,7 @@ function phaseName(phase: TickPhase): string {
   if (phase === victoryCheckStep) return 'victoryCheck'
   if (phase === diplomacyLifecycleStep) return 'diplomacyLifecycle'
   if (phase === economyPhase) return 'economy'
+  if (phase === historicalEventsPhase) return 'historicalEvents'
   return 'unknown'
 }
 
@@ -208,6 +210,7 @@ describe('createWorldFromM1Data — structure', () => {
       victoryCheckStep,
       diplomacyLifecycleStep,
       economyPhase,
+      historicalEventsPhase,
     ])
     expect(world.phases.map(phaseName)).toEqual(PHASE_ORDER)
 

@@ -7,6 +7,7 @@ import { characterLifecyclePhase } from '~/engine/systems/character'
 import { combatV2Step } from '~/engine/systems/combat-v2'
 import { diplomacyLifecycleStep } from '~/engine/systems/diplomacy'
 import { economyPhase } from '~/engine/systems/economy'
+import { historicalEventsPhase } from '~/engine/systems/events'
 import { manpowerTick } from '~/engine/systems/manpower'
 import { marchStep } from '~/engine/systems/march'
 import { orderApplyStep } from '~/engine/systems/orders'
@@ -341,6 +342,7 @@ export function createWorldFromM1Data(
       victoryCheckStep,
       diplomacyLifecycleStep,
       economyPhase,
+      historicalEventsPhase,
     ],
     pendingOrders: [],
   }

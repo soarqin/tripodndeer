@@ -433,6 +433,7 @@ export interface Realm {
   readonly economy: RealmEconomy
   readonly stats?: RealmStats
   readonly rulerId?: GeneralId | null
+  readonly traits?: readonly string[]
 }
 
 // 游戏日期（旬为最小单位）
