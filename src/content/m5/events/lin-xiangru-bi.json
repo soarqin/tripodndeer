@@ -1,0 +1,51 @@
+{
+  "id": "event_lin_xiangru_bi",
+  "trigger": {
+    "type": "date",
+    "between": [{ "yearBC": 280 }, { "yearBC": 278 }],
+    "realmId": "realm_zhao"
+  },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage1",
+      "text": "秦昭襄王索和氏璧，赵王惧，蔺相如请命出使。",
+      "choices": [
+        {
+          "id": "send_lin",
+          "label": "派蔺相如出使",
+          "effects": [
+            { "type": "realm.trait.add", "realmId": "realm_zhao", "trait": "lin_xiangru_diplomacy" },
+            { "type": "character.loyalty", "generalId": "gen_lin_xiangru", "delta": 10 }
+          ],
+          "nextStageId": "stage2"
+        },
+        {
+          "id": "send_jade",
+          "label": "送璧求和",
+          "effects": [
+            { "type": "realm.treasury", "realmId": "realm_zhao", "delta": -500 }
+          ]
+        },
+        {
+          "id": "refuse",
+          "label": "拒绝秦国",
+          "effects": [
+            { "type": "realm.trait.add", "realmId": "realm_zhao", "trait": "qin_zhao_tension" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stage2",
+      "text": "蔺相如完璧归赵，名声大振。",
+      "choices": [
+        {
+          "id": "continue",
+          "label": "继续",
+          "effects": []
+        }
+      ]
+    }
+  ]
+}
