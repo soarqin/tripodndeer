@@ -2,6 +2,7 @@ import {
   GENERAL_LOSER_DEATH_RATE,
   GENERAL_MIGHT_SCALING,
   GENERAL_WINNER_DEATH_RATE,
+  M5_ARMY_CAP_BONUS_PER_WU,
   RNG_VARIANCE_PERCENT,
   TERRAIN_DEFENSE,
   UNIT_BASE_POWER,
@@ -104,7 +105,8 @@ export function resolveCombat(ctx: BattleContext): BattleResolution {
     return { winner: 'attacker', attackerLoss: 0, defenderLoss: 0, deadGenerals: [], steps: [] }
   }
 
-  const commandCap = ctx.attackerGeneral ? ctx.attackerGeneral.command : Infinity
+  const wuBonus = ctx.attackerGeneral?.attrs ? ctx.attackerGeneral.attrs.wu * M5_ARMY_CAP_BONUS_PER_WU : 0
+  const commandCap = ctx.attackerGeneral ? ctx.attackerGeneral.command + wuBonus : Infinity
   const committedAttacker = Math.min(ctx.attackerArmy.manpower, commandCap)
 
   let attackerPower = computeBasePower(committedAttacker, ctx.attackerComposition)

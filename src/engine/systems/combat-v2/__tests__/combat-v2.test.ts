@@ -152,6 +152,50 @@ describe('resolveCombat v2', () => {
     expect(result.winner).toBe('defender')
   })
 
+  it('attrs.wu raises the army cap by 100 per point (wu=20 yields +2000)', () => {
+    const baseContext = makeContext({
+      attackerArmy: makeArmy({ manpower: 8000 }),
+      defenderArmies: [makeArmy({ id: 'army_defender', realmId: 'realm_han', manpower: 6500 })],
+      attackerGeneral: makeGeneral({ command: 5000 }),
+    })
+    const wuContext = makeContext({
+      attackerArmy: makeArmy({ manpower: 8000 }),
+      defenderArmies: [makeArmy({ id: 'army_defender', realmId: 'realm_han', manpower: 6500 })],
+      attackerGeneral: makeGeneral({
+        command: 5000,
+        attrs: { wu: 20, zheng: 0, jiao: 0, mou: 0, xue: 0, po: 0 },
+      }),
+    })
+
+    const baseResult = resolveCombat(baseContext)
+    const wuResult = resolveCombat(wuContext)
+
+    expect(baseResult.winner).toBe('defender')
+    expect(wuResult.winner).toBe('attacker')
+  })
+
+  it('attrs.wu=0 leaves the army cap unchanged', () => {
+    const noAttrsContext = makeContext({
+      attackerArmy: makeArmy({ manpower: 8000 }),
+      defenderArmies: [makeArmy({ id: 'army_defender', realmId: 'realm_han', manpower: 6500 })],
+      attackerGeneral: makeGeneral({ command: 5000 }),
+    })
+    const zeroWuContext = makeContext({
+      attackerArmy: makeArmy({ manpower: 8000 }),
+      defenderArmies: [makeArmy({ id: 'army_defender', realmId: 'realm_han', manpower: 6500 })],
+      attackerGeneral: makeGeneral({
+        command: 5000,
+        attrs: { wu: 0, zheng: 10, jiao: 10, mou: 10, xue: 10, po: 10 },
+      }),
+    })
+
+    const noAttrsResult = resolveCombat(noAttrsContext)
+    const zeroWuResult = resolveCombat(zeroWuContext)
+
+    expect(noAttrsResult).toEqual(zeroWuResult)
+    expect(zeroWuResult.winner).toBe('defender')
+  })
+
   it('zero defender manpower gives attacker a lossless win', () => {
     const result = resolveCombat(makeContext({ defenderArmies: [] }))
 
