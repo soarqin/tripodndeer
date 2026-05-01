@@ -65,8 +65,9 @@ describe('rulerLifecyclePhase', () => {
 
     const result = rulerLifecyclePhase(world, rng)
 
-    expect(result.events).toHaveLength(1)
-    expect(result.events[0]).toEqual({
+    const diedEvents = result.events.filter((e) => e.type === 'rulerDied')
+    expect(diedEvents).toHaveLength(1)
+    expect(diedEvents[0]).toEqual({
       type: 'rulerDied',
       payload: {
         realmId: 'realm_qin',
@@ -82,8 +83,9 @@ describe('rulerLifecyclePhase', () => {
 
     const result = rulerLifecyclePhase(world, rng)
 
-    expect(result.events).toHaveLength(1)
-    expect(result.events[0]).toEqual({
+    const diedEvents = result.events.filter((e) => e.type === 'rulerDied')
+    expect(diedEvents).toHaveLength(1)
+    expect(diedEvents[0]).toEqual({
       type: 'rulerDied',
       payload: {
         realmId: 'realm_qin',
@@ -93,14 +95,15 @@ describe('rulerLifecyclePhase', () => {
     })
   })
 
-  it('does NOT remove ruler from world.rulers when ruler dies (succession flow handles removal)', () => {
+  it('keeps ruler in world.rulers when player ruler dies (UI handles removal via crisis)', () => {
     const ruler = makeRuler('realm_qin', { age: 64, lifespan: 65, health: 50 })
     const world = worldWithRulers([ruler])
 
     const result = rulerLifecyclePhase(world, rng)
 
     expect(result.world.rulers.has('realm_qin')).toBe(true)
-    expect(result.events).toHaveLength(1)
+    const diedEvents = result.events.filter((e) => e.type === 'rulerDied')
+    expect(diedEvents).toHaveLength(1)
   })
 
   it('orders rulerDied events by realmId in dictionary order when multiple rulers die', () => {
@@ -113,11 +116,10 @@ describe('rulerLifecyclePhase', () => {
 
     const result = rulerLifecyclePhase(world, rng)
 
-    expect(result.events.map((e) => (e as { payload: { realmId: string } }).payload.realmId)).toEqual([
-      'realm_chu',
-      'realm_qin',
-      'realm_zhao',
-    ])
+    const diedRealmIds = result.events
+      .filter((e) => e.type === 'rulerDied')
+      .map((e) => (e as { payload: { realmId: string } }).payload.realmId)
+    expect(diedRealmIds).toEqual(['realm_chu', 'realm_qin', 'realm_zhao'])
   })
 
   it('does not emit rulerDied event when ruler is healthy and below lifespan', () => {

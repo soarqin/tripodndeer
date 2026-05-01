@@ -6,6 +6,7 @@ import { advanceClock, setSpeed as engineSetSpeed } from '@/engine/clock'
 import type { ClockState } from '@/engine/clock'
 import { applyDiplomacyAction, relationKey, validateDiplomacyAction, type DiplomacyActionRequest, type DiplomacyValidationReason } from '~/engine/systems/diplomacy'
 import { createWorldFromM1Data, loadM1Data } from '@/engine/world'
+import { M5_RULER_BASE_LIFESPAN } from '~/content/m2/balance'
 import type {
   ArmyId,
   DiplomaticActionKind,
@@ -15,8 +16,10 @@ import type {
   GameEvent,
   GeneralId,
   Order,
+  Realm,
   RealmId,
   RelationKey,
+  RulerState,
   SiteId,
   SpeedTier,
   World,
@@ -83,6 +86,10 @@ interface GameActions {
   clearBanner: () => void
   openModal: (modal: { title: string; content: React.ReactNode; actions: ModalAction[]; dismissable?: boolean }) => void
   closeModal: () => void
+  resolveSuccessionForceCollateral: (realmId: RealmId, candidateId: GeneralId) => void
+  resolveSuccessionFraternal: (realmId: RealmId, brotherId: GeneralId) => void
+  resolveSuccessionCivilWar: (realmId: RealmId) => void
+  resolveSuccessionForceVassal: (realmId: RealmId) => void
 }
 
 export interface ActivatePlayerEdictPayload {
@@ -177,6 +184,98 @@ function createUiActions(
     closeModal: () =>
       set((state) => {
         state.modal = null
+      }),
+  }
+}
+
+function installSuccessor(world: World, realmId: RealmId, newGeneralId: GeneralId): World {
+  const rulers = new Map(world.rulers)
+  const realms = new Map(world.realms)
+  const generals = new Map(world.generals)
+
+  const prevRuler = rulers.get(realmId)
+  const heir = generals.get(newGeneralId)
+
+  const successor: RulerState = {
+    realmId,
+    generalId: newGeneralId,
+    age: heir?.age ?? 30,
+    lifespan: M5_RULER_BASE_LIFESPAN,
+    health: 100,
+    personality: prevRuler?.personality ?? 'steward',
+    successionLawId: 'primogeniture',
+  }
+  rulers.set(realmId, successor)
+
+  const realm = realms.get(realmId)
+  if (realm !== undefined) {
+    const updatedRealm: Realm = { ...realm, rulerId: newGeneralId }
+    realms.set(realmId, updatedRealm)
+  }
+
+  if (prevRuler !== undefined) {
+    generals.delete(prevRuler.generalId)
+  }
+
+  return { ...world, rulers, realms, generals }
+}
+
+function vacateRealm(world: World, realmId: RealmId): World {
+  const rulers = new Map(world.rulers)
+  const realms = new Map(world.realms)
+  const generals = new Map(world.generals)
+
+  const prevRuler = rulers.get(realmId)
+  rulers.delete(realmId)
+
+  const realm = realms.get(realmId)
+  if (realm !== undefined) {
+    const updatedRealm: Realm = { ...realm, rulerId: null }
+    realms.set(realmId, updatedRealm)
+  }
+
+  if (prevRuler !== undefined) {
+    generals.delete(prevRuler.generalId)
+  }
+
+  return { ...world, rulers, realms, generals }
+}
+
+function createSuccessionActions(
+  set: StoreSet,
+): Pick<
+  GameActions,
+  | 'resolveSuccessionForceCollateral'
+  | 'resolveSuccessionFraternal'
+  | 'resolveSuccessionCivilWar'
+  | 'resolveSuccessionForceVassal'
+> {
+  return {
+    resolveSuccessionForceCollateral: (realmId: RealmId, candidateId: GeneralId) =>
+      set((state) => {
+        state.world = castDraft(installSuccessor(state.world, realmId, candidateId))
+        state.modal = null
+        state.clockState = engineSetSpeed(state.clockState, '1x')
+      }),
+    resolveSuccessionFraternal: (realmId: RealmId, brotherId: GeneralId) =>
+      set((state) => {
+        state.world = castDraft(installSuccessor(state.world, realmId, brotherId))
+        state.modal = null
+        state.clockState = engineSetSpeed(state.clockState, '1x')
+      }),
+    resolveSuccessionCivilWar: (realmId: RealmId) =>
+      set((state) => {
+        const events: GameEvent[] = [{ type: 'successionCivilWar', payload: { realmId } }]
+        state.world = castDraft(vacateRealm(state.world, realmId))
+        state.events = castDraft(events)
+        state.modal = null
+        state.clockState = engineSetSpeed(state.clockState, '1x')
+      }),
+    resolveSuccessionForceVassal: (realmId: RealmId) =>
+      set((state) => {
+        state.world = castDraft(vacateRealm(state.world, realmId))
+        state.modal = null
+        state.clockState = engineSetSpeed(state.clockState, '1x')
       }),
   }
 }
@@ -327,6 +426,7 @@ export const useGameStore = create<GameStore>()(
     ...createSelectionActions(set),
     ...createUiActions(set),
     ...createWorldActions(set),
+    ...createSuccessionActions(set),
   })),
 )
 

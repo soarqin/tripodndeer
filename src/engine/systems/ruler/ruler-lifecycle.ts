@@ -1,8 +1,43 @@
-import type { GameEvent, RNGState, RulerDiedEvent, RulerState, World } from '~/shared/types'
-import { M5_HEALTH_DEATH_THRESHOLD, M5_HEALTH_DECREASE_PER_YEAR } from '~/content/m2/balance'
+import type {
+  GameEvent,
+  General,
+  GeneralId,
+  RealmId,
+  Realm,
+  RNGState,
+  RulerDiedEvent,
+  RulerState,
+  SuccessionCrisisEvent,
+  SuccessionResolvedEvent,
+  World,
+} from '~/shared/types'
+import {
+  M5_HEALTH_DEATH_THRESHOLD,
+  M5_HEALTH_DECREASE_PER_YEAR,
+  M5_RULER_BASE_LIFESPAN,
+} from '~/content/m2/balance'
+import { selectHeir } from './succession'
 
 function isYearStart(world: World): boolean {
   return world.date.season === 'spring' && world.date.month === 1 && world.date.xun === 'shang'
+}
+
+function buildSuccessor(
+  realmId: RealmId,
+  heirId: GeneralId,
+  prevRuler: RulerState | undefined,
+  generals: ReadonlyMap<GeneralId, General>,
+): RulerState {
+  const heir = generals.get(heirId)
+  return {
+    realmId,
+    generalId: heirId,
+    age: heir?.age ?? 30,
+    lifespan: M5_RULER_BASE_LIFESPAN,
+    health: 100,
+    personality: prevRuler?.personality ?? 'steward',
+    successionLawId: 'primogeniture',
+  }
 }
 
 export function rulerLifecyclePhase(
@@ -14,7 +49,9 @@ export function rulerLifecyclePhase(
   }
 
   const rulers = new Map(world.rulers)
-  const events: RulerDiedEvent[] = []
+  const realms = new Map(world.realms)
+  const generals = new Map(world.generals)
+  const events: GameEvent[] = []
 
   const sortedRealmIds = [...rulers.keys()].sort((a, b) => a.localeCompare(b))
 
@@ -28,19 +65,49 @@ export function rulerLifecyclePhase(
     rulers.set(realmId, updatedRuler)
 
     if (newAge >= ruler.lifespan || newHealth <= M5_HEALTH_DEATH_THRESHOLD) {
-      events.push({
+      const diedEvent: RulerDiedEvent = {
         type: 'rulerDied',
         payload: {
           realmId,
           generalId: ruler.generalId,
           cause: 'natural',
         },
-      })
+      }
+      events.push(diedEvent)
+
+      const isPlayerRealm = realmId === world.playerRealmId
+      const probeWorld: World = { ...world, rulers, realms, generals }
+      const heirId = selectHeir(probeWorld, realmId)
+
+      if (heirId !== null && !isPlayerRealm) {
+        const successor = buildSuccessor(realmId, heirId, updatedRuler, generals)
+        rulers.set(realmId, successor)
+
+        const realm = realms.get(realmId)
+        if (realm !== undefined) {
+          const updatedRealm: Realm = { ...realm, rulerId: heirId }
+          realms.set(realmId, updatedRealm)
+        }
+
+        generals.delete(updatedRuler.generalId)
+
+        const resolvedEvent: SuccessionResolvedEvent = {
+          type: 'successionResolved',
+          payload: { realmId, newGeneralId: heirId },
+        }
+        events.push(resolvedEvent)
+      } else {
+        const crisisEvent: SuccessionCrisisEvent = {
+          type: 'successionCrisis',
+          payload: { realmId },
+        }
+        events.push(crisisEvent)
+      }
     }
   }
 
   return {
-    world: { ...world, rulers },
+    world: { ...world, rulers, realms, generals },
     nextRng: rng,
     events,
   }

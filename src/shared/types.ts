@@ -463,6 +463,21 @@ export interface RulerDiedEvent {
   }
 }
 
+export interface SuccessionResolvedEvent {
+  readonly type: 'successionResolved'
+  readonly payload: {
+    readonly realmId: RealmId
+    readonly newGeneralId: GeneralId
+  }
+}
+
+export interface SuccessionCrisisEvent {
+  readonly type: 'successionCrisis'
+  readonly payload: {
+    readonly realmId: RealmId
+  }
+}
+
 export type CharacterDeathCause = 'natural'
 
 export interface CharacterDiedEvent {
