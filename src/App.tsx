@@ -9,6 +9,7 @@ import { DiplomacyPanel } from '@/ui/components/DiplomacyPanel'
 import { EventBanner } from '@/ui/components/EventBanner'
 import { SiteContextMenu } from '@/ui/components/SiteContextMenu'
 import { EconomyPanel } from '@/ui/components/EconomyPanel'
+import { CharacterPanel } from '@/ui/components/CharacterPanel'
 import { Modal } from '@/ui/components/Modal'
 import { SuccessionModal } from '@/ui/components/SuccessionModal'
 import { useRafDriver } from '@/ui/store/raf-driver'
@@ -68,6 +69,7 @@ export function App(): React.JSX.Element {
         <SiteContextMenu />
         <RealmOverviewPanel />
         <EconomyPanel />
+        <CharacterPanel />
         <ArmyListPanel />
         <DiplomacyPanel />
         {victorious && (
@@ -80,6 +82,7 @@ export function App(): React.JSX.Element {
         onWanggong={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'wanggong' ? null : 'wanggong')}
         onJunshi={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'junshi' ? null : 'junshi')}
         onNeizheng={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'neizheng' ? null : 'neizheng')}
+        onRencai={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'rencai' ? null : 'rencai')}
       />
       <TimeControlBar />
       {import.meta.env.DEV && (

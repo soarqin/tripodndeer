@@ -125,6 +125,8 @@ export type OrderType =
   | 'propose-peace'
   | 'activate-edict'
   | 'assign-governor'
+  | 'assign-post'
+  | 'unassign-post'
 
 export interface ActivateEdictOrder {
   readonly type: 'activate-edict'
@@ -138,6 +140,18 @@ export interface AssignGovernorOrder {
   readonly type: 'assign-governor'
   readonly siteId: SiteId
   readonly generalId: GeneralId
+}
+
+export interface AssignPostOrder {
+  readonly type: 'assign-post'
+  readonly generalId: GeneralId
+  readonly post: Post
+}
+
+export interface UnassignPostOrder {
+  readonly type: 'unassign-post'
+  readonly generalId: GeneralId
+  readonly post: Post
 }
 
 export interface PeaceProposalOrderData {
@@ -160,6 +174,7 @@ export interface Order {
   readonly kind?: EdictKind
   readonly durationMonths?: number
   readonly generalId?: GeneralId
+  readonly post?: Post
 }
 
 export type WarKey = string

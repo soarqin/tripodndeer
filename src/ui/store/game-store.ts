@@ -37,7 +37,7 @@ interface GameState {
   playerRealmId: RealmId
   selectedArmyId: ArmyId | null
   contextMenu: { siteId: SiteId; x: number; y: number } | null
-  activePanel: 'wanggong' | 'junshi' | 'neizheng' | null
+  activePanel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | null
   diplomacyTargetRealmId: RealmId | null
   transientBanner: { text: string; createdAt: number } | null
   modal: {
@@ -76,12 +76,14 @@ interface GameActions {
   clearSelection: () => void
   openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) => void
   closeContextMenu: () => void
-  setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | null) => void
+  setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | null) => void
   openDiplomacyPanel: (realmId: RealmId) => void
   closeDiplomacyPanel: () => void
   issueOrder: (order: Order) => void
   activatePlayerEdict: (payload: ActivatePlayerEdictPayload) => void
   assignPlayerGovernor: (payload: AssignPlayerGovernorPayload) => void
+  assignPlayerPost: (payload: AssignPlayerPostPayload) => void
+  unassignPlayerPost: (payload: UnassignPlayerPostPayload) => void
   submitPlayerDiplomacyAction: (payload: SubmitPlayerDiplomacyActionPayload) => SubmitPlayerDiplomacyActionResult
   showBanner: (text: string) => void
   clearBanner: () => void
@@ -102,6 +104,16 @@ export interface ActivatePlayerEdictPayload {
 export interface AssignPlayerGovernorPayload {
   readonly siteId: SiteId
   readonly generalId: GeneralId
+}
+
+export interface AssignPlayerPostPayload {
+  readonly generalId: GeneralId
+  readonly post: import('~/shared/types').Post
+}
+
+export interface UnassignPlayerPostPayload {
+  readonly generalId: GeneralId
+  readonly post: import('~/shared/types').Post
 }
 
 type GameStore = GameState & GameActions
@@ -165,7 +177,7 @@ function createUiActions(
       set((state) => {
         state.contextMenu = null
       }),
-    setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | null) =>
+    setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | null) =>
       set((state) => {
         state.activePanel = panel
       }),
@@ -283,7 +295,7 @@ function createSuccessionActions(
 
 function createWorldActions(
   set: StoreSet,
-): Pick<GameActions, 'issueOrder' | 'activatePlayerEdict' | 'assignPlayerGovernor' | 'submitPlayerDiplomacyAction' | 'showBanner' | 'clearBanner'> {
+): Pick<GameActions, 'issueOrder' | 'activatePlayerEdict' | 'assignPlayerGovernor' | 'assignPlayerPost' | 'unassignPlayerPost' | 'submitPlayerDiplomacyAction' | 'showBanner' | 'clearBanner'> {
   return {
     issueOrder: (order: Order) =>
       set((state) => {
@@ -312,6 +324,30 @@ function createWorldActions(
           type: 'assign-governor',
           siteId: payload.siteId,
           generalId: payload.generalId,
+        }
+        state.world = castDraft({
+          ...state.world,
+          pendingOrders: [...state.world.pendingOrders, order],
+        })
+      }),
+    assignPlayerPost: (payload: AssignPlayerPostPayload) =>
+      set((state) => {
+        const order: Order = {
+          type: 'assign-post',
+          generalId: payload.generalId,
+          post: payload.post,
+        }
+        state.world = castDraft({
+          ...state.world,
+          pendingOrders: [...state.world.pendingOrders, order],
+        })
+      }),
+    unassignPlayerPost: (payload: UnassignPlayerPostPayload) =>
+      set((state) => {
+        const order: Order = {
+          type: 'unassign-post',
+          generalId: payload.generalId,
+          post: payload.post,
         }
         state.world = castDraft({
           ...state.world,

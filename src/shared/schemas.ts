@@ -131,6 +131,8 @@ export const OrderTypeSchema = z.enum([
   'propose-peace',
   'activate-edict',
   'assign-governor',
+  'assign-post',
+  'unassign-post',
 ])
 
 const MarchOrderSchema = z.object({
@@ -169,10 +171,24 @@ const ActivateEdictOrderSchema = z.object({
   durationMonths: z.number().int().positive(),
 })
 
+export const PostSchema = z.enum(['ruler', 'chancellor', 'general', 'governor'])
+
 const AssignGovernorOrderSchema = z.object({
   type: z.literal('assign-governor'),
   siteId: SiteIdSchema,
   generalId: z.string().min(1),
+})
+
+const AssignPostOrderSchema = z.object({
+  type: z.literal('assign-post'),
+  generalId: z.string().min(1),
+  post: PostSchema,
+})
+
+const UnassignPostOrderSchema = z.object({
+  type: z.literal('unassign-post'),
+  generalId: z.string().min(1),
+  post: PostSchema,
 })
 
 export const OrderSchema = z.discriminatedUnion('type', [
@@ -182,6 +198,8 @@ export const OrderSchema = z.discriminatedUnion('type', [
   ProposePeaceOrderSchema,
   ActivateEdictOrderSchema,
   AssignGovernorOrderSchema,
+  AssignPostOrderSchema,
+  UnassignPostOrderSchema,
 ])
 
 export const WarKeySchema = z.string().min(1)
@@ -240,8 +258,6 @@ export const FactionIdSchema = z.enum([
   'conservatives',
   'foreign_clients',
 ])
-
-export const PostSchema = z.enum(['ruler', 'chancellor', 'general', 'governor'])
 
 export const GeneralAttrsSchema = z.object({
   wu: z.number().int().min(0).max(20),
