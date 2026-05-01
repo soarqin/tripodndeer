@@ -123,6 +123,9 @@ AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按
 | 源文件无 `as any` / `@ts-ignore` | `src/__tests__/no-any.test.ts` |
 | 禁止引入特定依赖 | `src/__tests__/banned-deps.test.ts` |
 | 5 个关隘 edgeId 在 adjacencyEdges 中存在 | `src/engine/world/__tests__/passes-edge-existence.test.ts` |
+| Each realm has rulerId or null | `src/content/m1/__tests__/scenario-rulers.test.ts` |
+| All M5 balance constants prefixed M5_ | `src/content/m2/__tests__/balance-m5.test.ts` |
+| 8 archetypes covered in personality-coverage.test.ts | `src/engine/systems/ai/__tests__/personality-coverage.test.ts` |
 
 ---
 
@@ -138,6 +141,26 @@ world.adjacencyEdges: Map<AdjacencyEdgeId, AdjacencyEdge>
   → 旅行图边，仅含 5 条关隘边
   → Pass.edgeId 指向此 Map 的键
   → 不要与 world.edges 混用
+```
+
+---
+
+## Three Types of People (DO NOT CONFUSE)
+
+```
+world.rulers: Map<RealmId, RulerState>
+  → 君主状态（健康/年龄/性格/寿命）
+  → 每个 realm 最多 1 个
+  → 不要与 world.generals 混用
+
+world.generals: Map<GeneralId, General>
+  → 人才池（含君主、将领、太守等）
+  → Realm.rulerId 指向此 Map 的键
+  → 君主死亡时从此 Map 移除
+
+heir candidate
+  → 由 selectHeir(world, realmId) 动态计算
+  → 不存储在 World 中（纯函数）
 ```
 
 ---
@@ -214,6 +237,20 @@ const world: World = {
 
 ---
 
+## M5 Subsystems Quick Reference
+
+| 子系统 | 主文件 | 关键函数 |
+|---|---|---|
+| rulerLifecycle | `src/engine/systems/ruler/ruler-lifecycle.ts` | `rulerLifecyclePhase(world, rng)` |
+| characterLifecycle | `src/engine/systems/character/character-lifecycle.ts` | `characterLifecyclePhase(world, rng)` |
+| recruitment | `src/engine/systems/recruitment/recruitment.ts` | `recruitmentPhase(world, rng)` |
+| 继承 | `src/engine/systems/ruler/succession.ts` | `selectHeir(world, realmId)` |
+| 势力分裂 | `src/engine/systems/ruler/realm-split.ts` | `splitRealm(world, oldRealmId, config)` |
+| 事件链 | `src/engine/systems/events/event-chain-engine.ts` | `applyEventEffect(world, effect)` |
+| Modal UI | `src/ui/components/Modal/Modal.tsx` | `<Modal title content actions dismissable />` |
+
+---
+
 ## What NOT to Do
 
 ```
@@ -226,6 +263,10 @@ const world: World = {
 ❌ 不要修改与当前任务无关的 M1/M2 代码
 ❌ 不要新建 index.ts barrel file 除非匹配既有模式
 ❌ 不要在 engine 层使用 as any 或 @ts-ignore
+❌ 不要把 ruler 字段嵌入 Realm（ruler 状态在 world.rulers Map）
+❌ 不要给 character 加 portraitUrl / familyTree（违 §8.4）
+❌ 不要在 character lifecycle 之外修改 loyalty
+❌ 不要用 Realm.aiPersonality 决定 archetype（从 world.rulers[realmId].personality 读）
 ```
 
 ---
@@ -234,8 +275,8 @@ const world: World = {
 
 以下功能明确延后，**不要在对应里程碑之前实现**：
 
-- 将领学/谋维度实际效果（M5）
-- 8 种 AI 性格 archetype（M5）
+- 将领学/谋维度实际效果（M5）✅ 已交付
+- 8 种 AI 性格 archetype（M5）✅ 已交付
 - 变法系统（M4.1，依赖 M5 革新者人才）
 - 灾害 / 贸易 / 派系（M4.2，依赖 M5 人物）
 - `prestige` / `legitimacy` 文化威望字段（M6）
