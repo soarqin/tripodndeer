@@ -1,4 +1,8 @@
-import { TERRAIN_TRAVEL_COST } from '~/content/m2/balance'
+import {
+  DEFAULT_TRAVEL_COST,
+  FRIENDLY_PASS_TRAVEL_MULTIPLIER,
+  TERRAIN_TRAVEL_COST,
+} from '~/content/m2/balance'
 import type { GameEvent, RNGState, SiteId, World } from '~/shared/types'
 
 /**
@@ -12,13 +16,13 @@ export function computeMarchTicks(travelCost: number, speedFactor = 1): number {
 export function findTravelCost(world: World, fromSiteId: SiteId, toSiteId: SiteId, realmId?: string): number {
   const fromSite = world.sites.get(fromSiteId)
   const toSite = world.sites.get(toSiteId)
-  if (!fromSite || !toSite) return 3
+  if (!fromSite || !toSite) return DEFAULT_TRAVEL_COST
 
-  let baseCost = 3
+  let baseCost = DEFAULT_TRAVEL_COST
   const fromEdgeIds = new Set(fromSite.boundary.map(ref => ref.edge))
   for (const ref of toSite.boundary) {
     if (fromEdgeIds.has(ref.edge)) {
-      baseCost = world.edges.get(ref.edge)?.travel_cost ?? 3
+      baseCost = world.edges.get(ref.edge)?.travel_cost ?? DEFAULT_TRAVEL_COST
       break
     }
   }
@@ -31,13 +35,13 @@ export function findTravelCost(world: World, fromSiteId: SiteId, toSiteId: SiteI
       if (
         (ae.fromSiteId === fromSiteId && ae.toSiteId === toSiteId) ||
         (ae.fromSiteId === toSiteId && ae.toSiteId === fromSiteId)
-      ) {
-        const pass = world.passes.get(ae.passId)
-        if (pass && pass.controllerId === realmId) {
-          passMultiplier = 0.8
+        ) {
+          const pass = world.passes.get(ae.passId)
+          if (pass && pass.controllerId === realmId) {
+            passMultiplier = FRIENDLY_PASS_TRAVEL_MULTIPLIER
+          }
+          break
         }
-        break
-      }
     }
   }
 

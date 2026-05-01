@@ -23,6 +23,8 @@ import {
   DIPLOMACY_ATTITUDE_MAX,
   DIPLOMACY_ATTITUDE_MIN,
   DIPLOMACY_PROPOSAL_DURATION_TICKS,
+  DIPLOMACY_RELATION_NEUTRAL_ATTITUDE,
+  DIPLOMACY_RELATION_NEUTRAL_TRUST,
   DIPLOMACY_THREAT_ARMY_MANPOWER_DIVISOR,
   DIPLOMACY_THREAT_MANPOWER_DIVISOR,
   DIPLOMACY_THREAT_SITE_POWER,
@@ -95,6 +97,18 @@ export function clampRelation(relation: DiplomaticRelation): DiplomaticRelation 
     ...relation,
     attitude: clampAttitude(relation.attitude),
     trust: clampTrust(relation.trust),
+  }
+}
+
+export function createNeutralRelation(world: World, realmAId: RealmId, realmBId: RealmId): DiplomaticRelation {
+  const [lowerRealmId, higherRealmId] = sortedRealmPair(realmAId, realmBId)
+  return {
+    key: relationKey(realmAId, realmBId),
+    realmAId: lowerRealmId,
+    realmBId: higherRealmId,
+    attitude: DIPLOMACY_RELATION_NEUTRAL_ATTITUDE,
+    trust: DIPLOMACY_RELATION_NEUTRAL_TRUST,
+    updatedAt: world.date,
   }
 }
 
@@ -187,6 +201,10 @@ function createDiplomaticProposal(world: World, request: DiplomacyActionRequest)
 
 function createProposalId(request: DiplomacyActionRequest, tick: number): DiplomaticProposalId {
   return `diplomacy_${request.kind}_${relationKey(request.proposingRealmId, request.targetRealmId)}_${tick}`
+}
+
+function sortedRealmPair(a: RealmId, b: RealmId): readonly [RealmId, RealmId] {
+  return a.localeCompare(b) <= 0 ? [a, b] : [b, a]
 }
 
 function hasDuplicateProposal(world: World, kind: DiplomaticActionKind, key: RelationKey): boolean {

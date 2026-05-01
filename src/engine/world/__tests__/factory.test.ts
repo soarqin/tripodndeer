@@ -32,6 +32,18 @@ describe('loadM0Data', () => {
     expect(Object.keys(data.edges).length).toBeGreaterThan(0)
     expect(data.realms.length).toBe(2)
   })
+
+  it('keeps the M0 loading path free of M1/M2 scenario collections', () => {
+    const world = createInitialWorld(loadM0Data(), 42)
+
+    expect(world.phases).toEqual([])
+    expect(world.generals.size).toBe(0)
+    expect(world.passes.size).toBe(0)
+    expect(world.adjacencyEdges.size).toBe(0)
+    expect(world.peaceProposals.size).toBe(0)
+    expect(world.sieges.size).toBe(0)
+    expect(world.relations.size).toBe(0)
+  })
 })
 
 describe('createInitialWorld — structure', () => {
@@ -137,6 +149,10 @@ describe('createWorldFromM1Data — structure', () => {
 
     const result = runTickPhases(world, world.rngState)
     expect(result.world.tick).toBe(1)
+    expect(Object.keys(result).sort()).toEqual(['events', 'nextRng', 'world'])
+    expect(Array.isArray(result.events)).toBe(true)
+    expect(result.nextRng).toEqual(result.world.rngState)
+    expect(result.world.phases.map(phaseName)).toEqual(PHASE_ORDER)
   })
 
   it('builds populated sites and edges', () => {
@@ -177,5 +193,23 @@ describe('createWorldFromM1Data — structure', () => {
     for (const pass of world.passes.values()) {
       expect(world.adjacencyEdges.has(pass.edgeId)).toBe(true)
     }
+  })
+
+  it('creates a complete M2 world shape for every runtime collection', () => {
+    const world = createWorldFromM1Data(loadM1Data(), 99, 'realm_qin')
+
+    expect(world).toMatchObject({
+      wars: expect.any(Map),
+      peaceProposals: expect.any(Map),
+      relations: expect.any(Map),
+      diplomaticProposals: expect.any(Map),
+      treaties: expect.any(Map),
+      coalitions: expect.any(Map),
+      zhouInvestiture: expect.any(Map),
+      generals: expect.any(Map),
+      passes: expect.any(Map),
+      adjacencyEdges: expect.any(Map),
+      sieges: expect.any(Map),
+    })
   })
 })

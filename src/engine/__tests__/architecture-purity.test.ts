@@ -6,6 +6,9 @@ import { fileURLToPath } from 'url'
 const testDir = path.dirname(fileURLToPath(import.meta.url))
 // testDir = src/engine/__tests__；engine 根 = ../，向上一层即 src/engine/
 const engineDir = path.resolve(testDir, '../')
+const srcDir = path.resolve(engineDir, '../')
+const uiDir = path.resolve(srcDir, 'ui')
+const renderingDir = path.resolve(srcDir, 'rendering')
 
 function getAllTsFiles(dir: string): string[] {
   const entries = fs.readdirSync(dir, { withFileTypes: true })
@@ -24,6 +27,35 @@ function getAllTsFiles(dir: string): string[] {
 
 const BANNED_IMPORTS = ['react', 'react-dom', 'zustand', 'jsdom']
 const BANNED_GLOBALS = ['window.', 'document.', 'navigator.', 'requestAnimationFrame', 'cancelAnimationFrame']
+const IMPORT_PATTERN = /^\s*import\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"]/gm
+
+function extractImportSpecifiers(content: string): string[] {
+  return [...content.matchAll(IMPORT_PATTERN)].map(match => match[1]!)
+}
+
+function isBannedPackageImport(specifier: string): boolean {
+  return BANNED_IMPORTS.some(banned => specifier === banned || specifier.startsWith(`${banned}/`))
+}
+
+function resolvesInsideDir(target: string, dir: string): boolean {
+  const relative = path.relative(dir, target)
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative))
+}
+
+function resolveSourceImport(importerFile: string, specifier: string): string | null {
+  if (specifier.startsWith('@/') || specifier.startsWith('~/')) {
+    return path.resolve(srcDir, specifier.slice(2))
+  }
+  if (specifier.startsWith('./') || specifier.startsWith('../')) {
+    return path.resolve(path.dirname(importerFile), specifier)
+  }
+  return null
+}
+
+function isBannedLayerImport(importerFile: string, specifier: string): boolean {
+  const resolved = resolveSourceImport(importerFile, specifier)
+  return resolved !== null && (resolvesInsideDir(resolved, uiDir) || resolvesInsideDir(resolved, renderingDir))
+}
 
 describe('engine architecture purity', () => {
   const files = getAllTsFiles(engineDir)
@@ -36,16 +68,54 @@ describe('engine architecture purity', () => {
     const violations: string[] = []
     for (const file of files) {
       const content = fs.readFileSync(file, 'utf-8')
-      const importLines = content.match(/^import\s+.+\s+from\s+['"].+['"]/gm) ?? []
-      for (const line of importLines) {
-        for (const banned of BANNED_IMPORTS) {
-          if (line.includes(`'${banned}'`) || line.includes(`"${banned}"`)) {
-            violations.push(`${path.relative(engineDir, file)}: ${line.trim()}`)
-          }
+      for (const specifier of extractImportSpecifiers(content)) {
+        if (isBannedPackageImport(specifier) || isBannedLayerImport(file, specifier)) {
+          violations.push(`${path.relative(engineDir, file)}: imports ${specifier}`)
         }
       }
     }
     expect(violations, `Found banned imports:\n${violations.join('\n')}`).toHaveLength(0)
+  })
+
+  it('parses multiline import declarations', () => {
+    const specifiers = extractImportSpecifiers(`
+      import {
+        combatV2Step,
+        resolveCombat,
+      } from '~/engine/systems/combat-v2'
+      import type {
+        World,
+        Site,
+      } from '@/shared/types'
+    `)
+
+    expect(specifiers).toEqual(['~/engine/systems/combat-v2', '@/shared/types'])
+  })
+
+  it('rejects imports from UI and rendering aliases', () => {
+    const file = path.join(engineDir, 'systems', 'ai', 'ai.ts')
+
+    expect(isBannedLayerImport(file, '~/ui/store')).toBe(true)
+    expect(isBannedLayerImport(file, '@/ui/store')).toBe(true)
+    expect(isBannedLayerImport(file, '~/rendering/map')).toBe(true)
+    expect(isBannedLayerImport(file, '@/rendering/map')).toBe(true)
+  })
+
+  it('rejects relative imports resolving into UI or rendering', () => {
+    const file = path.join(engineDir, 'systems', 'ai', 'ai.ts')
+
+    expect(isBannedLayerImport(file, '../../../ui/store')).toBe(true)
+    expect(isBannedLayerImport(file, '../../../rendering/map')).toBe(true)
+    expect(isBannedLayerImport(file, '../../random')).toBe(false)
+    expect(isBannedLayerImport(file, '~/engine/random')).toBe(false)
+  })
+
+  it('rejects banned package imports including subpaths', () => {
+    expect(isBannedPackageImport('react')).toBe(true)
+    expect(isBannedPackageImport('react-dom/client')).toBe(true)
+    expect(isBannedPackageImport('zustand/middleware')).toBe(true)
+    expect(isBannedPackageImport('jsdom')).toBe(true)
+    expect(isBannedPackageImport('~/shared/types')).toBe(false)
   })
 
   it('no banned browser globals in engine files', () => {

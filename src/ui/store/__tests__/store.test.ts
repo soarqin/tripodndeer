@@ -140,6 +140,21 @@ describe('ui store panel and banner actions', () => {
       createdAt: useGameStore.getState().world.tick,
     })
   })
+
+  it('showBanner records the active world tick after clock advancement', () => {
+    const state = useGameStore.getState()
+    state.setSpeed('5x')
+    state.tick(10000)
+
+    const activeTick = useGameStore.getState().world.tick
+    useGameStore.getState().showBanner('after tick')
+
+    expect(activeTick).toBeGreaterThan(0)
+    expect(selectTransientBanner(useGameStore.getState())).toEqual({
+      text: 'after tick',
+      createdAt: activeTick,
+    })
+  })
 })
 
 describe('ui store order actions', () => {
@@ -227,6 +242,18 @@ describe('ui store diplomacy actions', () => {
       }),
     ])
     expect(after.world.wars.size).toBe(0)
+  })
+
+  it('submitPlayerDiplomacyAction stamps feedback with the active world tick', () => {
+    const state = useGameStore.getState()
+    state.setSpeed('5x')
+    state.tick(10000)
+    const activeTick = useGameStore.getState().world.tick
+    const targetRealmId = [...useGameStore.getState().world.realms.keys()].find((realmId) => realmId !== state.playerRealmId)!
+
+    useGameStore.getState().submitPlayerDiplomacyAction({ kind: 'envoy', targetRealmId })
+
+    expect(selectDiplomacyFeedback(useGameStore.getState())[0]?.createdAtTick).toBe(activeTick)
   })
 
   it('submitPlayerDiplomacyAction rejects truce-blocked declare_war without mutating war state', () => {

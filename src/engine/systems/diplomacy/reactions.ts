@@ -1,14 +1,12 @@
 import type { DiplomaticRelation, DiplomacyEvent, GameEvent, RealmId, World } from '~/shared/types'
 import {
-  DIPLOMACY_RELATION_NEUTRAL_ATTITUDE,
-  DIPLOMACY_RELATION_NEUTRAL_TRUST,
   DIPLOMACY_THIRD_PARTY_DECLARE_WAR_AGGRESSOR_ATTITUDE_DELTA,
   DIPLOMACY_THIRD_PARTY_DECLARE_WAR_AGGRESSOR_TRUST_DELTA,
   DIPLOMACY_THIRD_PARTY_DECLARE_WAR_TARGET_ATTITUDE_DELTA,
   DIPLOMACY_THIRD_PARTY_DECLARE_WAR_TARGET_TRUST_DELTA,
   DIPLOMACY_ZHOU_INVESTITURE_REACTION_MODIFIER,
 } from '~/content/m2/balance'
-import { clampRelation, relationKey } from './diplomacy-core'
+import { clampRelation, createNeutralRelation, relationKey } from './diplomacy-core'
 import { appendDiplomacyHistory } from './history'
 
 export function applyThirdPartyReactions(
@@ -86,19 +84,6 @@ function applyRelationDelta(
     relationKey: key,
   })
   return { history: pushed.history }
-}
-
-function createNeutralRelation(world: World, realmAId: RealmId, realmBId: RealmId): DiplomaticRelation {
-  const lowerRealmId = realmAId.localeCompare(realmBId) <= 0 ? realmAId : realmBId
-  const higherRealmId = lowerRealmId === realmAId ? realmBId : realmAId
-  return {
-    key: relationKey(realmAId, realmBId),
-    realmAId: lowerRealmId,
-    realmBId: higherRealmId,
-    attitude: DIPLOMACY_RELATION_NEUTRAL_ATTITUDE,
-    trust: DIPLOMACY_RELATION_NEUTRAL_TRUST,
-    updatedAt: world.date,
-  }
 }
 
 function sortedRealmIds(world: World): readonly RealmId[] {

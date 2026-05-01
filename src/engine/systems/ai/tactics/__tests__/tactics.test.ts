@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { makeTestWorld, TEST_WORLD_DATE } from '~/engine/__tests__/world-test-fixtures'
 import type { Army, Siege, Site, World } from '~/shared/types'
 import { evaluateCutSupplyOption, evaluateRetreatOption, evaluateSiegeOption } from '../index'
 
@@ -32,7 +33,7 @@ function makeSiege(overrides: Partial<Siege> & { id: string }): Siege {
   return {
     attackerArmyIds: ['army_attacker'],
     defenderSiteId: 'site_target',
-    startedAt: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
+    startedAt: TEST_WORLD_DATE,
     durationTicks: 0,
     fortification: 100,
     supplyRemaining: 20,
@@ -41,31 +42,7 @@ function makeSiege(overrides: Partial<Siege> & { id: string }): Siege {
 }
 
 function makeWorld(overrides: Partial<World> = {}): World {
-  return {
-    date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
-    tick: 0,
-    sites: new Map(),
-    realms: new Map(),
-    armies: new Map(),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    playerRealmId: 'realm_red',
-    rngState: { seed: 0, counter: 0 },
-    phases: [],
-    pendingOrders: [],
-    ...overrides,
-  }
+  return makeTestWorld({ playerRealmId: 'realm_red', ...overrides })
 }
 
 describe('evaluateSiegeOption', () => {
@@ -93,7 +70,7 @@ describe('evaluateSiegeOption', () => {
     expect(option!.kind).toBe('siege-continue')
     expect(option!.armyId).toBe('army_attacker')
     expect(option!.targetSiteId).toBe('site_target')
-    expect(option!.score).toBeGreaterThan(60)
+    expect(option!.score).toBe(140)
   })
 
   it('returns null when manpower advantage is below 1.2x', () => {
@@ -193,6 +170,7 @@ describe('evaluateCutSupplyOption', () => {
     expect(option!.kind).toBe('cut-supply')
     expect(option!.armyId).toBe('army_attacker')
     expect(option!.targetSiteId).toBe('site_a')
+    expect(option!.score).toBe(70)
   })
 
   it('returns null when army has insufficient manpower (<1500)', () => {
@@ -275,7 +253,7 @@ describe('evaluateRetreatOption', () => {
     expect(option!.kind).toBe('retreat')
     expect(option!.armyId).toBe('army_attacker')
     expect(option!.targetSiteId).toBe('site_friendly')
-    expect(option!.score).toBeGreaterThan(40)
+    expect(option!.score).toBe(90)
   })
 
   it('triggers when army is in siege with low supply (<5)', () => {

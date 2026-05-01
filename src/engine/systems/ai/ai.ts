@@ -49,39 +49,15 @@ export function aiPlanStep(
 
   const events: GameEvent[] = []
   let currentRng = rng
-  let armies = new Map(world.armies)
-  let sieges = new Map(world.sieges)
-  let sites = new Map(world.sites)
-  let wars = world.wars
-  let relations = world.relations
-  let diplomaticProposals = world.diplomaticProposals
-  let treaties = world.treaties
-  let diplomacyHistory = world.diplomacyHistory
-  let coalitions = world.coalitions
+  let phaseState = createAiPhaseState(world)
 
   for (const realm of [...world.realms.values()].sort((a, b) => a.id.localeCompare(b.id))) {
     if (realm.id === world.playerRealmId) continue
 
-    const diplomacyWorld: World = {
-      ...world,
-      armies,
-      sieges,
-      sites,
-      wars,
-      relations,
-      diplomaticProposals,
-      treaties,
-      diplomacyHistory,
-      coalitions,
-    }
+    const diplomacyWorld = worldWithAiPhaseState(world, phaseState)
     const diplomacy = planDiplomacyAction(diplomacyWorld, realm)
     if (diplomacy.ok) {
-      wars = diplomacy.world.wars
-      relations = diplomacy.world.relations
-      diplomaticProposals = diplomacy.world.diplomaticProposals
-      treaties = diplomacy.world.treaties
-      diplomacyHistory = diplomacy.world.diplomacyHistory
-      coalitions = diplomacy.world.coalitions
+      phaseState = phaseStateWithDiplomacyResult(phaseState, diplomacy.world)
       events.push(...diplomacy.events)
     }
 
@@ -90,27 +66,7 @@ export function aiPlanStep(
 
     if (roll.value >= 0.2) continue
 
-    const candidateTargets = findCandidateTargets(world, armies, realm.id)
-
-    const options: AIOption[] = candidateTargets.map(candidate => ({
-      kind: 'attack',
-      targetSiteId: candidate.targetSiteId,
-      armyId: candidate.armyId,
-      score: 50,
-    }))
-    options.push({ kind: 'idle', score: 10 })
-
-    const worldSnapshot: World = { ...world, armies, sieges, sites, wars }
-    for (const army of [...armies.values()]
-      .filter(a => a.realmId === realm.id)
-      .sort((a, b) => a.id.localeCompare(b.id))) {
-      const siegeOpt = evaluateSiegeOption(army, worldSnapshot)
-      if (siegeOpt) options.push(siegeOpt)
-      const cutSupplyOpt = evaluateCutSupplyOption(army, worldSnapshot)
-      if (cutSupplyOpt) options.push(cutSupplyOpt)
-      const retreatOpt = evaluateRetreatOption(army, worldSnapshot)
-      if (retreatOpt) options.push(retreatOpt)
-    }
+    const options = collectTacticalOptions(world, phaseState, realm.id)
 
     // If there are no concrete options (only idle) skip the action entirely so
     // we keep the historical "no candidate → no events / no extra rng draws" contract.
@@ -123,63 +79,169 @@ export function aiPlanStep(
     if (action.kind === 'idle') continue
     if (!action.targetSiteId || !action.armyId) continue
 
-    if (action.kind === 'attack' || action.kind === 'cut-supply') {
-      const dispatch = dispatchCandidate(
-        { ...world, armies, sieges, sites, wars, relations, diplomaticProposals, treaties, diplomacyHistory, coalitions },
-        armies,
-        realm.id,
-        {
-          targetSiteId: action.targetSiteId,
-          armyId: action.armyId,
-        },
-      )
-      wars = dispatch.world.wars
-      relations = dispatch.world.relations
-      diplomaticProposals = dispatch.world.diplomaticProposals
-      treaties = dispatch.world.treaties
-      diplomacyHistory = dispatch.world.diplomacyHistory
-      coalitions = dispatch.world.coalitions
-      events.push(...dispatch.events)
-    } else if (action.kind === 'siege-continue') {
-      const tempWorld: World = { ...world, armies, sieges, sites, wars }
-      const newWorld = startSiege(tempWorld, action.armyId, action.targetSiteId)
-      armies = new Map(newWorld.armies)
-      sieges = new Map(newWorld.sieges)
-      sites = new Map(newWorld.sites)
-      events.push({
-        type: 'aiStartedSiege',
-        payload: {
-          realmId: realm.id,
-          armyId: action.armyId,
-          siteId: action.targetSiteId,
-        },
-      })
-    } else if (action.kind === 'retreat') {
-      const army = armies.get(action.armyId)
-      if (!army) continue
-      armies.set(action.armyId, {
-        ...army,
-        state: 'retreating',
-        destination: action.targetSiteId,
-        ticksRemaining: findTravelCost(world, army.location, action.targetSiteId, realm.id),
-        source: army.location,
-      })
-      events.push({
-        type: 'aiRetreatedArmy',
-        payload: {
-          realmId: realm.id,
-          armyId: action.armyId,
-          targetSiteId: action.targetSiteId,
-        },
-      })
-    }
+    const result = applyTacticalAction(world, phaseState, realm.id, action)
+    phaseState = result.phaseState
+    events.push(...result.events)
   }
 
   return {
-    world: { ...world, armies, sieges, sites, wars, relations, diplomaticProposals, treaties, diplomacyHistory, coalitions },
+    world: worldWithAiPhaseState(world, phaseState),
     nextRng: currentRng,
     events,
   }
+}
+
+interface AiPhaseState {
+  readonly armies: Map<ArmyId, Army>
+  readonly sieges: World['sieges']
+  readonly sites: World['sites']
+  readonly wars: World['wars']
+  readonly relations: World['relations']
+  readonly diplomaticProposals: World['diplomaticProposals']
+  readonly treaties: World['treaties']
+  readonly diplomacyHistory: World['diplomacyHistory']
+  readonly coalitions: World['coalitions']
+}
+
+function createAiPhaseState(world: World): AiPhaseState {
+  return {
+    armies: new Map(world.armies),
+    sieges: new Map(world.sieges),
+    sites: new Map(world.sites),
+    wars: world.wars,
+    relations: world.relations,
+    diplomaticProposals: world.diplomaticProposals,
+    treaties: world.treaties,
+    diplomacyHistory: world.diplomacyHistory,
+    coalitions: world.coalitions,
+  }
+}
+
+function worldWithAiPhaseState(world: World, phaseState: AiPhaseState): World {
+  return {
+    ...world,
+    armies: phaseState.armies,
+    sieges: phaseState.sieges,
+    sites: phaseState.sites,
+    wars: phaseState.wars,
+    relations: phaseState.relations,
+    diplomaticProposals: phaseState.diplomaticProposals,
+    treaties: phaseState.treaties,
+    diplomacyHistory: phaseState.diplomacyHistory,
+    coalitions: phaseState.coalitions,
+  }
+}
+
+function phaseStateWithDiplomacyResult(phaseState: AiPhaseState, world: World): AiPhaseState {
+  return {
+    ...phaseState,
+    wars: world.wars,
+    relations: world.relations,
+    diplomaticProposals: world.diplomaticProposals,
+    treaties: world.treaties,
+    diplomacyHistory: world.diplomacyHistory,
+    coalitions: world.coalitions,
+  }
+}
+
+function phaseStateWithBattlefieldResult(phaseState: AiPhaseState, world: World): AiPhaseState {
+  return {
+    ...phaseState,
+    armies: new Map(world.armies),
+    sieges: new Map(world.sieges),
+    sites: new Map(world.sites),
+  }
+}
+
+function collectTacticalOptions(world: World, phaseState: AiPhaseState, realmId: RealmId): AIOption[] {
+  const candidateTargets = findCandidateTargets(world, phaseState.armies, realmId)
+
+  const options: AIOption[] = candidateTargets.map(candidate => ({
+    kind: 'attack',
+    targetSiteId: candidate.targetSiteId,
+    armyId: candidate.armyId,
+    score: 50,
+  }))
+  options.push({ kind: 'idle', score: 10 })
+
+  const worldSnapshot = worldWithAiPhaseState(world, phaseState)
+  for (const army of [...phaseState.armies.values()]
+    .filter(a => a.realmId === realmId)
+    .sort((a, b) => a.id.localeCompare(b.id))) {
+    const siegeOpt = evaluateSiegeOption(army, worldSnapshot)
+    if (siegeOpt) options.push(siegeOpt)
+    const cutSupplyOpt = evaluateCutSupplyOption(army, worldSnapshot)
+    if (cutSupplyOpt) options.push(cutSupplyOpt)
+    const retreatOpt = evaluateRetreatOption(army, worldSnapshot)
+    if (retreatOpt) options.push(retreatOpt)
+  }
+
+  return options
+}
+
+function applyTacticalAction(
+  world: World,
+  phaseState: AiPhaseState,
+  realmId: RealmId,
+  action: AIOption,
+): { readonly phaseState: AiPhaseState; readonly events: readonly GameEvent[] } {
+  if (!action.targetSiteId || !action.armyId) return { phaseState, events: [] }
+
+  if (action.kind === 'attack' || action.kind === 'cut-supply') {
+    const dispatch = dispatchCandidate(
+      worldWithAiPhaseState(world, phaseState),
+      phaseState.armies,
+      realmId,
+      {
+        targetSiteId: action.targetSiteId,
+        armyId: action.armyId,
+      },
+    )
+    return {
+      phaseState: phaseStateWithDiplomacyResult(phaseState, dispatch.world),
+      events: dispatch.events,
+    }
+  }
+
+  if (action.kind === 'siege-continue') {
+    const newWorld = startSiege(worldWithAiPhaseState(world, phaseState), action.armyId, action.targetSiteId)
+    return {
+      phaseState: phaseStateWithBattlefieldResult(phaseState, newWorld),
+      events: [{
+        type: 'aiStartedSiege',
+        payload: {
+          realmId,
+          armyId: action.armyId,
+          siteId: action.targetSiteId,
+        },
+      }],
+    }
+  }
+
+  if (action.kind === 'retreat') {
+    const army = phaseState.armies.get(action.armyId)
+    if (!army) return { phaseState, events: [] }
+    phaseState.armies.set(action.armyId, {
+      ...army,
+      state: 'retreating',
+      destination: action.targetSiteId,
+      ticksRemaining: findTravelCost(world, army.location, action.targetSiteId, realmId),
+      source: army.location,
+    })
+    return {
+      phaseState,
+      events: [{
+        type: 'aiRetreatedArmy',
+        payload: {
+          realmId,
+          armyId: action.armyId,
+          targetSiteId: action.targetSiteId,
+        },
+      }],
+    }
+  }
+
+  return { phaseState, events: [] }
 }
 
 interface DiplomacyCandidate {

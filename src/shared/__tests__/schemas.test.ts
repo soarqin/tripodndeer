@@ -190,34 +190,61 @@ describe('M1DataSchema valid', () => {
 })
 
 describe('WorldSchema', () => {
+  const runtimeWorldShape = {
+    date: { yearBC: 260, season: 'spring' as const, month: 1 as const, xun: 'shang' as const },
+    tick: 0,
+    sites: new Map(),
+    realms: new Map(),
+    armies: new Map(),
+    edges: new Map(),
+    wars: new Map(),
+    peaceProposals: new Map(),
+    relations: new Map(),
+    diplomaticProposals: new Map(),
+    treaties: new Map(),
+    diplomacyHistory: [],
+    coalitions: new Map(),
+    zhouInvestiture: new Map(),
+    generals: new Map(),
+    passes: new Map(),
+    adjacencyEdges: new Map(),
+    sieges: new Map(),
+    playerRealmId: 'realm_red',
+    rngState: { seed: 1, counter: 0 },
+    phases: [],
+    pendingOrders: [],
+  }
+
   it('accepts a runtime world shape', () => {
-    expect(
-      () =>
-        WorldSchema.parse({
-          date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
-          tick: 0,
-          sites: new Map(),
-          realms: new Map(),
-          armies: new Map(),
-          edges: new Map(),
-          wars: new Map(),
-          peaceProposals: new Map(),
-          relations: new Map(),
-          diplomaticProposals: new Map(),
-          treaties: new Map(),
-          diplomacyHistory: [],
-          coalitions: new Map(),
-          zhouInvestiture: new Map(),
-          generals: new Map(),
-          passes: new Map(),
-          adjacencyEdges: new Map(),
-          sieges: new Map(),
-          playerRealmId: 'realm_red',
-          rngState: { seed: 1, counter: 0 },
-          phases: [],
-          pendingOrders: [],
-        }),
-    ).not.toThrow()
+    expect(() => WorldSchema.parse(runtimeWorldShape)).not.toThrow()
+  })
+
+  it.each(['peaceProposals', 'generals', 'passes', 'adjacencyEdges', 'sieges'] as const)(
+    'requires M2 world field %s',
+    (field) => {
+      const { [field]: _omitted, ...missingFieldWorld } = runtimeWorldShape
+
+      expect(() => WorldSchema.parse(missingFieldWorld)).toThrow()
+    },
+  )
+
+  it('documents war and diplomacy relation key separators as distinct contracts', () => {
+    expect(() => DiplomaticRelationSchema.parse({
+      key: 'realm_han__realm_qin',
+      realmAId: 'realm_han',
+      realmBId: 'realm_qin',
+      attitude: 0,
+      trust: 50,
+      updatedAt: runtimeWorldShape.date,
+    })).not.toThrow()
+    expect(() => DiplomaticRelationSchema.parse({
+      key: 'realm_han:realm_qin',
+      realmAId: 'realm_han',
+      realmBId: 'realm_qin',
+      attitude: 0,
+      trust: 50,
+      updatedAt: runtimeWorldShape.date,
+    })).toThrow()
   })
 })
 

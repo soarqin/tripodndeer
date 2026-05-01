@@ -154,6 +154,15 @@ describe('MapCanvas (rendering)', () => {
     expect(ctx.fillRect).toHaveBeenCalledWith(100 - 4, 50 - 2, 8, 6)
     expect(ctx.strokeRect).toHaveBeenCalledWith(100 - 4, 50 - 2, 8, 6)
   })
+
+  it('shows the active pass tooltip from the current world pass state on hover', () => {
+    const { getByText, container } = render(<MapCanvas />)
+    const canvas = container.querySelector('canvas') as HTMLCanvasElement
+
+    fireEvent.mouseMove(canvas, { clientX: 100, clientY: 50 })
+
+    expect(getByText('Hangu Pass | 控制：无 | 防御：+50%')).toBeTruthy()
+  })
 })
 
 describe('MapCanvas (left click)', () => {

@@ -1,6 +1,5 @@
 import type {
   DiplomacyEvent,
-  DiplomacyEventId,
   DiplomaticActionKind,
   DiplomaticProposal,
   DiplomaticProposalStatus,
@@ -26,6 +25,7 @@ import {
 import { endWar, warKey } from '~/engine/wars'
 import { updateCoalitionPressure } from './coalitions'
 import { clampRelation, relationKey, scoreDiplomacyAcceptance } from './diplomacy-core'
+import { pushDiplomacyHistory } from './history'
 
 interface LifecycleState {
   readonly proposals: Map<string, DiplomaticProposal>
@@ -291,24 +291,7 @@ function pushHistory(
   event: Omit<DiplomacyEvent, 'id' | 'occurredAt'>,
   idSuffix = '',
 ): void {
-  const nextEvent: DiplomacyEvent = {
-    id: createHistoryId(world.tick, state.history.length, event, idSuffix),
-    occurredAt: world.date,
-    ...event,
-  }
-  state.history.push(nextEvent)
-  state.events.push({ type: 'diplomacyEvent', payload: nextEvent })
-}
-
-function createHistoryId(
-  tick: number,
-  index: number,
-  event: Omit<DiplomacyEvent, 'id' | 'occurredAt'>,
-  suffix: string,
-): DiplomacyEventId {
-  const subject = event.proposalId ?? event.treatyId ?? event.relationKey ?? 'world'
-  const suffixPart = suffix === '' ? '' : `_${suffix}`
-  return `diplomacy_history_${tick}_${event.kind}_${subject}${suffixPart}_${index}`
+  pushDiplomacyHistory(world, state.history, state.events, event, idSuffix)
 }
 
 function sortedProposals(proposals: ReadonlyMap<string, DiplomaticProposal>): readonly DiplomaticProposal[] {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Army, MapEdge, Realm, RNGState, Site, WarState, World } from '~/shared/types'
+import type { Army, GameEvent, MapEdge, Realm, RNGState, Site, WarState, World } from '~/shared/types'
 import { createInitialRng } from '~/engine/random'
 import { warKey } from '~/engine/wars'
 import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
@@ -54,6 +54,15 @@ function makeArmy(id: string, realmId: string, location: string, state: Army['st
     ticksRemaining: 0,
     source: null,
   }
+}
+
+function eventOrderKey(event: GameEvent): string {
+  if (event.type === 'diplomacyEvent') {
+    const payload = event.payload as { kind: string; relationKey?: string; coalitionId?: string }
+    return `${event.type}:${payload.kind}:${payload.relationKey ?? payload.coalitionId ?? ''}`
+  }
+  const payload = event.payload as { byRealm?: string; againstRealm?: string; realmId?: string; targetSiteId?: string }
+  return `${event.type}:${payload.byRealm ?? payload.realmId ?? ''}->${payload.againstRealm ?? payload.targetSiteId ?? ''}`
 }
 
 function baseWorld(overrides: Partial<World> = {}): World {
@@ -196,6 +205,59 @@ describe('AI determinism', () => {
     expect(armies1).toEqual(armies3)
     expect(result1.nextRng).toEqual(result2.nextRng)
     expect(result1.nextRng).toEqual(result3.nextRng)
+  })
+
+  it('locks fixed-seed M1 action and diplomacy event ordering', () => {
+    const world = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
+    const result = aiPlanStep(world, { seed: 42, counter: 0 })
+
+    expect(result.nextRng).toEqual({ seed: 42, counter: 9 })
+    expect(result.events.map(eventOrderKey)).toEqual([
+      'aiDeclaredWar:realm_chu->realm_wei',
+      'aiDispatchedArmy:realm_chu->site_020',
+      'diplomacyEvent:war_declared:realm_chu__realm_wei',
+      'diplomacyEvent:relation_changed:realm_chu__realm_han',
+      'diplomacyEvent:relation_changed:realm_han__realm_wei',
+      'diplomacyEvent:relation_changed:realm_chu__realm_qi',
+      'diplomacyEvent:relation_changed:realm_qi__realm_wei',
+      'diplomacyEvent:relation_changed:realm_chu__realm_qin',
+      'diplomacyEvent:relation_changed:realm_qin__realm_wei',
+      'diplomacyEvent:relation_changed:realm_chu__realm_yan',
+      'diplomacyEvent:relation_changed:realm_wei__realm_yan',
+      'diplomacyEvent:relation_changed:realm_chu__realm_zhao',
+      'diplomacyEvent:relation_changed:realm_wei__realm_zhao',
+      'diplomacyEvent:relation_changed:realm_chu__realm_zhou',
+      'diplomacyEvent:relation_changed:realm_wei__realm_zhou',
+      'diplomacyEvent:coalition_changed:coalition_against_realm_chu',
+      'diplomacyEvent:coalition_changed:coalition_against_realm_qin',
+      'aiDeclaredWar:realm_yan->realm_qi',
+      'aiDispatchedArmy:realm_yan->site_045',
+      'diplomacyEvent:war_declared:realm_qi__realm_yan',
+      'diplomacyEvent:relation_changed:realm_chu__realm_yan',
+      'diplomacyEvent:relation_changed:realm_chu__realm_qi',
+      'diplomacyEvent:relation_changed:realm_han__realm_yan',
+      'diplomacyEvent:relation_changed:realm_han__realm_qi',
+      'diplomacyEvent:relation_changed:realm_qin__realm_yan',
+      'diplomacyEvent:relation_changed:realm_qi__realm_qin',
+      'diplomacyEvent:relation_changed:realm_wei__realm_yan',
+      'diplomacyEvent:relation_changed:realm_qi__realm_wei',
+      'diplomacyEvent:relation_changed:realm_yan__realm_zhao',
+      'diplomacyEvent:relation_changed:realm_qi__realm_zhao',
+      'diplomacyEvent:relation_changed:realm_yan__realm_zhou',
+      'diplomacyEvent:relation_changed:realm_qi__realm_zhou',
+      'diplomacyEvent:coalition_changed:coalition_against_realm_chu',
+      'diplomacyEvent:coalition_changed:coalition_against_realm_qin',
+    ])
+    expect([...result.world.armies.values()].filter(army => army.state !== 'idle').map(army => ({
+      id: army.id,
+      state: army.state,
+      destination: army.destination,
+      ticksRemaining: army.ticksRemaining,
+      source: army.source,
+    }))).toEqual([
+      { id: 'army_chu_2', state: 'marching', destination: 'site_020', ticksRemaining: 1, source: 'site_009' },
+      { id: 'army_yan_2', state: 'marching', destination: 'site_045', ticksRemaining: 1, source: 'site_013' },
+    ])
   })
 })
 

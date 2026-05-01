@@ -9,6 +9,7 @@ test.describe('QA-CONTROL-1: Pause stops tick', () => {
     await clickSpeed(page, '3x')
     await page.waitForTimeout(3000)
     const tickBefore = await getTickCount(page)
+    expect(tickBefore).toBeGreaterThan(0)
 
     // Pause and wait — the tick counter must stay constant while paused.
     await clickSpeed(page, 'pause')

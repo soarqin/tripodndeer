@@ -1,3 +1,9 @@
+import {
+  AI_CUT_SUPPLY_BASE_SCORE,
+  AI_CUT_SUPPLY_ENEMY_CONTROL_SCORE_SCALE,
+  AI_CUT_SUPPLY_MAX_ENCIRCLEMENT,
+  AI_CUT_SUPPLY_MIN_MANPOWER,
+} from '~/content/m2/balance'
 import type { Army, Site, World } from '~/shared/types'
 import type { AIOption } from '../utility-scorer'
 
@@ -11,7 +17,7 @@ import type { AIOption } from '../utility-scorer'
 export function evaluateCutSupplyOption(army: Army, world: World): AIOption | null {
   const activeSiege = [...world.sieges.values()].find(s => s.attackerArmyIds.includes(army.id))
   if (!activeSiege) return null
-  if (army.manpower < 1500) return null
+  if (army.manpower < AI_CUT_SUPPLY_MIN_MANPOWER) return null
 
   const destSite = world.sites.get(activeSiege.defenderSiteId)
   if (!destSite) return null
@@ -24,7 +30,7 @@ export function evaluateCutSupplyOption(army: Army, world: World): AIOption | nu
   const enemyControlled = adjacentSites.length
   const encirclement = 1 - enemyControlled / Math.max(1, totalAdjacent)
 
-  if (encirclement >= 0.5) return null
+  if (encirclement >= AI_CUT_SUPPLY_MAX_ENCIRCLEMENT) return null
 
   const targetSite = adjacentSites[0]
   if (!targetSite) return null
@@ -33,6 +39,6 @@ export function evaluateCutSupplyOption(army: Army, world: World): AIOption | nu
     kind: 'cut-supply',
     armyId: army.id,
     targetSiteId: targetSite.id,
-    score: 40 + (enemyControlled / Math.max(1, totalAdjacent)) * 30,
+    score: AI_CUT_SUPPLY_BASE_SCORE + (enemyControlled / Math.max(1, totalAdjacent)) * AI_CUT_SUPPLY_ENEMY_CONTROL_SCORE_SCALE,
   }
 }

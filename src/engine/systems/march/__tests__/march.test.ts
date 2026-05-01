@@ -1,33 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
 import { computeMarchTicks, findTravelCost, marchStep } from '../march'
 import type { Army, RNGState, Site, World } from '~/shared/types'
 
 function makeWorld(armies: Army[]): World {
-  return {
-    date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
-    tick: 0,
-    sites: new Map(),
-    realms: new Map(),
-    armies: new Map(armies.map((army) => [army.id, army])),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    playerRealmId: 'realm_qin',
-    rngState: { seed: 0, counter: 0 },
-    phases: [],
-    pendingOrders: [],
-  }
+  return makeTestWorld({ armies: new Map(armies.map((army) => [army.id, army])) })
 }
 
 function makeArmy(overrides: Partial<Army> = {}): Army {
@@ -75,61 +53,28 @@ describe('computeMarchTicks', () => {
 
 describe('findTravelCost', () => {
   it('doubles mountain march cost', () => {
-    const world: World = {
-      date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
-      tick: 0,
+    const world: World = makeTestWorld({
       sites: new Map([
         ['site_a', makeSite('site_a', 'plains')],
         ['site_b', makeSite('site_b', 'mountains')],
       ]),
-      realms: new Map(),
-      armies: new Map(),
       edges: new Map([
         ['edge_1', { id: 'edge_1', curveType: 'polyline', travel_cost: 3, anchors: [[0, 0], [1, 0]] }],
       ]),
-      wars: new Map(),
-      peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-      generals: new Map(),
-      passes: new Map(),
-      adjacencyEdges: new Map(),
-      sieges: new Map(),
-      playerRealmId: 'realm_qin',
-      rngState: { seed: 0, counter: 0 },
-      phases: [],
-      pendingOrders: [],
-    }
+    })
 
     expect(findTravelCost(world, 'site_a', 'site_b')).toBe(6)
   })
 
   it('friendly-controlled pass reduces travel cost by 20%', () => {
-    const world: World = {
-      date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
-      tick: 0,
+    const world: World = makeTestWorld({
       sites: new Map([
         ['site_a', makeSite('site_a', 'plains')],
         ['site_b', makeSite('site_b', 'plains')],
       ]),
-      realms: new Map(),
-      armies: new Map(),
       edges: new Map([
         ['edge_1', { id: 'edge_1', curveType: 'polyline', travel_cost: 5, anchors: [[0, 0], [1, 0]] }],
       ]),
-      wars: new Map(),
-      peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-      generals: new Map(),
       passes: new Map([
         [
           'pass_1',
@@ -154,12 +99,7 @@ describe('findTravelCost', () => {
           },
         ],
       ]),
-      sieges: new Map(),
-      playerRealmId: 'realm_qin',
-      rngState: { seed: 0, counter: 0 },
-      phases: [],
-      pendingOrders: [],
-    }
+    })
 
     expect(findTravelCost(world, 'site_a', 'site_b')).toBe(5)
     expect(findTravelCost(world, 'site_a', 'site_b', 'realm_qin')).toBe(4)

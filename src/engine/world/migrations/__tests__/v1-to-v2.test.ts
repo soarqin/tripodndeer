@@ -35,6 +35,11 @@ describe('migrateScenarioV1ToV2', () => {
     expect(world.diplomacyHistory).toEqual([])
     expect(world.coalitions.size).toBe(0)
     expect(world.zhouInvestiture.size).toBe(0)
+    expect(world.generals.size).toBe(0)
+    expect(world.passes.size).toBe(0)
+    expect(world.adjacencyEdges.size).toBe(0)
+    expect(world.peaceProposals.size).toBe(0)
+    expect(world.sieges.size).toBe(0)
   })
 
   it('migrates v1 data with explicit schema_version 1', () => {
