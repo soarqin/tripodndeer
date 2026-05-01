@@ -45,6 +45,7 @@ interface GameState {
     content: React.ReactNode
     actions: ModalAction[]
     dismissable: boolean
+    testId?: string
   } | null
 }
 
@@ -84,7 +85,7 @@ interface GameActions {
   submitPlayerDiplomacyAction: (payload: SubmitPlayerDiplomacyActionPayload) => SubmitPlayerDiplomacyActionResult
   showBanner: (text: string) => void
   clearBanner: () => void
-  openModal: (modal: { title: string; content: React.ReactNode; actions: ModalAction[]; dismissable?: boolean }) => void
+  openModal: (modal: { title: string; content: React.ReactNode; actions: ModalAction[]; dismissable?: boolean; testId?: string }) => void
   closeModal: () => void
   resolveSuccessionForceCollateral: (realmId: RealmId, candidateId: GeneralId) => void
   resolveSuccessionFraternal: (realmId: RealmId, brotherId: GeneralId) => void

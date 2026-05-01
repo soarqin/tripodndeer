@@ -10,6 +10,7 @@ import { EventBanner } from '@/ui/components/EventBanner'
 import { SiteContextMenu } from '@/ui/components/SiteContextMenu'
 import { EconomyPanel } from '@/ui/components/EconomyPanel'
 import { Modal } from '@/ui/components/Modal'
+import { SuccessionModal } from '@/ui/components/SuccessionModal'
 import { useRafDriver } from '@/ui/store/raf-driver'
 import { useGameStore } from '@/ui/store/game-store'
 import { isVictorious } from '@/engine/systems/victory'
@@ -51,6 +52,7 @@ export function App(): React.JSX.Element {
     <div className={styles.app}>
       <TopBar />
       <EventBanner />
+      <SuccessionModal />
       {modal && (
         <Modal
           title={modal.title}
@@ -58,6 +60,7 @@ export function App(): React.JSX.Element {
           actions={modal.actions}
           dismissable={modal.dismissable}
           onClose={closeModal}
+          testId={modal.testId}
         />
       )}
       <div className={styles.mapContainer}>

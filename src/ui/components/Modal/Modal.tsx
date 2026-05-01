@@ -6,6 +6,8 @@ export interface ModalAction {
   label: string
   onClick: () => void
   primary?: boolean
+  title?: string
+  testId?: string
 }
 
 export interface ModalProps {
@@ -14,9 +16,10 @@ export interface ModalProps {
   actions: ModalAction[]
   dismissable?: boolean
   onClose: () => void
+  testId?: string
 }
 
-export function Modal({ title, content, actions, dismissable = true, onClose }: ModalProps) {
+export function Modal({ title, content, actions, dismissable = true, onClose, testId }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -81,7 +84,7 @@ export function Modal({ title, content, actions, dismissable = true, onClose }: 
         role="dialog" 
         aria-modal="true" 
         aria-labelledby="modal-title"
-        data-testid="generic-modal"
+        data-testid={testId ?? "generic-modal"}
         ref={modalRef}
       >
         <div className={styles.header}>
@@ -96,7 +99,8 @@ export function Modal({ title, content, actions, dismissable = true, onClose }: 
               key={action.id}
               className={`${styles.button} ${action.primary ? styles.primary : ''}`}
               onClick={action.onClick}
-              data-testid={`modal-action-${action.id}`}
+              title={action.title}
+              data-testid={action.testId ?? `modal-action-${action.id}`}
             >
               {action.label}
             </button>
