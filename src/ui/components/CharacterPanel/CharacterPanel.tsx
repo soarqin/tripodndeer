@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useGameStore } from '~/ui/store'
-import { selectActivePanel, useGenerals, useSites } from '~/ui/store/selectors'
+import { M5_ARMY_CAP_BONUS_PER_WU, M5_GOVERNOR_TAX_BONUS_PER_ZHENG } from '~/content/m2/balance'
+import { selectActivePanel, useGenerals, useSites, selectPlayerGovernorAssignments } from '~/ui/store/selectors'
 import styles from './CharacterPanel.module.css'
 
 export function CharacterPanel() {
@@ -8,6 +9,7 @@ export function CharacterPanel() {
   const playerRealmId = useGameStore((s) => s.playerRealmId)
   const generals = useGenerals()
   const sites = useSites()
+  const governorAssignments = useGameStore(selectPlayerGovernorAssignments)
   const assignPlayerPost = useGameStore((s) => s.assignPlayerPost)
   const unassignPlayerPost = useGameStore((s) => s.unassignPlayerPost)
   const assignPlayerGovernor = useGameStore((s) => s.assignPlayerGovernor)
@@ -51,11 +53,26 @@ export function CharacterPanel() {
                   <div className={styles.tags}>
                     {general.specialty && <span className={styles.tag}>{general.specialty}</span>}
                     {general.loyaltyState && <span className={styles.tag}>{general.loyaltyState}</span>}
-                    {general.posts?.map((post) => (
-                      <span key={post} className={`${styles.tag} ${styles.postTag}`} data-testid="character-post-general">
-                        {post}
-                      </span>
-                    ))}
+                    {general.posts?.map((post) => {
+                      let effectText = ''
+                      if (post === 'general') {
+                        effectText = ` (+${(general.attrs?.wu ?? 0) * M5_ARMY_CAP_BONUS_PER_WU} 军容)`
+                      } else if (post === 'governor') {
+                        const assignment = governorAssignments.find((a) => a.generalId === general.id)
+                        const site = assignment ? sites.get(assignment.siteId) : null
+                        const bonus = Math.floor((general.attrs?.zheng ?? 0) * M5_GOVERNOR_TAX_BONUS_PER_ZHENG)
+                        if (site) {
+                          effectText = ` (+${bonus} 税收 @ ${site.name})`
+                        } else {
+                          effectText = ` (+${bonus} 税收)`
+                        }
+                      }
+                      return (
+                        <span key={post} className={`${styles.tag} ${styles.postTag}`} data-testid={`character-post-${post}`}>
+                          {post}{effectText}
+                        </span>
+                      )
+                    })}
                   </div>
                 </div>
 

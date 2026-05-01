@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useGameStore } from '~/ui/store'
+import { M5_GOVERNOR_TAX_BONUS_PER_ZHENG } from '~/content/m2/balance'
 import {
   selectActivePanel,
   selectPlayerTreasury,
@@ -197,7 +198,19 @@ export function EconomyPanel() {
                 <div key={site.id} className={styles.siteCard}>
                   <div className={styles.siteHeader}>
                     <span>{site.name}</span>
-                    <span>{governor ? `太守: ${governor.name}` : '无太守'}</span>
+                    <span>
+                      {governor ? (
+                        <>
+                          太守: {governor.name}
+                          <span data-testid="governor-tax-bonus">
+                            {' '}
+                            +{Math.floor(M5_GOVERNOR_TAX_BONUS_PER_ZHENG * (governor.attrs?.zheng ?? 0))}
+                          </span>
+                        </>
+                      ) : (
+                        '无太守'
+                      )}
+                    </span>
                   </div>
                   <div className={styles.siteStats}>
                     <span>人口: {site.economy.population.toLocaleString()}</span>
