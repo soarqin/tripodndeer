@@ -44,7 +44,7 @@ describe('M5 performance budget', () => {
       PHASE_NAMES.RULER_LIFECYCLE,
       PHASE_NAMES.CHARACTER_LIFECYCLE,
       PHASE_NAMES.RECRUITMENT,
-    ]
+    ] as const
 
     let currentWorld = world
     for (let i = 0; i < 100; i++) {
@@ -54,7 +54,7 @@ describe('M5 performance budget', () => {
 
       for (const phase of currentWorld.phases) {
         const phaseName = phase.name || ''
-        if (m5Phases.includes(phaseName)) {
+        if (m5Phases.includes(phaseName as typeof m5Phases[number])) {
           const result = phase(tickWorld, tickRng)
           tickWorld = result.world
           tickRng = result.nextRng
