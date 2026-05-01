@@ -125,49 +125,55 @@ const EXPECTED_BEHAVIOR: Record<PersonalityArchetype, Record<Context, AIOption['
 }
 
 function createWorldForContext(context: Context, archetype: PersonalityArchetype): World {
-  const world = makeEmptyWorld()
-  world.rulers.set('realm_ai', {
-    id: 'ruler_1',
+  let world = makeEmptyWorld()
+  
+  const rulers = new Map(world.rulers)
+  rulers.set('realm_ai', {
     realmId: 'realm_ai',
-    name: 'AI Ruler',
-    personality: archetype,
-    birthYearBC: 300,
+    generalId: 'general_1',
+    age: 30,
+    lifespan: 60,
     health: 100,
-    specialty: 'commander',
+    personality: archetype,
+    successionLawId: 'primogeniture',
   })
+  world = { ...world, rulers }
 
   if (context === 'threatened-by-stronger-neighbor') {
-    world.armies.set('army_enemy', {
+    const armies = new Map(world.armies)
+    armies.set('army_enemy', {
       id: 'army_enemy',
       realmId: 'realm_enemy',
       location: 'site_1',
       manpower: 10000,
       state: 'idle',
-      unitType: 'infantry',
-      morale: 100,
-      supply: 100,
+      destination: null,
+      ticksRemaining: 0,
+      source: null,
     })
-    world.armies.set('army_self', {
+    armies.set('army_self', {
       id: 'army_self',
       realmId: 'realm_ai',
       location: 'site_2',
       manpower: 2000,
       state: 'idle',
-      unitType: 'infantry',
-      morale: 100,
-      supply: 100,
+      destination: null,
+      ticksRemaining: 0,
+      source: null,
     })
+    world = { ...world, armies }
   } else if (context === 'at-war-winning') {
-    world.wars.set('realm_ai:realm_enemy', {
-      aggressorId: 'realm_ai',
-      defenderId: 'realm_enemy',
+    const wars = new Map(world.wars)
+    wars.set('realm_ai:realm_enemy', {
       casusBelli: 'conquest',
-      startDate: world.date,
-      warScore: 80,
-      battles: [],
+      declaredAt: world.date,
+      occupiedSites: new Map(),
+      peaceProposalId: null,
     })
+    world = { ...world, wars }
   } else if (context === 'peacetime-rich') {
-    world.realms.set('realm_ai', {
+    const realms = new Map(world.realms)
+    realms.set('realm_ai', {
       id: 'realm_ai',
       displayName: 'AI',
       fullTitle: 'AI',
@@ -178,8 +184,10 @@ function createWorldForContext(context: Context, archetype: PersonalityArchetype
       aiPersonality: 'cautious',
       economy: { treasury: 50000, foodStores: 50000, taxRate: 10 },
     })
+    world = { ...world, realms }
   } else if (context === 'peacetime-poor') {
-    world.realms.set('realm_ai', {
+    const realms = new Map(world.realms)
+    realms.set('realm_ai', {
       id: 'realm_ai',
       displayName: 'AI',
       fullTitle: 'AI',
@@ -190,20 +198,25 @@ function createWorldForContext(context: Context, archetype: PersonalityArchetype
       aiPersonality: 'cautious',
       economy: { treasury: 100, foodStores: 100, taxRate: 10 },
     })
+    world = { ...world, realms }
   } else if (context === 'low-manpower') {
-    world.armies.set('army_self', {
+    const armies = new Map(world.armies)
+    armies.set('army_self', {
       id: 'army_self',
       realmId: 'realm_ai',
       location: 'site_1',
       manpower: 500,
       state: 'idle',
-      unitType: 'infantry',
-      morale: 100,
-      supply: 100,
+      destination: null,
+      ticksRemaining: 0,
+      source: null,
     })
+    world = { ...world, armies }
   } else if (context === 'heir-crisis') {
     const ruler = world.rulers.get('realm_ai')!
-    world.rulers.set('realm_ai', { ...ruler, health: 5 })
+    const newRulers = new Map(world.rulers)
+    newRulers.set('realm_ai', { ...ruler, health: 5 })
+    world = { ...world, rulers: newRulers }
   }
 
   return world
