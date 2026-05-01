@@ -11009,6 +11009,7 @@
         "manpowerCap": 80000,
         "warWeariness": 0
       },
+      "rulerId": "gen_qin_zhaoxiangwang",
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11045,6 +11046,7 @@
         "manpowerCap": 80000,
         "warWeariness": 0
       },
+      "rulerId": "gen_chu_kaoliewang",
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11078,6 +11080,7 @@
         "manpowerCap": 80000,
         "warWeariness": 0
       },
+      "rulerId": "gen_qi_wangjian",
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11110,6 +11113,7 @@
         "manpowerCap": 80000,
         "warWeariness": 0
       },
+      "rulerId": "gen_yan_huiwang",
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11142,6 +11146,7 @@
         "manpowerCap": 80000,
         "warWeariness": 0
       },
+      "rulerId": "gen_han_huanhuiwang",
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11176,6 +11181,7 @@
         "manpowerCap": 80000,
         "warWeariness": 0
       },
+      "rulerId": "gen_zhao_xiaochengwang",
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11208,6 +11214,7 @@
         "manpowerCap": 80000,
         "warWeariness": 0
       },
+      "rulerId": "gen_wei_anxiwang",
       "aiPersonality": "aggressive_random"
     },
     {
@@ -11236,6 +11243,7 @@
         "manpowerCap": 80000,
         "warWeariness": 0
       },
+      "rulerId": null,
       "aiPersonality": "aggressive_random"
     }
   ],
@@ -11294,26 +11302,41 @@
   "initialArmies": [],
   "initialWars": [],
   "generals": [
-    { "id": "gen_baiqi", "realmId": "realm_qin", "name": "白起", "might": 20, "command": 12000, "loyalty": 90 },
-    { "id": "gen_wangjian", "realmId": "realm_qin", "name": "王翦", "might": 18, "command": 11000, "loyalty": 85 },
-    { "id": "gen_mengao", "realmId": "realm_qin", "name": "蒙骜", "might": 17, "command": 10000, "loyalty": 83 },
-    { "id": "gen_lianpo", "realmId": "realm_zhao", "name": "廉颇", "might": 17, "command": 10000, "loyalty": 80 },
-    { "id": "gen_limu", "realmId": "realm_zhao", "name": "李牧", "might": 19, "command": 11000, "loyalty": 88 },
-    { "id": "gen_zhaoshe", "realmId": "realm_zhao", "name": "赵奢", "might": 16, "command": 9000, "loyalty": 82 },
-    { "id": "gen_xiangyan", "realmId": "realm_chu", "name": "项燕", "might": 17, "command": 10000, "loyalty": 85 },
-    { "id": "gen_jingyang", "realmId": "realm_chu", "name": "景阳", "might": 14, "command": 8000, "loyalty": 75 },
-    { "id": "gen_tiandan", "realmId": "realm_qi", "name": "田单", "might": 18, "command": 10000, "loyalty": 86 },
-    { "id": "gen_kuangzhang", "realmId": "realm_qi", "name": "匡章", "might": 15, "command": 8500, "loyalty": 78 },
-    { "id": "gen_yueyi", "realmId": "realm_yan", "name": "乐毅", "might": 18, "command": 10000, "loyalty": 88 },
-    { "id": "gen_qinkai", "realmId": "realm_yan", "name": "秦开", "might": 15, "command": 8000, "loyalty": 82 },
-    { "id": "gen_baoyuan", "realmId": "realm_han", "name": "暴鸢", "might": 14, "command": 7500, "loyalty": 75 },
-    { "id": "gen_fengting", "realmId": "realm_han", "name": "冯亭", "might": 13, "command": 7000, "loyalty": 70 },
-    { "id": "gen_pangjuan", "realmId": "realm_wei", "name": "庞涓", "might": 16, "command": 9000, "loyalty": 78 },
-    { "id": "gen_gongsunyan", "realmId": "realm_wei", "name": "公孙衍", "might": 14, "command": 8500, "loyalty": 72 },
-    { "id": "gen_yuecheng", "realmId": "realm_wei", "name": "乐乘", "might": 15, "command": 8200, "loyalty": 76 },
-    { "id": "gen_zhoujun_a", "realmId": "realm_zhou", "name": "周君甲", "might": 11, "command": 5500, "loyalty": 60 },
-    { "id": "gen_zhoujun_b", "realmId": "realm_zhou", "name": "周君乙", "might": 10, "command": 5000, "loyalty": 55 },
-    { "id": "gen_zhoujun_c", "realmId": "realm_zhou", "name": "周君丙", "might": 12, "command": 5200, "loyalty": 58 }
+    { "id": "gen_baiqi", "realmId": "realm_qin", "name": "白起", "might": 20, "command": 12000, "loyalty": 90, "attrs": { "wu": 20, "zheng": 8, "jiao": 9, "mou": 16, "xue": 12, "po": 18 }, "specialty": "warrior", "ambition": "mid", "age": 50, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_wangjian", "realmId": "realm_qin", "name": "王翦", "might": 18, "command": 11000, "loyalty": 85, "attrs": { "wu": 18, "zheng": 12, "jiao": 13, "mou": 17, "xue": 13, "po": 16 }, "specialty": "commander", "ambition": "mid", "age": 45, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_mengao", "realmId": "realm_qin", "name": "蒙骜", "might": 17, "command": 10000, "loyalty": 83, "attrs": { "wu": 17, "zheng": 10, "jiao": 10, "mou": 13, "xue": 11, "po": 15 }, "specialty": "warrior", "ambition": "mid", "age": 48, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_lianpo", "realmId": "realm_zhao", "name": "廉颇", "might": 17, "command": 10000, "loyalty": 80, "attrs": { "wu": 18, "zheng": 12, "jiao": 13, "mou": 14, "xue": 12, "po": 16 }, "specialty": "commander", "ambition": "mid", "age": 60, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_limu", "realmId": "realm_zhao", "name": "李牧", "might": 19, "command": 11000, "loyalty": 88, "attrs": { "wu": 19, "zheng": 13, "jiao": 13, "mou": 18, "xue": 14, "po": 17 }, "specialty": "commander", "ambition": "mid", "age": 40, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_zhaoshe", "realmId": "realm_zhao", "name": "赵奢", "might": 16, "command": 9000, "loyalty": 82, "attrs": { "wu": 16, "zheng": 12, "jiao": 12, "mou": 15, "xue": 13, "po": 14 }, "specialty": "commander", "ambition": "mid", "age": 50, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_xiangyan", "realmId": "realm_chu", "name": "项燕", "might": 17, "command": 10000, "loyalty": 85, "attrs": { "wu": 17, "zheng": 11, "jiao": 12, "mou": 14, "xue": 12, "po": 15 }, "specialty": "commander", "ambition": "mid", "age": 45, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_jingyang", "realmId": "realm_chu", "name": "景阳", "might": 14, "command": 8000, "loyalty": 75, "attrs": { "wu": 14, "zheng": 9, "jiao": 9, "mou": 11, "xue": 10, "po": 12 }, "specialty": "warrior", "ambition": "mid", "age": 40, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_tiandan", "realmId": "realm_qi", "name": "田单", "might": 18, "command": 10000, "loyalty": 86, "attrs": { "wu": 18, "zheng": 13, "jiao": 14, "mou": 17, "xue": 13, "po": 16 }, "specialty": "strategist", "ambition": "mid", "age": 50, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_kuangzhang", "realmId": "realm_qi", "name": "匡章", "might": 15, "command": 8500, "loyalty": 78, "attrs": { "wu": 15, "zheng": 11, "jiao": 11, "mou": 13, "xue": 11, "po": 13 }, "specialty": "commander", "ambition": "mid", "age": 50, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_yueyi", "realmId": "realm_yan", "name": "乐毅", "might": 18, "command": 10000, "loyalty": 88, "attrs": { "wu": 18, "zheng": 14, "jiao": 15, "mou": 17, "xue": 14, "po": 16 }, "specialty": "commander", "ambition": "mid", "age": 45, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_qinkai", "realmId": "realm_yan", "name": "秦开", "might": 15, "command": 8000, "loyalty": 82, "attrs": { "wu": 15, "zheng": 10, "jiao": 10, "mou": 12, "xue": 11, "po": 13 }, "specialty": "warrior", "ambition": "mid", "age": 45, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_baoyuan", "realmId": "realm_han", "name": "暴鸢", "might": 14, "command": 7500, "loyalty": 75, "attrs": { "wu": 14, "zheng": 9, "jiao": 9, "mou": 11, "xue": 10, "po": 12 }, "specialty": "warrior", "ambition": "mid", "age": 40, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_fengting", "realmId": "realm_han", "name": "冯亭", "might": 13, "command": 7000, "loyalty": 70, "attrs": { "wu": 13, "zheng": 12, "jiao": 11, "mou": 12, "xue": 11, "po": 11 }, "specialty": "administrator", "ambition": "mid", "age": 45, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_pangjuan", "realmId": "realm_wei", "name": "庞涓", "might": 16, "command": 9000, "loyalty": 78, "attrs": { "wu": 16, "zheng": 11, "jiao": 11, "mou": 14, "xue": 12, "po": 13 }, "specialty": "commander", "ambition": "high", "age": 45, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_gongsunyan", "realmId": "realm_wei", "name": "公孙衍", "might": 14, "command": 8500, "loyalty": 72, "attrs": { "wu": 14, "zheng": 13, "jiao": 16, "mou": 15, "xue": 13, "po": 12 }, "specialty": "diplomat", "ambition": "mid", "age": 50, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_yuecheng", "realmId": "realm_wei", "name": "乐乘", "might": 15, "command": 8200, "loyalty": 76, "attrs": { "wu": 15, "zheng": 10, "jiao": 10, "mou": 12, "xue": 11, "po": 13 }, "specialty": "warrior", "ambition": "mid", "age": 40, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_zhoujun_a", "realmId": "realm_zhou", "name": "周君甲", "might": 11, "command": 5500, "loyalty": 60, "attrs": { "wu": 11, "zheng": 11, "jiao": 11, "mou": 11, "xue": 11, "po": 11 }, "specialty": "administrator", "ambition": "low", "age": 50, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_zhoujun_b", "realmId": "realm_zhou", "name": "周君乙", "might": 10, "command": 5000, "loyalty": 55, "attrs": { "wu": 10, "zheng": 10, "jiao": 10, "mou": 10, "xue": 10, "po": 10 }, "specialty": "administrator", "ambition": "low", "age": 50, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_zhoujun_c", "realmId": "realm_zhou", "name": "周君丙", "might": 12, "command": 5200, "loyalty": 58, "attrs": { "wu": 12, "zheng": 11, "jiao": 11, "mou": 11, "xue": 11, "po": 11 }, "specialty": "administrator", "ambition": "low", "age": 50, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_qin_zhaoxiangwang", "realmId": "realm_qin", "name": "秦昭襄王", "might": 12, "command": 12, "loyalty": 100, "attrs": { "wu": 12, "zheng": 16, "jiao": 14, "mou": 17, "xue": 14, "po": 16 }, "specialty": "commander", "ambition": "high", "age": 70, "posts": ["ruler"], "loyaltyState": "loyal" },
+    { "id": "gen_zhao_xiaochengwang", "realmId": "realm_zhao", "name": "赵孝成王", "might": 11, "command": 11, "loyalty": 100, "attrs": { "wu": 11, "zheng": 13, "jiao": 12, "mou": 11, "xue": 12, "po": 11 }, "specialty": "administrator", "ambition": "mid", "age": 30, "posts": ["ruler"], "loyaltyState": "loyal" },
+    { "id": "gen_wei_anxiwang", "realmId": "realm_wei", "name": "魏安釐王", "might": 10, "command": 10, "loyalty": 100, "attrs": { "wu": 10, "zheng": 12, "jiao": 14, "mou": 14, "xue": 13, "po": 11 }, "specialty": "diplomat", "ambition": "mid", "age": 35, "posts": ["ruler"], "loyaltyState": "loyal" },
+    { "id": "gen_han_huanhuiwang", "realmId": "realm_han", "name": "韩桓惠王", "might": 10, "command": 10, "loyalty": 100, "attrs": { "wu": 10, "zheng": 9, "jiao": 10, "mou": 8, "xue": 10, "po": 8 }, "specialty": "administrator", "ambition": "low", "age": 40, "posts": ["ruler"], "loyaltyState": "loyal" },
+    { "id": "gen_chu_kaoliewang", "realmId": "realm_chu", "name": "楚考烈王", "might": 10, "command": 10, "loyalty": 100, "attrs": { "wu": 10, "zheng": 14, "jiao": 13, "mou": 12, "xue": 13, "po": 11 }, "specialty": "administrator", "ambition": "mid", "age": 30, "posts": ["ruler"], "loyaltyState": "loyal" },
+    { "id": "gen_qi_wangjian", "realmId": "realm_qi", "name": "齐王建", "might": 10, "command": 10, "loyalty": 100, "attrs": { "wu": 10, "zheng": 11, "jiao": 11, "mou": 9, "xue": 11, "po": 9 }, "specialty": "administrator", "ambition": "low", "age": 25, "posts": ["ruler"], "loyaltyState": "loyal" },
+    { "id": "gen_yan_huiwang", "realmId": "realm_yan", "name": "燕惠王", "might": 10, "command": 10, "loyalty": 100, "attrs": { "wu": 10, "zheng": 12, "jiao": 11, "mou": 11, "xue": 12, "po": 10 }, "specialty": "administrator", "ambition": "mid", "age": 35, "posts": ["ruler"], "loyaltyState": "loyal" },
+    { "id": "gen_linxiangru", "realmId": "realm_zhao", "name": "蔺相如", "might": 10, "command": 10, "loyalty": 80, "attrs": { "wu": 10, "zheng": 16, "jiao": 18, "mou": 16, "xue": 17, "po": 12 }, "specialty": "diplomat", "ambition": "mid", "age": 50, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_fanju", "realmId": "realm_qin", "name": "范雎", "might": 10, "command": 10, "loyalty": 80, "attrs": { "wu": 10, "zheng": 15, "jiao": 15, "mou": 18, "xue": 16, "po": 13 }, "specialty": "strategist", "ambition": "high", "age": 50, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_zhaokuo", "realmId": "realm_zhao", "name": "赵括", "might": 12, "command": 12, "loyalty": 80, "attrs": { "wu": 12, "zheng": 8, "jiao": 8, "mou": 12, "xue": 14, "po": 10 }, "specialty": "strategist", "ambition": "high", "age": 40, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_maosui", "realmId": "realm_zhao", "name": "毛遂", "might": 12, "command": 12, "loyalty": 80, "attrs": { "wu": 12, "zheng": 11, "jiao": 16, "mou": 14, "xue": 13, "po": 14 }, "specialty": "diplomat", "ambition": "high", "age": 40, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_pingyuanjun", "realmId": "realm_zhao", "name": "平原君", "might": 11, "command": 11, "loyalty": 80, "attrs": { "wu": 11, "zheng": 15, "jiao": 14, "mou": 13, "xue": 13, "po": 11 }, "specialty": "administrator", "ambition": "mid", "age": 50, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_xinlingjun", "realmId": "realm_wei", "name": "信陵君", "might": 16, "command": 16, "loyalty": 80, "attrs": { "wu": 16, "zheng": 14, "jiao": 15, "mou": 15, "xue": 13, "po": 14 }, "specialty": "commander", "ambition": "mid", "age": 35, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_lvbuwei", "realmId": "realm_qin", "name": "吕不韦", "might": 10, "command": 10, "loyalty": 80, "attrs": { "wu": 10, "zheng": 17, "jiao": 16, "mou": 16, "xue": 15, "po": 12 }, "specialty": "reformer", "ambition": "high", "age": 40, "posts": [], "loyaltyState": "loyal" },
+    { "id": "gen_chunshenjun", "realmId": "realm_chu", "name": "春申君", "might": 12, "command": 12, "loyalty": 80, "attrs": { "wu": 12, "zheng": 14, "jiao": 16, "mou": 14, "xue": 13, "po": 12 }, "specialty": "diplomat", "ambition": "mid", "age": 45, "posts": [], "loyaltyState": "loyal" }
   ],
   "adjacencyEdges": [
     { "id": "ae_pass_hangu", "fromSiteId": "site_008", "toSiteId": "site_021", "passId": "pass_hangu" },
