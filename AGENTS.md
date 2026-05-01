@@ -188,6 +188,8 @@ const world: World = {
   generals: new Map(),        // ← M2 新增
   peaceProposals: new Map(),  // ← M2 新增
   sieges: new Map(),          // ← M2 新增
+  rulers: new Map(),          // ← M5 新增
+  eventChainStates: new Map(), // ← M5 新增
   playerRealmId: 'realm_qin',
   rngState: { seed: 42, counter: 0 },
   phases: [],
