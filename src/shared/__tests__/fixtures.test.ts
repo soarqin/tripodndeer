@@ -18,6 +18,8 @@ const REQUIRED_WORLD_KEYS: readonly (keyof World)[] = [
   'coalitions',
   'zhouInvestiture',
   'generals',
+  'rulers',
+  'eventChainStates',
   'passes',
   'adjacencyEdges',
   'sieges',
@@ -57,6 +59,8 @@ describe('makeEmptyWorld', () => {
     expect(world.coalitions).toBeInstanceOf(Map)
     expect(world.zhouInvestiture).toBeInstanceOf(Map)
     expect(world.generals).toBeInstanceOf(Map)
+    expect(world.rulers).toBeInstanceOf(Map)
+    expect(world.eventChainStates).toBeInstanceOf(Map)
     expect(world.passes).toBeInstanceOf(Map)
     expect(world.adjacencyEdges).toBeInstanceOf(Map)
     expect(world.sieges).toBeInstanceOf(Map)

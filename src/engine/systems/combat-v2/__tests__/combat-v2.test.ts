@@ -72,6 +72,8 @@ function makeWorld(
     coalitions: new Map(),
     zhouInvestiture: new Map(),
     generals: new Map(generals.map((general) => [general.id, general])),
+    rulers: new Map(),
+    eventChainStates: new Map(),
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),

@@ -97,6 +97,8 @@ function baseWorld(overrides: Partial<World> = {}): World {
     coalitions: new Map(),
     zhouInvestiture: new Map(),
     generals: new Map(),
+    rulers: new Map(),
+    eventChainStates: new Map(),
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),

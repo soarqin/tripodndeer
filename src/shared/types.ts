@@ -351,6 +351,15 @@ export interface RulerState {
   readonly successionLawId: 'primogeniture'
 }
 
+export type EventChainId = string
+
+export interface EventChainState {
+  readonly id: EventChainId
+  readonly currentStageId: string
+  readonly completed: boolean
+  readonly startedAtTick: number
+}
+
 export interface SiteOccupation {
   occupierId: RealmId
   controlLevel: number
@@ -469,6 +478,8 @@ export interface World {
   coalitions: ReadonlyMap<CoalitionId, CoalitionState>
   zhouInvestiture: ReadonlyMap<RealmId, ZhouInvestitureState>
   generals: ReadonlyMap<GeneralId, General>
+  rulers: ReadonlyMap<RealmId, RulerState>
+  eventChainStates: ReadonlyMap<EventChainId, EventChainState>
   passes: ReadonlyMap<PassId, Pass>
   adjacencyEdges: ReadonlyMap<AdjacencyEdgeId, AdjacencyEdge>
   sieges: ReadonlyMap<SiegeId, Siege>

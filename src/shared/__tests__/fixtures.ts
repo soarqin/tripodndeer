@@ -1,8 +1,5 @@
 import type { General, GeneralId, Realm, RealmId, RNGState, World } from '~/shared/types'
 
-// M5 will add `rulers` and `eventChainStates` to World (planned in T1.4).
-// Update this fixture when those fields land on the World type.
-
 export const TEST_WORLD_DATE = {
   yearBC: 260,
   season: 'spring',
@@ -29,6 +26,8 @@ export function makeEmptyWorld(overrides: Partial<World> = {}): World {
     coalitions: new Map(),
     zhouInvestiture: new Map(),
     generals: new Map(),
+    rulers: new Map(),
+    eventChainStates: new Map(),
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),
