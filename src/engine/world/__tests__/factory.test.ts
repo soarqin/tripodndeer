@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { runTickPhases } from '@/engine/clock'
 import { PHASE_ORDER } from '@/engine/phases'
 import { aiPlanStep } from '@/engine/systems/ai'
+import { characterLifecyclePhase } from '@/engine/systems/character'
 import { combatV2Step } from '@/engine/systems/combat-v2'
 import { diplomacyLifecycleStep } from '@/engine/systems/diplomacy'
 import { economyPhase } from '@/engine/systems/economy'
@@ -45,6 +46,7 @@ function phaseName(phase: TickPhase): string {
   if (phase === combatV2Step) return 'combat-v2'
   if (phase === manpowerTick) return 'manpower'
   if (phase === rulerLifecyclePhase) return 'rulerLifecycle'
+  if (phase === characterLifecyclePhase) return 'characterLifecycle'
   if (phase === victoryCheckStep) return 'victoryCheck'
   if (phase === diplomacyLifecycleStep) return 'diplomacyLifecycle'
   if (phase === economyPhase) return 'economy'
@@ -199,6 +201,7 @@ describe('createWorldFromM1Data — structure', () => {
       combatV2Step,
       manpowerTick,
       rulerLifecyclePhase,
+      characterLifecyclePhase,
       victoryCheckStep,
       diplomacyLifecycleStep,
       economyPhase,

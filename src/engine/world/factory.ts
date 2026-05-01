@@ -3,6 +3,7 @@ import m1Data from '@/content/m1/scenario.json'
 import { INITIAL_DATE } from '@/shared/constants'
 import { M0DataSchema, M1DataSchemaV2 } from '@/shared/schemas'
 import { aiPlanStep } from '~/engine/systems/ai'
+import { characterLifecyclePhase } from '~/engine/systems/character'
 import { combatV2Step } from '~/engine/systems/combat-v2'
 import { diplomacyLifecycleStep } from '~/engine/systems/diplomacy'
 import { economyPhase } from '~/engine/systems/economy'
@@ -321,6 +322,7 @@ export function createWorldFromM1Data(
       combatV2Step,
       manpowerTick,
       rulerLifecyclePhase,
+      characterLifecyclePhase,
       victoryCheckStep,
       diplomacyLifecycleStep,
       economyPhase,

@@ -463,6 +463,35 @@ export interface RulerDiedEvent {
   }
 }
 
+export type CharacterDeathCause = 'natural'
+
+export interface CharacterDiedEvent {
+  readonly type: 'characterDied'
+  readonly payload: {
+    readonly generalId: GeneralId
+    readonly generalName: string
+    readonly realmId: RealmId
+    readonly cause: CharacterDeathCause
+  }
+}
+
+export interface CharacterDefectedEvent {
+  readonly type: 'characterDefected'
+  readonly payload: {
+    readonly generalId: GeneralId
+    readonly generalName: string
+    readonly realmId: RealmId
+  }
+}
+
+export interface GovernorAssignmentRevokedEvent {
+  readonly type: 'governorAssignmentRevoked'
+  readonly payload: {
+    readonly siteId: SiteId
+    readonly generalId: GeneralId
+  }
+}
+
 // 时间速度档位
 export type SpeedTier = 'pause' | '1x' | '2x' | '3x' | '4x' | '5x'
 
