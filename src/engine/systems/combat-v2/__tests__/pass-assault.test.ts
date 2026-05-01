@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { setCombatVarianceEnabled } from '~/engine/random'
 import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   AdjacencyEdge,
   Army,
@@ -70,32 +71,14 @@ function makeWorld(
   adjacencyEdges: readonly AdjacencyEdge[] = [],
   yearBC = 260,
 ): World {
-  return {
+  return makeEmptyWorld({
     date: { yearBC, season: 'spring', month: 1, xun: 'shang' },
-    tick: 0,
     sites: new Map(sites.map((site) => [site.id, site])),
-    realms: new Map(),
     armies: new Map(armies.map((army) => [army.id, army])),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
     passes: new Map(passes.map((pass) => [pass.id, pass])),
     adjacencyEdges: new Map(adjacencyEdges.map((ae) => [ae.id, ae])),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
-    playerRealmId: 'realm_qin',
     rngState: rng,
-    phases: [],
-    pendingOrders: [],
-  }
+  })
 }
 
 describe('pass-assault factory loading', () => {

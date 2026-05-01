@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { isVictorious, victoryCheckStep } from '../victory'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { RNGState, Site, World } from '~/shared/types'
 
 function makeWorld(siteOwners: Record<string, string>, playerRealmId: string): World {
@@ -19,32 +20,10 @@ function makeWorld(siteOwners: Record<string, string>, playerRealmId: string): W
     ]),
   )
 
-  return {
-    date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
-    tick: 0,
+  return makeEmptyWorld({
     sites,
-    realms: new Map(),
-    armies: new Map(),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
     playerRealmId,
-    rngState: { seed: 0, counter: 0 },
-    phases: [],
-    pendingOrders: [],
-  } as World
+  })
 }
 
 const rng: RNGState = { seed: 0, counter: 0 }

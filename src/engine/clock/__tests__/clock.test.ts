@@ -1,35 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { INITIAL_DATE } from '@/shared/constants'
+import { makeEmptyWorld } from '@/shared/__tests__/fixtures'
 import type { TickPhase, World } from '@/shared/types'
 import { advanceClock, runTickPhases, setSpeed } from '../index'
 
 function makeTestWorld(): World {
-  return {
+  return makeEmptyWorld({
     date: { ...INITIAL_DATE },
-    tick: 0,
-    sites: new Map(),
-    realms: new Map(),
-    armies: new Map(),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
     playerRealmId: 'realm_red',
     rngState: { seed: 42, counter: 0 },
-    phases: [],
-    pendingOrders: [],
-  }
+  })
 }
 
 describe('advanceClock pause', () => {

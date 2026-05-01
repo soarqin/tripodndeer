@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { Army, RNGState, Site, World } from '~/shared/types'
 import { combatStep, resolveCombat } from '../combat'
 
@@ -33,32 +34,11 @@ function makeSite(id: string, ownerId: string | null): Site {
 }
 
 function makeWorld(armies: readonly Army[], sites: readonly Site[] = []): World {
-  return {
-    date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
-    tick: 0,
+  return makeEmptyWorld({
     sites: new Map(sites.map((site) => [site.id, site])),
-    realms: new Map(),
     armies: new Map(armies.map((army) => [army.id, army])),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
-    playerRealmId: 'realm_qin',
     rngState: rng,
-    phases: [],
-    pendingOrders: [],
-  }
+  })
 }
 
 const combatCases: readonly {
