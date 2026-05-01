@@ -484,6 +484,15 @@ export interface CharacterDefectedEvent {
   }
 }
 
+export interface CharacterRecruitedEvent {
+  readonly type: 'characterRecruited'
+  readonly payload: {
+    readonly generalId: GeneralId
+    readonly realmId: RealmId
+    readonly name: string
+  }
+}
+
 export interface GovernorAssignmentRevokedEvent {
   readonly type: 'governorAssignmentRevoked'
   readonly payload: {
