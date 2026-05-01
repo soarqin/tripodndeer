@@ -169,6 +169,7 @@ export type PeaceProposalId = string
 export type AdjacencyEdgeId = string
 export type PassId = string
 export type GeneralId = string
+export type RulerStateId = string
 // Canonical sorted pair `${lowerRealmId}__${higherRealmId}`.
 export type RelationKey = string
 export type DiplomaticProposalId = string
@@ -340,6 +341,16 @@ export interface General {
   loyaltyState?: LoyaltyState
 }
 
+export interface RulerState {
+  readonly realmId: RealmId
+  readonly generalId: GeneralId
+  readonly age: number
+  readonly lifespan: number
+  readonly health: number
+  readonly personality: PersonalityArchetype
+  readonly successionLawId: 'primogeniture'
+}
+
 export interface SiteOccupation {
   occupierId: RealmId
   controlLevel: number
@@ -397,6 +408,7 @@ export interface Realm {
   readonly aiPersonality: AIPersonality
   readonly economy: RealmEconomy
   readonly stats?: RealmStats
+  readonly rulerId?: GeneralId | null
 }
 
 // 游戏日期（旬为最小单位）

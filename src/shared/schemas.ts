@@ -221,6 +221,17 @@ export const LoyaltyStateSchema = z.enum([
   'defected',
 ])
 
+export const PersonalityArchetypeSchema = z.enum([
+  'conqueror',
+  'steward',
+  'schemer',
+  'learned',
+  'tyrant',
+  'incompetent',
+  'benevolent',
+  'builder',
+])
+
 export const FactionIdSchema = z.enum([
   'royal_kin',
   'noble_clans',
@@ -257,6 +268,16 @@ export const GeneralSchema = z.object({
   age: z.number().int().nonnegative().optional(),
   posts: z.array(PostSchema).optional(),
   loyaltyState: LoyaltyStateSchema.optional(),
+})
+
+export const RulerStateSchema = z.object({
+  realmId: RealmIdSchema,
+  generalId: z.string().min(1),
+  age: z.number().int().nonnegative(),
+  lifespan: z.number().int().positive(),
+  health: z.number().int().min(0).max(100),
+  personality: PersonalityArchetypeSchema,
+  successionLawId: z.literal('primogeniture'),
 })
 
 export const SiteOccupationSchema = z.object({
@@ -385,6 +406,7 @@ export const RealmSchema = z.object({
   initialArmies: z.array(ArmyTemplateSchema),
   aiPersonality: AIPersonalitySchema,
   economy: RealmEconomySchema.default({ treasury: 0, foodStores: 0, taxRate: 10 }),
+  rulerId: z.string().nullable().optional(),
 })
 
 export const M0DataSchema = z.object({
