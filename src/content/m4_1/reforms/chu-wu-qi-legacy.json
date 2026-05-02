@@ -1,0 +1,95 @@
+{
+  "id": "reform_chu_wu_qi_legacy",
+  "displayName": "Wu Qi's Unfinished Legacy",
+  "displayNameZh": "楚国吴起遗志",
+  "trigger": {
+    "kind": "and",
+    "children": [
+      { "kind": "realm.id", "value": "realm_chu" },
+      { "kind": "realm.has-character-with-specialty", "specialty": "reformer" },
+      { "kind": "realm.ruler-personality-in", "values": ["builder", "conqueror"] },
+      { "kind": "realm.has-trait", "trait": "wu_qi_failed_legacy" },
+      { "kind": "realm.has-trait", "trait": "chu_wu_qi_legacy_done", "not": true },
+      { "kind": "realm.no-active-war" },
+      { "kind": "realm.year-after", "yearBC": 260 }
+    ]
+  },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "memory_of_wu_qi",
+      "textZh": "楚改革之臣思吴起未竟之业，进言于王曰：「昔起之法既废，宗室复肆。今天下方乱，我楚不变，必为人鱼肉。」王沉吟久之，问群臣何以？",
+      "choices": [
+        {
+          "id": "secret_revival",
+          "labelZh": "潜行其志，渐损宗室",
+          "effects": [],
+          "nextStageId": "noble_resistance",
+          "outcome": "continue"
+        },
+        {
+          "id": "open_proclaim",
+          "labelZh": "明诏天下，复行新法",
+          "effects": [],
+          "nextStageId": "noble_resistance",
+          "outcome": "continue"
+        },
+        {
+          "id": "abandon_idea",
+          "labelZh": "不复议新法",
+          "effects": [],
+          "outcome": "failure"
+        }
+      ],
+      "advanceAfterMonths": 12
+    },
+    {
+      "id": "noble_resistance",
+      "textZh": "屈、景、昭三族会于宗庙，誓阻新法。或诉之于太傅，或谋于令尹。改革之臣孤军于朝，请王决断。",
+      "choices": [
+        {
+          "id": "balance",
+          "labelZh": "折中而行，留世族之权",
+          "effects": [],
+          "nextStageId": "partial_success",
+          "outcome": "continue"
+        },
+        {
+          "id": "force",
+          "labelZh": "强压宗室",
+          "effects": [],
+          "nextStageId": "partial_success",
+          "outcome": "continue"
+        },
+        {
+          "id": "yield_again",
+          "labelZh": "复退如悼王后事",
+          "effects": [],
+          "outcome": "failure"
+        }
+      ],
+      "advanceAfterMonths": 24
+    },
+    {
+      "id": "partial_success",
+      "textZh": "新令既下，制度浅改。屯兵于江汉，赏军功，损不急之官。然世族之根未拔，公族之议未息。楚之富强稍见，而非全功也。",
+      "choices": [
+        {
+          "id": "lock_in",
+          "labelZh": "据此为本，世代承之",
+          "effects": [],
+          "outcome": "success"
+        },
+        {
+          "id": "let_drift",
+          "labelZh": "听其自然，不强约束",
+          "effects": [],
+          "outcome": "failure"
+        }
+      ],
+      "advanceAfterMonths": 24
+    }
+  ],
+  "successTrait": "chu_wu_qi_legacy_done",
+  "failureTrait": "reform_failed_scar"
+}

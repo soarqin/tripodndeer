@@ -1,0 +1,95 @@
+{
+  "id": "reform_han_shen_buhai_restart",
+  "displayName": "Shen Buhai Statecraft Revival",
+  "displayNameZh": "韩国申不害术治",
+  "trigger": {
+    "kind": "and",
+    "children": [
+      { "kind": "realm.id", "value": "realm_han" },
+      { "kind": "realm.has-character-with-specialty", "specialty": "reformer" },
+      { "kind": "realm.ruler-personality-in", "values": ["builder", "schemer"] },
+      { "kind": "realm.has-trait", "trait": "han_shen_buhai_done", "not": true },
+      { "kind": "realm.no-active-war" },
+      { "kind": "realm.treasury-above", "value": 1500 },
+      { "kind": "realm.year-after", "yearBC": 260 }
+    ]
+  },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "shen_buhai_revival",
+      "textZh": "韩相召旧吏，言曰：「昔申不害以术辅昭侯，国治兵强。今天下方乱，韩处四战之地，非术不能立。」乃议重申术治，群臣或忧或喜。",
+      "choices": [
+        {
+          "id": "full_revival",
+          "labelZh": "尽复术治，整顿百官",
+          "effects": [],
+          "nextStageId": "centralization",
+          "outcome": "continue"
+        },
+        {
+          "id": "selective",
+          "labelZh": "择其要而行之",
+          "effects": [],
+          "nextStageId": "centralization",
+          "outcome": "continue"
+        },
+        {
+          "id": "no_revival",
+          "labelZh": "议而罢之",
+          "effects": [],
+          "outcome": "failure"
+        }
+      ],
+      "advanceAfterMonths": 12
+    },
+    {
+      "id": "centralization",
+      "textZh": "严守名实，赏罚分明。臣下莫敢欺君，百官各守其职。然贵戚之家失其旧权，怨怼之声起于宗室。",
+      "choices": [
+        {
+          "id": "press_forward",
+          "labelZh": "毋恤宗室之怨，深行术治",
+          "effects": [],
+          "nextStageId": "completion",
+          "outcome": "continue"
+        },
+        {
+          "id": "appease",
+          "labelZh": "安抚宗室，留其余封",
+          "effects": [],
+          "nextStageId": "completion",
+          "outcome": "continue"
+        },
+        {
+          "id": "retreat_again",
+          "labelZh": "迫于宗室而废术",
+          "effects": [],
+          "outcome": "failure"
+        }
+      ],
+      "advanceAfterMonths": 24
+    },
+    {
+      "id": "completion",
+      "textZh": "韩政为之一新，吏治清明，财赋稍丰。然韩处四战之地，强邻在侧，术治之效未及大显。当何以承之？",
+      "choices": [
+        {
+          "id": "institutionalize",
+          "labelZh": "以术治为常制",
+          "effects": [],
+          "outcome": "success"
+        },
+        {
+          "id": "lapse",
+          "labelZh": "放任旧弊复兴",
+          "effects": [],
+          "outcome": "failure"
+        }
+      ],
+      "advanceAfterMonths": 24
+    }
+  ],
+  "successTrait": "han_shen_buhai_done",
+  "failureTrait": "reform_failed_scar"
+}

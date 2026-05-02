@@ -1,0 +1,95 @@
+{
+  "id": "reform_qi_jixia_debate",
+  "displayName": "Jixia Academy Reform Debate",
+  "displayNameZh": "齐国稷下变制",
+  "trigger": {
+    "kind": "and",
+    "children": [
+      { "kind": "realm.id", "value": "realm_qi" },
+      { "kind": "realm.has-character-with-specialty", "specialty": "reformer" },
+      { "kind": "realm.ruler-personality-in", "values": ["builder", "steward"] },
+      { "kind": "realm.has-trait", "trait": "qi_jixia_reform_done", "not": true },
+      { "kind": "realm.no-active-war" },
+      { "kind": "realm.population-above", "value": 50000 },
+      { "kind": "realm.year-after", "yearBC": 260 }
+    ]
+  },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "jixia_debate",
+      "textZh": "稷下学者咸集于王门，议政之风炽盛。淳于髡、邹衍、田骈之徒，各陈其说。或言阴阳，或论名实，或议法度。王听之，未决其从。",
+      "choices": [
+        {
+          "id": "follow_legalist",
+          "labelZh": "采名实之学，明法度",
+          "effects": [],
+          "nextStageId": "institutional_revision",
+          "outcome": "continue"
+        },
+        {
+          "id": "follow_huanglao",
+          "labelZh": "用黄老之术，无为而治",
+          "effects": [],
+          "nextStageId": "institutional_revision",
+          "outcome": "continue"
+        },
+        {
+          "id": "all_talk",
+          "labelZh": "听其议而不行",
+          "effects": [],
+          "outcome": "failure"
+        }
+      ],
+      "advanceAfterMonths": 12
+    },
+    {
+      "id": "institutional_revision",
+      "textZh": "王诏曰：「废旧弊，行新令。」稷下学者参议政事，旧吏多有不便。或请阳奉阴违以全旧制，或请尽革之以畅新政。学宫之内，议论纷纷。",
+      "choices": [
+        {
+          "id": "thorough",
+          "labelZh": "尽革旧弊，明赏罚",
+          "effects": [],
+          "nextStageId": "culture_flowering",
+          "outcome": "continue"
+        },
+        {
+          "id": "moderate",
+          "labelZh": "兼采诸家，循序渐进",
+          "effects": [],
+          "nextStageId": "culture_flowering",
+          "outcome": "continue"
+        },
+        {
+          "id": "stall",
+          "labelZh": "议而不决，旷日持久",
+          "effects": [],
+          "outcome": "failure"
+        }
+      ],
+      "advanceAfterMonths": 24
+    },
+    {
+      "id": "culture_flowering",
+      "textZh": "学者来归，临淄之盛甲于天下。仓廪实，府库丰，士民相安。然学派纷争未息，王当何以御之？",
+      "choices": [
+        {
+          "id": "preserve_jixia",
+          "labelZh": "尊学宫为国本",
+          "effects": [],
+          "outcome": "success"
+        },
+        {
+          "id": "narrow_school",
+          "labelZh": "独尊一家，斥诸子",
+          "effects": [],
+          "outcome": "failure"
+        }
+      ],
+      "advanceAfterMonths": 24
+    }
+  ],
+  "successTrait": "qi_jixia_reform_done",
+  "failureTrait": "reform_failed_scar"
+}

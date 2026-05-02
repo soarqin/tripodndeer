@@ -1,0 +1,95 @@
+{
+  "id": "reform_hu_fu_qi_she",
+  "displayName": "Hu Clothing and Mounted Archery",
+  "displayNameZh": "胡服骑射",
+  "trigger": {
+    "kind": "and",
+    "children": [
+      { "kind": "realm.id", "value": "realm_zhao" },
+      { "kind": "realm.has-character-with-specialty", "specialty": "reformer" },
+      { "kind": "realm.ruler-personality-in", "values": ["conqueror"] },
+      { "kind": "realm.has-trait", "trait": "hu_fu_qi_she_done", "not": true },
+      { "kind": "realm.no-active-war" },
+      { "kind": "realm.year-after", "yearBC": 310 }
+    ]
+  },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "wuling_proposal",
+      "textZh": "赵雍北观胡骑之利，南思中原之弊，欲胡服以习骑射。曰：「愚者闇于成事，智者见于未萌。」朝议之时，公族皆以为非礼。武灵王孤立而倡之。",
+      "choices": [
+        {
+          "id": "decree",
+          "labelZh": "下令胡服，王身先之",
+          "effects": [],
+          "nextStageId": "court_debate",
+          "outcome": "continue"
+        },
+        {
+          "id": "persuade_first",
+          "labelZh": "先说服公族再行之",
+          "effects": [],
+          "nextStageId": "court_debate",
+          "outcome": "continue"
+        },
+        {
+          "id": "withdraw",
+          "labelZh": "畏宗室之议而退",
+          "effects": [],
+          "outcome": "failure"
+        }
+      ],
+      "advanceAfterMonths": 12
+    },
+    {
+      "id": "court_debate",
+      "textZh": "公子成称疾不朝。武灵王亲诣其家而谕之曰：「夫服者，以便用也；礼者，以便事也。」肥义辅之以策，反复数日。公子成乃服胡服而朝。然旧儒之议未息。",
+      "choices": [
+        {
+          "id": "press_on",
+          "labelZh": "强力推行，斩抗命者",
+          "effects": [],
+          "nextStageId": "reform_success",
+          "outcome": "continue"
+        },
+        {
+          "id": "win_hearts",
+          "labelZh": "以理服人，赏胡服将士",
+          "effects": [],
+          "nextStageId": "reform_success",
+          "outcome": "continue"
+        },
+        {
+          "id": "halve_reform",
+          "labelZh": "仅及军中，不及朝服",
+          "effects": [],
+          "outcome": "failure"
+        }
+      ],
+      "advanceAfterMonths": 24
+    },
+    {
+      "id": "reform_success",
+      "textZh": "赵骑既成，灭中山，破林胡、楼烦，辟地千里，骑甲天下。秦人闻之而惮，齐魏不敢北窥。武灵王自号主父，传位于子。今当何以续之？",
+      "choices": [
+        {
+          "id": "consolidate",
+          "labelZh": "永立胡骑之制",
+          "effects": [],
+          "outcome": "success"
+        },
+        {
+          "id": "split_attention",
+          "labelZh": "复修旧礼以平公族",
+          "effects": [],
+          "outcome": "failure"
+        }
+      ],
+      "advanceAfterMonths": 24
+    }
+  ],
+  "successTrait": "hu_fu_qi_she_done",
+  "failureTrait": "reform_failed_scar",
+  "historicalYearRange": [307, 298]
+}
