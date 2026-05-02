@@ -1,7 +1,7 @@
 import scenarioRaw from '@/content/m1/scenario.json'
 import { createWorldFromM1Data } from '@/engine/world/factory'
 import { migrateScenarioV2ToV3 } from '../v2-to-v3'
-import { migrateScenarioV3ToV4 } from '../v3-to-v4'
+import { migrateScenarioV4ToV5 } from '../v4-to-v5'
 import { M1DataSchemaV2, type M1DataV2 } from '@/shared/schemas'
 import { describe, expect, it } from 'vitest'
 
@@ -366,8 +366,8 @@ describe('migrateScenarioV2ToV3 — schema and integration', () => {
 
   it('populates world.rulers Map for realms with rulers', () => {
     const v3 = migrateScenarioV2ToV3(scenarioV2)
-    const v4 = migrateScenarioV3ToV4(v3)
-    const world = createWorldFromM1Data(v4, 99, 'realm_qin')
+    const v5 = migrateScenarioV4ToV5(v3)
+    const world = createWorldFromM1Data(v5, 99, 'realm_qin')
 
     expect(world.rulers.size).toBeGreaterThan(0)
     for (const realm of world.realms.values()) {
@@ -381,8 +381,8 @@ describe('migrateScenarioV2ToV3 — schema and integration', () => {
 
   it('initializes world.eventChainStates as empty Map', () => {
     const v3 = migrateScenarioV2ToV3(scenarioV2)
-    const v4 = migrateScenarioV3ToV4(v3)
-    const world = createWorldFromM1Data(v4, 99, 'realm_qin')
+    const v5 = migrateScenarioV4ToV5(v3)
+    const world = createWorldFromM1Data(v5, 99, 'realm_qin')
 
     expect(world.eventChainStates.size).toBe(0)
   })

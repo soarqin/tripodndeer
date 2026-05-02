@@ -1,7 +1,7 @@
 import m0Data from '@/content/m0/sites.json'
 import m1Data from '@/content/m1/scenario.json'
 import { INITIAL_DATE } from '@/shared/constants'
-import { M0DataSchema, M1DataSchemaV4 } from '@/shared/schemas'
+import { M0DataSchema, M1DataSchemaV5 } from '@/shared/schemas'
 import { aiPlanStep } from '~/engine/systems/ai'
 import { characterLifecyclePhase } from '~/engine/systems/character'
 import { combatV2Step } from '~/engine/systems/combat-v2'
@@ -32,6 +32,7 @@ import type {
   ArmyId,
   CoalitionId,
   CoalitionState,
+  DisasterState,
   DiplomaticProposal,
   DiplomaticProposalId,
   DiplomaticRelation,
@@ -39,11 +40,15 @@ import type {
   EdictState,
   EventChainId,
   EventChainState,
+  FactionId,
+  FactionInfluenceState,
   ReformState,
   GovernorAssignment,
   ZhouInvestitureState,
   RelationKey,
   RulerState,
+  TradeRoute,
+  TradeRouteId,
   Treaty,
   TreatyId,
   EdgeId,
@@ -66,8 +71,8 @@ import type {
   WarState,
   World,
 } from '@/shared/types'
-import type { M1DataV4 } from '@/shared/schemas'
-import { migrateScenarioV3ToV4 } from './migrations/v3-to-v4'
+import type { M1DataV5 } from '@/shared/schemas'
+import { migrateScenarioV4ToV5 } from './migrations/v4-to-v5'
 
 /** 将一个 site 的 boundary 引用展开为具体的 polygon 顶点列表 */
 function expandPolygon(
@@ -172,13 +177,13 @@ export function loadM0Data(): M0Data {
 }
 
 /** 加载并验证 M1 场景数据（静态 import + Zod 校验） */
-export function loadM1Data(): M1DataV4 {
+export function loadM1Data(): M1DataV5 {
   const raw = m1Data as unknown
   const version = (raw as { schema_version?: number } | null)?.schema_version
-  if (version === undefined || version < 4) {
-    return migrateScenarioV3ToV4(raw)
+  if (version === undefined || version < 5) {
+    return migrateScenarioV4ToV5(raw)
   }
-  return M1DataSchemaV4.parse(raw)
+  return M1DataSchemaV5.parse(raw)
 }
 
 /** 构造初始 World（含 Zod 校验 + ownership 引用完整性 + polygon/adjacency 派发） */
@@ -225,11 +230,11 @@ export function createInitialWorld(data: M0Data, seed: number): World {
 }
 
 export function createWorldFromM1Data(
-  data: M1DataV4,
+  data: M1DataV5,
   seed: number,
   playerRealmId: RealmId,
 ): World {
-  M1DataSchemaV4.parse(data)
+  M1DataSchemaV5.parse(data)
 
   const realms = buildRealmMap(data.realms)
   const sites = buildSites(data.sites, data.edges, data.initialOwnership, realms)
@@ -317,6 +322,24 @@ export function createWorldFromM1Data(
     reformStates.set(reformState.realmId, reformState)
   }
 
+  const disasterStates = new Map<RealmId, DisasterState>()
+  for (const disaster of data.disasterStates ?? []) {
+    disasterStates.set(disaster.realmId, disaster)
+  }
+
+  const tradeRoutes = new Map<TradeRouteId, TradeRoute>()
+  for (const route of data.tradeRoutes ?? []) {
+    tradeRoutes.set(route.id, route)
+  }
+
+  const factionInfluences = new Map<RealmId, FactionInfluenceState>()
+  for (const fi of data.factionInfluences ?? []) {
+    factionInfluences.set(fi.realmId, {
+      realmId: fi.realmId,
+      influences: new Map(Object.entries(fi.influences)) as ReadonlyMap<FactionId, number>,
+    })
+  }
+
   return {
     date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
     tick: 0,
@@ -336,9 +359,9 @@ export function createWorldFromM1Data(
     rulers,
     eventChainStates,
     reformStates,
-    disasterStates: new Map(),
-    tradeRoutes: new Map(),
-    factionInfluences: new Map(),
+    disasterStates,
+    tradeRoutes,
+    factionInfluences,
     passes,
     adjacencyEdges,
     sieges: new Map<SiegeId, Siege>(),
