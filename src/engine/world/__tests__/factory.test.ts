@@ -12,6 +12,7 @@ import { manpowerTick } from '@/engine/systems/manpower'
 import { marchStep } from '@/engine/systems/march'
 import { orderApplyStep } from '@/engine/systems/orders'
 import { recruitmentPhase } from '@/engine/systems/recruitment'
+import { reformPhase } from '@/engine/systems/reform'
 import { rulerLifecyclePhase } from '@/engine/systems/ruler'
 import { siegeStep } from '@/engine/systems/siege'
 import { victoryCheckStep } from '@/engine/systems/victory'
@@ -50,6 +51,7 @@ function phaseName(phase: TickPhase): string {
   if (phase === rulerLifecyclePhase) return 'rulerLifecycle'
   if (phase === characterLifecyclePhase) return 'characterLifecycle'
   if (phase === recruitmentPhase) return 'recruitment'
+  if (phase === reformPhase) return 'reform'
   if (phase === victoryCheckStep) return 'victoryCheck'
   if (phase === diplomacyLifecycleStep) return 'diplomacyLifecycle'
   if (phase === economyPhase) return 'economy'
@@ -207,6 +209,7 @@ describe('createWorldFromM1Data — structure', () => {
       rulerLifecyclePhase,
       characterLifecyclePhase,
       recruitmentPhase,
+      reformPhase,
       victoryCheckStep,
       diplomacyLifecycleStep,
       economyPhase,

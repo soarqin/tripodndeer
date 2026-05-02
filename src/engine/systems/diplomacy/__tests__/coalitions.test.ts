@@ -22,6 +22,8 @@ function makeRealm(id: string, manpowerPool: number): Realm {
     aiPersonality: 'aggressive_random',
     economy: { treasury: 0, foodStores: 0, taxRate: 10 },
     stats: { manpowerPool, manpowerCap: Math.max(5000, manpowerPool), warWeariness: 0 },
+    traits: [],
+    politicalSystem: 'enfeoffment',
   }
 }
 
@@ -81,6 +83,7 @@ function baseWorld(overrides: Partial<World> = {}): World {
     generals: new Map(),
     rulers: new Map(),
     eventChainStates: new Map(),
+    reformStates: new Map(),
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),

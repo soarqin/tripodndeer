@@ -130,6 +130,7 @@ export function siegeStep(
       const attacker = pickFirstAttacker(siege.attackerArmyIds, armies)
       if (site && attacker) {
         const defenders = findDefendingArmies(armies, siege.defenderSiteId, site.ownerId)
+        const defenderRealmId = defenders[0]?.realmId ?? site.ownerId
         const ctx: BattleContext = {
           attackerArmy: attacker,
           defenderArmies: defenders,
@@ -146,6 +147,8 @@ export function siegeStep(
           attackerComposition: attacker.composition ?? DEFAULT_COMPOSITION,
           defenderComposition: defenders[0]?.composition ?? DEFAULT_COMPOSITION,
           date: world.date,
+          attackerRealm: world.realms.get(attacker.realmId) ?? null,
+          defenderRealm: defenderRealmId ? world.realms.get(defenderRealmId) ?? null : null,
         }
         const result = resolveCombat(ctx)
 

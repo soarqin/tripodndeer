@@ -23,6 +23,8 @@ function makeRealm(id: string, treasury = 1000): Realm {
     initialArmies: [],
     aiPersonality: 'cautious',
     economy: { treasury, foodStores: 500, taxRate: 10 },
+    traits: [],
+    politicalSystem: 'enfeoffment',
   }
 }
 
@@ -287,15 +289,16 @@ describe('checkTrigger — date triggers', () => {
   it('state triggers always return false in M5 v1', () => {
     const world = worldWith()
 
-    const result = checkTrigger(world, { type: 'state', predicate: 'realm_qin.treasury > 1000' })
+    const result = checkTrigger(world, { type: 'state', predicate: { kind: 'realm.treasury-above', value: 1000 } })
 
     expect(result).toBe(false)
   })
 })
 
 describe('historicalEventsPhase', () => {
-  it('returns world unchanged when no event chains loaded', () => {
-    const world = worldWith()
+  it('returns world unchanged when no chain triggers match the date', () => {
+    const date: GameDate = { yearBC: 400, season: 'spring', month: 1, xun: 'shang' }
+    const world = worldWith({ date })
 
     const result = historicalEventsPhase(world, rng)
 
@@ -304,7 +307,8 @@ describe('historicalEventsPhase', () => {
   })
 
   it('returns same RNG state by reference (no random consumed)', () => {
-    const world = worldWith()
+    const date: GameDate = { yearBC: 400, season: 'spring', month: 1, xun: 'shang' }
+    const world = worldWith({ date })
 
     const result = historicalEventsPhase(world, rng)
 
@@ -312,7 +316,8 @@ describe('historicalEventsPhase', () => {
   })
 
   it('phase signature returns world/nextRng/events keys', () => {
-    const world = worldWith()
+    const date: GameDate = { yearBC: 400, season: 'spring', month: 1, xun: 'shang' }
+    const world = worldWith({ date })
 
     const result = historicalEventsPhase(world, rng)
 

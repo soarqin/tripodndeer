@@ -216,6 +216,7 @@ describe('WorldSchema', () => {
     sieges: new Map(),
     edicts: new Map(),
     governorAssignments: new Map(),
+    reformStates: new Map(),
     playerRealmId: 'realm_red',
     rngState: { seed: 1, counter: 0 },
     phases: [],

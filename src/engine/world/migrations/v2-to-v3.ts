@@ -80,6 +80,7 @@ export function migrateScenarioV2ToV3(rawData: unknown): M1DataV3 {
       health: 80,
       personality: mapAiPersonality(realm.aiPersonality),
       successionLawId: 'primogeniture' as const,
+      inOfficeSinceTick: 0,
     }))
 
   const migrated = {

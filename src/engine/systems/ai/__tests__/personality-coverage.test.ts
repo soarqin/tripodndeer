@@ -136,6 +136,7 @@ function createWorldForContext(context: Context, archetype: PersonalityArchetype
     health: 100,
     personality: archetype,
     successionLawId: 'primogeniture',
+    inOfficeSinceTick: 0,
   })
   world = { ...world, rulers }
 
@@ -183,6 +184,8 @@ function createWorldForContext(context: Context, archetype: PersonalityArchetype
       initialArmies: [],
       aiPersonality: 'cautious',
       economy: { treasury: 50000, foodStores: 50000, taxRate: 10 },
+      traits: [],
+      politicalSystem: 'enfeoffment',
     })
     world = { ...world, realms }
   } else if (context === 'peacetime-poor') {
@@ -197,6 +200,8 @@ function createWorldForContext(context: Context, archetype: PersonalityArchetype
       initialArmies: [],
       aiPersonality: 'cautious',
       economy: { treasury: 100, foodStores: 100, taxRate: 10 },
+      traits: [],
+      politicalSystem: 'enfeoffment',
     })
     world = { ...world, realms }
   } else if (context === 'low-manpower') {

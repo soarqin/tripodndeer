@@ -20,7 +20,8 @@ function makeRealm(id: string, treasury = 1000, traits: readonly string[] = []):
     initialArmies: [],
     aiPersonality: 'cautious',
     economy: { treasury, foodStores: 500, taxRate: 0.1 },
-    ...(traits.length > 0 ? { traits } : {}),
+    traits,
+    politicalSystem: 'enfeoffment',
   }
 }
 

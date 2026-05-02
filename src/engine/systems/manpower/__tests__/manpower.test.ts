@@ -16,7 +16,7 @@ describe('manpower tick', () => {
     const base = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
     const qin = base.realms.get('realm_qin')!
     const realms = new Map(base.realms)
-    realms.set('realm_qin', { ...qin, stats: { manpowerPool: 0, manpowerCap: 80000, warWeariness: 0 } })
+    realms.set('realm_qin', { ...qin, traits: [], stats: { manpowerPool: 0, manpowerCap: 80000, warWeariness: 0 } })
     const world = { ...base, realms, tick: 0 } as World
     const result = manpowerTick(world, world.rngState)
     expect(result.world.realms.get('realm_qin')!.stats?.manpowerPool).toBe(500)
@@ -28,7 +28,7 @@ describe('manpower tick', () => {
     const qin = base.realms.get('realm_qin')!
 
     const realms = new Map(base.realms)
-    realms.set('realm_qin', { ...qin, stats: { manpowerPool: 0, manpowerCap: 80000, warWeariness: 0 } })
+    realms.set('realm_qin', { ...qin, traits: [], stats: { manpowerPool: 0, manpowerCap: 80000, warWeariness: 0 } })
 
     const wars = new Map(base.wars)
     wars.set(warKey('realm_qin', 'realm_zhao'), {
@@ -54,7 +54,7 @@ describe('manpower tick', () => {
     const base = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
     const qin = base.realms.get('realm_qin')!
     const realms = new Map(base.realms)
-    realms.set('realm_qin', { ...qin, stats: { manpowerPool: 79900, manpowerCap: 80000, warWeariness: 0 } })
+    realms.set('realm_qin', { ...qin, traits: [], stats: { manpowerPool: 79900, manpowerCap: 80000, warWeariness: 0 } })
     const world = { ...base, realms, tick: 0 } as World
     const result = manpowerTick(world, world.rngState)
     expect(result.world.realms.get('realm_qin')!.stats?.manpowerPool).toBe(80000)

@@ -37,6 +37,8 @@ function makeRealm(id: string, treasury: number, foodStores: number, taxRate: nu
     initialArmies: [],
     aiPersonality: 'cautious',
     economy: { treasury, foodStores, taxRate },
+    traits: [],
+    politicalSystem: 'enfeoffment',
   }
 }
 
@@ -133,6 +135,7 @@ function makeWorld(date: GameDate = shangDate): World {
     generals: new Map(),
     rulers: new Map(),
     eventChainStates: new Map(),
+    reformStates: new Map(),
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),

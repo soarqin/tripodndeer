@@ -74,6 +74,7 @@ function makeWorld(
     generals: new Map(generals.map((general) => [general.id, general])),
     rulers: new Map(),
     eventChainStates: new Map(),
+    reformStates: new Map(),
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),

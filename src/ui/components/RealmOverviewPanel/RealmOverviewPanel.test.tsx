@@ -43,7 +43,9 @@ describe('RealmOverviewPanel', () => {
       initialSites: [],
       initialArmies: [],
       aiPersonality: 'aggressive_random',
-      economy: { treasury: 0, foodStores: 0, taxRate: 10 }
+      economy: { treasury: 0, foodStores: 0, taxRate: 10 },
+      traits: [],
+      politicalSystem: 'enfeoffment',
     }
 
     const site1: Site = { id: 's1', name: '许昌', position: [0, 0], ownerId: 'r1', polygon: [], adjacency: [], boundary: [], economy: { population: 0, households: 0, taxBase: 0, foodProduction: 0 } }

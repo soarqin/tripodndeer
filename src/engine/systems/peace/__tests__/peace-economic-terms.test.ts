@@ -22,6 +22,8 @@ function makeRealm(id: string, treasury: number, foodStores = 0): Realm {
     initialArmies: [],
     aiPersonality: 'cautious',
     economy: { treasury, foodStores, taxRate: 10 },
+    traits: [],
+    politicalSystem: 'enfeoffment',
   }
 }
 
@@ -56,6 +58,7 @@ function baseWorld(overrides: Partial<World> = {}): World {
     generals: new Map(),
     rulers: new Map(),
     eventChainStates: new Map(),
+    reformStates: new Map(),
     passes: new Map(),
     adjacencyEdges: new Map(),
     sieges: new Map(),

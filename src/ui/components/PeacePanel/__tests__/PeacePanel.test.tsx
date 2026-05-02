@@ -22,7 +22,9 @@ describe('PeacePanel', () => {
     initialSites: [],
     initialArmies: [],
     aiPersonality: 'aggressive_random',
-    economy: { treasury: 0, foodStores: 0, taxRate: 10 }
+    economy: { treasury: 0, foodStores: 0, taxRate: 10 },
+    traits: [],
+    politicalSystem: 'enfeoffment',
   }
 
   const mockTargetRealm: Realm = {
@@ -35,6 +37,8 @@ describe('PeacePanel', () => {
     initialArmies: [],
     aiPersonality: 'aggressive_random',
     economy: { treasury: 0, foodStores: 0, taxRate: 10 },
+    traits: [],
+    politicalSystem: 'enfeoffment',
     stats: {
       manpowerPool: 1000,
       manpowerCap: 1000,

@@ -26,6 +26,7 @@ function makeRuler(realmId: RealmId, generalId: GeneralId): RulerState {
     health: 80,
     personality: 'steward',
     successionLawId: 'primogeniture',
+    inOfficeSinceTick: 0,
   }
 }
 

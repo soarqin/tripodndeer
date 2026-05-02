@@ -43,6 +43,7 @@ function makeRuler(realmId: RealmId, overrides: Partial<RulerState> = {}): Ruler
     health: 80,
     personality: 'steward',
     successionLawId: 'primogeniture',
+    inOfficeSinceTick: 0,
     ...overrides,
   }
 }
@@ -59,6 +60,8 @@ function makeRealm(id: RealmId, overrides: Partial<Realm> = {}): Realm {
     aiPersonality: 'cautious',
     economy: { treasury: 1000, foodStores: 1000, taxRate: 0.1 },
     rulerId: `general_${id}`,
+    traits: [],
+    politicalSystem: 'enfeoffment',
     ...overrides,
   }
 }
@@ -185,6 +188,7 @@ describe('succession crisis & resolution (rulerLifecyclePhase)', () => {
       health: 100,
       personality: 'conqueror',
       successionLawId: 'primogeniture',
+      inOfficeSinceTick: 0,
     })
 
     expect(result.world.realms.get(realmId)?.rulerId).toBe('g_heir_zhao')

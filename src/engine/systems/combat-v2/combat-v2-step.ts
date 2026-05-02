@@ -103,6 +103,7 @@ export function combatV2Step(
     const battleType: BattleContext['battleType'] = isPassAssault ? 'pass-assault' : 'field'
     const passDefenseBonus = isPassAssault && passOnEdge ? passOnEdge.defenseBonus : 0
 
+    const defenderRealmId = defenders[0]?.realmId ?? destSite.ownerId
     const ctx: BattleContext = {
       attackerArmy: army,
       defenderArmies: defenders,
@@ -115,6 +116,8 @@ export function combatV2Step(
       attackerComposition: army.composition ?? DEFAULT_COMPOSITION,
       defenderComposition: defenders[0]?.composition ?? DEFAULT_COMPOSITION,
       date: world.date,
+      attackerRealm: world.realms.get(army.realmId) ?? null,
+      defenderRealm: defenderRealmId ? world.realms.get(defenderRealmId) ?? null : null,
     }
 
     const result = resolveCombat(ctx)

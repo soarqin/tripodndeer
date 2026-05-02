@@ -47,8 +47,8 @@ function makeSites(): ReadonlyMap<string, Site> {
 
 function makeRealms(): ReadonlyMap<string, Realm> {
   return new Map([
-    ['realm_red', { id: 'realm_red', displayName: '红', fullTitle: '红方', color: '#dc2626', capital: 'site_1', initialSites: ['site_1'], initialArmies: [], aiPersonality: 'aggressive_random', economy: { treasury: 0, foodStores: 0, taxRate: 10 } }],
-    ['realm_blue', { id: 'realm_blue', displayName: '蓝', fullTitle: '蓝方', color: '#2563eb', capital: 'site_2', initialSites: ['site_2'], initialArmies: [], aiPersonality: 'aggressive_random', economy: { treasury: 0, foodStores: 0, taxRate: 10 } }],
+    ['realm_red', { id: 'realm_red', displayName: '红', fullTitle: '红方', color: '#dc2626', capital: 'site_1', initialSites: ['site_1'], initialArmies: [], aiPersonality: 'aggressive_random', economy: { treasury: 0, foodStores: 0, taxRate: 10 }, traits: [], politicalSystem: 'enfeoffment' }],
+    ['realm_blue', { id: 'realm_blue', displayName: '蓝', fullTitle: '蓝方', color: '#2563eb', capital: 'site_2', initialSites: ['site_2'], initialArmies: [], aiPersonality: 'aggressive_random', economy: { treasury: 0, foodStores: 0, taxRate: 10 }, traits: [], politicalSystem: 'enfeoffment' }],
   ])
 }
 

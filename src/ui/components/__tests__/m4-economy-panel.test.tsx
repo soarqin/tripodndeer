@@ -43,6 +43,9 @@ vi.mock('~/ui/store/selectors', () => ({
   selectPlayerGovernorAssignments: () => [
     { siteId: 'site_1', generalId: 'gen_1' }
   ],
+  selectPlayerActiveReform: () => null,
+  selectPlayerReformTraits: () => [],
+  selectPlayerPoliticalSystem: () => 'enfeoffment',
   useSites: () => new Map([
     ['site_1', { id: 'site_1', name: '咸阳', ownerId: 'realm_qin', economy: { population: 5000, households: 1000 } }],
     ['site_2', { id: 'site_2', name: '雍', ownerId: 'realm_qin', economy: { population: 5000, households: 1000 } }],

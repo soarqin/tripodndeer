@@ -1,7 +1,7 @@
 import m0Data from '@/content/m0/sites.json'
 import m1Data from '@/content/m1/scenario.json'
 import { INITIAL_DATE } from '@/shared/constants'
-import { M0DataSchema, M1DataSchemaV3 } from '@/shared/schemas'
+import { M0DataSchema, M1DataSchemaV4 } from '@/shared/schemas'
 import { aiPlanStep } from '~/engine/systems/ai'
 import { characterLifecyclePhase } from '~/engine/systems/character'
 import { combatV2Step } from '~/engine/systems/combat-v2'
@@ -12,6 +12,7 @@ import { manpowerTick } from '~/engine/systems/manpower'
 import { marchStep } from '~/engine/systems/march'
 import { orderApplyStep } from '~/engine/systems/orders'
 import { recruitmentPhase } from '~/engine/systems/recruitment'
+import { reformPhase } from '~/engine/systems/reform'
 import { rulerLifecyclePhase } from '~/engine/systems/ruler'
 import { siegeStep } from '~/engine/systems/siege'
 import { victoryCheckStep } from '~/engine/systems/victory'
@@ -38,6 +39,7 @@ import type {
   EdictState,
   EventChainId,
   EventChainState,
+  ReformState,
   GovernorAssignment,
   ZhouInvestitureState,
   RelationKey,
@@ -64,8 +66,8 @@ import type {
   WarState,
   World,
 } from '@/shared/types'
-import type { M1DataV3 } from '@/shared/schemas'
-import { migrateScenarioV2ToV3 } from './migrations/v2-to-v3'
+import type { M1DataV4 } from '@/shared/schemas'
+import { migrateScenarioV3ToV4 } from './migrations/v3-to-v4'
 
 /** 将一个 site 的 boundary 引用展开为具体的 polygon 顶点列表 */
 function expandPolygon(
@@ -118,6 +120,8 @@ function buildRealmMap(realms: readonly Realm[]): Map<RealmId, Realm> {
         foodStores: M4_DEFAULT_REALM_FOOD_STORES,
         taxRate: M4_DEFAULT_TAX_RATE,
       },
+      traits: realm.traits ?? [],
+      politicalSystem: realm.politicalSystem ?? 'enfeoffment',
     })
   }
   return realmMap
@@ -168,13 +172,13 @@ export function loadM0Data(): M0Data {
 }
 
 /** 加载并验证 M1 场景数据（静态 import + Zod 校验） */
-export function loadM1Data(): M1DataV3 {
+export function loadM1Data(): M1DataV4 {
   const raw = m1Data as unknown
   const version = (raw as { schema_version?: number } | null)?.schema_version
-  if (version === undefined || version < 3) {
-    return migrateScenarioV2ToV3(raw)
+  if (version === undefined || version < 4) {
+    return migrateScenarioV3ToV4(raw)
   }
-  return M1DataSchemaV3.parse(raw)
+  return M1DataSchemaV4.parse(raw)
 }
 
 /** 构造初始 World（含 Zod 校验 + ownership 引用完整性 + polygon/adjacency 派发） */
@@ -204,6 +208,7 @@ export function createInitialWorld(data: M0Data, seed: number): World {
     generals: new Map<GeneralId, General>(),
     rulers: new Map(),
     eventChainStates: new Map(),
+    reformStates: new Map(),
     passes: new Map<PassId, Pass>(),
     adjacencyEdges: new Map<AdjacencyEdgeId, AdjacencyEdge>(),
     sieges: new Map<SiegeId, Siege>(),
@@ -217,11 +222,11 @@ export function createInitialWorld(data: M0Data, seed: number): World {
 }
 
 export function createWorldFromM1Data(
-  data: M1DataV3,
+  data: M1DataV4,
   seed: number,
   playerRealmId: RealmId,
 ): World {
-  M1DataSchemaV3.parse(data)
+  M1DataSchemaV4.parse(data)
 
   const realms = buildRealmMap(data.realms)
   const sites = buildSites(data.sites, data.edges, data.initialOwnership, realms)
@@ -304,6 +309,11 @@ export function createWorldFromM1Data(
     eventChainStates.set(chain.id, chain)
   }
 
+  const reformStates = new Map<RealmId, ReformState>()
+  for (const reformState of data.reformStates) {
+    reformStates.set(reformState.realmId, reformState)
+  }
+
   return {
     date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
     tick: 0,
@@ -322,6 +332,7 @@ export function createWorldFromM1Data(
     generals,
     rulers,
     eventChainStates,
+    reformStates,
     passes,
     adjacencyEdges,
     sieges: new Map<SiegeId, Siege>(),
@@ -339,6 +350,7 @@ export function createWorldFromM1Data(
       rulerLifecyclePhase,
       characterLifecyclePhase,
       recruitmentPhase,
+      reformPhase,
       victoryCheckStep,
       diplomacyLifecycleStep,
       economyPhase,

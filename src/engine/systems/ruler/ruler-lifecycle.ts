@@ -27,6 +27,7 @@ function buildSuccessor(
   heirId: GeneralId,
   prevRuler: RulerState | undefined,
   generals: ReadonlyMap<GeneralId, General>,
+  inOfficeSinceTick: number,
 ): RulerState {
   const heir = generals.get(heirId)
   return {
@@ -37,6 +38,7 @@ function buildSuccessor(
     health: 100,
     personality: prevRuler?.personality ?? 'steward',
     successionLawId: 'primogeniture',
+    inOfficeSinceTick,
   }
 }
 
@@ -80,7 +82,7 @@ export function rulerLifecyclePhase(
       const heirId = selectHeir(probeWorld, realmId)
 
       if (heirId !== null && !isPlayerRealm) {
-        const successor = buildSuccessor(realmId, heirId, updatedRuler, generals)
+        const successor = buildSuccessor(realmId, heirId, updatedRuler, generals, world.tick)
         rulers.set(realmId, successor)
 
         const realm = realms.get(realmId)

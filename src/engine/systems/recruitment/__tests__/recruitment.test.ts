@@ -30,6 +30,8 @@ function makeRealm(id: RealmId): Realm {
     initialArmies: [],
     aiPersonality: 'cautious',
     economy: { treasury: 0, foodStores: 0, taxRate: 10 },
+    traits: [],
+    politicalSystem: 'enfeoffment',
   }
 }
 

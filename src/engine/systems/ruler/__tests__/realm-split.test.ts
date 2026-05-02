@@ -42,6 +42,8 @@ function makeRealm(id: RealmId, overrides: Partial<Realm> = {}): Realm {
     initialArmies: [],
     aiPersonality: 'aggressive_random',
     economy: { treasury: 1000, foodStores: 800, taxRate: 10 },
+    traits: [],
+    politicalSystem: 'enfeoffment',
     ...overrides,
   }
 }
@@ -109,6 +111,7 @@ function makeRuler(realmId: RealmId, generalId: string): RulerState {
     health: 80,
     personality: 'steward',
     successionLawId: 'primogeniture',
+    inOfficeSinceTick: 0,
   }
 }
 

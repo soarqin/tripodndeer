@@ -18,6 +18,7 @@ function makeRuler(realmId: RealmId, overrides: Partial<RulerState> = {}): Ruler
     health: 80,
     personality: 'steward',
     successionLawId: 'primogeniture',
+    inOfficeSinceTick: 0,
     ...overrides,
   }
 }

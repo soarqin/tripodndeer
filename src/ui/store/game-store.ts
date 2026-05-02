@@ -217,6 +217,7 @@ function installSuccessor(world: World, realmId: RealmId, newGeneralId: GeneralI
     health: 100,
     personality: prevRuler?.personality ?? 'steward',
     successionLawId: 'primogeniture',
+    inOfficeSinceTick: world.tick,
   }
   rulers.set(realmId, successor)
 

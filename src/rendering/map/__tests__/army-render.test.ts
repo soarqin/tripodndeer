@@ -41,6 +41,8 @@ function makeRealm(id: string, color: string): Realm {
     id, displayName: '秦', fullTitle: '秦国', color,
     capital: 'site_1', initialSites: [], initialArmies: [], aiPersonality: 'aggressive_random',
     economy: { treasury: 0, foodStores: 0, taxRate: 10 },
+    traits: [],
+    politicalSystem: 'enfeoffment',
   } as Realm
 }
 

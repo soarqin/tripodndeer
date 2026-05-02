@@ -104,7 +104,7 @@ describe('EventChainSchema (M5)', () => {
       id: 'chain_state',
       trigger: {
         type: 'state',
-        predicate: 'realm.treasury > 1000',
+        predicate: { kind: 'realm.treasury-above', value: 1000 },
       },
       oneShot: false,
       stages: [
@@ -121,7 +121,7 @@ describe('EventChainSchema (M5)', () => {
   it('rejects an EventChain with empty stages', () => {
     const chain = {
       id: 'chain_empty',
-      trigger: { type: 'state', predicate: 'true' },
+      trigger: { type: 'state', predicate: { kind: 'realm.no-active-war' } },
       oneShot: true,
       stages: [],
     }
@@ -131,7 +131,7 @@ describe('EventChainSchema (M5)', () => {
   it('rejects an EventChain stage with invalid effect in choice', () => {
     const chain = {
       id: 'chain_bad',
-      trigger: { type: 'state', predicate: 'true' },
+      trigger: { type: 'state', predicate: { kind: 'realm.no-active-war' } },
       oneShot: true,
       stages: [
         {
