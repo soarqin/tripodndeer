@@ -1,0 +1,62 @@
+[
+  {
+    "id": "route_qin_wei",
+    "fromSiteId": "site_001",
+    "toSiteId": "site_010",
+    "fromRealmId": "realm_qin",
+    "toRealmId": "realm_wei",
+    "establishedAtTick": 0,
+    "baseIncomePerXun": 50,
+    "status": "active"
+  },
+  {
+    "id": "route_wei_qi",
+    "fromSiteId": "site_018",
+    "toSiteId": "site_005",
+    "fromRealmId": "realm_wei",
+    "toRealmId": "realm_qi",
+    "establishedAtTick": 0,
+    "baseIncomePerXun": 50,
+    "status": "active"
+  },
+  {
+    "id": "route_qi_zhao",
+    "fromSiteId": "site_005",
+    "toSiteId": "site_014",
+    "fromRealmId": "realm_qi",
+    "toRealmId": "realm_zhao",
+    "establishedAtTick": 0,
+    "baseIncomePerXun": 50,
+    "status": "active"
+  },
+  {
+    "id": "route_qin_han",
+    "fromSiteId": "site_001",
+    "toSiteId": "site_015",
+    "fromRealmId": "realm_qin",
+    "toRealmId": "realm_han",
+    "establishedAtTick": 0,
+    "baseIncomePerXun": 50,
+    "status": "active"
+  },
+  {
+    "id": "route_zhao_yan",
+    "fromSiteId": "site_014",
+    "toSiteId": "site_006",
+    "fromRealmId": "realm_zhao",
+    "toRealmId": "realm_yan",
+    "establishedAtTick": 0,
+    "baseIncomePerXun": 50,
+    "status": "active"
+  },
+  {
+    "id": "route_chu_wei",
+    "fromSiteId": "site_025",
+    "toSiteId": "site_018",
+    "fromRealmId": "realm_chu",
+    "toRealmId": "realm_wei",
+    "establishedAtTick": 0,
+    "baseIncomePerXun": 50,
+    "status": "active"
+  }
+]
