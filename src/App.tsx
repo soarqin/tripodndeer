@@ -12,6 +12,7 @@ import { EconomyPanel } from '@/ui/components/EconomyPanel'
 import { CharacterPanel } from '@/ui/components/CharacterPanel'
 import { Modal } from '@/ui/components/Modal'
 import { SuccessionModal } from '@/ui/components/SuccessionModal'
+import { DisasterReliefModal } from '@/ui/components/DisasterReliefModal'
 import { useRafDriver } from '@/ui/store/raf-driver'
 import { useGameStore } from '@/ui/store/game-store'
 import { isVictorious } from '@/engine/systems/victory'
@@ -54,6 +55,7 @@ export function App(): React.JSX.Element {
       <TopBar />
       <EventBanner />
       <SuccessionModal />
+      <DisasterReliefModal />
       {modal && (
         <Modal
           title={modal.title}

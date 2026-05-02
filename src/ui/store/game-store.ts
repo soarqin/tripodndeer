@@ -6,6 +6,7 @@ import { advanceClock, setSpeed as engineSetSpeed } from '@/engine/clock'
 import type { ClockState } from '@/engine/clock'
 import { applyDiplomacyAction, relationKey, validateDiplomacyAction, type DiplomacyActionRequest, type DiplomacyValidationReason } from '~/engine/systems/diplomacy'
 import { createWorldFromM1Data, loadM1Data } from '@/engine/world'
+import { applyChoiceEffects, loadDisasterDefinitions, setDisasterState } from '~/engine/systems/disaster/disaster-phase'
 import { M5_RULER_BASE_LIFESPAN } from '~/content/m2/balance'
 import type {
   ArmyId,
@@ -93,6 +94,7 @@ interface GameActions {
   resolveSuccessionFraternal: (realmId: RealmId, brotherId: GeneralId) => void
   resolveSuccessionCivilWar: (realmId: RealmId) => void
   resolveSuccessionForceVassal: (realmId: RealmId) => void
+  applyDisasterChoice: (disasterId: string, choiceId: string) => void
 }
 
 export interface ActivatePlayerEdictPayload {
@@ -451,6 +453,38 @@ function createDiplomacyActionFeedback(
   }
 }
 
+function createDisasterActions(set: StoreSet): Pick<GameActions, 'applyDisasterChoice'> {
+  return {
+    applyDisasterChoice: (disasterId: string, choiceId: string) =>
+      set((state) => {
+        const defs = loadDisasterDefinitions()
+        const def = defs.find(d => d.id === disasterId)
+        if (!def) return
+
+        const playerRealmId = state.playerRealmId
+        const existingState = state.world.disasterStates.get(playerRealmId)
+        if (!existingState || existingState.status !== 'awaiting_decision' || existingState.disasterId !== disasterId) {
+          return
+        }
+
+        let nextWorld = applyChoiceEffects(state.world, def, choiceId, playerRealmId)
+        
+        const resolvedState = {
+          ...existingState,
+          status: 'resolved' as const,
+          chosenChoiceId: choiceId,
+          resolvedAtTick: nextWorld.tick,
+        }
+        
+        nextWorld = setDisasterState(nextWorld, playerRealmId, resolvedState)
+        
+        state.world = castDraft(nextWorld)
+        state.modal = null
+        state.clockState = engineSetSpeed(state.clockState, '1x')
+      }),
+  }
+}
+
 /**
  * Zustand 桥接 store：
  * - 持有 World + ClockState + 最近一次 events
@@ -465,6 +499,7 @@ export const useGameStore = create<GameStore>()(
     ...createUiActions(set),
     ...createWorldActions(set),
     ...createSuccessionActions(set),
+    ...createDisasterActions(set),
   })),
 )
 

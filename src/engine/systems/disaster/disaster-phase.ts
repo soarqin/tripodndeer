@@ -35,11 +35,11 @@ const DEFAULT_DEFINITIONS: readonly DisasterDefinition[] = [
   wenYiJson,
 ].map((json) => DisasterDefinitionSchema.parse(json))
 
-function loadDisasterDefinitions(): readonly DisasterDefinition[] {
+export function loadDisasterDefinitions(): readonly DisasterDefinition[] {
   return DEFAULT_DEFINITIONS
 }
 
-function setDisasterState(
+export function setDisasterState(
   world: World,
   realmId: string,
   state: DisasterState,
@@ -85,7 +85,7 @@ function applyDisasterFactionDelta(
   return { ...world, factionInfluences }
 }
 
-function applyChoiceEffects(world: World, def: DisasterDefinition, choiceId: string, realmId: RealmId): World {
+export function applyChoiceEffects(world: World, def: DisasterDefinition, choiceId: string, realmId: RealmId): World {
   const choice = def.playerChoices.find((c) => c.id === choiceId)
   if (!choice) return world
   let next = world
