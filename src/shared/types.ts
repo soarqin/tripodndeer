@@ -310,6 +310,10 @@ export type FactionId =
   | 'conservatives'
   | 'foreign_clients'
 
+export type DisasterId = string
+export type TradeRouteId = string
+export type FactionImbalanceEventId = string
+
 export type Post = 'ruler' | 'chancellor' | 'general' | 'governor'
 
 export interface WarState {
@@ -430,6 +434,62 @@ export interface ReformState {
   readonly stageEnteredAtTick: number
   readonly status: 'in_progress' | 'completed_success' | 'completed_failure' | 'paused'
   readonly choiceHistory: readonly { stageId: string; choiceId: string; tick: number }[]
+}
+
+export interface DisasterChoice {
+  readonly id: string
+  readonly labelZh: string
+  readonly costType: 'treasury' | 'foodStores' | 'morale' | 'none'
+  readonly costAmount: number
+  readonly effects: readonly Effect[]
+  readonly outcomeZh: string
+}
+
+export interface DisasterDefinition {
+  readonly id: DisasterId
+  readonly displayName: string
+  readonly displayNameZh: string
+  readonly trigger: PredicateNode
+  readonly baseProbabilityBp: number
+  readonly effects: readonly Effect[]
+  readonly playerChoices: readonly DisasterChoice[]
+  readonly durationMonths: number
+  readonly historicalYearRange?: readonly [number, number]
+}
+
+export interface DisasterState {
+  readonly realmId: RealmId
+  readonly disasterId: DisasterId
+  readonly siteId: SiteId
+  readonly startedAtTick: number
+  readonly status: 'awaiting_decision' | 'resolving' | 'resolved'
+  readonly chosenChoiceId?: string
+  readonly resolvedAtTick?: number
+}
+
+export interface TradeRoute {
+  readonly id: TradeRouteId
+  readonly fromSiteId: SiteId
+  readonly toSiteId: SiteId
+  readonly fromRealmId: RealmId
+  readonly toRealmId: RealmId
+  readonly establishedAtTick: number
+  readonly baseIncomePerXun: number
+  readonly status: 'active' | 'cut'
+}
+
+export interface FactionInfluenceState {
+  readonly realmId: RealmId
+  readonly influences: ReadonlyMap<FactionId, number>
+}
+
+export interface FactionImbalanceEvent {
+  readonly id: FactionImbalanceEventId
+  readonly kind: 'coup' | 'split' | 'overthrow'
+  readonly triggerPredicate: PredicateNode
+  readonly effects: readonly Effect[]
+  readonly cooldownYears: number
+  readonly displayNameZh: string
 }
 
 export interface TraitEffect {
@@ -645,6 +705,9 @@ export interface World {
   rulers: ReadonlyMap<RealmId, RulerState>
   eventChainStates: ReadonlyMap<EventChainId, EventChainState>
   reformStates: ReadonlyMap<RealmId, ReformState>
+  disasterStates: ReadonlyMap<RealmId, DisasterState>
+  tradeRoutes: ReadonlyMap<TradeRouteId, TradeRoute>
+  factionInfluences: ReadonlyMap<RealmId, FactionInfluenceState>
   passes: ReadonlyMap<PassId, Pass>
   adjacencyEdges: ReadonlyMap<AdjacencyEdgeId, AdjacencyEdge>
   sieges: ReadonlyMap<SiegeId, Siege>
