@@ -2,6 +2,7 @@ import {
   GENERAL_LOSER_DEATH_RATE,
   GENERAL_MIGHT_SCALING,
   GENERAL_WINNER_DEATH_RATE,
+  M4_BASIS_POINTS_DIVISOR,
   M5_ARMY_CAP_BONUS_PER_WU,
   RNG_VARIANCE_PERCENT,
   TERRAIN_DEFENSE,
@@ -9,8 +10,9 @@ import {
   UNIT_COUNTER_MATRIX,
 } from '~/content/m2/balance'
 import type { TerrainType, UnitType } from '~/content/m2/balance'
+import { getTraitModifiers } from '~/content/m4_1/trait-effects'
 import { nextRng, pickWithVariance } from '~/engine/random'
-import type { Army, GameDate, General, GeneralId } from '~/shared/types'
+import type { Army, GameDate, General, GeneralId, Realm } from '~/shared/types'
 import { pickTactic } from './tactics'
 
 export interface Composition {
@@ -34,6 +36,8 @@ export interface BattleContext {
   attackerComposition: Composition
   defenderComposition: Composition
   date: GameDate
+  attackerRealm?: Realm | null
+  defenderRealm?: Realm | null
 }
 
 export interface ModifierStep {
@@ -141,7 +145,22 @@ export function resolveCombat(ctx: BattleContext): BattleResolution {
     steps.push({ name: 'might', attackerMultiplier: 1 + mightBonus, defenderMultiplier: 1 })
   }
 
-  // Step 7: tactic effect (Task 2.6)
+  if (ctx.attackerRealm || ctx.defenderRealm) {
+    const attackerTraitMod = ctx.attackerRealm ? getTraitModifiers(ctx.attackerRealm) : null
+    const defenderTraitMod = ctx.defenderRealm ? getTraitModifiers(ctx.defenderRealm) : null
+    const attackerMultiplier = attackerTraitMod
+      ? (M4_BASIS_POINTS_DIVISOR + attackerTraitMod.combatPowerMultiplierBp) / M4_BASIS_POINTS_DIVISOR
+      : 1
+    const defenderMultiplier = defenderTraitMod
+      ? (M4_BASIS_POINTS_DIVISOR + defenderTraitMod.combatPowerMultiplierBp) / M4_BASIS_POINTS_DIVISOR
+      : 1
+    if (attackerMultiplier !== 1 || defenderMultiplier !== 1) {
+      attackerPower *= attackerMultiplier
+      defenderPower *= defenderMultiplier
+      steps.push({ name: 'trait-multiplier', attackerMultiplier, defenderMultiplier })
+    }
+  }
+
   const tacticEffect = pickTactic(ctx)
   if (tacticEffect) {
     if (tacticEffect.attackMultiplier) {

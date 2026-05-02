@@ -18,6 +18,7 @@ import {
   type GovernorSettlementModifiers,
 } from '~/engine/systems/statecraft/governors'
 import { settlePeaceTributes } from '~/engine/systems/peace'
+import { getTraitModifiers } from '~/content/m4_1/trait-effects'
 
 export function economyPhase(
   world: World,
@@ -74,9 +75,17 @@ function settleRealm(
     foodConsumption += nextSite.economy.households * M4_FOOD_CONSUMPTION_PER_HOUSEHOLD
   }
 
-  const effectiveTaxIncome = applyBasisPointsDelta(taxIncome, edictModifiers.taxIncomeBasisPoints)
+  const traitModifiers = getTraitModifiers(realm)
+  const effectiveTaxIncome = applyBasisPointsDelta(
+    taxIncome,
+    edictModifiers.taxIncomeBasisPoints + traitModifiers.taxIncomeMultiplierBp,
+  )
+  const effectiveFoodProduction = applyBasisPointsDelta(
+    foodProduction,
+    traitModifiers.foodProductionMultiplierBp,
+  )
   const nextTreasury = Math.max(0, realm.economy.treasury + effectiveTaxIncome - edictModifiers.treasuryCost)
-  const nextFoodStores = Math.max(0, realm.economy.foodStores + foodProduction - foodConsumption)
+  const nextFoodStores = Math.max(0, realm.economy.foodStores + effectiveFoodProduction - foodConsumption)
 
   return {
     realm: {

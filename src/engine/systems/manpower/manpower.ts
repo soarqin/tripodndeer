@@ -1,9 +1,11 @@
 import type { GameEvent, RNGState, World } from '~/shared/types'
 import {
+  M4_BASIS_POINTS_DIVISOR,
   MANPOWER_RECOVERY_PER_MONTH,
   WAR_WEARINESS_PER_MONTH_AT_WAR,
   WAR_WEARINESS_RECOVERY_THRESHOLD,
 } from '~/content/m2/balance'
+import { getTraitModifiers } from '~/content/m4_1/trait-effects'
 
 export function manpowerTick(
   world: World,
@@ -27,11 +29,19 @@ export function manpowerTick(
       ? realm.stats.warWeariness + WAR_WEARINESS_PER_MONTH_AT_WAR
       : realm.stats.warWeariness
 
-    const recovery = newWeariness > WAR_WEARINESS_RECOVERY_THRESHOLD
+    const baseRecovery = newWeariness > WAR_WEARINESS_RECOVERY_THRESHOLD
       ? Math.floor(MANPOWER_RECOVERY_PER_MONTH / 2)
       : MANPOWER_RECOVERY_PER_MONTH
 
-    const newManpower = Math.min(realm.stats.manpowerPool + recovery, realm.stats.manpowerCap)
+    const traitMod = getTraitModifiers(realm)
+    const recovery = Math.floor(
+      baseRecovery * (M4_BASIS_POINTS_DIVISOR + traitMod.recruitmentSpeedMultiplierBp) / M4_BASIS_POINTS_DIVISOR,
+    )
+    const effectiveCap = Math.floor(
+      realm.stats.manpowerCap * (M4_BASIS_POINTS_DIVISOR + traitMod.manpowerCapMultiplierBp) / M4_BASIS_POINTS_DIVISOR,
+    )
+
+    const newManpower = Math.min(realm.stats.manpowerPool + recovery, effectiveCap)
 
     realms.set(realm.id, {
       ...realm,
