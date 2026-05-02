@@ -9,6 +9,7 @@ import type {
   World,
 } from '~/shared/types'
 import { nextRng } from '~/engine/random'
+import { isYearStart } from '~/engine/calendar'
 import {
   M5_RECRUITMENT_PER_REALM_PER_YEAR,
   M5_SPECIALTY_WEIGHTS_RECRUITMENT,
@@ -22,10 +23,6 @@ const NAME_POOL: readonly string[] = [
   '正', '直', '刚', '毅', '明', '达', '通', '博', '雅', '清',
   '洁', '纯', '朴', '诚', '实', '厚', '重', '慎', '谦', '和',
 ]
-
-function isYearStart(world: World): boolean {
-  return world.date.season === 'spring' && world.date.month === 1 && world.date.xun === 'shang'
-}
 
 function pickSpecialty(rng: RNGState): { specialty: Specialty; nextRng: RNGState } {
   const roll = nextRng(rng)
