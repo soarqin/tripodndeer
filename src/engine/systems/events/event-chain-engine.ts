@@ -12,6 +12,10 @@ const EFFECT_TYPES = [
   'character.loyalty',
   'realm.trait.add',
   'realm.politicalSystem.set',
+  'site.population.delta',
+  'realm.faction.delta',
+  'realm.warWeariness.delta',
+  'realm.foodStores.delta',
 ] as const
 
 type EffectType = (typeof EFFECT_TYPES)[number]
@@ -77,6 +81,51 @@ function applyEffect(world: World, effect: Effect): World {
       if (!realm) return world
       const realms = new Map(world.realms)
       realms.set(realm.id, { ...realm, politicalSystem: effect.system })
+      return { ...world, realms }
+    }
+    case 'site.population.delta': {
+      const site = world.sites.get(effect.siteId)
+      if (!site) return world
+      const sites = new Map(world.sites)
+      const newPop = Math.max(0, site.economy.population + effect.delta)
+      sites.set(site.id, {
+        ...site,
+        economy: { ...site.economy, population: newPop },
+      })
+      return { ...world, sites }
+    }
+    case 'realm.faction.delta': {
+      const current = world.factionInfluences.get(effect.realmId)
+      if (!current) return world
+      const oldVal = current.influences.get(effect.faction) ?? 0
+      const newVal = Math.min(100, Math.max(0, oldVal + effect.delta))
+      const influences = new Map(current.influences)
+      influences.set(effect.faction, newVal)
+      const factionInfluences = new Map(world.factionInfluences)
+      factionInfluences.set(effect.realmId, { ...current, influences })
+      return { ...world, factionInfluences }
+    }
+    case 'realm.warWeariness.delta': {
+      const realm = world.realms.get(effect.realmId)
+      if (!realm) return world
+      const realms = new Map(world.realms)
+      const currentWW = realm.stats?.warWeariness ?? 0
+      const newWW = Math.min(100, Math.max(0, currentWW + effect.delta))
+      realms.set(realm.id, {
+        ...realm,
+        stats: { ...(realm.stats ?? { manpowerPool: 0, manpowerCap: 0, warWeariness: 0 }), warWeariness: newWW },
+      })
+      return { ...world, realms }
+    }
+    case 'realm.foodStores.delta': {
+      const realm = world.realms.get(effect.realmId)
+      if (!realm) return world
+      const realms = new Map(world.realms)
+      const newFood = Math.max(0, realm.economy.foodStores + effect.delta)
+      realms.set(realm.id, {
+        ...realm,
+        economy: { ...realm.economy, foodStores: newFood },
+      })
       return { ...world, realms }
     }
     default: {
