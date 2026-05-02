@@ -18,6 +18,8 @@ import type {
   General,
   Treaty,
   ZhouInvestitureState,
+  ReformState,
+  PoliticalSystem,
 } from '~/shared/types'
 import { isAtWar } from '~/engine/wars'
 import type { DiplomacyActionFeedback, GameStoreState } from './game-store'
@@ -265,4 +267,18 @@ function isEconomySettlementPayload(
     && typeof candidate.foodStoresDelta === 'number'
     && (candidate.populationDelta === undefined || typeof candidate.populationDelta === 'number')
     && (candidate.householdsDelta === undefined || typeof candidate.householdsDelta === 'number')
+}
+
+export function selectPlayerActiveReform(state: GameStoreState): ReformState | null {
+  return state.world.reformStates?.get(state.playerRealmId) ?? null
+}
+
+export function selectPlayerReformTraits(state: GameStoreState): readonly string[] {
+  const realm = state.world.realms.get(state.playerRealmId)
+  return realm?.traits ?? []
+}
+
+export function selectPlayerPoliticalSystem(state: GameStoreState): PoliticalSystem {
+  const realm = state.world.realms.get(state.playerRealmId)
+  return realm?.politicalSystem ?? 'enfeoffment'
 }

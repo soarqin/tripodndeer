@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useGameStore } from '~/ui/store'
 import { M5_GOVERNOR_TAX_BONUS_PER_ZHENG } from '~/content/m2/balance'
+import type { PoliticalSystem } from '~/shared/types'
 import {
   selectActivePanel,
   selectPlayerTreasury,
@@ -10,10 +11,76 @@ import {
   selectPlayerOwnedSiteEconomyTotals,
   selectPlayerActiveEdicts,
   selectPlayerGovernorAssignments,
+  selectPlayerActiveReform,
+  selectPlayerReformTraits,
+  selectPlayerPoliticalSystem,
   useSites,
   useGenerals,
 } from '~/ui/store/selectors'
 import styles from './EconomyPanel.module.css'
+
+function politicalSystemLabel(system: PoliticalSystem): string {
+  const labels: Record<PoliticalSystem, string> = {
+    enfeoffment: '分封制',
+    commandery: '郡县制',
+    legalist_centralized: '法家集权',
+  }
+  return labels[system]
+}
+
+function traitDisplayName(trait: string): string {
+  const names: Record<string, string> = {
+    shang_yang_reform_done: '商鞅变法',
+    hu_fu_qi_she_done: '胡服骑射',
+    li_kui_reform_done: '李悝变法',
+    wu_qi_failed_legacy: '吴起遗志',
+    chu_wu_qi_legacy_done: '楚国吴起遗志',
+    qi_jixia_reform_done: '稷下变制',
+    han_shen_buhai_done: '申不害术治',
+    reform_failed_scar: '变法失败之痛',
+  }
+  return names[trait] ?? trait
+}
+
+interface ReformSectionProps {
+  politicalSystem: PoliticalSystem
+  reformTraits: readonly string[]
+  activeReformId: string | null
+}
+
+function ReformSection({ politicalSystem, reformTraits, activeReformId }: ReformSectionProps) {
+  return (
+    <div className={styles.section}>
+      <div className={styles.sectionTitle}>变法 (Reforms)</div>
+      <div className={styles.statRow}>
+        <span className={styles.label}>政治体制</span>
+        <span className={styles.value} data-testid="political-system-display">
+          {politicalSystemLabel(politicalSystem)}
+        </span>
+      </div>
+      <div className={styles.statRow}>
+        <span className={styles.label}>变法特质</span>
+        <span className={styles.value} data-testid="reform-trait-list">
+          {reformTraits.length > 0 ? (
+            reformTraits.map(trait => (
+              <span key={trait} className={styles.traitBadge}>
+                {traitDisplayName(trait)}
+              </span>
+            ))
+          ) : (
+            '无'
+          )}
+        </span>
+      </div>
+      {activeReformId && (
+        <div className={styles.statRow}>
+          <span className={styles.label}>进行中</span>
+          <span className={styles.value}>{activeReformId}</span>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export function EconomyPanel() {
   const activePanel = useGameStore(selectActivePanel)
@@ -25,50 +92,37 @@ export function EconomyPanel() {
   const totals = useGameStore(selectPlayerOwnedSiteEconomyTotals)
   const activeEdicts = useGameStore(selectPlayerActiveEdicts)
   const governorAssignments = useGameStore(selectPlayerGovernorAssignments)
+  const activeReform = useGameStore(selectPlayerActiveReform)
+  const reformTraits = useGameStore(selectPlayerReformTraits)
+  const politicalSystem = useGameStore(selectPlayerPoliticalSystem)
   const sites = useSites()
   const generals = useGenerals()
   const activatePlayerEdict = useGameStore((s) => s.activatePlayerEdict)
   const assignPlayerGovernor = useGameStore((s) => s.assignPlayerGovernor)
-
   const tick = useGameStore((s) => s.world.tick)
   const pendingOrdersCount = useGameStore((s) => s.world.pendingOrders.length)
-
   const [selectedSiteId, setSelectedSiteId] = useState<string>('')
   const [selectedGeneralId, setSelectedGeneralId] = useState<string>('')
-
   if (activePanel !== 'neizheng') return null
-
   const ownedSites = [...sites.values()].filter((s) => s.ownerId === playerRealmId)
-  
   const playerGenerals = [...generals.values()].filter((g) => g.realmId === playerRealmId)
   const assignedGeneralIds = new Set(governorAssignments.map((a) => a.generalId))
   const availableGenerals = playerGenerals.filter((g) => !assignedGeneralIds.has(g.id))
-
-  const handleActivateTaxRelief = () => {
-    activatePlayerEdict({
-      edictId: `edict_${tick}_tax_${activeEdicts.length}_${pendingOrdersCount}`,
-      kind: 'edict_tax_relief',
-      durationMonths: 3,
-    })
-  }
-
-  const handleActivateGrainReserve = () => {
-    activatePlayerEdict({
-      edictId: `edict_${tick}_grain_${activeEdicts.length}_${pendingOrdersCount}`,
-      kind: 'edict_grain_reserve',
-      durationMonths: 3,
-    })
-  }
-
+  const handleActivateTaxRelief = () => activatePlayerEdict({
+    edictId: `edict_${tick}_tax_${activeEdicts.length}_${pendingOrdersCount}`,
+    kind: 'edict_tax_relief',
+    durationMonths: 3,
+  })
+  const handleActivateGrainReserve = () => activatePlayerEdict({
+    edictId: `edict_${tick}_grain_${activeEdicts.length}_${pendingOrdersCount}`,
+    kind: 'edict_grain_reserve',
+    durationMonths: 3,
+  })
   const handleAssignGovernor = () => {
     if (!selectedSiteId || !selectedGeneralId) return
-    assignPlayerGovernor({
-      siteId: selectedSiteId,
-      generalId: selectedGeneralId,
-    })
+    assignPlayerGovernor({ siteId: selectedSiteId, generalId: selectedGeneralId })
     setSelectedGeneralId('')
   }
-
   const isAssignDisabled = !selectedSiteId || !selectedGeneralId || availableGenerals.length === 0
 
   return (
@@ -126,6 +180,12 @@ export function EconomyPanel() {
             </span>
           </div>
         </div>
+
+        <ReformSection
+          politicalSystem={politicalSystem}
+          reformTraits={reformTraits}
+          activeReformId={activeReform?.reformId ?? null}
+        />
 
         <div className={styles.section}>
           <div className={styles.sectionTitle}>政令 (Edicts)</div>
