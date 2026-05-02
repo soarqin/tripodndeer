@@ -503,6 +503,9 @@ export interface TraitEffect {
   readonly recruitmentSpeedMultiplierBp?: number
   readonly generalRecruitmentWeightBp?: number
   readonly combatPowerMultiplierBp?: number
+  readonly disasterResistanceMultiplierBp?: number
+  readonly tradeIncomeMultiplierBp?: number
+  readonly factionStabilityBonusBp?: number
 }
 
 export interface TraitModifiers {
@@ -512,6 +515,9 @@ export interface TraitModifiers {
   readonly recruitmentSpeedMultiplierBp: number
   readonly generalRecruitmentWeightBp: number
   readonly combatPowerMultiplierBp: number
+  readonly disasterResistanceMultiplierBp: number
+  readonly tradeIncomeMultiplierBp: number
+  readonly factionStabilityBonusBp: number
 }
 
 export interface SiteOccupation {

@@ -43,6 +43,9 @@ describe('TraitEffectSchema', () => {
       recruitmentSpeedMultiplierBp: 0,
       generalRecruitmentWeightBp: 0,
       combatPowerMultiplierBp: 0,
+      disasterResistanceMultiplierBp: 0,
+      tradeIncomeMultiplierBp: 0,
+      factionStabilityBonusBp: 0,
     }
     expect(modifiers.manpowerCapMultiplierBp).toBe(0)
     expect(modifiers.combatPowerMultiplierBp).toBe(0)

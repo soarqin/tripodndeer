@@ -61,7 +61,28 @@ describe('getTraitModifiers', () => {
       recruitmentSpeedMultiplierBp: 0,
       generalRecruitmentWeightBp: 0,
       combatPowerMultiplierBp: 0,
+      disasterResistanceMultiplierBp: 0,
+      tradeIncomeMultiplierBp: 0,
+      factionStabilityBonusBp: 0,
     })
+  })
+
+  it('accumulates disasterResistanceMultiplierBp from traits', () => {
+    const realm = makeRealm(['hu_fu_qi_she_done'])
+    const modifiers = getTraitModifiers(realm)
+    expect(modifiers.disasterResistanceMultiplierBp).toBe(1000)
+  })
+
+  it('accumulates tradeIncomeMultiplierBp from traits', () => {
+    const realm = makeRealm(['shang_yang_reform_done'])
+    const modifiers = getTraitModifiers(realm)
+    expect(modifiers.tradeIncomeMultiplierBp).toBe(1500)
+  })
+
+  it('accumulates factionStabilityBonusBp from traits', () => {
+    const realm = makeRealm(['qi_jixia_reform_done'])
+    const modifiers = getTraitModifiers(realm)
+    expect(modifiers.factionStabilityBonusBp).toBe(500)
   })
 
   it('returns single trait modifiers (shang_yang)', () => {
