@@ -1,8 +1,10 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { DisasterReliefModal } from '../DisasterReliefModal'
 import { useGameStore } from '~/ui/store/game-store'
+import type { GameStoreState } from '~/ui/store/game-store'
+import type { ModalAction } from '~/ui/components/Modal/Modal'
 import type { DisasterState, Site } from '~/shared/types'
 
 vi.mock('~/ui/store/game-store', () => ({
@@ -28,7 +30,7 @@ describe('DisasterReliefModal', () => {
         openModal: mockOpenModal,
         applyDisasterChoice: mockApplyDisasterChoice,
       }
-      return selector(state as any)
+      return selector(state as unknown as GameStoreState)
     })
 
     render(<DisasterReliefModal />)
@@ -56,7 +58,7 @@ describe('DisasterReliefModal', () => {
         openModal: mockOpenModal,
         applyDisasterChoice: mockApplyDisasterChoice,
       }
-      return selector(state as any)
+      return selector(state as unknown as GameStoreState)
     })
 
     render(<DisasterReliefModal />)
@@ -98,7 +100,7 @@ describe('DisasterReliefModal', () => {
         openModal: mockOpenModal,
         applyDisasterChoice: mockApplyDisasterChoice,
       }
-      return selector(state as any)
+      return selector(state as unknown as GameStoreState)
     })
 
     render(<DisasterReliefModal />)
@@ -111,13 +113,13 @@ describe('DisasterReliefModal', () => {
     expect(modalArgs.testId).toBe('disaster-modal')
     expect(modalArgs.actions).toHaveLength(4)
     
-    const actionIds = modalArgs.actions.map((a: any) => a.id)
+    const actionIds = modalArgs.actions.map((a: ModalAction) => a.id)
     expect(actionIds).toContain('open_granary')
     expect(actionIds).toContain('reduce_tax')
     expect(actionIds).toContain('forced_levy')
     expect(actionIds).toContain('ignore')
 
-    const openGranaryAction = modalArgs.actions.find((a: any) => a.id === 'open_granary')
+    const openGranaryAction = modalArgs.actions.find((a: ModalAction) => a.id === 'open_granary')
     openGranaryAction.onClick()
     
     expect(mockApplyDisasterChoice).toHaveBeenCalledWith('disaster_da_shui', 'open_granary')

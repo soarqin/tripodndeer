@@ -283,6 +283,7 @@ export const M42_TRADE_ROUTE_DISTANCE_PENALTY_BP_PER_HOP = 200
 export const M42_TRADE_ROUTE_INITIAL_COUNT = 6
 export const M42_TRADE_FACTION_INFLUENCE_PER_ROUTE_PER_YEAR = 5
 export const M42_TRADE_ATTITUDE_BONUS_PER_YEAR = 2
+export const M42_TRADE_MAX_HOPS_FALLBACK = 5
 export const M42_FACTION_COUNT = 6
 export const M42_FACTION_INFLUENCE_INITIAL = 50
 export const M42_FACTION_INFLUENCE_MIN = 0
@@ -292,6 +293,9 @@ export const M42_FACTION_EVENT_COOLDOWN_YEARS = 5
 export const M42_FACTION_EVENT_PRIORITY: readonly string[] = ['coup', 'split', 'overthrow']
 export const M42_FACTION_DRIFT_PER_GENERAL_BP = 50
 export const M42_TRAIT_DIMENSIONS_COUNT = 3
+export const M42_FACTION_BALANCE_PROXIMITY_THRESHOLD = 10
+export const M42_FACTION_BALANCE_EDICT_DURATION_MONTHS = 6
+export const M42_FACTION_REFORM_BLOCK_THRESHOLD = 70
 export const M42_AI_DISASTER_RELIEF_PROPENSITY: Record<string, string> = {
   benevolent: 'open_granary',
   steward: 'reduce_tax',

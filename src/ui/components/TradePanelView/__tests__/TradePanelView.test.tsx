@@ -2,12 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { TradePanelView } from '../TradePanelView'
 import type { TradeRoute } from '~/shared/types'
+import type { GameStoreState } from '~/ui/store/game-store'
 
-let mockWorld: any = null
+interface MockWorld {
+  playerRealmId: string
+  tradeRoutes: Map<string, TradeRoute>
+}
+
+let mockWorld: MockWorld | null = null
 
 vi.mock('~/ui/store/game-store', () => ({
-  useGameStore: (selector: any) => {
-    return selector({ world: mockWorld })
+  useGameStore: (selector: (state: GameStoreState) => unknown) => {
+    return selector({ world: mockWorld } as unknown as GameStoreState)
   }
 }))
 
@@ -33,7 +39,7 @@ describe('TradePanelView', () => {
   })
 
   it('shows active routes for player', () => {
-    mockWorld.tradeRoutes.set('route_1', {
+    mockWorld!.tradeRoutes.set('route_1', {
       id: 'route_1',
       fromSiteId: 'site_a',
       toSiteId: 'site_b',
@@ -53,7 +59,7 @@ describe('TradePanelView', () => {
   })
 
   it('shows cut routes with different styling', () => {
-    mockWorld.tradeRoutes.set('route_2', {
+    mockWorld!.tradeRoutes.set('route_2', {
       id: 'route_2',
       fromSiteId: 'site_c',
       toSiteId: 'site_d',
@@ -75,7 +81,7 @@ describe('TradePanelView', () => {
   })
 
   it('does not show routes not involving player', () => {
-    mockWorld.tradeRoutes.set('route_3', {
+    mockWorld!.tradeRoutes.set('route_3', {
       id: 'route_3',
       fromSiteId: 'site_e',
       toSiteId: 'site_f',

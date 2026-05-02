@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { FactionStatusView } from '../FactionStatusView'
 import { useGameStore } from '~/ui/store/game-store'
+import type { GameStoreState } from '~/ui/store/game-store'
 import type { FactionId, FactionInfluenceState } from '~/shared/types'
 
 vi.mock('~/ui/store/game-store', () => ({
@@ -22,7 +23,7 @@ describe('FactionStatusView', () => {
           factionInfluences: new Map(),
         },
       }
-      return selector(state as any)
+      return selector(state as unknown as GameStoreState)
     })
 
     render(<FactionStatusView />)
@@ -53,7 +54,7 @@ describe('FactionStatusView', () => {
           factionInfluences: new Map([['realm_qin', factionState]]),
         },
       }
-      return selector(state as any)
+      return selector(state as unknown as GameStoreState)
     })
 
     render(<FactionStatusView />)

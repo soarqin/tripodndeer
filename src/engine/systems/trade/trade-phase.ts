@@ -12,6 +12,7 @@ import type {
 } from '~/shared/types'
 import {
   M42_TRADE_FACTION_INFLUENCE_PER_ROUTE_PER_YEAR,
+  M42_TRADE_MAX_HOPS_FALLBACK,
   M42_TRADE_ROUTE_DISTANCE_PENALTY_BP_PER_HOP,
 } from '~/content/m2/balance'
 import { warKey } from '~/engine/wars/wars'
@@ -20,7 +21,6 @@ import { getTraitModifiers } from '~/content/m4_1/trait-effects'
 const BASIS_POINTS_DIVISOR = 10000
 const MONTHS_PER_YEAR = 12
 const FOREIGN_CLIENTS: FactionId = 'foreign_clients'
-const MAX_HOPS_FALLBACK = 5
 
 export function tradePhase(
   world: World,
@@ -184,5 +184,5 @@ function calculateHopCount(world: World, fromSiteId: SiteId, toSiteId: SiteId): 
     }
   }
 
-  return MAX_HOPS_FALLBACK
+  return M42_TRADE_MAX_HOPS_FALLBACK
 }

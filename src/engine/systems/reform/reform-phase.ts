@@ -12,17 +12,8 @@ import {
   M41_AI_PERSONALITY_REFORM_PROPENSITY,
   M41_REFORMER_GRACE_PERIOD_YEARS,
   M41_REFORM_FAILED_SCAR_TRAIT,
+  M42_FACTION_REFORM_BLOCK_THRESHOLD,
 } from '~/content/m2/balance'
-
-const REFORMIST_REFORM_IDS: ReadonlySet<ReformId> = new Set([
-  'shang_yang',
-  'wu_qi',
-  'hu_fu_qi_she',
-  'chu_wu_qi_legacy',
-  'han_shen_buhai_restart',
-])
-
-const FACTION_REFORM_BLOCK_THRESHOLD = 70
 import { ReformDefinitionSchema } from '~/shared/schemas'
 import { evaluatePredicate } from './predicate'
 import { applyReformChoice, completeReform } from './stage-progression'
@@ -32,6 +23,14 @@ import huFuQiSheJson from '~/content/m4_1/reforms/hu-fu-qi-she.json'
 import chuWuQiLegacyJson from '~/content/m4_1/reforms/chu-wu-qi-legacy.json'
 import qiJixiaDebateJson from '~/content/m4_1/reforms/qi-jixia-debate.json'
 import hanShenBuhaiJson from '~/content/m4_1/reforms/han-shen-buhai-restart.json'
+
+const REFORMIST_REFORM_IDS: ReadonlySet<ReformId> = new Set([
+  'shang_yang',
+  'wu_qi',
+  'hu_fu_qi_she',
+  'chu_wu_qi_legacy',
+  'han_shen_buhai_restart',
+])
 
 const TICKS_PER_MONTH = 3
 const TICKS_PER_YEAR = 36
@@ -124,7 +123,7 @@ function tryAITrigger(
     if (REFORMIST_REFORM_IDS.has(def.id)) {
       const factionState = currentWorld.factionInfluences.get(realmId)
       const conservativeInfluence = factionState?.influences.get('conservatives') ?? 0
-      if (conservativeInfluence > FACTION_REFORM_BLOCK_THRESHOLD) continue
+      if (conservativeInfluence > M42_FACTION_REFORM_BLOCK_THRESHOLD) continue
     }
 
     const { value, nextState } = nextRng(currentRng)

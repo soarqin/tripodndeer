@@ -1,5 +1,9 @@
 import type { EdictKind, EdictState, FactionId, Realm, World } from '~/shared/types'
-import { M42_FACTION_IMBALANCE_THRESHOLD } from '~/content/m2/balance'
+import {
+  M42_FACTION_BALANCE_EDICT_DURATION_MONTHS,
+  M42_FACTION_BALANCE_PROXIMITY_THRESHOLD,
+  M42_FACTION_IMBALANCE_THRESHOLD,
+} from '~/content/m2/balance'
 
 const FACTION_BALANCE_EDICTS: Record<FactionId, EdictKind> = {
   military_meritocracy: 'edict_tax_relief',
@@ -9,9 +13,6 @@ const FACTION_BALANCE_EDICTS: Record<FactionId, EdictKind> = {
   conservatives: 'edict_tax_relief',
   foreign_clients: 'edict_grain_reserve',
 }
-
-const PROXIMITY_THRESHOLD = 10
-const EDICT_DURATION_MONTHS = 6
 
 export function evaluateFactionBalanceAction(world: World, realm: Realm): World {
   if (realm.id === world.playerRealmId) return world
@@ -26,7 +27,7 @@ export function evaluateFactionBalanceAction(world: World, realm: Realm): World 
   const minInfluence = Math.min(...values)
   const imbalance = maxInfluence - minInfluence
 
-  if (imbalance <= M42_FACTION_IMBALANCE_THRESHOLD - PROXIMITY_THRESHOLD) return world
+  if (imbalance <= M42_FACTION_IMBALANCE_THRESHOLD - M42_FACTION_BALANCE_PROXIMITY_THRESHOLD) return world
 
   for (const edict of world.edicts.values()) {
     if (edict.realmId === realm.id && edict.status === 'active') {
@@ -51,8 +52,8 @@ export function evaluateFactionBalanceAction(world: World, realm: Realm): World 
     realmId: realm.id,
     kind: edictKind,
     startedAtTick: world.tick,
-    durationMonths: EDICT_DURATION_MONTHS,
-    remainingMonths: EDICT_DURATION_MONTHS,
+    durationMonths: M42_FACTION_BALANCE_EDICT_DURATION_MONTHS,
+    remainingMonths: M42_FACTION_BALANCE_EDICT_DURATION_MONTHS,
     status: 'active',
   }
 

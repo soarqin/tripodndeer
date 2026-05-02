@@ -1,8 +1,9 @@
+/* eslint-disable max-lines-per-function */
 import { describe, expect, it } from 'vitest'
 import { applyEventEffect, isValidEffectType } from '../event-chain-engine'
 import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
 import type { Effect } from '~/shared/schemas'
-import type { Realm, Site } from '~/shared/types'
+import type { Realm, Site, World } from '~/shared/types'
 
 function makeRealm(id: string, traits: readonly string[] = [], politicalSystem: Realm['politicalSystem'] = 'enfeoffment'): Realm {
   return {
@@ -34,7 +35,7 @@ function makeSite(id: string, ownerId: string | null = null): Site {
   }
 }
 
-function worldWith(overrides: any = {}): any {
+function worldWith(overrides: Partial<World> = {}): World {
   return makeTestWorld(overrides)
 }
 

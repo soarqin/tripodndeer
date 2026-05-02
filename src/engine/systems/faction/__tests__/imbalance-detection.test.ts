@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { describe, expect, it } from 'vitest'
 
 import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
