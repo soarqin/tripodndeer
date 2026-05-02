@@ -5,6 +5,7 @@ import {
   DIPLOMACY_TRUST_MAX,
   DIPLOMACY_TRUST_MIN,
 } from '~/content/m2/balance'
+import type { PredicateNode } from './types'
 
 export const SiteIdSchema = z.string().min(1)
 export const RealmIdSchema = z.string().min(1)
@@ -294,7 +295,10 @@ export const RulerStateSchema = z.object({
   health: z.number().int().min(0).max(100),
   personality: PersonalityArchetypeSchema,
   successionLawId: z.literal('primogeniture'),
+  inOfficeSinceTick: z.number().int().nonnegative().default(0),
 })
+
+export const PoliticalSystemSchema = z.enum(['enfeoffment', 'commandery', 'legalist_centralized'])
 
 export const EffectSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('realm.treasury'), realmId: RealmIdSchema, delta: z.number() }),
@@ -302,6 +306,7 @@ export const EffectSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('character.kill'), generalId: z.string().min(1) }),
   z.object({ type: z.literal('character.loyalty'), generalId: z.string().min(1), delta: z.number() }),
   z.object({ type: z.literal('realm.trait.add'), realmId: RealmIdSchema, trait: z.string().min(1) }),
+  z.object({ type: z.literal('realm.politicalSystem.set'), realmId: RealmIdSchema, system: PoliticalSystemSchema }),
 ])
 
 export type Effect = z.infer<typeof EffectSchema>
@@ -319,6 +324,75 @@ export const EventChainStageSchema = z.object({
   choices: z.array(EventChainChoiceSchema),
 })
 
+export const PredicateNodeSchema: z.ZodType<PredicateNode> = z.lazy(() =>
+  z.union([
+    z.object({ kind: z.literal('realm.id'), value: RealmIdSchema }),
+    z.object({ kind: z.literal('realm.has-character-with-specialty'), specialty: SpecialtySchema }),
+    z.object({ kind: z.literal('realm.ruler-personality-in'), values: z.array(PersonalityArchetypeSchema) }),
+    z.object({ kind: z.literal('realm.has-trait'), trait: z.string().min(1), not: z.boolean().optional() }),
+    z.object({ kind: z.literal('realm.no-active-war') }),
+    z.object({ kind: z.literal('realm.treasury-above'), value: z.number() }),
+    z.object({ kind: z.literal('realm.population-above'), value: z.number() }),
+    z.object({ kind: z.literal('realm.ruler-in-office-years'), minYears: z.number().int().nonnegative() }),
+    z.object({ kind: z.literal('realm.has-political-system'), system: PoliticalSystemSchema }),
+    z.object({ kind: z.literal('realm.year-after'), yearBC: z.number().int() }),
+    z.object({ kind: z.literal('and'), children: z.array(PredicateNodeSchema) }),
+    z.object({ kind: z.literal('or'), children: z.array(PredicateNodeSchema) }),
+  ]),
+)
+
+export const ReformChoiceSchema = z.object({
+  id: z.string().min(1),
+  labelZh: z.string().min(1),
+  effects: z.array(EffectSchema),
+  nextStageId: z.string().min(1).optional(),
+  outcome: z.enum(['continue', 'success', 'failure']),
+})
+
+export const ReformStageSchema = z.object({
+  id: z.string().min(1),
+  textZh: z.string().min(1),
+  choices: z.array(ReformChoiceSchema).min(2).max(4),
+  advanceAfterMonths: z.number().int().positive(),
+})
+
+export const ReformDefinitionSchema = z.object({
+  id: z.string().min(1),
+  displayName: z.string().min(1),
+  displayNameZh: z.string().min(1),
+  trigger: PredicateNodeSchema,
+  oneShot: z.literal(true),
+  stages: z.array(ReformStageSchema).min(1).max(5),
+  successTrait: z.string().min(1),
+  failureTrait: z.string().min(1),
+  historicalYearRange: z.tuple([z.number().int(), z.number().int()]).optional(),
+})
+
+export const ReformStateSchema = z.object({
+  realmId: RealmIdSchema,
+  reformId: z.string().min(1),
+  currentStageId: z.string().min(1),
+  startedAtTick: z.number().int().nonnegative(),
+  stageEnteredAtTick: z.number().int().nonnegative(),
+  status: z.enum(['in_progress', 'completed_success', 'completed_failure', 'paused']),
+  choiceHistory: z.array(
+    z.object({
+      stageId: z.string().min(1),
+      choiceId: z.string().min(1),
+      tick: z.number().int().nonnegative(),
+    }),
+  ),
+})
+
+export const TraitEffectSchema = z.object({
+  manpowerCapMultiplierBp: z.number().int().optional(),
+  taxIncomeMultiplierBp: z.number().int().optional(),
+  foodProductionMultiplierBp: z.number().int().optional(),
+  recruitmentSpeedMultiplierBp: z.number().int().optional(),
+  generalRecruitmentWeightBp: z.number().int().optional(),
+  combatPowerMultiplierBp: z.number().int().optional(),
+})
+
 export const EventChainTriggerSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('date'),
@@ -330,7 +404,8 @@ export const EventChainTriggerSchema = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('state'),
-    predicate: z.string().min(1),
+    predicate: PredicateNodeSchema,
+    realmId: RealmIdSchema.optional(),
   }),
 ])
 
@@ -475,6 +550,8 @@ export const RealmSchema = z.object({
   aiPersonality: AIPersonalitySchema,
   economy: RealmEconomySchema.default({ treasury: 0, foodStores: 0, taxRate: 10 }),
   rulerId: z.string().nullable().optional(),
+  traits: z.array(z.string()).default([]),
+  politicalSystem: PoliticalSystemSchema.default('enfeoffment'),
 })
 
 export const M0DataSchema = z.object({
@@ -526,6 +603,13 @@ export const M1DataSchemaV3 = M1DataSchemaV2.extend({
 
 export type M1DataV3 = z.infer<typeof M1DataSchemaV3>
 
+export const M1DataSchemaV4 = M1DataSchemaV3.extend({
+  schema_version: z.literal(4),
+  reformStates: z.array(ReformStateSchema).default([]),
+})
+
+export type M1DataV4 = z.infer<typeof M1DataSchemaV4>
+
 // World Schema (for runtime World validation)
 export const WorldSchema = z.object({
   date: z.object({
@@ -553,6 +637,7 @@ export const WorldSchema = z.object({
   sieges: z.instanceof(Map),
   edicts: z.instanceof(Map),
   governorAssignments: z.instanceof(Map),
+  reformStates: z.instanceof(Map),
   playerRealmId: z.string(),
   rngState: z.object({ seed: z.number(), counter: z.number() }),
   phases: z.array(z.function()),

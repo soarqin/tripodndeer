@@ -1,4 +1,5 @@
 import type { TerrainType } from '~/content/m2/balance'
+import type { Effect } from './schemas'
 
 // 邑的 ID 类型（opaque string，如 'site_1'）
 export type SiteId = string
@@ -364,6 +365,7 @@ export interface RulerState {
   readonly health: number
   readonly personality: PersonalityArchetype
   readonly successionLawId: 'primogeniture'
+  readonly inOfficeSinceTick: number
 }
 
 export type EventChainId = string
@@ -373,6 +375,79 @@ export interface EventChainState {
   readonly currentStageId: string
   readonly completed: boolean
   readonly startedAtTick: number
+}
+
+export type PoliticalSystem = 'enfeoffment' | 'commandery' | 'legalist_centralized'
+
+export type PredicateNode =
+  | { kind: 'realm.id'; value: RealmId }
+  | { kind: 'realm.has-character-with-specialty'; specialty: Specialty }
+  | { kind: 'realm.ruler-personality-in'; values: readonly PersonalityArchetype[] }
+  | { kind: 'realm.has-trait'; trait: string; not?: boolean }
+  | { kind: 'realm.no-active-war' }
+  | { kind: 'realm.treasury-above'; value: number }
+  | { kind: 'realm.population-above'; value: number }
+  | { kind: 'realm.ruler-in-office-years'; minYears: number }
+  | { kind: 'realm.has-political-system'; system: PoliticalSystem }
+  | { kind: 'realm.year-after'; yearBC: number }
+  | { kind: 'and'; children: readonly PredicateNode[] }
+  | { kind: 'or'; children: readonly PredicateNode[] }
+
+export type ReformId = string
+
+export interface ReformChoice {
+  readonly id: string
+  readonly labelZh: string
+  readonly effects: readonly Effect[]
+  readonly nextStageId?: string
+  readonly outcome: 'continue' | 'success' | 'failure'
+}
+
+export interface ReformStage {
+  readonly id: string
+  readonly textZh: string
+  readonly choices: readonly ReformChoice[]
+  readonly advanceAfterMonths: number
+}
+
+export interface ReformDefinition {
+  readonly id: ReformId
+  readonly displayName: string
+  readonly displayNameZh: string
+  readonly trigger: PredicateNode
+  readonly oneShot: true
+  readonly stages: readonly ReformStage[]
+  readonly successTrait: string
+  readonly failureTrait: string
+  readonly historicalYearRange?: readonly [number, number]
+}
+
+export interface ReformState {
+  readonly realmId: RealmId
+  readonly reformId: ReformId
+  readonly currentStageId: string
+  readonly startedAtTick: number
+  readonly stageEnteredAtTick: number
+  readonly status: 'in_progress' | 'completed_success' | 'completed_failure' | 'paused'
+  readonly choiceHistory: readonly { stageId: string; choiceId: string; tick: number }[]
+}
+
+export interface TraitEffect {
+  readonly manpowerCapMultiplierBp?: number
+  readonly taxIncomeMultiplierBp?: number
+  readonly foodProductionMultiplierBp?: number
+  readonly recruitmentSpeedMultiplierBp?: number
+  readonly generalRecruitmentWeightBp?: number
+  readonly combatPowerMultiplierBp?: number
+}
+
+export interface TraitModifiers {
+  readonly manpowerCapMultiplierBp: number
+  readonly taxIncomeMultiplierBp: number
+  readonly foodProductionMultiplierBp: number
+  readonly recruitmentSpeedMultiplierBp: number
+  readonly generalRecruitmentWeightBp: number
+  readonly combatPowerMultiplierBp: number
 }
 
 export interface SiteOccupation {
@@ -433,7 +508,8 @@ export interface Realm {
   readonly economy: RealmEconomy
   readonly stats?: RealmStats
   readonly rulerId?: GeneralId | null
-  readonly traits?: readonly string[]
+  readonly traits: readonly string[]
+  readonly politicalSystem: PoliticalSystem
 }
 
 // 游戏日期（旬为最小单位）
@@ -568,6 +644,7 @@ export interface World {
   generals: ReadonlyMap<GeneralId, General>
   rulers: ReadonlyMap<RealmId, RulerState>
   eventChainStates: ReadonlyMap<EventChainId, EventChainState>
+  reformStates: ReadonlyMap<RealmId, ReformState>
   passes: ReadonlyMap<PassId, Pass>
   adjacencyEdges: ReadonlyMap<AdjacencyEdgeId, AdjacencyEdge>
   sieges: ReadonlyMap<SiegeId, Siege>
