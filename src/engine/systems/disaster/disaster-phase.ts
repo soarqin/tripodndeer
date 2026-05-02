@@ -11,14 +11,13 @@ import type {
 import { nextRng } from '~/engine/random'
 import { applyEventEffect } from '../events/event-chain-engine'
 import {
-  M42_AI_DISASTER_RELIEF_PROPENSITY,
   M42_DISASTER_COOLDOWN_TICKS,
   M42_DISASTER_DECISION_TIMEOUT_TICKS,
   M42_FACTION_INFLUENCE_MAX,
   M42_FACTION_INFLUENCE_MIN,
 } from '~/content/m2/balance'
 import { evaluatePredicate } from '../reform/predicate'
-import { getPersonality } from '../ai/utility-scorer'
+import { selectAIDisasterChoice } from '../ai/disaster-decision'
 import { DisasterDefinitionSchema } from '~/shared/schemas'
 import fengNianJson from '~/content/m4_2/disasters/feng-nian.json'
 import qianNianJson from '~/content/m4_2/disasters/qian-nian.json'
@@ -199,11 +198,9 @@ export function disasterPhase(
       triggered = true
 
       if (realm.id !== currentWorld.playerRealmId) {
-        const personality = getPersonality(currentWorld, realm.id)
-        const preferredChoiceId =
-          M42_AI_DISASTER_RELIEF_PROPENSITY[personality] ?? 'ignore'
+        const choiceId = selectAIDisasterChoice(currentWorld, realm, def)
         const choice =
-          def.playerChoices.find((c) => c.id === preferredChoiceId)
+          def.playerChoices.find((c) => c.id === choiceId)
           ?? def.playerChoices.find((c) => c.id === 'ignore')
           ?? def.playerChoices[0]
         if (!choice) break
