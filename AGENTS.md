@@ -126,6 +126,7 @@ AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按
 | Each realm has rulerId or null | `src/content/m1/__tests__/scenario-rulers.test.ts` |
 | All M5 balance constants prefixed M5_ | `src/content/m2/__tests__/balance-m5.test.ts` |
 | 8 archetypes covered in personality-coverage.test.ts | `src/engine/systems/ai/__tests__/personality-coverage.test.ts` |
+| M4.1_REFORMS_COUNT === 6 | `src/content/m2/__tests__/balance-m41.test.ts` |
 
 ---
 
@@ -161,6 +162,27 @@ world.generals: Map<GeneralId, General>
 heir candidate
   → 由 selectHeir(world, realmId) 动态计算
   → 不存储在 World 中（纯函数）
+```
+
+---
+
+## Three Types of Reform Data (DO NOT CONFUSE)
+
+```
+Realm.traits: readonly string[]
+  → 永久 buff 数组（已完成变法的 trait）
+  → 通过 getTraitModifiers(realm) 影响数值
+  → 不要与 world.reformStates 混用
+
+world.reformStates: Map<RealmId, ReformState>
+  → 进行中变法的状态（最多 1 个 per realm）
+  → 包含 currentStageId / choiceHistory / status
+  → 不要与 Realm.traits 混用
+
+ReformDefinition JSON in src/content/m4_1/reforms/
+  → 变法定义模板（trigger / stages / choices）
+  → 不存储在 World 中（纯数据）
+  → 不要把 ReformDefinition 字段加到 World
 ```
 
 ---
@@ -251,6 +273,19 @@ const world: World = {
 
 ---
 
+## M4.1 Subsystems Quick Reference
+
+| 子系统 | 主文件 | 关键函数 |
+|---|---|---|
+| reformPhase | `src/engine/systems/reform/reform-phase.ts` | `reformPhase(world, rng)` |
+| predicate evaluator | `src/engine/systems/reform/predicate.ts` | `evaluatePredicate(world, realm, node)` |
+| stage progression | `src/engine/systems/reform/stage-progression.ts` | `applyReformChoice`, `completeReform` |
+| TraitEffectRegistry | `src/content/m4_1/trait-effects.ts` | `getTraitModifiers(realm)` |
+| reform JSONs | `src/content/m4_1/reforms/` | 6 reform definitions |
+| v3→v4 migration | `src/engine/world/migrations/v3-to-v4.ts` | `migrateScenarioV3ToV4` |
+
+---
+
 ## What NOT to Do
 
 ```
@@ -267,6 +302,9 @@ const world: World = {
 ❌ 不要给 character 加 portraitUrl / familyTree（违 §8.4）
 ❌ 不要在 character lifecycle 之外修改 loyalty
 ❌ 不要用 Realm.aiPersonality 决定 archetype（从 world.rulers[realmId].personality 读）
+❌ **不直接读 `politicalSystem` 改公式**——数值效果只通过 trait
+❌ **不向 utility-scorer 添加变法决策**——独立 phase
+❌ **不修改 lin_xiangru/fan_ju/lian_po JSON 格式**——保持 M5 数据完整
 ```
 
 ---
