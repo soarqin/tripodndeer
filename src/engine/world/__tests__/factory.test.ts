@@ -6,7 +6,9 @@ import { aiPlanStep } from '@/engine/systems/ai'
 import { characterLifecyclePhase } from '@/engine/systems/character'
 import { combatV2Step } from '@/engine/systems/combat-v2'
 import { diplomacyLifecycleStep } from '@/engine/systems/diplomacy'
+import { disasterPhase } from '@/engine/systems/disaster/disaster-phase'
 import { economyPhase } from '@/engine/systems/economy'
+import { factionPhase } from '@/engine/systems/faction/faction-phase'
 import { historicalEventsPhase } from '@/engine/systems/events'
 import { manpowerTick } from '@/engine/systems/manpower'
 import { marchStep } from '@/engine/systems/march'
@@ -15,6 +17,7 @@ import { recruitmentPhase } from '@/engine/systems/recruitment'
 import { reformPhase } from '@/engine/systems/reform'
 import { rulerLifecyclePhase } from '@/engine/systems/ruler'
 import { siegeStep } from '@/engine/systems/siege'
+import { tradePhase } from '@/engine/systems/trade/trade-phase'
 import { victoryCheckStep } from '@/engine/systems/victory'
 import {
   M4_BASE_FOOD_PRODUCTION_PER_HOUSEHOLD,
@@ -55,6 +58,9 @@ function phaseName(phase: TickPhase): string {
   if (phase === victoryCheckStep) return 'victoryCheck'
   if (phase === diplomacyLifecycleStep) return 'diplomacyLifecycle'
   if (phase === economyPhase) return 'economy'
+  if (phase === disasterPhase) return 'disaster'
+  if (phase === tradePhase) return 'trade'
+  if (phase === factionPhase) return 'faction'
   if (phase === historicalEventsPhase) return 'historicalEvents'
   return 'unknown'
 }
@@ -213,6 +219,9 @@ describe('createWorldFromM1Data — structure', () => {
       victoryCheckStep,
       diplomacyLifecycleStep,
       economyPhase,
+      disasterPhase,
+      tradePhase,
+      factionPhase,
       historicalEventsPhase,
     ])
     expect(world.phases.map(phaseName)).toEqual(PHASE_ORDER)

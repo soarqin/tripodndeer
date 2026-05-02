@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { PHASE_NAMES, PHASE_ORDER } from '../index'
 
 describe('phase chain constants', () => {
-  it('PHASE_ORDER has exactly 14 phases', () => {
-    expect(PHASE_ORDER.length).toBe(14)
+  it('PHASE_ORDER has exactly 17 phases', () => {
+    expect(PHASE_ORDER.length).toBe(17)
   })
 
   it('PHASE_ORDER is in correct order', () => {
@@ -20,6 +20,33 @@ describe('phase chain constants', () => {
     expect(PHASE_ORDER[10]).toBe(PHASE_NAMES.VICTORY_CHECK)
     expect(PHASE_ORDER[11]).toBe(PHASE_NAMES.DIPLOMACY_LIFECYCLE)
     expect(PHASE_ORDER[12]).toBe(PHASE_NAMES.ECONOMY)
-    expect(PHASE_ORDER[13]).toBe(PHASE_NAMES.HISTORICAL_EVENTS)
+    expect(PHASE_ORDER[13]).toBe(PHASE_NAMES.DISASTER)
+    expect(PHASE_ORDER[14]).toBe(PHASE_NAMES.TRADE)
+    expect(PHASE_ORDER[15]).toBe(PHASE_NAMES.FACTION)
+    expect(PHASE_ORDER[16]).toBe(PHASE_NAMES.HISTORICAL_EVENTS)
+  })
+
+  it('DISASTER comes after ECONOMY', () => {
+    const economyIdx = PHASE_ORDER.indexOf(PHASE_NAMES.ECONOMY)
+    const disasterIdx = PHASE_ORDER.indexOf(PHASE_NAMES.DISASTER)
+    expect(disasterIdx).toBe(economyIdx + 1)
+  })
+
+  it('TRADE comes after DISASTER', () => {
+    const disasterIdx = PHASE_ORDER.indexOf(PHASE_NAMES.DISASTER)
+    const tradeIdx = PHASE_ORDER.indexOf(PHASE_NAMES.TRADE)
+    expect(tradeIdx).toBe(disasterIdx + 1)
+  })
+
+  it('FACTION comes after TRADE', () => {
+    const tradeIdx = PHASE_ORDER.indexOf(PHASE_NAMES.TRADE)
+    const factionIdx = PHASE_ORDER.indexOf(PHASE_NAMES.FACTION)
+    expect(factionIdx).toBe(tradeIdx + 1)
+  })
+
+  it('HISTORICAL_EVENTS comes after FACTION', () => {
+    const factionIdx = PHASE_ORDER.indexOf(PHASE_NAMES.FACTION)
+    const historicalIdx = PHASE_ORDER.indexOf(PHASE_NAMES.HISTORICAL_EVENTS)
+    expect(historicalIdx).toBe(factionIdx + 1)
   })
 })

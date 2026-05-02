@@ -12,6 +12,9 @@ export const PHASE_NAMES = {
   VICTORY_CHECK: 'victoryCheck',
   DIPLOMACY_LIFECYCLE: 'diplomacyLifecycle',
   ECONOMY: 'economy',
+  DISASTER: 'disaster',
+  TRADE: 'trade',
+  FACTION: 'faction',
   HISTORICAL_EVENTS: 'historicalEvents',
 } as const
 
@@ -29,6 +32,9 @@ export const PHASE_ORDER: readonly string[] = [
   PHASE_NAMES.VICTORY_CHECK,
   PHASE_NAMES.DIPLOMACY_LIFECYCLE,
   PHASE_NAMES.ECONOMY,
+  PHASE_NAMES.DISASTER,
+  PHASE_NAMES.TRADE,
+  PHASE_NAMES.FACTION,
   PHASE_NAMES.HISTORICAL_EVENTS,
 ]
 
