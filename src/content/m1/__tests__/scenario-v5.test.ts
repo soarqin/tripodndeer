@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest'
 import scenarioJson from '../scenario.json'
-import { M1DataSchemaV2 } from '~/shared/schemas'
+import { M1DataSchemaV5 } from '~/shared/schemas'
 
-describe('scenario v2 data compliance', () => {
-  it('has schema_version === 2', () => {
-    expect((scenarioJson as { schema_version?: number }).schema_version).toBe(2)
+describe('scenario v5 data compliance', () => {
+  it('has schema_version === 5', () => {
+    expect((scenarioJson as { schema_version?: number }).schema_version).toBe(5)
   })
 
-  it('passes M1DataSchemaV2 parse', () => {
-    expect(() => M1DataSchemaV2.parse(scenarioJson)).not.toThrow()
+  it('passes M1DataSchemaV5 parse', () => {
+    expect(() => M1DataSchemaV5.parse(scenarioJson)).not.toThrow()
   })
 
   it('maintains 50 sites', () => {
@@ -20,7 +20,7 @@ describe('scenario v2 data compliance', () => {
   })
 
   it('all 8 realms have stats with correct defaults', () => {
-    const data = M1DataSchemaV2.parse(scenarioJson)
+    const data = M1DataSchemaV5.parse(scenarioJson)
     expect(data.realms.length).toBe(8)
     for (const realm of data.realms) {
       expect(realm.stats?.manpowerPool).toBe(50000)
