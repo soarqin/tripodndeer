@@ -1,0 +1,44 @@
+{
+  "id": "disaster_wen_yi",
+  "displayName": "Epidemic",
+  "displayNameZh": "瘟疫",
+  "trigger": { "kind": "and", "children": [] },
+  "baseProbabilityBp": 200,
+  "effects": [],
+  "playerChoices": [
+    {
+      "id": "open_granary",
+      "labelZh": "开仓赈灾",
+      "costType": "foodStores",
+      "costAmount": 2000,
+      "effects": [],
+      "outcomeZh": "开仓赈灾，民心安定。"
+    },
+    {
+      "id": "reduce_tax",
+      "labelZh": "减免赋税",
+      "costType": "treasury",
+      "costAmount": 500,
+      "effects": [],
+      "outcomeZh": "减轻赋税，百姓稍安。"
+    },
+    {
+      "id": "forced_levy",
+      "labelZh": "强征民力",
+      "costType": "none",
+      "costAmount": 0,
+      "effects": [],
+      "outcomeZh": "强征民力，怨声载道。"
+    },
+    {
+      "id": "ignore",
+      "labelZh": "置之不理",
+      "costType": "none",
+      "costAmount": 0,
+      "effects": [],
+      "outcomeZh": "置之不理，民心涣散。"
+    }
+  ],
+  "durationMonths": 9,
+  "historicalYearRange": [280, 230]
+}

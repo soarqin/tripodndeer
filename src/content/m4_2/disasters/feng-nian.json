@@ -1,0 +1,44 @@
+{
+  "id": "disaster_feng_nian",
+  "displayName": "Bumper Harvest",
+  "displayNameZh": "丰年",
+  "trigger": { "kind": "and", "children": [] },
+  "baseProbabilityBp": 800,
+  "effects": [],
+  "playerChoices": [
+    {
+      "id": "open_granary",
+      "labelZh": "开仓赈灾",
+      "costType": "foodStores",
+      "costAmount": 2000,
+      "effects": [],
+      "outcomeZh": "大开粮仓，施惠于民，百姓感恩。"
+    },
+    {
+      "id": "reduce_tax",
+      "labelZh": "减免赋税",
+      "costType": "treasury",
+      "costAmount": 500,
+      "effects": [],
+      "outcomeZh": "减免赋税，民间富足。"
+    },
+    {
+      "id": "forced_levy",
+      "labelZh": "强征民力",
+      "costType": "none",
+      "costAmount": 0,
+      "effects": [],
+      "outcomeZh": "大肆征粮，民心怨愤。"
+    },
+    {
+      "id": "ignore",
+      "labelZh": "置之不理",
+      "costType": "none",
+      "costAmount": 0,
+      "effects": [],
+      "outcomeZh": "坐收丰年之利，但错失收心之机。"
+    }
+  ],
+  "durationMonths": 1,
+  "historicalYearRange": [280, 230]
+}
