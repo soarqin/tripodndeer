@@ -1,4 +1,14 @@
-import type { GeneralId, RealmId, World } from '~/shared/types'
+import type { General, GeneralId, RealmId, World } from '~/shared/types'
+
+function candidateScore(general: General, world: World, realmId: RealmId): number {
+  const baseScore = general.loyalty * 1000 + (general.attrs?.zheng ?? 0) + (general.attrs?.jiao ?? 0)
+  const factionState = world.factionInfluences.get(realmId)
+  if (factionState && general.faction) {
+    const factionInfluence = factionState.influences.get(general.faction) ?? 50
+    return baseScore * (1 + factionInfluence / 100)
+  }
+  return baseScore
+}
 
 export function selectHeir(world: World, deceasedRealmId: RealmId): GeneralId | null {
   const currentRuler = world.rulers.get(deceasedRealmId)
@@ -25,12 +35,8 @@ export function selectHeir(world: World, deceasedRealmId: RealmId): GeneralId | 
   if (candidates.length === 0) return null
 
   candidates.sort((a, b) => {
-    const loyaltyA = a.loyalty
-    const loyaltyB = b.loyalty
-    if (loyaltyB !== loyaltyA) return loyaltyB - loyaltyA
-
-    const scoreA = (a.attrs?.zheng ?? 0) + (a.attrs?.jiao ?? 0)
-    const scoreB = (b.attrs?.zheng ?? 0) + (b.attrs?.jiao ?? 0)
+    const scoreA = candidateScore(a, world, deceasedRealmId)
+    const scoreB = candidateScore(b, world, deceasedRealmId)
     if (scoreB !== scoreA) return scoreB - scoreA
 
     return a.id.localeCompare(b.id)

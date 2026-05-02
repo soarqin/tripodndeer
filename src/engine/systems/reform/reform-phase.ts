@@ -2,6 +2,7 @@ import type {
   GameEvent,
   RNGState,
   ReformDefinition,
+  ReformId,
   ReformState,
   World,
 } from '~/shared/types'
@@ -12,6 +13,16 @@ import {
   M41_REFORMER_GRACE_PERIOD_YEARS,
   M41_REFORM_FAILED_SCAR_TRAIT,
 } from '~/content/m2/balance'
+
+const REFORMIST_REFORM_IDS: ReadonlySet<ReformId> = new Set([
+  'shang_yang',
+  'wu_qi',
+  'hu_fu_qi_she',
+  'chu_wu_qi_legacy',
+  'han_shen_buhai_restart',
+])
+
+const FACTION_REFORM_BLOCK_THRESHOLD = 70
 import { ReformDefinitionSchema } from '~/shared/schemas'
 import { evaluatePredicate } from './predicate'
 import { applyReformChoice, completeReform } from './stage-progression'
@@ -109,6 +120,12 @@ function tryAITrigger(
 
   for (const def of sortedDefs) {
     if (!evaluatePredicate(currentWorld, realm, def.trigger)) continue
+
+    if (REFORMIST_REFORM_IDS.has(def.id)) {
+      const factionState = currentWorld.factionInfluences.get(realmId)
+      const conservativeInfluence = factionState?.influences.get('conservatives') ?? 0
+      if (conservativeInfluence > FACTION_REFORM_BLOCK_THRESHOLD) continue
+    }
 
     const { value, nextState } = nextRng(currentRng)
     currentRng = nextState

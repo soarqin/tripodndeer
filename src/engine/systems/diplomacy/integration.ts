@@ -4,7 +4,7 @@ import type {
   World,
 } from '~/shared/types'
 import { DIPLOMACY_BETRAYAL_TRUST_DELTA } from '~/content/m2/balance'
-import { declareWarWithCasus } from '~/engine/wars'
+import { cutTradeRoutesBetween, declareWarWithCasus } from '~/engine/wars'
 import { updateCoalitionPressure } from './coalitions'
 import {
   clampRelation,
@@ -56,7 +56,11 @@ export function applyDiplomacyAction(world: World, request: DiplomacyActionReque
     validation.proposalOrOrder.order.casusBelli ?? null,
     world.date,
   )
-  const nextWorld: World = { ...world, wars }
+  const nextWorld: World = cutTradeRoutesBetween(
+    { ...world, wars },
+    request.proposingRealmId,
+    request.targetRealmId,
+  )
   const events: GameEvent[] = []
   let history = [...world.diplomacyHistory]
 

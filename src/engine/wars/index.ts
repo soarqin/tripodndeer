@@ -6,4 +6,5 @@ export {
   declareWarWithCasus,
   endWar,
   attachPeaceProposal,
+  cutTradeRoutesBetween,
 } from './wars'

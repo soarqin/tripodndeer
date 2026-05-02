@@ -1,7 +1,10 @@
 import type {
   DisasterDefinition,
   DisasterState,
+  FactionId,
+  FactionInfluenceState,
   GameEvent,
+  RealmId,
   RNGState,
   World,
 } from '~/shared/types'
@@ -11,6 +14,8 @@ import {
   M42_AI_DISASTER_RELIEF_PROPENSITY,
   M42_DISASTER_COOLDOWN_TICKS,
   M42_DISASTER_DECISION_TIMEOUT_TICKS,
+  M42_FACTION_INFLUENCE_MAX,
+  M42_FACTION_INFLUENCE_MIN,
 } from '~/content/m2/balance'
 import { evaluatePredicate } from '../reform/predicate'
 import { getPersonality } from '../ai/utility-scorer'
@@ -45,12 +50,52 @@ function setDisasterState(
   return { ...world, disasterStates }
 }
 
-function applyChoiceEffects(world: World, def: DisasterDefinition, choiceId: string): World {
+const DISASTER_CHOICE_FACTION_DELTAS: Record<string, readonly { faction: FactionId; delta: number }[]> = {
+  open_granary: [
+    { faction: 'royal_kin', delta: 5 },
+    { faction: 'reformists', delta: 3 },
+  ],
+  reduce_tax: [
+    { faction: 'military_meritocracy', delta: 3 },
+  ],
+  forced_levy: [
+    { faction: 'conservatives', delta: 5 },
+    { faction: 'reformists', delta: -5 },
+  ],
+  ignore: [
+    { faction: 'noble_clans', delta: -10 },
+    { faction: 'military_meritocracy', delta: 5 },
+  ],
+}
+
+function applyDisasterFactionDelta(
+  world: World,
+  realmId: RealmId,
+  faction: FactionId,
+  delta: number,
+): World {
+  const current = world.factionInfluences.get(realmId)
+  if (!current) return world
+  const oldVal = current.influences.get(faction) ?? 0
+  const newVal = Math.min(M42_FACTION_INFLUENCE_MAX, Math.max(M42_FACTION_INFLUENCE_MIN, oldVal + delta))
+  const influences = new Map(current.influences)
+  influences.set(faction, newVal)
+  const next: FactionInfluenceState = { ...current, influences }
+  const factionInfluences = new Map(world.factionInfluences)
+  factionInfluences.set(realmId, next)
+  return { ...world, factionInfluences }
+}
+
+function applyChoiceEffects(world: World, def: DisasterDefinition, choiceId: string, realmId: RealmId): World {
   const choice = def.playerChoices.find((c) => c.id === choiceId)
   if (!choice) return world
   let next = world
   for (const effect of choice.effects) {
     next = applyEventEffect(next, effect)
+  }
+  const factionDeltas = DISASTER_CHOICE_FACTION_DELTAS[choiceId] ?? []
+  for (const { faction, delta } of factionDeltas) {
+    next = applyDisasterFactionDelta(next, realmId, faction, delta)
   }
   return next
 }
@@ -81,7 +126,7 @@ export function disasterPhase(
       if (ticksWaiting >= M42_DISASTER_DECISION_TIMEOUT_TICKS) {
         const def = definitions.find((d) => d.id === existingState.disasterId)
         if (def) {
-          currentWorld = applyChoiceEffects(currentWorld, def, 'ignore')
+          currentWorld = applyChoiceEffects(currentWorld, def, 'ignore', realm.id)
         }
         const resolvedState: DisasterState = {
           ...existingState,
@@ -163,7 +208,7 @@ export function disasterPhase(
           ?? def.playerChoices[0]
         if (!choice) break
 
-        currentWorld = applyChoiceEffects(currentWorld, def, choice.id)
+        currentWorld = applyChoiceEffects(currentWorld, def, choice.id, realm.id)
         const resolvedState: DisasterState = {
           ...newState,
           status: 'resolved',

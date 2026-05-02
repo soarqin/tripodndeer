@@ -1,6 +1,6 @@
 import type { Army, GameEvent, GovernorModifierKind, Order, RNGState, Site, WarKey, WarState, World } from '~/shared/types'
 import { findTravelCost } from '~/engine/systems/march'
-import { declareWar, declareWarWithCasus, isAtWar } from '~/engine/wars'
+import { cutTradeRoutesBetween, declareWar, declareWarWithCasus, isAtWar } from '~/engine/wars'
 import { createPeaceProposal } from '~/engine/systems/peace'
 
 type OrderResult = { world: World; events: readonly GameEvent[] }
@@ -34,8 +34,10 @@ export function applyOrder(world: World, order: Order): OrderResult {
     }
     const casusBelli = order.casusBelli ?? null
     const nextWars = declareWarWithCasus(world.wars, world.playerRealmId, order.targetRealmId, casusBelli, world.date)
+    const worldAfterWar: World = { ...world, wars: nextWars, pendingOrders: [] }
+    const worldAfterCut = cutTradeRoutesBetween(worldAfterWar, world.playerRealmId, order.targetRealmId)
     return {
-      world: { ...world, wars: nextWars, pendingOrders: [] },
+      world: worldAfterCut,
       events: [{ type: 'warDeclared', payload: { byRealm: world.playerRealmId, againstRealm: order.targetRealmId, casusBelli } }],
     }
   }

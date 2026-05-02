@@ -1,4 +1,4 @@
-import type { CasusBelliId, GameDate, PeaceProposalId, RealmId, WarKey, WarState } from '~/shared/types'
+import type { CasusBelliId, GameDate, PeaceProposalId, RealmId, TradeRoute, TradeRouteId, WarKey, WarState, World } from '~/shared/types'
 
 export function warKey(a: RealmId, b: RealmId): WarKey {
   if (a === b) throw new Error('Realm cannot be at war with itself')
@@ -76,4 +76,22 @@ export function attachPeaceProposal(
   const next = new Map(wars)
   next.set(key, { ...state, peaceProposalId: proposalId })
   return next
+}
+
+export function cutTradeRoutesBetween(world: World, a: RealmId, b: RealmId): World {
+  if (a === b) return world
+  const tradeRoutes = new Map<TradeRouteId, TradeRoute>(world.tradeRoutes)
+  let changed = false
+  for (const [id, route] of tradeRoutes) {
+    if (route.status !== 'active') continue
+    const matches =
+      (route.fromRealmId === a && route.toRealmId === b) ||
+      (route.fromRealmId === b && route.toRealmId === a)
+    if (matches) {
+      tradeRoutes.set(id, { ...route, status: 'cut' })
+      changed = true
+    }
+  }
+  if (!changed) return world
+  return { ...world, tradeRoutes }
 }

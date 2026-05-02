@@ -1,4 +1,6 @@
 import type {
+  FactionId,
+  FactionInfluenceState,
   GameEvent,
   RealmId,
   ReformDefinition,
@@ -6,7 +8,56 @@ import type {
   World,
 } from '~/shared/types'
 import { applyEventEffect } from '../events/event-chain-engine'
-import { M41_REFORM_FAILURE_TREASURY_LOSS } from '~/content/m2/balance'
+import {
+  M41_REFORM_FAILURE_TREASURY_LOSS,
+  M42_FACTION_INFLUENCE_MAX,
+  M42_FACTION_INFLUENCE_MIN,
+} from '~/content/m2/balance'
+
+const REFORM_FACTION_EFFECTS: Record<string, readonly { faction: FactionId; delta: number }[]> = {
+  shang_yang: [
+    { faction: 'military_meritocracy', delta: 20 },
+    { faction: 'noble_clans', delta: -15 },
+    { faction: 'conservatives', delta: -10 },
+  ],
+  wu_qi: [
+    { faction: 'military_meritocracy', delta: 15 },
+    { faction: 'conservatives', delta: -10 },
+  ],
+  hu_fu_qi_she: [
+    { faction: 'military_meritocracy', delta: 15 },
+    { faction: 'conservatives', delta: -10 },
+  ],
+  qi_jixia_debate: [
+    { faction: 'foreign_clients', delta: 10 },
+  ],
+  chu_wu_qi_legacy: [
+    { faction: 'military_meritocracy', delta: 10 },
+    { faction: 'conservatives', delta: -8 },
+  ],
+  han_shen_buhai_restart: [
+    { faction: 'reformists', delta: 15 },
+    { faction: 'conservatives', delta: -10 },
+  ],
+}
+
+function applyReformFactionDelta(
+  world: World,
+  realmId: RealmId,
+  faction: FactionId,
+  delta: number,
+): World {
+  const current = world.factionInfluences.get(realmId)
+  if (!current) return world
+  const oldVal = current.influences.get(faction) ?? 0
+  const newVal = Math.min(M42_FACTION_INFLUENCE_MAX, Math.max(M42_FACTION_INFLUENCE_MIN, oldVal + delta))
+  const influences = new Map(current.influences)
+  influences.set(faction, newVal)
+  const next: FactionInfluenceState = { ...current, influences }
+  const factionInfluences = new Map(world.factionInfluences)
+  factionInfluences.set(realmId, next)
+  return { ...world, factionInfluences }
+}
 
 export function applyReformChoice(
   world: World,
@@ -97,6 +148,10 @@ export function completeReform(
       realmId,
       trait: reformDef.successTrait,
     })
+    const factionDeltas = REFORM_FACTION_EFFECTS[reformDef.id] ?? []
+    for (const { faction, delta } of factionDeltas) {
+      currentWorld = applyReformFactionDelta(currentWorld, realmId, faction, delta)
+    }
     events.push({
       type: 'reformCompleted',
       payload: { realmId, reformId: reformDef.id, success: true },
