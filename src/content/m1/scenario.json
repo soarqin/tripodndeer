@@ -11010,7 +11010,9 @@
         "warWeariness": 0
       },
       "rulerId": "gen_qin_zhaoxiangwang",
-      "aiPersonality": "aggressive_random"
+      "aiPersonality": "aggressive_random",
+      "traits": ["shang_yang_reform_done"],
+      "politicalSystem": "legalist_centralized"
     },
     {
       "id": "realm_chu",
@@ -11047,7 +11049,9 @@
         "warWeariness": 0
       },
       "rulerId": "gen_chu_kaoliewang",
-      "aiPersonality": "aggressive_random"
+      "aiPersonality": "aggressive_random",
+      "traits": ["wu_qi_failed_legacy"],
+      "politicalSystem": "enfeoffment"
     },
     {
       "id": "realm_qi",
@@ -11081,7 +11085,9 @@
         "warWeariness": 0
       },
       "rulerId": "gen_qi_wangjian",
-      "aiPersonality": "aggressive_random"
+      "aiPersonality": "aggressive_random",
+      "traits": [],
+      "politicalSystem": "enfeoffment"
     },
     {
       "id": "realm_yan",
@@ -11114,7 +11120,9 @@
         "warWeariness": 0
       },
       "rulerId": "gen_yan_huiwang",
-      "aiPersonality": "aggressive_random"
+      "aiPersonality": "aggressive_random",
+      "traits": [],
+      "politicalSystem": "enfeoffment"
     },
     {
       "id": "realm_han",
@@ -11147,7 +11155,9 @@
         "warWeariness": 0
       },
       "rulerId": "gen_han_huanhuiwang",
-      "aiPersonality": "aggressive_random"
+      "aiPersonality": "aggressive_random",
+      "traits": [],
+      "politicalSystem": "enfeoffment"
     },
     {
       "id": "realm_zhao",
@@ -11182,7 +11192,9 @@
         "warWeariness": 0
       },
       "rulerId": "gen_zhao_xiaochengwang",
-      "aiPersonality": "aggressive_random"
+      "aiPersonality": "aggressive_random",
+      "traits": ["hu_fu_qi_she_done"],
+      "politicalSystem": "commandery"
     },
     {
       "id": "realm_wei",
@@ -11215,7 +11227,9 @@
         "warWeariness": 0
       },
       "rulerId": "gen_wei_anxiwang",
-      "aiPersonality": "aggressive_random"
+      "aiPersonality": "aggressive_random",
+      "traits": ["li_kui_reform_done"],
+      "politicalSystem": "commandery"
     },
     {
       "id": "realm_zhou",
@@ -11244,7 +11258,9 @@
         "warWeariness": 0
       },
       "rulerId": null,
-      "aiPersonality": "aggressive_random"
+      "aiPersonality": "aggressive_random",
+      "traits": [],
+      "politicalSystem": "enfeoffment"
     }
   ],
   "initialOwnership": {
