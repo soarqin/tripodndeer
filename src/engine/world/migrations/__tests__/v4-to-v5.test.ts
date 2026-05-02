@@ -95,7 +95,7 @@ describe('migrateScenarioV4ToV5 — chain', () => {
   })
 
   it('chains v2→v3→v4→v5 when raw data has schema_version=2', () => {
-    const v5 = migrateScenarioV4ToV5(scenarioV1)
+    const v5 = migrateScenarioV4ToV5({ ...scenarioV1, schema_version: 2 })
 
     expect(v5.schema_version).toBe(5)
     expect(v5.disasterStates).toEqual([])

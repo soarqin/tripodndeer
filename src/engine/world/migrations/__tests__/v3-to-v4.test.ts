@@ -95,7 +95,7 @@ describe('migrateScenarioV3ToV4 — chain', () => {
   })
 
   it('chains v2→v3→v4 when raw data has schema_version=2', () => {
-    const v4 = migrateScenarioV3ToV4(scenarioV1)
+    const v4 = migrateScenarioV3ToV4({ ...scenarioV1, schema_version: 2 })
 
     expect(v4.schema_version).toBe(4)
     expect(v4.reformStates).toEqual([])

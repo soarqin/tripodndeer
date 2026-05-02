@@ -5,7 +5,7 @@ import { migrateScenarioV4ToV5 } from '../v4-to-v5'
 import { M1DataSchemaV2, type M1DataV2 } from '@/shared/schemas'
 import { describe, expect, it } from 'vitest'
 
-const scenarioV2 = M1DataSchemaV2.parse(scenarioRaw)
+const scenarioV2 = M1DataSchemaV2.parse({ ...scenarioRaw, schema_version: 2 })
 
 function makeV2(overrides: Partial<M1DataV2> = {}): M1DataV2 {
   return M1DataSchemaV2.parse({

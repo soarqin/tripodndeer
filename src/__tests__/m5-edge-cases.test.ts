@@ -36,7 +36,7 @@ import type {
 const YEAR_START: GameDate = { yearBC: 260, season: 'spring', month: 1, xun: 'shang' }
 const RNG = { seed: 0, counter: 0 }
 
-const scenarioV2 = M1DataSchemaV2.parse(scenarioRaw)
+const scenarioV2 = M1DataSchemaV2.parse({ ...scenarioRaw, schema_version: 2 })
 
 function makeRealm(id: RealmId, overrides: Partial<Realm> = {}): Realm {
   return {
