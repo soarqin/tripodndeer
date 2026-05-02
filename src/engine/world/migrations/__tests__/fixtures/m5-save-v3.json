@@ -1,0 +1,109 @@
+{
+  "schema_version": 3,
+  "edges": {
+    "e_001": {
+      "id": "e_001",
+      "curveType": "polyline",
+      "travel_cost": 1,
+      "anchors": [[0, 0], [10, 0]]
+    },
+    "e_002": {
+      "id": "e_002",
+      "curveType": "polyline",
+      "travel_cost": 1,
+      "anchors": [[10, 0], [10, 10]]
+    },
+    "e_003": {
+      "id": "e_003",
+      "curveType": "polyline",
+      "travel_cost": 1,
+      "anchors": [[10, 10], [0, 0]]
+    }
+  },
+  "sites": [
+    {
+      "id": "site_a",
+      "name": "Site A",
+      "position": [5, 5],
+      "boundary": [
+        { "edge": "e_001", "reverse": false },
+        { "edge": "e_002", "reverse": false },
+        { "edge": "e_003", "reverse": false }
+      ]
+    }
+  ],
+  "realms": [
+    {
+      "id": "realm_with_traits",
+      "displayName": "With Traits",
+      "fullTitle": "Realm With Traits",
+      "color": "#ff0000",
+      "capital": "site_a",
+      "initialSites": ["site_a"],
+      "initialArmies": [],
+      "aiPersonality": "aggressive",
+      "rulerId": null,
+      "traits": ["legalist", "qin_legacy"]
+    },
+    {
+      "id": "realm_without_traits",
+      "displayName": "Without Traits",
+      "fullTitle": "Realm Without Traits",
+      "color": "#00ff00",
+      "capital": "site_a",
+      "initialSites": [],
+      "initialArmies": [],
+      "aiPersonality": "cautious",
+      "rulerId": "gen_ruler"
+    }
+  ],
+  "initialOwnership": {
+    "site_a": "realm_with_traits"
+  },
+  "initialArmies": [],
+  "initialWars": [],
+  "generals": [
+    {
+      "id": "gen_ruler",
+      "realmId": "realm_without_traits",
+      "name": "Test Ruler",
+      "might": 12,
+      "command": 5000,
+      "loyalty": 100,
+      "specialty": "commander",
+      "ambition": "mid",
+      "age": 40,
+      "posts": ["ruler"],
+      "loyaltyState": "loyal",
+      "attrs": {
+        "wu": 12,
+        "zheng": 10,
+        "jiao": 10,
+        "mou": 10,
+        "xue": 10,
+        "po": 10
+      }
+    }
+  ],
+  "passes": [],
+  "adjacencyEdges": [],
+  "peaceProposals": [],
+  "relations": [],
+  "diplomaticProposals": [],
+  "treaties": [],
+  "diplomacyHistory": [],
+  "coalitions": [],
+  "zhouInvestiture": [],
+  "rulers": [
+    {
+      "realmId": "realm_without_traits",
+      "generalId": "gen_ruler",
+      "age": 45,
+      "lifespan": 65,
+      "health": 80,
+      "personality": "conqueror",
+      "successionLawId": "primogeniture"
+    }
+  ],
+  "eventChainStates": []
+}
