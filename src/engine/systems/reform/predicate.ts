@@ -57,5 +57,35 @@ export function evaluatePredicate(world: World, realm: Realm, node: PredicateNod
 
     case 'or':
       return node.children.some((child) => evaluatePredicate(world, realm, child))
+
+    case 'site.terrain': {
+      const site = world.sites.get(node.siteId)
+      return site ? site.terrainType === node.value : false
+    }
+
+    case 'site.population-above': {
+      const site = world.sites.get(node.siteId)
+      return site ? site.economy.population > node.value : false
+    }
+
+    case 'site.governor-zheng-above': {
+      const site = world.sites.get(node.siteId)
+      if (!site) return false
+      const govAssignment = [...world.governorAssignments.values()].find(
+        (ga) => ga.siteId === node.siteId,
+      )
+      if (!govAssignment) return false
+      const general = world.generals.get(govAssignment.generalId)
+      return general ? (general.attrs?.zheng ?? 0) > node.value : false
+    }
+
+    case 'realm.faction-influence-above': {
+      const factionState = [...world.factionInfluences.values()].find(
+        (fi) => fi.realmId === node.realmId,
+      )
+      if (!factionState) return false
+      const influence = factionState.influences.get(node.faction) ?? 0
+      return influence > node.value
+    }
   }
 }

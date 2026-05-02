@@ -396,6 +396,10 @@ export type PredicateNode =
   | { kind: 'realm.year-after'; yearBC: number }
   | { kind: 'and'; children: readonly PredicateNode[] }
   | { kind: 'or'; children: readonly PredicateNode[] }
+  | { kind: 'site.terrain'; siteId: SiteId; value: TerrainType }
+  | { kind: 'site.population-above'; siteId: SiteId; value: number }
+  | { kind: 'site.governor-zheng-above'; siteId: SiteId; value: number }
+  | { kind: 'realm.faction-influence-above'; realmId: RealmId; faction: FactionId; value: number }
 
 export type ReformId = string
 

@@ -11,6 +11,9 @@ export const SiteIdSchema = z.string().min(1)
 export const RealmIdSchema = z.string().min(1)
 export const EdictIdSchema = z.string().min(1)
 export const ArmyIdSchema = z.string().min(1)
+export const DisasterIdSchema = z.string().min(1)
+export const TradeRouteIdSchema = z.string().min(1)
+export const FactionImbalanceEventIdSchema = z.string().min(1)
 export const Vec2Schema = z.tuple([z.number(), z.number()]) as z.ZodType<readonly [number, number]>
 export const PolygonSchema = z.array(Vec2Schema).min(3)
 export const EdgeIdSchema = z.string().min(1)
@@ -307,6 +310,10 @@ export const EffectSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('character.loyalty'), generalId: z.string().min(1), delta: z.number() }),
   z.object({ type: z.literal('realm.trait.add'), realmId: RealmIdSchema, trait: z.string().min(1) }),
   z.object({ type: z.literal('realm.politicalSystem.set'), realmId: RealmIdSchema, system: PoliticalSystemSchema }),
+  z.object({ type: z.literal('site.population.delta'), siteId: SiteIdSchema, delta: z.number().int() }),
+  z.object({ type: z.literal('realm.faction.delta'), realmId: RealmIdSchema, faction: FactionIdSchema, delta: z.number() }),
+  z.object({ type: z.literal('realm.warWeariness.delta'), realmId: RealmIdSchema, delta: z.number() }),
+  z.object({ type: z.literal('realm.foodStores.delta'), realmId: RealmIdSchema, delta: z.number() }),
 ])
 
 export type Effect = z.infer<typeof EffectSchema>
@@ -338,6 +345,10 @@ export const PredicateNodeSchema: z.ZodType<PredicateNode> = z.lazy(() =>
     z.object({ kind: z.literal('realm.year-after'), yearBC: z.number().int() }),
     z.object({ kind: z.literal('and'), children: z.array(PredicateNodeSchema) }),
     z.object({ kind: z.literal('or'), children: z.array(PredicateNodeSchema) }),
+    z.object({ kind: z.literal('site.terrain'), siteId: SiteIdSchema, value: TerrainTypeSchema }),
+    z.object({ kind: z.literal('site.population-above'), siteId: SiteIdSchema, value: z.number() }),
+    z.object({ kind: z.literal('site.governor-zheng-above'), siteId: SiteIdSchema, value: z.number() }),
+    z.object({ kind: z.literal('realm.faction-influence-above'), realmId: RealmIdSchema, faction: FactionIdSchema, value: z.number() }),
   ]),
 )
 
@@ -382,6 +393,62 @@ export const ReformStateSchema = z.object({
       tick: z.number().int().nonnegative(),
     }),
   ),
+})
+
+export const DisasterChoiceSchema = z.object({
+  id: z.string().min(1),
+  labelZh: z.string().min(1),
+  costType: z.enum(['treasury', 'foodStores', 'morale', 'none']),
+  costAmount: z.number().int().nonnegative(),
+  effects: z.array(EffectSchema),
+  outcomeZh: z.string().min(1),
+})
+
+export const DisasterDefinitionSchema = z.object({
+  id: DisasterIdSchema,
+  displayName: z.string().min(1),
+  displayNameZh: z.string().min(1),
+  trigger: PredicateNodeSchema,
+  baseProbabilityBp: z.number().int().nonnegative(),
+  effects: z.array(EffectSchema),
+  playerChoices: z.array(DisasterChoiceSchema).min(4).max(4),
+  durationMonths: z.number().int().positive(),
+  historicalYearRange: z.tuple([z.number().int(), z.number().int()]).optional(),
+})
+
+export const DisasterStateSchema = z.object({
+  realmId: RealmIdSchema,
+  disasterId: DisasterIdSchema,
+  siteId: SiteIdSchema,
+  startedAtTick: z.number().int().nonnegative(),
+  status: z.enum(['awaiting_decision', 'resolving', 'resolved']),
+  chosenChoiceId: z.string().optional(),
+  resolvedAtTick: z.number().int().nonnegative().optional(),
+})
+
+export const TradeRouteSchema = z.object({
+  id: TradeRouteIdSchema,
+  fromSiteId: SiteIdSchema,
+  toSiteId: SiteIdSchema,
+  fromRealmId: RealmIdSchema,
+  toRealmId: RealmIdSchema,
+  establishedAtTick: z.number().int().nonnegative(),
+  baseIncomePerXun: z.number().int().positive(),
+  status: z.enum(['active', 'cut']),
+})
+
+export const FactionInfluenceStateSchema = z.object({
+  realmId: RealmIdSchema,
+  influences: z.record(FactionIdSchema, z.number().min(0).max(100)),
+})
+
+export const FactionImbalanceEventSchema = z.object({
+  id: FactionImbalanceEventIdSchema,
+  kind: z.enum(['coup', 'split', 'overthrow']),
+  triggerPredicate: PredicateNodeSchema,
+  effects: z.array(EffectSchema),
+  cooldownYears: z.number().int().positive(),
+  displayNameZh: z.string().min(1),
 })
 
 export const TraitEffectSchema = z.object({
@@ -609,6 +676,15 @@ export const M1DataSchemaV4 = M1DataSchemaV3.extend({
 })
 
 export type M1DataV4 = z.infer<typeof M1DataSchemaV4>
+
+export const M1DataSchemaV5 = M1DataSchemaV4.extend({
+  schema_version: z.literal(5),
+  disasterStates: z.array(DisasterStateSchema).optional().default([]),
+  tradeRoutes: z.array(TradeRouteSchema).optional().default([]),
+  factionInfluences: z.array(FactionInfluenceStateSchema).optional().default([]),
+})
+
+export type M1DataV5 = z.infer<typeof M1DataSchemaV5>
 
 // World Schema (for runtime World validation)
 export const WorldSchema = z.object({
