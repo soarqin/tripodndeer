@@ -1,0 +1,11 @@
+{
+  "id": "imbalance_split",
+  "kind": "split",
+  "triggerPredicate": {
+    "kind": "and",
+    "children": []
+  },
+  "effects": [],
+  "cooldownYears": 5,
+  "displayNameZh": "势力分裂"
+}

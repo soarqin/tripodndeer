@@ -1,0 +1,7 @@
+{
+  "id": "military_meritocracy",
+  "displayNameZh": "军功派",
+  "taglineZh": "凭战功晋身，以强兵克敌，主张军功授爵。",
+  "preferredPersonalityArchetypes": ["conqueror"],
+  "preferredEdicts": []
+}

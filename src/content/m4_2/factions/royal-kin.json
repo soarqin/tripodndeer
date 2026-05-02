@@ -1,0 +1,7 @@
+{
+  "id": "royal_kin",
+  "displayNameZh": "君党",
+  "taglineZh": "忠于王室，维护王权，以礼法安邦。",
+  "preferredPersonalityArchetypes": ["benevolent", "builder"],
+  "preferredEdicts": ["edict_tax_relief"]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "imbalance_coup",
+  "kind": "coup",
+  "triggerPredicate": {
+    "kind": "and",
+    "children": []
+  },
+  "effects": [],
+  "cooldownYears": 5,
+  "displayNameZh": "政变夺权"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "foreign_clients",
+  "displayNameZh": "外姓客卿",
+  "taglineZh": "异邦才士，为君效力，以谋略纵横立身。",
+  "preferredPersonalityArchetypes": ["schemer", "learned"],
+  "preferredEdicts": []
+}

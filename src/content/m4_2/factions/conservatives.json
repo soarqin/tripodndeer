@@ -1,0 +1,7 @@
+{
+  "id": "conservatives",
+  "displayNameZh": "守旧派",
+  "taglineZh": "守成祖制，抗拒变法，以礼乐治国为本。",
+  "preferredPersonalityArchetypes": ["steward"],
+  "preferredEdicts": []
+}

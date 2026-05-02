@@ -1,0 +1,7 @@
+{
+  "id": "noble_clans",
+  "displayNameZh": "公族",
+  "taglineZh": "世家大族，把持朝政，以封邑传家。",
+  "preferredPersonalityArchetypes": ["steward"],
+  "preferredEdicts": []
+}

@@ -1,0 +1,11 @@
+{
+  "id": "imbalance_overthrow",
+  "kind": "overthrow",
+  "triggerPredicate": {
+    "kind": "and",
+    "children": []
+  },
+  "effects": [],
+  "cooldownYears": 5,
+  "displayNameZh": "颠覆王朝"
+}

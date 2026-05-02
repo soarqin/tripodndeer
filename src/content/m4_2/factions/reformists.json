@@ -1,0 +1,7 @@
+{
+  "id": "reformists",
+  "displayNameZh": "改革派",
+  "taglineZh": "变法图强，革故鼎新，以富国强兵为志。",
+  "preferredPersonalityArchetypes": ["builder"],
+  "preferredEdicts": ["edict_grain_reserve"]
+}
