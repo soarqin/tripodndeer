@@ -14,6 +14,7 @@ import {
   M42_FACTION_INFLUENCE_MIN,
 } from '~/content/m2/balance'
 import { getTraitModifiers } from '~/content/m4_1/trait-effects'
+import { detectImbalanceEvents } from './imbalance-detection'
 
 const ALL_FACTION_IDS: readonly FactionId[] = [
   'royal_kin',
@@ -129,5 +130,9 @@ export function factionPhase(
     currentWorld = { ...currentWorld, factionInfluences }
   }
 
-  return { world: currentWorld, nextRng: rng, events }
+  const imbalanceResult = detectImbalanceEvents(currentWorld, rng)
+  currentWorld = imbalanceResult.world
+  events.push(...imbalanceResult.gameEvents)
+
+  return { world: currentWorld, nextRng: imbalanceResult.nextRng, events }
 }
