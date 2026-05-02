@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
 import { BattlePanel } from '../BattlePanel'
 import type { BattleResolution } from '~/engine/systems/combat-v2'
 
@@ -47,5 +47,21 @@ describe('BattlePanel', () => {
   it('does not render dead generals when empty', () => {
     render(<BattlePanel resolution={mockResolution} />)
     expect(screen.queryByTestId('battle-dead-generals')).toBeNull()
+  })
+
+  it('renders close button when onClose is provided and calls it on click', () => {
+    const onClose = vi.fn()
+    render(<BattlePanel resolution={mockResolution} onClose={onClose} />)
+    
+    const closeButton = screen.getByTestId('battle-panel-close')
+    expect(closeButton).toBeDefined()
+    
+    fireEvent.click(closeButton)
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not render close button when onClose is not provided', () => {
+    render(<BattlePanel resolution={mockResolution} />)
+    expect(screen.queryByTestId('battle-panel-close')).toBeNull()
   })
 })

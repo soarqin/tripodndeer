@@ -34,6 +34,7 @@ describe('historicalEventsPhase — real implementation', () => {
       currentStageId: 'stage1',
       completed: false,
       startedAtTick: 0,
+      choiceHistory: [],
     }
     const eventChainStates = new Map([['event_lin_xiangru_bi', existingState]])
     const world = makeEmptyWorld({ date, eventChainStates })
@@ -69,6 +70,7 @@ describe('historicalEventsPhase — real implementation', () => {
     expect(state?.currentStageId).toBe('stage1')
     expect(state?.completed).toBe(false)
     expect(state?.startedAtTick).toBe(100)
+    expect(state?.choiceHistory).toEqual([])
   })
 
   it('triggers fan_ju chain when date is 266 (within 268-264)', () => {

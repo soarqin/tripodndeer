@@ -17,6 +17,7 @@ import {
   useSites,
   useGenerals,
 } from '~/ui/store/selectors'
+import { TradePanelView } from '../TradePanelView'
 import styles from './EconomyPanel.module.css'
 
 function politicalSystemLabel(system: PoliticalSystem): string {
@@ -186,6 +187,10 @@ export function EconomyPanel() {
           reformTraits={reformTraits}
           activeReformId={activeReform?.reformId ?? null}
         />
+
+        <div className={styles.section}>
+          <TradePanelView />
+        </div>
 
         <div className={styles.section}>
           <div className={styles.sectionTitle}>政令 (Edicts)</div>

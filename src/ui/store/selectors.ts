@@ -11,6 +11,8 @@ import type {
   MapEdge,
   Realm,
   RealmId,
+  ReformDefinition,
+  ReformStage,
   Site,
   SiteId,
   SpeedTier,
@@ -22,6 +24,7 @@ import type {
   PoliticalSystem,
 } from '~/shared/types'
 import { isAtWar } from '~/engine/wars'
+import { loadReformDefinitions } from '~/engine/systems/reform'
 import type { DiplomacyActionFeedback, GameStoreState } from './game-store'
 import { useGameStore } from './game-store'
 
@@ -271,6 +274,26 @@ function isEconomySettlementPayload(
 
 export function selectPlayerActiveReform(state: GameStoreState): ReformState | null {
   return state.world.reformStates?.get(state.playerRealmId) ?? null
+}
+
+export function selectActiveReformForPlayerRealm(
+  state: GameStoreState,
+): { reform: ReformDefinition; currentStage: ReformStage } | null {
+  const reformState = state.world.reformStates?.get(state.playerRealmId)
+  if (!reformState || reformState.status !== 'in_progress') return null
+
+  const defs = loadReformDefinitions()
+  const reform = defs.find((d) => d.id === reformState.reformId)
+  if (!reform) return null
+
+  const currentStage = reform.stages.find((s) => s.id === reformState.currentStageId)
+  if (!currentStage) return null
+
+  const ticksInStage = state.world.tick - reformState.stageEnteredAtTick
+  const advanceTicks = currentStage.advanceAfterMonths * 3
+  if (ticksInStage < advanceTicks) return null
+
+  return { reform, currentStage }
 }
 
 export function selectPlayerReformTraits(state: GameStoreState): readonly string[] {

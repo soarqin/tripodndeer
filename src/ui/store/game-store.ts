@@ -4,10 +4,14 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { advanceClock, setSpeed as engineSetSpeed } from '@/engine/clock'
 import type { ClockState } from '@/engine/clock'
+import type { BattleResolution } from '~/engine/systems/combat-v2'
 import { applyDiplomacyAction, relationKey, validateDiplomacyAction, type DiplomacyActionRequest, type DiplomacyValidationReason } from '~/engine/systems/diplomacy'
 import { createWorldFromM1Data, loadM1Data } from '@/engine/world'
 import { applyChoiceEffects, loadDisasterDefinitions, setDisasterState } from '~/engine/systems/disaster/disaster-phase'
+import { applyReformChoice as engineApplyReformChoice, loadReformDefinitions } from '~/engine/systems/reform'
+import { applyEventChainChoice as engineApplyEventChainChoice, getEventChain } from '~/engine/systems/events/event-chain-engine'
 import { M5_RULER_BASE_LIFESPAN } from '~/content/m2/balance'
+import { bannerTextForCriticalEvent, type CriticalEventType } from './critical-events'
 import type {
   ArmyId,
   DiplomaticActionKind,
@@ -19,6 +23,8 @@ import type {
   Order,
   Realm,
   RealmId,
+  ReformId,
+  EventChainId,
   RelationKey,
   RulerState,
   SiteId,
@@ -30,6 +36,32 @@ import type {
 
 import type { ModalAction } from '@/ui/components/Modal'
 
+export enum ModalPriority {
+  SUCCESSION_CRISIS = 100,
+  EVENT_CHAIN = 80,
+  REFORM_PROMPT = 60,
+  DISASTER_RELIEF = 40,
+  GENERIC = 20,
+}
+
+export interface Modal {
+  readonly title: string
+  readonly content: React.ReactNode
+  readonly actions: ModalAction[]
+  readonly dismissable: boolean
+  readonly priority: ModalPriority
+  readonly testId?: string
+}
+
+export interface OpenModalPayload {
+  readonly title: string
+  readonly content: React.ReactNode
+  readonly actions: ModalAction[]
+  readonly dismissable?: boolean
+  readonly priority?: ModalPriority
+  readonly testId?: string
+}
+
 interface GameState {
   world: World
   clockState: ClockState
@@ -37,17 +69,14 @@ interface GameState {
   diplomacyFeedback: readonly DiplomacyActionFeedback[]
   playerRealmId: RealmId
   selectedArmyId: ArmyId | null
+  lastBattleResolution: BattleResolution | null
   contextMenu: { siteId: SiteId; x: number; y: number } | null
-  activePanel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | null
+  activePanel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | null
   diplomacyTargetRealmId: RealmId | null
+  isPeacePanelOpen: boolean
   transientBanner: { text: string; createdAt: number } | null
-  modal: {
-    title: string
-    content: React.ReactNode
-    actions: ModalAction[]
-    dismissable: boolean
-    testId?: string
-  } | null
+  modalQueue: ReadonlyArray<Modal>
+  previousClockSpeed: SpeedTier
 }
 
 export interface DiplomacyActionFeedback {
@@ -75,11 +104,15 @@ interface GameActions {
   reset: () => void
   selectArmy: (armyId: ArmyId) => void
   clearSelection: () => void
+  setLastBattleResolution: (resolution: BattleResolution | null) => void
+  clearLastBattleResolution: () => void
   openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) => void
   closeContextMenu: () => void
-  setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | null) => void
+  setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | null) => void
   openDiplomacyPanel: (realmId: RealmId) => void
   closeDiplomacyPanel: () => void
+  openPeacePanel: () => void
+  closePeacePanel: () => void
   issueOrder: (order: Order) => void
   activatePlayerEdict: (payload: ActivatePlayerEdictPayload) => void
   assignPlayerGovernor: (payload: AssignPlayerGovernorPayload) => void
@@ -88,13 +121,17 @@ interface GameActions {
   submitPlayerDiplomacyAction: (payload: SubmitPlayerDiplomacyActionPayload) => SubmitPlayerDiplomacyActionResult
   showBanner: (text: string) => void
   clearBanner: () => void
-  openModal: (modal: { title: string; content: React.ReactNode; actions: ModalAction[]; dismissable?: boolean; testId?: string }) => void
+  openModal: (modal: OpenModalPayload) => void
   closeModal: () => void
+  clearModalQueue: () => void
   resolveSuccessionForceCollateral: (realmId: RealmId, candidateId: GeneralId) => void
   resolveSuccessionFraternal: (realmId: RealmId, brotherId: GeneralId) => void
   resolveSuccessionCivilWar: (realmId: RealmId) => void
   resolveSuccessionForceVassal: (realmId: RealmId) => void
   applyDisasterChoice: (disasterId: string, choiceId: string) => void
+  applyReformChoice: (realmId: RealmId, reformId: ReformId, choiceId: string) => void
+  applyEventChainChoice: (chainId: EventChainId, choiceId: string) => void
+  pauseOnCriticalEvent: (eventType: CriticalEventType, payload?: Record<string, unknown>) => void
 }
 
 export interface ActivatePlayerEdictPayload {
@@ -124,6 +161,67 @@ export type GameStoreState = GameStore
 
 type StoreSet = (updater: (state: GameStore) => void) => void
 
+function getPlayerBattleResolution(events: readonly GameEvent[], playerRealmId: RealmId): BattleResolution | null {
+  let latest: BattleResolution | null = null
+
+  for (const event of events) {
+    if (event.type !== 'battleResolved') continue
+    if (typeof event.payload !== 'object' || event.payload === null) continue
+
+    const payload = event.payload as {
+      readonly battleResolution?: BattleResolution
+      readonly attackerRealmId?: RealmId | null
+      readonly defenderRealmId?: RealmId | null
+    }
+
+    if (payload.attackerRealmId === playerRealmId || payload.defenderRealmId === playerRealmId) {
+      latest = payload.battleResolution ?? null
+    }
+  }
+
+  return latest
+}
+
+function enqueueModal(state: GameStore, modal: OpenModalPayload): void {
+  const wasEmpty = state.modalQueue.length === 0
+  const queuedModal: Modal = {
+    ...modal,
+    dismissable: modal.dismissable ?? true,
+    priority: modal.priority ?? ModalPriority.GENERIC,
+  }
+
+  const nextQueue = [...state.modalQueue]
+  const insertAt = nextQueue.findIndex((entry) => entry.priority < queuedModal.priority)
+  if (insertAt === -1) {
+    nextQueue.push(queuedModal)
+  } else {
+    nextQueue.splice(insertAt, 0, queuedModal)
+  }
+
+  state.modalQueue = castDraft(nextQueue)
+  if (wasEmpty) {
+    state.previousClockSpeed = state.clockState.speed
+    state.clockState = engineSetSpeed(state.clockState, 'pause')
+  }
+}
+
+function closeQueuedModal(state: GameStore): void {
+  if (state.modalQueue.length === 0) return
+
+  const nextQueue = state.modalQueue.slice(1)
+  state.modalQueue = castDraft(nextQueue)
+  if (nextQueue.length === 0) {
+    state.clockState = engineSetSpeed(state.clockState, state.previousClockSpeed)
+  }
+}
+
+function clearQueuedModals(state: GameStore): void {
+  if (state.modalQueue.length === 0) return
+
+  state.modalQueue = []
+  state.clockState = engineSetSpeed(state.clockState, state.previousClockSpeed)
+}
+
 function createCoreActions(set: StoreSet): Pick<GameActions, 'tick' | 'setSpeed' | 'reset'> {
   return {
     tick: (deltaMs: number) =>
@@ -132,6 +230,11 @@ function createCoreActions(set: StoreSet): Pick<GameActions, 'tick' | 'setSpeed'
         state.world = castDraft(result.nextWorld)
         state.clockState = result.clockState
         state.events = castDraft(result.events)
+
+        const lastBattleResolution = getPlayerBattleResolution(result.events, state.playerRealmId)
+        if (lastBattleResolution !== null) {
+          state.lastBattleResolution = lastBattleResolution
+        }
       }),
     setSpeed: (speed: SpeedTier) =>
       set((state) => {
@@ -146,10 +249,13 @@ function createCoreActions(set: StoreSet): Pick<GameActions, 'tick' | 'setSpeed'
         state.diplomacyFeedback = castDraft(fresh.diplomacyFeedback)
         state.playerRealmId = fresh.playerRealmId
         state.selectedArmyId = fresh.selectedArmyId
+        state.lastBattleResolution = fresh.lastBattleResolution
         state.contextMenu = fresh.contextMenu
         state.activePanel = fresh.activePanel
         state.diplomacyTargetRealmId = fresh.diplomacyTargetRealmId
         state.transientBanner = fresh.transientBanner
+        state.modalQueue = castDraft(fresh.modalQueue)
+        state.previousClockSpeed = fresh.previousClockSpeed
       }),
   }
 }
@@ -167,9 +273,22 @@ function createSelectionActions(set: StoreSet): Pick<GameActions, 'selectArmy' |
   }
 }
 
+function createBattleActions(set: StoreSet): Pick<GameActions, 'setLastBattleResolution' | 'clearLastBattleResolution'> {
+  return {
+    setLastBattleResolution: (resolution: BattleResolution | null) =>
+      set((state) => {
+        state.lastBattleResolution = resolution
+      }),
+    clearLastBattleResolution: () =>
+      set((state) => {
+        state.lastBattleResolution = null
+      }),
+  }
+}
+
 function createUiActions(
   set: StoreSet,
-): Pick<GameActions, 'openContextMenu' | 'closeContextMenu' | 'setActivePanel' | 'openDiplomacyPanel' | 'closeDiplomacyPanel' | 'openModal' | 'closeModal'> {
+): Pick<GameActions, 'openContextMenu' | 'closeContextMenu' | 'setActivePanel' | 'openDiplomacyPanel' | 'closeDiplomacyPanel' | 'openPeacePanel' | 'closePeacePanel' | 'openModal' | 'closeModal' | 'clearModalQueue'> {
   return {
     openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) =>
       set((state) => {
@@ -179,7 +298,7 @@ function createUiActions(
       set((state) => {
         state.contextMenu = null
       }),
-    setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | null) =>
+    setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | null) =>
       set((state) => {
         state.activePanel = panel
       }),
@@ -191,14 +310,25 @@ function createUiActions(
       set((state) => {
         state.diplomacyTargetRealmId = null
       }),
+    openPeacePanel: () =>
+      set((state) => {
+        state.isPeacePanelOpen = true
+      }),
+    closePeacePanel: () =>
+      set((state) => {
+        state.isPeacePanelOpen = false
+      }),
     openModal: (modal) =>
       set((state) => {
-        state.modal = { ...modal, dismissable: modal.dismissable ?? true }
-        state.clockState = engineSetSpeed(state.clockState, 'pause')
+        enqueueModal(state, modal)
       }),
     closeModal: () =>
       set((state) => {
-        state.modal = null
+        closeQueuedModal(state)
+      }),
+    clearModalQueue: () =>
+      set((state) => {
+        clearQueuedModals(state)
       }),
   }
 }
@@ -270,28 +400,24 @@ function createSuccessionActions(
     resolveSuccessionForceCollateral: (realmId: RealmId, candidateId: GeneralId) =>
       set((state) => {
         state.world = castDraft(installSuccessor(state.world, realmId, candidateId))
-        state.modal = null
-        state.clockState = engineSetSpeed(state.clockState, '1x')
+        closeQueuedModal(state)
       }),
     resolveSuccessionFraternal: (realmId: RealmId, brotherId: GeneralId) =>
       set((state) => {
         state.world = castDraft(installSuccessor(state.world, realmId, brotherId))
-        state.modal = null
-        state.clockState = engineSetSpeed(state.clockState, '1x')
+        closeQueuedModal(state)
       }),
     resolveSuccessionCivilWar: (realmId: RealmId) =>
       set((state) => {
         const events: GameEvent[] = [{ type: 'successionCivilWar', payload: { realmId } }]
         state.world = castDraft(vacateRealm(state.world, realmId))
         state.events = castDraft(events)
-        state.modal = null
-        state.clockState = engineSetSpeed(state.clockState, '1x')
+        closeQueuedModal(state)
       }),
     resolveSuccessionForceVassal: (realmId: RealmId) =>
       set((state) => {
         state.world = castDraft(vacateRealm(state.world, realmId))
-        state.modal = null
-        state.clockState = engineSetSpeed(state.clockState, '1x')
+        closeQueuedModal(state)
       }),
   }
 }
@@ -415,19 +541,76 @@ function createWorldActions(
 
 function makeInitialState(): GameState {
   const data = loadM1Data()
-  const playerRealmId = 'realm_qin'
+  let playerRealmId = 'realm_qin'
+
+  if (typeof window !== 'undefined' && import.meta.env.DEV) {
+    const params = new URLSearchParams(window.location.search)
+    const forcePlayerRealm = params.get('forcePlayerRealm')
+    if (forcePlayerRealm) {
+      playerRealmId = forcePlayerRealm
+    }
+  }
+
+  let world = createWorldFromM1Data(data, 42, playerRealmId)
+
+  if (typeof window !== 'undefined' && import.meta.env.DEV) {
+    const params = new URLSearchParams(window.location.search)
+    const forceTrigger = params.get('forceTrigger')
+    if (forceTrigger) {
+      const chainIds = forceTrigger.split(',')
+      const eventChainStates = new Map(world.eventChainStates)
+      for (const chainId of chainIds) {
+        const chain = getEventChain(chainId)
+        if (chain && chain.stages.length > 0) {
+          eventChainStates.set(chainId, {
+            id: chainId,
+            currentStageId: chain.stages[0]!.id,
+            completed: false,
+            startedAtTick: world.tick,
+            choiceHistory: [],
+          })
+        }
+      }
+      world = { ...world, eventChainStates }
+    }
+
+    const forceReform = params.get('forceReform')
+    if (forceReform) {
+      const targetRealmId = params.get('forceReformRealm') || playerRealmId
+      const reformStates = new Map(world.reformStates)
+      const defs = loadReformDefinitions()
+      const def = defs.find(d => d.id === forceReform)
+      if (def && def.stages.length > 0) {
+        const firstStage = def.stages[0]!
+        reformStates.set(targetRealmId, {
+          realmId: targetRealmId,
+          reformId: forceReform,
+          status: 'in_progress',
+          currentStageId: firstStage.id,
+          startedAtTick: world.tick,
+          stageEnteredAtTick: world.tick - firstStage.advanceAfterMonths * 3,
+          choiceHistory: [],
+        })
+      }
+      world = { ...world, reformStates }
+    }
+  }
+
   return {
-    world: createWorldFromM1Data(data, 42, playerRealmId),
+    world,
     clockState: { speed: 'pause', realTimeAccum: 0 },
     events: [],
     diplomacyFeedback: [],
     playerRealmId,
     selectedArmyId: null,
+    lastBattleResolution: null,
     contextMenu: null,
     activePanel: null,
     diplomacyTargetRealmId: null,
+    isPeacePanelOpen: false,
     transientBanner: null,
-    modal: null,
+    modalQueue: [],
+    previousClockSpeed: '1x',
   }
 }
 
@@ -479,8 +662,51 @@ function createDisasterActions(set: StoreSet): Pick<GameActions, 'applyDisasterC
         nextWorld = setDisasterState(nextWorld, playerRealmId, resolvedState)
         
         state.world = castDraft(nextWorld)
-        state.modal = null
-        state.clockState = engineSetSpeed(state.clockState, '1x')
+        closeQueuedModal(state)
+      }),
+  }
+}
+
+function createReformActions(set: StoreSet): Pick<GameActions, 'applyReformChoice'> {
+  return {
+    applyReformChoice: (realmId: RealmId, reformId: ReformId, choiceId: string) =>
+      set((state) => {
+        const defs = loadReformDefinitions()
+        const def = defs.find((d) => d.id === reformId)
+        if (!def) return
+
+        const result = engineApplyReformChoice(state.world, realmId, def, choiceId)
+        if (result.world === state.world) return
+
+        state.world = castDraft(result.world)
+      }),
+  }
+}
+
+function createEventChainActions(set: StoreSet): Pick<GameActions, 'applyEventChainChoice'> {
+  return {
+    applyEventChainChoice: (chainId: EventChainId, choiceId: string) =>
+      set((state) => {
+        const result = engineApplyEventChainChoice(state.world, chainId, choiceId)
+        state.world = castDraft(result.world)
+        state.events = castDraft(result.events)
+        closeQueuedModal(state)
+      }),
+  }
+}
+
+function createCriticalEventActions(set: StoreSet): Pick<GameActions, 'pauseOnCriticalEvent'> {
+  return {
+    pauseOnCriticalEvent: (eventType: CriticalEventType, _payload?: Record<string, unknown>) =>
+      set((state) => {
+        if (state.clockState.speed !== 'pause') {
+          state.previousClockSpeed = state.clockState.speed
+          state.clockState = engineSetSpeed(state.clockState, 'pause')
+        }
+        state.transientBanner = {
+          text: bannerTextForCriticalEvent(eventType),
+          createdAt: state.world.tick,
+        }
       }),
   }
 }
@@ -496,10 +722,14 @@ export const useGameStore = create<GameStore>()(
     ...makeInitialState(),
     ...createCoreActions(set),
     ...createSelectionActions(set),
+    ...createBattleActions(set),
     ...createUiActions(set),
     ...createWorldActions(set),
     ...createSuccessionActions(set),
     ...createDisasterActions(set),
+    ...createReformActions(set),
+    ...createEventChainActions(set),
+    ...createCriticalEventActions(set),
   })),
 )
 

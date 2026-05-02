@@ -8,9 +8,9 @@ AI agent behavioral guidelines for this codebase. Read before making any changes
 
 战国策略游戏引擎原型。Vite + React + TypeScript strict，纯函数引擎 + Zustand UI 层。
 
-**当前里程碑**: M0/M1/M2/M3/M4(v1) 已交付。M5（人物与人才）为下一里程碑。
+**当前里程碑**: M0/M1/M2/M3/M3.1/M4(v1)/M5/M4.1/M4.2 已交付。M6（文化与意识形态）为下一里程碑。
 
-**实施顺序**: M4(已) → M5 人物 → M4.1 变法 → M4.2 灾害·贸易·派系 → M6 文化 → M7 谍报
+**实施顺序**: M4(✅) → M5 人物(✅) → M4.1 变法(✅) → M4.2 灾害·贸易·派系(✅) → M6 文化 → M7 谍报
 
 ---
 
@@ -54,7 +54,7 @@ interface World {
 ### Phase Pipeline (M2)
 
 ```
-aiPlan → orderApply → march → siege → combat-v2 → manpower → victoryCheck
+aiPlan → orderApply → march → siege → combat-v2 → manpower → rulerLifecycle → characterLifecycle → recruitment → reform → victoryCheck → diplomacyLifecycle → economy → disaster → trade → faction → historicalEvents
 ```
 
 每个 phase 是纯函数：`(World, RNGState) → { world, nextRng, events }`
@@ -126,7 +126,7 @@ AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按
 | Each realm has rulerId or null | `src/content/m1/__tests__/scenario-rulers.test.ts` |
 | All M5 balance constants prefixed M5_ | `src/content/m2/__tests__/balance-m5.test.ts` |
 | 8 archetypes covered in personality-coverage.test.ts | `src/engine/systems/ai/__tests__/personality-coverage.test.ts` |
-| M4.1_REFORMS_COUNT === 6 | `src/content/m2/__tests__/balance-m41.test.ts` |
+| M4.1_REFORMS_COUNT === 4 | `src/content/m2/__tests__/balance-m41.test.ts` |
 
 ---
 
@@ -281,7 +281,7 @@ const world: World = {
 | predicate evaluator | `src/engine/systems/reform/predicate.ts` | `evaluatePredicate(world, realm, node)` |
 | stage progression | `src/engine/systems/reform/stage-progression.ts` | `applyReformChoice`, `completeReform` |
 | TraitEffectRegistry | `src/content/m4_1/trait-effects.ts` | `getTraitModifiers(realm)` |
-| reform JSONs | `src/content/m4_1/reforms/` | 6 reform definitions |
+| reform JSONs | `src/content/m4_1/reforms/` | 4 reform definitions |
 | v3→v4 migration | `src/engine/world/migrations/v3-to-v4.ts` | `migrateScenarioV3ToV4` |
 
 ---
@@ -315,8 +315,8 @@ const world: World = {
 
 - 将领学/谋维度实际效果（M5）✅ 已交付
 - 8 种 AI 性格 archetype（M5）✅ 已交付
-- 变法系统（M4.1，依赖 M5 革新者人才）
-- 灾害 / 贸易 / 派系（M4.2，依赖 M5 人物）
+- 变法系统（M4.1，依赖 M5 革新者人才）✅ 已交付（M4.1）
+- 灾害 / 贸易 / 派系（M4.2，依赖 M5 人物）✅ 已交付（M4.2）
 - `prestige` / `legitimacy` 文化威望字段（M6）
 - 学宫 / 百家 / 文化扩散（M6，依赖 M5 学宫产人才）
 - 谍报行动（M7，依赖 M5 间者人才）

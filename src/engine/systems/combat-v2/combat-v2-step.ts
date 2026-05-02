@@ -121,6 +121,15 @@ export function combatV2Step(
     }
 
     const result = resolveCombat(ctx)
+    events.push({
+      type: 'battleResolved',
+      payload: {
+        battleResolution: result,
+        attackerRealmId: army.realmId,
+        defenderRealmId,
+        siteId: destination,
+      },
+    })
     generals = applyGeneralDeaths(armies, generals, result.deadGenerals, destination, events)
     const currentAttacker = armies.get(army.id) ?? army
 

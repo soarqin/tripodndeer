@@ -290,6 +290,58 @@ describe('reformPhase: active reform handling', () => {
     expect(state?.currentStageId).toBe('stage2')
     expect(state?.choiceHistory.length).toBe(1)
   })
+
+  it('does NOT auto-advance reform stage for player realm even when threshold reached', () => {
+    const def: ReformDefinition = {
+      id: 'multi_stage',
+      displayName: 'Multi',
+      displayNameZh: '多',
+      trigger: { kind: 'realm.id', value: 'realm_qin' },
+      oneShot: true,
+      stages: [
+        {
+          id: 'stage1',
+          textZh: 'Stage 1',
+          choices: [
+            { id: 'go', labelZh: 'Go', effects: [], outcome: 'continue', nextStageId: 'stage2' },
+          ],
+          advanceAfterMonths: 12,
+        },
+        {
+          id: 'stage2',
+          textZh: 'Stage 2',
+          choices: [
+            { id: 'finish', labelZh: 'Finish', effects: [], outcome: 'success' },
+          ],
+          advanceAfterMonths: 12,
+        },
+      ],
+      successTrait: 'shang_yang_reform_done',
+      failureTrait: 'reform_failed_scar',
+    }
+    const reformState: ReformState = {
+      realmId: 'realm_qin',
+      reformId: 'multi_stage',
+      currentStageId: 'stage1',
+      startedAtTick: 0,
+      stageEnteredAtTick: 0,
+      status: 'in_progress',
+      choiceHistory: [],
+    }
+    const world = makeTestWorld({
+      tick: 36,
+      realms: new Map([['realm_qin', makeRealm()]]),
+      rulers: new Map([['realm_qin', makeRuler('builder')]]),
+      generals: new Map([['gen_reformer', makeReformer()]]),
+      reformStates: new Map([['realm_qin', reformState]]),
+      playerRealmId: 'realm_qin',
+    })
+    const result = reformPhase(world, { seed: 1, counter: 0 }, [def])
+    const state = result.world.reformStates.get('realm_qin')
+    expect(state?.currentStageId).toBe('stage1')
+    expect(state?.choiceHistory.length).toBe(0)
+    expect(state?.status).toBe('in_progress')
+  })
 })
 
 describe('reformPhase: determinism', () => {

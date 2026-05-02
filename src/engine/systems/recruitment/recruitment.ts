@@ -113,6 +113,7 @@ export function recruitmentPhase(
         specialty: specialtyRoll.specialty,
         ambition: ambitionRoll.ambition,
         age: 25,
+        recruitedAtTick: world.tick,
         posts: [],
         loyaltyState: 'loyal',
       }

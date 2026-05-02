@@ -15,6 +15,26 @@
   min-width: 0;
 }
 
+.resourceGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 16px;
+  flex: 1;
+  justify-content: center;
+}
+
+.resourceChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  font-weight: 500;
+  color: #333;
+}
+
 .separator {
   color: #999;
 }

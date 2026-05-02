@@ -3,6 +3,7 @@ import styles from './BattlePanel.module.css'
 
 interface BattlePanelProps {
   resolution: BattleResolution
+  onClose?: () => void
 }
 
 const STEP_LABELS: Record<string, string> = {
@@ -16,7 +17,7 @@ const STEP_LABELS: Record<string, string> = {
   'variance': '随机因素',
 }
 
-export function BattlePanel({ resolution }: BattlePanelProps) {
+export function BattlePanel({ resolution, onClose }: BattlePanelProps) {
   const formatMultiplier = (val: number) => {
     if (val === 1) return '-'
     return `x${val.toFixed(2)}`
@@ -26,6 +27,15 @@ export function BattlePanel({ resolution }: BattlePanelProps) {
     <div className={styles.panel} data-testid="battle-panel">
       <div className={styles.header}>
         <h2 className={styles.title}>战斗结果</h2>
+        {onClose && (
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            data-testid="battle-panel-close"
+          >
+            ×
+          </button>
+        )}
       </div>
       
       <div className={styles.content}>

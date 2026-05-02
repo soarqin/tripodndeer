@@ -37,6 +37,13 @@
   font-weight: 600;
 }
 
+.queueBadge {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #aaa;
+}
+
 .content {
   padding: 24px;
   font-size: 15px;

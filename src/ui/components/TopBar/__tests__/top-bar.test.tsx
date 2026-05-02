@@ -19,6 +19,16 @@ const mockState = {
           initialSites: [],
           initialArmies: [],
           aiPersonality: 'aggressive_random',
+          economy: {
+            treasury: 12300,
+            foodStores: 500,
+            taxRate: 0.1,
+          },
+          stats: {
+            manpowerPool: 15000,
+            manpowerCap: 20000,
+            warWeariness: 12,
+          },
         },
       ],
     ]),
@@ -85,5 +95,13 @@ describe('TopBar', () => {
     const tick = screen.getByTestId('top-bar-tick-count')
     expect(tick.textContent).toBe('时步：0')
     expect(screen.queryByText(/^Tick:/)).toBeNull()
+
+    expect(screen.getByTestId('top-bar-treasury').textContent).toContain('12.3K')
+    expect(screen.getByTestId('top-bar-food').textContent).toContain('500')
+    expect(screen.getByTestId('top-bar-manpower').textContent).toContain('15.0K')
+    expect(screen.getByTestId('top-bar-war-weariness').textContent).toContain('12')
+
+    expect(screen.queryByTestId('top-bar-prestige')).toBeNull()
+    expect(screen.queryByTestId('top-bar-population')).toBeNull()
   })
 })

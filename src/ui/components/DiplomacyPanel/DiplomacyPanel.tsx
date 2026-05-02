@@ -36,9 +36,12 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function DiplomacyPanel() {
   const targetRealmId = useGameStore(selectDiplomacyTargetRealmId)
+  const activePanel = useGameStore(state => state.activePanel)
   const playerRealm = useGameStore(selectPlayerRealm)
   const closeDiplomacyPanel = useGameStore(state => state.closeDiplomacyPanel)
+  const setActivePanel = useGameStore(state => state.setActivePanel)
   const submitPlayerDiplomacyAction = useGameStore(state => state.submitPlayerDiplomacyAction)
+  const openPeacePanel = useGameStore(state => state.openPeacePanel)
   const relationSummaries = useGameStore(selectDiplomacyRelationSummaries)
   const feedbackList = useGameStore(selectDiplomacyFeedback)
   const coalitionPressure = useGameStore(selectCoalitionPressure)
@@ -46,14 +49,14 @@ export function DiplomacyPanel() {
 
   const [localFeedback, setLocalFeedback] = useState<{ ok: boolean; message: string } | null>(null)
 
-  if (!targetRealmId || !playerRealm) return null
+  if ((!targetRealmId && activePanel !== 'waijiao') || !playerRealm) return null
 
-  const summary = relationSummaries.find(s => s.counterpartRealmId === targetRealmId)
+  const summary = targetRealmId ? relationSummaries.find(s => s.counterpartRealmId === targetRealmId) : undefined
   
   // If no summary exists, we still need to show the panel with default values
   const displaySummary = summary || {
-    counterpartRealmId: targetRealmId,
-    counterpartRealmName: targetRealmId,
+    counterpartRealmId: targetRealmId || '',
+    counterpartRealmName: targetRealmId || '请选择势力',
     attitude: 0,
     trust: 0,
     atWar: false,
@@ -62,10 +65,25 @@ export function DiplomacyPanel() {
     hasActiveTruce: false,
   }
 
-  const targetFeedback = feedbackList.filter(f => f.targetRealmId === targetRealmId)
+  const targetFeedback = targetRealmId ? feedbackList.filter(f => f.targetRealmId === targetRealmId) : []
   const latestFeedback = targetFeedback[targetFeedback.length - 1]
 
+  const handleClose = () => {
+    closeDiplomacyPanel()
+    if (activePanel === 'waijiao') {
+      setActivePanel(null)
+    }
+  }
+
   const handleAction = (kind: 'envoy' | 'alliance' | 'non_aggression' | 'tribute' | 'marriage' | 'declare_war' | 'peace') => {
+    if (!targetRealmId) {
+      setLocalFeedback({ ok: false, message: '请先选择目标势力' })
+      return
+    }
+    if (kind === 'peace') {
+      openPeacePanel()
+      return
+    }
     const result = submitPlayerDiplomacyAction({
       kind,
       targetRealmId,
@@ -84,7 +102,7 @@ export function DiplomacyPanel() {
       <div className={styles.panel} data-testid="diplomacy-panel">
         <div className={styles.header}>
           <h2>外交: {displaySummary.counterpartRealmName}</h2>
-          <button className={styles.closeBtn} onClick={closeDiplomacyPanel}>X</button>
+          <button className={styles.closeBtn} onClick={handleClose}>X</button>
         </div>
 
         <div className={styles.content}>

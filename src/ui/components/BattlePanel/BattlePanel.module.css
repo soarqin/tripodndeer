@@ -10,7 +10,7 @@
   color: #eee;
   font-family: sans-serif;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8);
-  z-index: 200;
+  z-index: 100;
   overflow: hidden;
 }
 
@@ -19,6 +19,24 @@
   border-bottom: 1px solid #444;
   background-color: #333;
   text-align: center;
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.closeButton:hover {
+  color: #fff;
 }
 
 .title {

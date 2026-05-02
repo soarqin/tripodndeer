@@ -158,6 +158,7 @@ describe('EventChainStateSchema (M5)', () => {
       currentStageId: 'stage_1',
       completed: false,
       startedAtTick: 42,
+      choiceHistory: [],
     }
     expect(EventChainStateSchema.safeParse(state).success).toBe(true)
   })
@@ -168,6 +169,7 @@ describe('EventChainStateSchema (M5)', () => {
       currentStageId: 'final',
       completed: true,
       startedAtTick: 0,
+      choiceHistory: [{ stageId: 'stage_1', choiceId: 'continue' }],
     }
     expect(EventChainStateSchema.safeParse(state).success).toBe(true)
   })

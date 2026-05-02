@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useGameStore } from '~/ui/store'
 import { M5_ARMY_CAP_BONUS_PER_WU, M5_GOVERNOR_TAX_BONUS_PER_ZHENG } from '~/content/m2/balance'
 import { selectActivePanel, useGenerals, useSites, selectPlayerGovernorAssignments } from '~/ui/store/selectors'
+import { RecruitmentLog } from '../RecruitmentLog'
 import styles from './CharacterPanel.module.css'
 
 export function CharacterPanel() {
@@ -39,6 +40,7 @@ export function CharacterPanel() {
     <div className={styles.panel} data-testid="character-panel">
       <div className={styles.header}>人才 (Characters)</div>
       <div className={styles.content}>
+        <RecruitmentLog />
         <div className={styles.characterList}>
           {playerGenerals.map((general) => {
             const hasPosts = general.posts && general.posts.length > 0

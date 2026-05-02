@@ -1,4 +1,5 @@
-export { useGameStore } from './game-store'
+export { ModalPriority, useGameStore } from './game-store'
+export type { Modal, OpenModalPayload } from './game-store'
 export { useRafDriver } from './raf-driver'
 export {
   selectPlayerActiveEdicts,

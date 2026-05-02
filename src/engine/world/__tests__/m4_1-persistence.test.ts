@@ -7,13 +7,13 @@ type V5ReformState = M1DataV5['reformStates'][number]
 
 const SAMPLE_REFORM_STATE: V5ReformState = {
   realmId: 'realm_qin',
-  reformId: 'reform_shang_yang',
-  currentStageId: 'shang_yang_proposal',
+  reformId: 'reform_hu_fu_qi_she',
+  currentStageId: 'wuling_proposal',
   startedAtTick: 12,
   stageEnteredAtTick: 12,
   status: 'in_progress',
   choiceHistory: [
-    { stageId: 'shang_yang_proposal', choiceId: 'adopt', tick: 12 },
+    { stageId: 'wuling_proposal', choiceId: 'decree', tick: 12 },
   ],
 }
 

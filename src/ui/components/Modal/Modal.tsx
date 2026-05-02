@@ -17,9 +17,10 @@ export interface ModalProps {
   dismissable?: boolean
   onClose: () => void
   testId?: string
+  queuedCount?: number
 }
 
-export function Modal({ title, content, actions, dismissable = true, onClose, testId }: ModalProps) {
+export function Modal({ title, content, actions, dismissable = true, onClose, testId, queuedCount = 0 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -88,7 +89,10 @@ export function Modal({ title, content, actions, dismissable = true, onClose, te
         ref={modalRef}
       >
         <div className={styles.header}>
-          <h2 id="modal-title" className={styles.title}>{title}</h2>
+          <h2 id="modal-title" className={styles.title}>
+            {title}
+            {queuedCount > 0 && <span className={styles.queueBadge}>({queuedCount} more)</span>}
+          </h2>
         </div>
         <div className={styles.content}>
           {content}

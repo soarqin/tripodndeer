@@ -1,6 +1,7 @@
 import { useGameStore } from '~/ui/store'
 import { selectPlayerRealm, selectAllPlayerArmies, selectActivePanel } from '~/ui/store/selectors'
 import { RulerPanel } from '../RulerPanel'
+import { FactionStatusView } from '../FactionStatusView'
 import styles from './RealmOverviewPanel.module.css'
 export function RealmOverviewPanel() {
   const activePanel = useGameStore(selectActivePanel)
@@ -58,6 +59,7 @@ export function RealmOverviewPanel() {
         </div>
       </div>
       {world.rulers.has(realm.id) && <RulerPanel />}
+      {world.factionInfluences?.has(realm.id) && <FactionStatusView />}
     </div>
   )
 }

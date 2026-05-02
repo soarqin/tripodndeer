@@ -1,5 +1,4 @@
-import type { Effect } from '~/shared/schemas'
-import type { EventChainState, GameEvent, General, PredicateNode, RealmId, RNGState, World } from '~/shared/types'
+import type { Effect, EventChain, EventChainId, EventChainStage, EventChainState, GameEvent, General, RNGState, World } from '~/shared/types'
 import { evaluatePredicate } from '../reform/predicate'
 import fanJuStrategy from '~/content/m5/events/fan-ju-strategy.json'
 import lianPoElder from '~/content/m5/events/lian-po-elder.json'
@@ -142,14 +141,7 @@ export function applyEventEffect(world: World, effect: Effect): World {
   return applyEffect(world, effect)
 }
 
-export interface EventChainTrigger {
-  readonly type: 'date' | 'state'
-  readonly between?: readonly [{ readonly yearBC: number }, { readonly yearBC: number }]
-  readonly predicate?: PredicateNode
-  readonly realmId?: RealmId
-}
-
-export function checkTrigger(world: World, trigger: EventChainTrigger): boolean {
+export function checkTrigger(world: World, trigger: EventChain['trigger']): boolean {
   if (trigger.type === 'date') {
     if (!trigger.between) return false
     const [start, end] = trigger.between
@@ -164,18 +156,82 @@ export function checkTrigger(world: World, trigger: EventChainTrigger): boolean 
   return false
 }
 
-interface LoadedEventChain {
-  readonly id: string
-  readonly trigger: EventChainTrigger
-  readonly oneShot: boolean
-  readonly stages: readonly { readonly id: string }[]
+const EVENT_CHAINS: readonly EventChain[] = [
+  linXiangruBi as unknown as EventChain,
+  fanJuStrategy as unknown as EventChain,
+  lianPoElder as unknown as EventChain,
+]
+
+export function getEventChain(chainId: EventChainId): EventChain | null {
+  return EVENT_CHAINS.find((chain) => chain.id === chainId) ?? null
 }
 
-const EVENT_CHAINS: readonly LoadedEventChain[] = [
-  linXiangruBi as unknown as LoadedEventChain,
-  fanJuStrategy as unknown as LoadedEventChain,
-  lianPoElder as unknown as LoadedEventChain,
-]
+export function getCurrentStage(world: World, chainId: EventChainId): EventChainStage | null {
+  const state = world.eventChainStates.get(chainId)
+  if (!state) return null
+
+  const chain = getEventChain(chainId)
+  if (!chain) return null
+
+  return chain.stages.find((stage) => stage.id === state.currentStageId) ?? null
+}
+
+export function applyEventChainChoice(
+  world: World,
+  chainId: EventChainId,
+  choiceId: string,
+): { world: World; events: readonly GameEvent[] } {
+  const state = world.eventChainStates.get(chainId)
+  if (!state || state.completed) return { world, events: [] }
+
+  const currentStage = getCurrentStage(world, chainId)
+  if (!currentStage) return { world, events: [] }
+
+  const choice = currentStage.choices.find((candidate) => candidate.id === choiceId)
+  if (!choice) return { world, events: [] }
+
+  let currentWorld = world
+  for (const effect of choice.effects) {
+    currentWorld = applyEventEffect(currentWorld, effect)
+  }
+
+  const updatedState: EventChainState = {
+    ...state,
+    choiceHistory: [
+      ...(Array.isArray(state.choiceHistory) ? state.choiceHistory : []),
+      { stageId: state.currentStageId, choiceId },
+    ],
+  }
+
+  const eventChainStates = new Map(currentWorld.eventChainStates)
+  const events: GameEvent[] = []
+
+  if (choice.nextStageId) {
+    const nextState: EventChainState = {
+      ...updatedState,
+      currentStageId: choice.nextStageId,
+    }
+    eventChainStates.set(chainId, nextState)
+    currentWorld = { ...currentWorld, eventChainStates }
+    events.push({
+      type: 'eventChainAdvanced',
+      payload: { chainId, fromStageId: state.currentStageId, toStageId: choice.nextStageId, choiceId },
+    })
+  } else {
+    const nextState: EventChainState = {
+      ...updatedState,
+      completed: true,
+    }
+    eventChainStates.set(chainId, nextState)
+    currentWorld = { ...currentWorld, eventChainStates }
+    events.push({
+      type: 'eventChainCompleted',
+      payload: { chainId, stageId: state.currentStageId, choiceId },
+    })
+  }
+
+  return { world: currentWorld, events }
+}
 
 export function historicalEventsPhase(
   world: World,
@@ -196,6 +252,7 @@ export function historicalEventsPhase(
       currentStageId: chain.stages[0]!.id,
       completed: false,
       startedAtTick: currentWorld.tick,
+      choiceHistory: [],
     }
     const eventChainStates = new Map(currentWorld.eventChainStates)
     eventChainStates.set(chain.id, newState)

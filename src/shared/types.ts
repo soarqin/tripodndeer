@@ -1,5 +1,4 @@
 import type { TerrainType } from '~/content/m2/balance'
-import type { Effect } from './schemas'
 
 // 邑的 ID 类型（opaque string，如 'site_1'）
 export type SiteId = string
@@ -357,6 +356,7 @@ export interface General {
   ambition?: Ambition
   faction?: FactionId
   age?: number
+  recruitedAtTick?: number
   posts?: readonly Post[]
   loyaltyState?: LoyaltyState
 }
@@ -374,14 +374,59 @@ export interface RulerState {
 
 export type EventChainId = string
 
+export type PoliticalSystem = 'enfeoffment' | 'commandery' | 'legalist_centralized'
+
+export type Effect =
+  | { readonly type: 'realm.treasury'; readonly realmId: RealmId; readonly delta: number }
+  | { readonly type: 'character.create'; readonly generalId: GeneralId; readonly realmId: RealmId; readonly name: string }
+  | { readonly type: 'character.kill'; readonly generalId: GeneralId }
+  | { readonly type: 'character.loyalty'; readonly generalId: GeneralId; readonly delta: number }
+  | { readonly type: 'realm.trait.add'; readonly realmId: RealmId; readonly trait: string }
+  | { readonly type: 'realm.politicalSystem.set'; readonly realmId: RealmId; readonly system: PoliticalSystem }
+  | { readonly type: 'site.population.delta'; readonly siteId: SiteId; readonly delta: number }
+  | { readonly type: 'realm.faction.delta'; readonly realmId: RealmId; readonly faction: FactionId; readonly delta: number }
+  | { readonly type: 'realm.warWeariness.delta'; readonly realmId: RealmId; readonly delta: number }
+  | { readonly type: 'realm.foodStores.delta'; readonly realmId: RealmId; readonly delta: number }
+
+export interface EventChainChoice {
+  readonly id: string
+  readonly label: string
+  readonly effects: readonly Effect[]
+  readonly nextStageId?: string
+}
+
+export interface EventChainStage {
+  readonly id: string
+  readonly text: string
+  readonly choices: readonly EventChainChoice[]
+}
+
+export type EventChainTrigger =
+  | {
+      readonly type: 'date'
+      readonly between?: readonly [{ readonly yearBC: number }, { readonly yearBC: number }]
+      readonly realmId?: RealmId
+    }
+  | {
+      readonly type: 'state'
+      readonly predicate?: PredicateNode
+      readonly realmId?: RealmId
+    }
+
+export interface EventChain {
+  readonly id: EventChainId
+  readonly trigger: EventChainTrigger
+  readonly oneShot: boolean
+  readonly stages: readonly EventChainStage[]
+}
+
 export interface EventChainState {
   readonly id: EventChainId
   readonly currentStageId: string
   readonly completed: boolean
   readonly startedAtTick: number
+  readonly choiceHistory: ReadonlyArray<{ readonly stageId: string; readonly choiceId: string }>
 }
-
-export type PoliticalSystem = 'enfeoffment' | 'commandery' | 'legalist_centralized'
 
 export type PredicateNode =
   | { kind: 'realm.id'; value: RealmId }

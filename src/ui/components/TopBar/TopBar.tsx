@@ -23,6 +23,14 @@ function speedLabel(speed: SpeedTier): string {
   return labels[speed]
 }
 
+function formatResource(value: number | undefined): string {
+  if (value === undefined) return '0'
+  if (value >= 10000) {
+    return `${(value / 1000).toFixed(1)}K`
+  }
+  return value.toString()
+}
+
 export const TopBar = React.memo(function TopBar() {
   const realm = useGameStore(selectPlayerRealm)
   const armies = useGameStore(selectAllPlayerArmies)
@@ -47,6 +55,20 @@ export const TopBar = React.memo(function TopBar() {
         <span data-testid="top-bar-speed">速度: {speedLabel(speed)}</span>
         <span className={styles.separator}>|</span>
         <span data-testid="top-bar-tick-count">时步：{tick}</span>
+      </div>
+      <div className={styles.resourceGroup}>
+        <span className={styles.resourceChip} data-testid="top-bar-treasury" title="国库">
+          💰 {formatResource(realm?.economy?.treasury)}
+        </span>
+        <span className={styles.resourceChip} data-testid="top-bar-food" title="粮草">
+          🌾 {formatResource(realm?.economy?.foodStores)}
+        </span>
+        <span className={styles.resourceChip} data-testid="top-bar-manpower" title="人力">
+          👥 {formatResource(realm?.stats?.manpowerPool)}
+        </span>
+        <span className={styles.resourceChip} data-testid="top-bar-war-weariness" title="厌战度">
+          💢 {formatResource(realm?.stats?.warWeariness)}
+        </span>
       </div>
       <span className={styles.manpowerBadge}>总兵 {totalManpower}</span>
     </div>

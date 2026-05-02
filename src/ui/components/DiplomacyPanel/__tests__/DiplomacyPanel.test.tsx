@@ -4,6 +4,7 @@ import { DiplomacyPanel } from '../DiplomacyPanel'
 
 const mockCloseDiplomacyPanel = vi.fn()
 const mockSubmitPlayerDiplomacyAction = vi.fn()
+const mockOpenPeacePanel = vi.fn()
 
 let mockState: Record<string, unknown> = {}
 
@@ -47,7 +48,8 @@ describe('DiplomacyPanel', () => {
       coalitionPressure: [],
       zhouInvestiture: null,
       closeDiplomacyPanel: mockCloseDiplomacyPanel,
-      submitPlayerDiplomacyAction: mockSubmitPlayerDiplomacyAction
+      submitPlayerDiplomacyAction: mockSubmitPlayerDiplomacyAction,
+      openPeacePanel: mockOpenPeacePanel
     }
   })
 
@@ -110,7 +112,7 @@ describe('DiplomacyPanel', () => {
     expect(mockSubmitPlayerDiplomacyAction).toHaveBeenCalledWith({ kind: 'declare_war', targetRealmId: 'realm_zhao' })
 
     fireEvent.click(screen.getByTestId('diplomacy-action-peace'))
-    expect(mockSubmitPlayerDiplomacyAction).toHaveBeenCalledWith({ kind: 'peace', targetRealmId: 'realm_zhao' })
+    expect(mockOpenPeacePanel).toHaveBeenCalled()
   })
 
   it('renders zhou investiture and coalition pressure', () => {
@@ -160,7 +162,7 @@ describe('DiplomacyPanel', () => {
     mockSubmitPlayerDiplomacyAction.mockReturnValue({ ok: false, reason: 'unexpected_reason' })
     render(<DiplomacyPanel />)
 
-    fireEvent.click(screen.getByTestId('diplomacy-action-peace'))
+    fireEvent.click(screen.getByTestId('diplomacy-action-alliance'))
 
     const feedback = screen.getByTestId('diplomacy-feedback')
     expect(feedback.textContent).toContain('已拒绝：行动暂不可用')

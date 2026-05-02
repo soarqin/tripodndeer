@@ -16,8 +16,8 @@ import {
 } from '../balance'
 
 describe('M4.1 balance constants', () => {
-  it('M41_REFORMS_COUNT === 6', () => {
-    expect(M41_REFORMS_COUNT).toBe(6)
+  it('M41_REFORMS_COUNT === 4', () => {
+    expect(M41_REFORMS_COUNT).toBe(4)
   })
 
   it('all 8 archetypes present in M41_AI_PERSONALITY_REFORM_PROPENSITY', () => {

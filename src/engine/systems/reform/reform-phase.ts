@@ -17,8 +17,6 @@ import {
 import { ReformDefinitionSchema } from '~/shared/schemas'
 import { evaluatePredicate } from './predicate'
 import { applyReformChoice, completeReform } from './stage-progression'
-import shangYangJson from '~/content/m4_1/reforms/shang-yang.json'
-import wuQiJson from '~/content/m4_1/reforms/wu-qi.json'
 import huFuQiSheJson from '~/content/m4_1/reforms/hu-fu-qi-she.json'
 import chuWuQiLegacyJson from '~/content/m4_1/reforms/chu-wu-qi-legacy.json'
 import qiJixiaDebateJson from '~/content/m4_1/reforms/qi-jixia-debate.json'
@@ -36,15 +34,13 @@ const TICKS_PER_MONTH = 3
 const TICKS_PER_YEAR = 36
 
 const REFORM_DEFINITIONS: readonly ReformDefinition[] = [
-  shangYangJson,
-  wuQiJson,
   huFuQiSheJson,
   chuWuQiLegacyJson,
   qiJixiaDebateJson,
   hanShenBuhaiJson,
 ].map(json => ReformDefinitionSchema.parse(json))
 
-function loadReformDefinitions(): readonly ReformDefinition[] {
+export function loadReformDefinitions(): readonly ReformDefinition[] {
   return REFORM_DEFINITIONS
 }
 
@@ -170,6 +166,7 @@ export function reformPhase(
   for (const realmId of sortedRealmIds) {
     const activeState = currentWorld.reformStates.get(realmId)
     if (activeState?.status === 'in_progress') {
+      if (realmId === currentWorld.playerRealmId) continue
       const result = handleActiveReform(currentWorld, realmId, activeState, reformDefs)
       currentWorld = result.world
       events.push(...result.events)

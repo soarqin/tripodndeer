@@ -33,7 +33,7 @@ export function TradePanelView() {
           ))}
         </div>
       )}
-      <button data-testid="trade-establish-btn">建立新商路</button>
+      <button data-testid="trade-establish-btn" style={{ display: 'none' }}>建立新商路</button>
     </div>
   )
 }

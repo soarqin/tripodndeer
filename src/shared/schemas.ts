@@ -286,6 +286,7 @@ export const GeneralSchema = z.object({
   ambition: AmbitionSchema.optional(),
   faction: FactionIdSchema.optional(),
   age: z.number().int().nonnegative().optional(),
+  recruitedAtTick: z.number().int().nonnegative().optional(),
   posts: z.array(PostSchema).optional(),
   loyaltyState: LoyaltyStateSchema.optional(),
 })
@@ -491,6 +492,7 @@ export const EventChainStateSchema = z.object({
   currentStageId: z.string().min(1),
   completed: z.boolean(),
   startedAtTick: z.number().int().nonnegative(),
+  choiceHistory: z.array(z.object({ stageId: z.string(), choiceId: z.string() })),
 })
 
 export const SiteOccupationSchema = z.object({
@@ -711,6 +713,11 @@ export const WorldSchema = z.object({
   coalitions: z.instanceof(Map),
   zhouInvestiture: z.instanceof(Map),
   generals: z.instanceof(Map),
+  rulers: z.map(RealmIdSchema, RulerStateSchema),
+  eventChainStates: z.map(z.string().min(1), EventChainStateSchema),
+  disasterStates: z.map(RealmIdSchema, DisasterStateSchema),
+  tradeRoutes: z.map(TradeRouteIdSchema, TradeRouteSchema),
+  factionInfluences: z.map(RealmIdSchema, FactionInfluenceStateSchema),
   passes: z.instanceof(Map),
   adjacencyEdges: z.instanceof(Map),
   sieges: z.instanceof(Map),

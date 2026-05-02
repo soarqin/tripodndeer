@@ -9,21 +9,22 @@ describe('BottomBar', () => {
     expect(buttons).toHaveLength(8)
   })
 
-  it('only 4 buttons are enabled (not disabled)', () => {
+  it('only 5 buttons are enabled (not disabled)', () => {
     render(<BottomBar />)
     const buttons = screen.getAllByRole('button')
     const enabledButtons = buttons.filter(btn => !(btn as HTMLButtonElement).disabled)
-    expect(enabledButtons).toHaveLength(4)
+    expect(enabledButtons).toHaveLength(5)
     expect(enabledButtons[0]?.textContent).toBe('王宫')
     expect(enabledButtons[1]?.textContent).toBe('军事')
-    expect(enabledButtons[2]?.textContent).toBe('内政')
-    expect(enabledButtons[3]?.textContent).toBe('人才')
+    expect(enabledButtons[2]?.textContent).toBe('外交')
+    expect(enabledButtons[3]?.textContent).toBe('内政')
+    expect(enabledButtons[4]?.textContent).toBe('人才')
   })
 
   it('disabled buttons have aria-disabled="true"', () => {
     render(<BottomBar />)
     const disabledButtons = screen.getAllByRole('button').filter(btn => (btn as HTMLButtonElement).disabled)
-    expect(disabledButtons).toHaveLength(4)
+    expect(disabledButtons).toHaveLength(3)
     disabledButtons.forEach(btn => {
       expect(btn.getAttribute('aria-disabled')).toBe('true')
     })
