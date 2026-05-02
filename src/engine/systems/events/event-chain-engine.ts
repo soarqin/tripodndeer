@@ -1,5 +1,9 @@
 import type { Effect } from '~/shared/schemas'
-import type { GameEvent, General, RNGState, World } from '~/shared/types'
+import type { EventChainState, GameEvent, General, PredicateNode, RealmId, RNGState, World } from '~/shared/types'
+import { evaluatePredicate } from '../reform/predicate'
+import fanJuStrategy from '~/content/m5/events/fan-ju-strategy.json'
+import lianPoElder from '~/content/m5/events/lian-po-elder.json'
+import linXiangruBi from '~/content/m5/events/lin-xiangru-bi.json'
 
 const EFFECT_TYPES = [
   'realm.treasury',
@@ -7,6 +11,7 @@ const EFFECT_TYPES = [
   'character.kill',
   'character.loyalty',
   'realm.trait.add',
+  'realm.politicalSystem.set',
 ] as const
 
 type EffectType = (typeof EFFECT_TYPES)[number]
@@ -61,9 +66,17 @@ function applyEffect(world: World, effect: Effect): World {
     case 'realm.trait.add': {
       const realm = world.realms.get(effect.realmId)
       if (!realm) return world
+      if (realm.traits.includes(effect.trait)) return world
       const realms = new Map(world.realms)
-      const traits = [...(realm.traits ?? []), effect.trait]
+      const traits = [...realm.traits, effect.trait]
       realms.set(realm.id, { ...realm, traits })
+      return { ...world, realms }
+    }
+    case 'realm.politicalSystem.set': {
+      const realm = world.realms.get(effect.realmId)
+      if (!realm) return world
+      const realms = new Map(world.realms)
+      realms.set(realm.id, { ...realm, politicalSystem: effect.system })
       return { ...world, realms }
     }
     default: {
@@ -83,7 +96,8 @@ export function applyEventEffect(world: World, effect: Effect): World {
 export interface EventChainTrigger {
   readonly type: 'date' | 'state'
   readonly between?: readonly [{ readonly yearBC: number }, { readonly yearBC: number }]
-  readonly predicate?: string
+  readonly predicate?: PredicateNode
+  readonly realmId?: RealmId
 }
 
 export function checkTrigger(world: World, trigger: EventChainTrigger): boolean {
@@ -92,13 +106,55 @@ export function checkTrigger(world: World, trigger: EventChainTrigger): boolean 
     const [start, end] = trigger.between
     return world.date.yearBC <= start.yearBC && world.date.yearBC >= end.yearBC
   }
+  if (trigger.type === 'state') {
+    if (!trigger.realmId || !trigger.predicate) return false
+    const realm = world.realms.get(trigger.realmId)
+    if (!realm) return false
+    return evaluatePredicate(world, realm, trigger.predicate)
+  }
   return false
 }
+
+interface LoadedEventChain {
+  readonly id: string
+  readonly trigger: EventChainTrigger
+  readonly oneShot: boolean
+  readonly stages: readonly { readonly id: string }[]
+}
+
+const EVENT_CHAINS: readonly LoadedEventChain[] = [
+  linXiangruBi as unknown as LoadedEventChain,
+  fanJuStrategy as unknown as LoadedEventChain,
+  lianPoElder as unknown as LoadedEventChain,
+]
 
 export function historicalEventsPhase(
   world: World,
   rng: RNGState,
 ): { world: World; nextRng: RNGState; events: readonly GameEvent[] } {
-  const events: readonly GameEvent[] = []
-  return { world, nextRng: rng, events }
+  const events: GameEvent[] = []
+  let currentWorld = world
+
+  const sortedChains = [...EVENT_CHAINS].sort((a, b) => a.id.localeCompare(b.id))
+
+  for (const chain of sortedChains) {
+    if (chain.oneShot && currentWorld.eventChainStates.has(chain.id)) continue
+    if (!checkTrigger(currentWorld, chain.trigger)) continue
+    if (chain.stages.length === 0) continue
+
+    const newState: EventChainState = {
+      id: chain.id,
+      currentStageId: chain.stages[0]!.id,
+      completed: false,
+      startedAtTick: currentWorld.tick,
+    }
+    const eventChainStates = new Map(currentWorld.eventChainStates)
+    eventChainStates.set(chain.id, newState)
+    currentWorld = { ...currentWorld, eventChainStates }
+
+    events.push({ type: 'eventChainTriggered', payload: { chainId: chain.id } })
+  }
+
+  if (events.length === 0) return { world, nextRng: rng, events: [] }
+  return { world: currentWorld, nextRng: rng, events }
 }
