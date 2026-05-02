@@ -5,6 +5,7 @@ import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
 import { warKey } from '~/engine/wars/wars'
 import type {
   General,
+  GovernorAssignment,
   PersonalityArchetype,
   PoliticalSystem,
   Realm,
@@ -532,6 +533,222 @@ describe('evaluatePredicate: or', () => {
           { kind: 'realm.id', value: 'realm_zhao' },
           { kind: 'realm.id', value: 'realm_chu' },
         ],
+      }),
+    ).toBe(false)
+  })
+})
+
+describe('evaluatePredicate: site.terrain', () => {
+  it('returns true when site terrain matches value', () => {
+    const realm = makeRealm({ id: 'realm_qin' })
+    const site = makeSite('site_01', 'realm_qin', 5000)
+    site.terrainType = 'plains'
+    const world = makeTestWorld({ sites: new Map([['site_01', site]]) })
+    expect(
+      evaluatePredicate(world, realm, {
+        kind: 'site.terrain',
+        siteId: 'site_01',
+        value: 'plains',
+      }),
+    ).toBe(true)
+  })
+
+  it('returns false when site terrain does not match value', () => {
+    const realm = makeRealm({ id: 'realm_qin' })
+    const site = makeSite('site_01', 'realm_qin', 5000)
+    site.terrainType = 'plains'
+    const world = makeTestWorld({ sites: new Map([['site_01', site]]) })
+    expect(
+      evaluatePredicate(world, realm, {
+        kind: 'site.terrain',
+        siteId: 'site_01',
+        value: 'mountains',
+      }),
+    ).toBe(false)
+  })
+
+  it('returns false when site does not exist', () => {
+    const realm = makeRealm({ id: 'realm_qin' })
+    const world = makeTestWorld()
+    expect(
+      evaluatePredicate(world, realm, {
+        kind: 'site.terrain',
+        siteId: 'nonexistent',
+        value: 'plains',
+      }),
+    ).toBe(false)
+  })
+})
+
+describe('evaluatePredicate: site.population-above', () => {
+  it('returns true when site population exceeds value', () => {
+    const realm = makeRealm({ id: 'realm_qin' })
+    const site = makeSite('site_01', 'realm_qin', 10000)
+    const world = makeTestWorld({ sites: new Map([['site_01', site]]) })
+    expect(
+      evaluatePredicate(world, realm, {
+        kind: 'site.population-above',
+        siteId: 'site_01',
+        value: 5000,
+      }),
+    ).toBe(true)
+  })
+
+  it('returns false when site population is below or equal to value', () => {
+    const realm = makeRealm({ id: 'realm_qin' })
+    const site = makeSite('site_01', 'realm_qin', 10000)
+    const world = makeTestWorld({ sites: new Map([['site_01', site]]) })
+    expect(
+      evaluatePredicate(world, realm, {
+        kind: 'site.population-above',
+        siteId: 'site_01',
+        value: 20000,
+      }),
+    ).toBe(false)
+  })
+
+  it('returns false when site does not exist', () => {
+    const realm = makeRealm({ id: 'realm_qin' })
+    const world = makeTestWorld()
+    expect(
+      evaluatePredicate(world, realm, {
+        kind: 'site.population-above',
+        siteId: 'nonexistent',
+        value: 5000,
+      }),
+    ).toBe(false)
+  })
+})
+
+describe('evaluatePredicate: site.governor-zheng-above', () => {
+  it('returns true when governor zheng exceeds value', () => {
+    const realm = makeRealm({ id: 'realm_qin' })
+    const site = makeSite('site_01', 'realm_qin', 5000)
+    const general = makeGeneral({
+      id: 'gen_01',
+      realmId: 'realm_qin',
+      attrs: { wu: 10, zheng: 15, jiao: 10, mou: 10, xue: 10, po: 10 },
+    })
+    const govAssignment: GovernorAssignment = {
+      siteId: 'site_01',
+      realmId: 'realm_qin',
+      generalId: 'gen_01',
+      assignedAtTick: 0,
+      modifierKind: 'tax_efficiency',
+    }
+    const world = makeTestWorld({
+      sites: new Map([['site_01', site]]),
+      generals: new Map([['gen_01', general]]),
+      governorAssignments: new Map([['site_01', govAssignment]]),
+    })
+    expect(
+      evaluatePredicate(world, realm, {
+        kind: 'site.governor-zheng-above',
+        siteId: 'site_01',
+        value: 10,
+      }),
+    ).toBe(true)
+  })
+
+  it('returns false when governor zheng is below or equal to value', () => {
+    const realm = makeRealm({ id: 'realm_qin' })
+    const site = makeSite('site_01', 'realm_qin', 5000)
+    const general = makeGeneral({
+      id: 'gen_01',
+      realmId: 'realm_qin',
+      attrs: { wu: 10, zheng: 15, jiao: 10, mou: 10, xue: 10, po: 10 },
+    })
+    const govAssignment: GovernorAssignment = {
+      siteId: 'site_01',
+      realmId: 'realm_qin',
+      generalId: 'gen_01',
+      assignedAtTick: 0,
+      modifierKind: 'tax_efficiency',
+    }
+    const world = makeTestWorld({
+      sites: new Map([['site_01', site]]),
+      generals: new Map([['gen_01', general]]),
+      governorAssignments: new Map([['site_01', govAssignment]]),
+    })
+    expect(
+      evaluatePredicate(world, realm, {
+        kind: 'site.governor-zheng-above',
+        siteId: 'site_01',
+        value: 20,
+      }),
+    ).toBe(false)
+  })
+
+  it('returns false when no governor is assigned to site', () => {
+    const realm = makeRealm({ id: 'realm_qin' })
+    const site = makeSite('site_01', 'realm_qin', 5000)
+    const world = makeTestWorld({ sites: new Map([['site_01', site]]) })
+    expect(
+      evaluatePredicate(world, realm, {
+        kind: 'site.governor-zheng-above',
+        siteId: 'site_01',
+        value: 10,
+      }),
+    ).toBe(false)
+  })
+})
+
+describe('evaluatePredicate: realm.faction-influence-above', () => {
+  it('returns true when faction influence exceeds value', () => {
+    const realm = makeRealm({ id: 'realm_qin' })
+    const world = makeTestWorld({
+      factionInfluences: new Map([
+        [
+          'realm_qin',
+          {
+            realmId: 'realm_qin',
+            influences: new Map([['military_meritocracy', 70]]),
+          },
+        ],
+      ]),
+    })
+    expect(
+      evaluatePredicate(world, realm, {
+        kind: 'realm.faction-influence-above',
+        realmId: 'realm_qin',
+        faction: 'military_meritocracy',
+        value: 50,
+      }),
+    ).toBe(true)
+  })
+
+  it('returns false when faction influence is below or equal to value', () => {
+    const realm = makeRealm({ id: 'realm_qin' })
+    const world = makeTestWorld({
+      factionInfluences: new Map([
+        [
+          'realm_qin',
+          {
+            realmId: 'realm_qin',
+            influences: new Map([['military_meritocracy', 70]]),
+          },
+        ],
+      ]),
+    })
+    expect(
+      evaluatePredicate(world, realm, {
+        kind: 'realm.faction-influence-above',
+        realmId: 'realm_qin',
+        faction: 'military_meritocracy',
+        value: 80,
+      }),
+    ).toBe(false)
+  })
+
+  it('returns false when realm has no faction influences', () => {
+    const realm = makeRealm({ id: 'realm_qin' })
+    const world = makeTestWorld()
+    expect(
+      evaluatePredicate(world, realm, {
+        kind: 'realm.faction-influence-above',
+        realmId: 'realm_qin',
+        faction: 'military_meritocracy',
+        value: 50,
       }),
     ).toBe(false)
   })
