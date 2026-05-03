@@ -1,0 +1,38 @@
+{
+  "id": "usurpation_wang",
+  "scope": "realm-scoped",
+  "oneShot": true,
+  "trigger": {
+    "type": "state",
+    "realmId": "$currentRealm",
+    "predicate": {
+      "kind": "and",
+      "children": [
+        { "kind": "realm.prestige.gte", "threshold": 80 },
+        { "kind": "realm.zhouInvestiture.has" },
+        { "kind": "realm.relation.attitude", "targetRealmId": "realm_zhou", "minAttitude": "neutral" }
+      ]
+    }
+  },
+  "stages": [
+    {
+      "id": "usurpation_choice",
+      "text": "僭号称王 — 威望日盛，可效魏惠王故事，自称王号。",
+      "choices": [
+        {
+          "id": "usurp",
+          "label": "称王僭号",
+          "effects": [
+            { "type": "realm.prestige.delta", "realmId": "$currentRealm", "delta": -30 },
+            { "type": "realm.relation.delta", "realmId": "$currentRealm", "targetRealmId": "realm_zhou", "delta": -50 }
+          ]
+        },
+        {
+          "id": "decline",
+          "label": "守诸侯礼",
+          "effects": []
+        }
+      ]
+    }
+  ]
+}
