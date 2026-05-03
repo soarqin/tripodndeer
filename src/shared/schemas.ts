@@ -767,6 +767,36 @@ export const M1DataSchemaV6 = M1DataSchemaV5.extend({
 
 export type M1DataV6 = z.infer<typeof M1DataSchemaV6>
 
+export const EspionageActionKindSchema = z.enum(['reconnaissance', 'rumor', 'discord', 'counter_intel'])
+
+export const CoverageKeySchema = z.string().regex(/^[^_]+(?:_[^_]+)*__[^_]+(?:_[^_]+)*$/)
+
+export const SpyMissionStatusSchema = z.enum(['in_progress', 'success', 'failed', 'exposed', 'cancelled'])
+
+export const SpyMissionSchema = z.object({
+  id: z.string().min(1),
+  spyGeneralId: z.string().min(1),
+  spyRealmId: RealmIdSchema,
+  targetRealmId: RealmIdSchema,
+  action: EspionageActionKindSchema,
+  startTick: z.number().int().nonnegative(),
+  resolveTick: z.number().int().nonnegative(),
+  status: SpyMissionStatusSchema,
+  targetGeneralId: z.string().min(1).nullable(),
+})
+
+export const CounterIntelStateSchema = z.object({
+  realmId: RealmIdSchema,
+  detectionLevel: z.number().int().min(0).max(10),
+  lastUpdatedTick: z.number().int().nonnegative(),
+})
+
+export const M1DataSchemaV7 = M1DataSchemaV6.extend({
+  schema_version: z.literal(7),
+})
+
+export type M1DataV7 = z.infer<typeof M1DataSchemaV7>
+
 // World Schema (for runtime World validation)
 export const WorldSchema = z.object({
   date: z.object({
@@ -801,6 +831,9 @@ export const WorldSchema = z.object({
   edicts: z.instanceof(Map),
   governorAssignments: z.instanceof(Map),
   reformStates: z.instanceof(Map),
+  intelligenceCoverage: z.instanceof(Map),
+  spyMissions: z.instanceof(Map),
+  counterIntelStates: z.instanceof(Map),
   playerRealmId: z.string(),
   rngState: z.object({ seed: z.number(), counter: z.number() }),
   phases: z.array(z.function()),
