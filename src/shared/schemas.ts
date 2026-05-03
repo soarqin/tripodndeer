@@ -46,12 +46,38 @@ export const BoundaryRefSchema = z.object({
 export const TerrainTypeSchema = z.enum(['plains', 'hills', 'mountains', 'forest', 'swamp', 'grassland', 'desert'])
 export const IdeologySchema = z.enum(['fa', 'ru', 'dao', 'mo', 'zonghen', 'bing'])
 export const IdeologyLeanSchema = z.object({
-  fa: z.number(),
-  ru: z.number(),
-  dao: z.number(),
-  mo: z.number(),
-  zonghen: z.number(),
-  bing: z.number(),
+  fa: z.number().int().min(0).max(100),
+  ru: z.number().int().min(0).max(100),
+  dao: z.number().int().min(0).max(100),
+  mo: z.number().int().min(0).max(100),
+  zonghen: z.number().int().min(0).max(100),
+  bing: z.number().int().min(0).max(100),
+})
+
+export const CulturalTagSchema = z.enum([
+  'chinese_qin',
+  'chinese_chu',
+  'chinese_qi',
+  'chinese_zhou_central',
+  'chinese_yan',
+  'chinese_zhao',
+  'chinese_wei',
+  'chinese_han',
+  'yi_dong',
+  'di_xirong',
+])
+
+export const AcademyStatusSchema = z.enum(['active', 'dormant'])
+
+export const AcademySchema = z.object({
+  id: AcademyIdSchema,
+  hostRealmId: RealmIdSchema,
+  hostSiteId: SiteIdSchema,
+  primaryIdeology: IdeologySchema,
+  secondaryIdeology: IdeologySchema.nullable(),
+  founded: z.number().int().positive(),
+  level: z.literal(1),
+  status: AcademyStatusSchema,
 })
 
 export const RawSiteSchema = z.object({
@@ -60,6 +86,10 @@ export const RawSiteSchema = z.object({
   position: Vec2Schema,
   boundary: z.array(BoundaryRefSchema).min(3),
   terrainType: TerrainTypeSchema.optional(),
+  cultural: CulturalTagSchema.optional(),
+  culturalIdentityStrength: z.number().min(0).max(100).optional(),
+  lastConquestTick: z.number().int().nonnegative().nullable().optional(),
+  lowIdentitySinceTick: z.number().int().nonnegative().nullable().optional(),
 })
 
 export const RealmEconomySchema = z.object({
@@ -315,6 +345,8 @@ export const RulerStateSchema = z.object({
 
 export const PoliticalSystemSchema = z.enum(['enfeoffment', 'commandery', 'legalist_centralized'])
 
+export const ZhouInvestitureRankSchema = z.enum(['duke', 'marquis', 'count', 'viscount', 'baron'])
+
 export const EffectSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('realm.treasury'), realmId: RealmIdSchema, delta: z.number() }),
   z.object({ type: z.literal('character.create'), generalId: z.string().min(1), realmId: RealmIdSchema, name: z.string().min(1) }),
@@ -326,6 +358,14 @@ export const EffectSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('realm.faction.delta'), realmId: RealmIdSchema, faction: FactionIdSchema, delta: z.number() }),
   z.object({ type: z.literal('realm.warWeariness.delta'), realmId: RealmIdSchema, delta: z.number() }),
   z.object({ type: z.literal('realm.foodStores.delta'), realmId: RealmIdSchema, delta: z.number() }),
+  z.object({ type: z.literal('realm.prestige.delta'), realmId: RealmIdSchema, delta: z.number() }),
+  z.object({ type: z.literal('realm.ideology.delta'), realmId: RealmIdSchema, ideology: IdeologySchema, delta: z.number() }),
+  z.object({ type: z.literal('realm.relation.delta'), realmId: RealmIdSchema, targetRealmId: RealmIdSchema, delta: z.number() }),
+  z.object({ type: z.literal('site.culturalIdentity.delta'), siteId: SiteIdSchema, delta: z.number() }),
+  z.object({ type: z.literal('site.cultural.set'), siteId: SiteIdSchema, tag: CulturalTagSchema }),
+  z.object({ type: z.literal('academy.create'), academyId: AcademyIdSchema, hostRealmId: RealmIdSchema, hostSiteId: SiteIdSchema, primaryIdeology: IdeologySchema }),
+  z.object({ type: z.literal('academy.dormant'), academyId: AcademyIdSchema }),
+  z.object({ type: z.literal('zhouInvestiture.grant'), realmId: RealmIdSchema, rank: ZhouInvestitureRankSchema }),
 ])
 
 export type Effect = z.infer<typeof EffectSchema>
@@ -619,6 +659,8 @@ export const ZhouInvestitureStateSchema = z.object({
   grantedAtTick: z.number().int().nonnegative(),
   expiresAtTick: z.number().int().nonnegative().nullable(),
   source: z.literal('zhou'),
+  rank: ZhouInvestitureRankSchema.optional(),
+  lastTributeTick: z.number().int().nonnegative().optional(),
 })
 
 export const AIPersonalitySchema = z.enum(['aggressive_random', 'aggressive', 'cautious'] as const)
@@ -729,6 +771,7 @@ export const WorldSchema = z.object({
   zhouInvestiture: z.instanceof(Map),
   generals: z.instanceof(Map),
   rulers: z.map(RealmIdSchema, RulerStateSchema),
+  academies: z.map(AcademyIdSchema, AcademySchema),
   eventChainStates: z.map(z.string().min(1), EventChainStateSchema),
   disasterStates: z.map(RealmIdSchema, DisasterStateSchema),
   tradeRoutes: z.map(TradeRouteIdSchema, TradeRouteSchema),

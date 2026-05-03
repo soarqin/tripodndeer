@@ -212,6 +212,7 @@ describe('WorldSchema', () => {
     zhouInvestiture: new Map(),
     generals: new Map(),
     rulers: new Map(),
+    academies: new Map(),
     eventChainStates: new Map(),
     passes: new Map(),
     adjacencyEdges: new Map(),

@@ -414,6 +414,8 @@ export type EventChainId = string
 
 export type PoliticalSystem = 'enfeoffment' | 'commandery' | 'legalist_centralized'
 
+export type ZhouInvestitureRank = 'duke' | 'marquis' | 'count' | 'viscount' | 'baron'
+
 export type Effect =
   | { readonly type: 'realm.treasury'; readonly realmId: RealmId; readonly delta: number }
   | { readonly type: 'character.create'; readonly generalId: GeneralId; readonly realmId: RealmId; readonly name: string }
@@ -425,6 +427,14 @@ export type Effect =
   | { readonly type: 'realm.faction.delta'; readonly realmId: RealmId; readonly faction: FactionId; readonly delta: number }
   | { readonly type: 'realm.warWeariness.delta'; readonly realmId: RealmId; readonly delta: number }
   | { readonly type: 'realm.foodStores.delta'; readonly realmId: RealmId; readonly delta: number }
+  | { readonly type: 'realm.prestige.delta'; readonly realmId: RealmId; readonly delta: number }
+  | { readonly type: 'realm.ideology.delta'; readonly realmId: RealmId; readonly ideology: Ideology; readonly delta: number }
+  | { readonly type: 'realm.relation.delta'; readonly realmId: RealmId; readonly targetRealmId: RealmId; readonly delta: number }
+  | { readonly type: 'site.culturalIdentity.delta'; readonly siteId: SiteId; readonly delta: number }
+  | { readonly type: 'site.cultural.set'; readonly siteId: SiteId; readonly tag: CulturalTag }
+  | { readonly type: 'academy.create'; readonly academyId: AcademyId; readonly hostRealmId: RealmId; readonly hostSiteId: SiteId; readonly primaryIdeology: Ideology }
+  | { readonly type: 'academy.dormant'; readonly academyId: AcademyId }
+  | { readonly type: 'zhouInvestiture.grant'; readonly realmId: RealmId; readonly rank: ZhouInvestitureRank }
 
 export interface EventChainChoice {
   readonly id: string
