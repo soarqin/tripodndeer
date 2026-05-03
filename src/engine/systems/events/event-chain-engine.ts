@@ -1,5 +1,6 @@
-import type { Effect, EventChain, EventChainId, EventChainStage, EventChainState, GameEvent, General, RNGState, World } from '~/shared/types'
+import type { Academy, Effect, EventChain, EventChainId, EventChainStage, EventChainState, GameEvent, General, RNGState, World, ZhouInvestitureState } from '~/shared/types'
 import { evaluatePredicate } from '../reform/predicate'
+import { relationKey } from '~/engine/systems/diplomacy/diplomacy-core'
 import fanJuStrategy from '~/content/m5/events/fan-ju-strategy.json'
 import lianPoElder from '~/content/m5/events/lian-po-elder.json'
 import linXiangruBi from '~/content/m5/events/lin-xiangru-bi.json'
@@ -15,6 +16,14 @@ const EFFECT_TYPES = [
   'realm.faction.delta',
   'realm.warWeariness.delta',
   'realm.foodStores.delta',
+  'realm.prestige.delta',
+  'realm.ideology.delta',
+  'realm.relation.delta',
+  'site.culturalIdentity.delta',
+  'site.cultural.set',
+  'academy.create',
+  'academy.dormant',
+  'zhouInvestiture.grant',
 ] as const
 
 type EffectType = (typeof EFFECT_TYPES)[number]
@@ -127,11 +136,119 @@ function applyEffect(world: World, effect: Effect): World {
       })
       return { ...world, realms }
     }
+    case 'realm.prestige.delta': {
+      const realm = world.realms.get(effect.realmId)
+      if (!realm) return world
+      const current = realm.prestige ?? 0
+      const newPrestige = Math.max(0, Math.min(100, current + effect.delta))
+      const realms = new Map(world.realms)
+      realms.set(realm.id, { ...realm, prestige: newPrestige })
+      return { ...world, realms }
+    }
+    case 'realm.ideology.delta': {
+      const realm = world.realms.get(effect.realmId)
+      if (!realm) return world
+      const lean = realm.ideologyLean ?? { fa: 0, ru: 0, dao: 0, mo: 0, zonghen: 0, bing: 0 }
+      const currentVal = lean[effect.ideology]
+      const newVal = Math.max(0, Math.min(100, currentVal + effect.delta))
+      const newLean = { ...lean, [effect.ideology]: newVal }
+      const realms = new Map(world.realms)
+      realms.set(realm.id, { ...realm, ideologyLean: newLean })
+      return { ...world, realms }
+    }
+    case 'realm.relation.delta':
+      return applyRealmRelationDelta(world, effect.realmId, effect.targetRealmId, effect.delta)
+    case 'site.culturalIdentity.delta': {
+      const site = world.sites.get(effect.siteId)
+      if (!site) return world
+      const current = site.culturalIdentityStrength ?? 100
+      const newStrength = Math.max(0, Math.min(100, current + effect.delta))
+      const sites = new Map(world.sites)
+      sites.set(site.id, { ...site, culturalIdentityStrength: newStrength })
+      return { ...world, sites }
+    }
+    case 'site.cultural.set': {
+      const site = world.sites.get(effect.siteId)
+      if (!site) return world
+      const sites = new Map(world.sites)
+      sites.set(site.id, { ...site, cultural: effect.tag })
+      return { ...world, sites }
+    }
+    case 'academy.create':
+      return applyAcademyCreate(world, effect)
+    case 'academy.dormant': {
+      const academy = world.academies.get(effect.academyId)
+      if (!academy) return world
+      const academies = new Map(world.academies)
+      academies.set(academy.id, { ...academy, status: 'dormant' })
+      return { ...world, academies }
+    }
+    case 'zhouInvestiture.grant':
+      return applyZhouInvestitureGrant(world, effect.realmId, effect.rank)
     default: {
       const unknownType = (effect as { type: string }).type
       throw new Error(`Unknown effect type: ${unknownType}`)
     }
   }
+}
+
+function applyRealmRelationDelta(world: World, realmId: string, targetRealmId: string, delta: number): World {
+  if (realmId === targetRealmId) return world
+  if (!world.realms.has(realmId) || !world.realms.has(targetRealmId)) return world
+  const key = relationKey(realmId, targetRealmId)
+  const existing = world.relations.get(key)
+  const [lowerId, higherId] = realmId.localeCompare(targetRealmId) <= 0
+    ? [realmId, targetRealmId]
+    : [targetRealmId, realmId]
+  const baseAttitude = existing?.attitude ?? 0
+  const newAttitude = Math.max(-100, Math.min(100, baseAttitude + delta))
+  const relations = new Map(world.relations)
+  relations.set(key, {
+    key,
+    realmAId: existing?.realmAId ?? lowerId,
+    realmBId: existing?.realmBId ?? higherId,
+    attitude: newAttitude,
+    trust: existing?.trust ?? 0,
+    updatedAt: world.date,
+  })
+  return { ...world, relations }
+}
+
+function applyAcademyCreate(world: World, effect: Extract<Effect, { type: 'academy.create' }>): World {
+  if (!world.realms.has(effect.hostRealmId)) return world
+  if (!world.sites.has(effect.hostSiteId)) return world
+  if (world.academies.has(effect.academyId)) return world
+  const academy: Academy = {
+    id: effect.academyId,
+    hostRealmId: effect.hostRealmId,
+    hostSiteId: effect.hostSiteId,
+    primaryIdeology: effect.primaryIdeology,
+    secondaryIdeology: null,
+    founded: world.date.yearBC,
+    level: 1,
+    status: 'active',
+  }
+  const academies = new Map(world.academies)
+  academies.set(academy.id, academy)
+  return { ...world, academies }
+}
+
+function applyZhouInvestitureGrant(world: World, realmId: string, rank: ZhouInvestitureState['rank']): World {
+  if (!world.realms.has(realmId)) return world
+  const existing = world.zhouInvestiture.get(realmId)
+  const next: ZhouInvestitureState = existing
+    ? { ...existing, rank, recognizedTitle: rank ?? existing.recognizedTitle }
+    : {
+        realmId,
+        recognizedTitle: rank ?? '',
+        grantedAtTick: world.tick,
+        expiresAtTick: null,
+        source: 'zhou',
+        rank,
+      }
+  const zhouInvestiture = new Map(world.zhouInvestiture)
+  zhouInvestiture.set(realmId, next)
+  return { ...world, zhouInvestiture }
 }
 
 export function applyEventEffect(world: World, effect: Effect): World {

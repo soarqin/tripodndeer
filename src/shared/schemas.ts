@@ -383,6 +383,8 @@ export const EventChainStageSchema = z.object({
   choices: z.array(EventChainChoiceSchema),
 })
 
+const AttitudeBucketSchema = z.enum(['hostile', 'cold', 'neutral', 'friendly', 'ally'])
+
 export const PredicateNodeSchema: z.ZodType<PredicateNode> = z.lazy(() =>
   z.union([
     z.object({ kind: z.literal('realm.id'), value: RealmIdSchema }),
@@ -401,6 +403,12 @@ export const PredicateNodeSchema: z.ZodType<PredicateNode> = z.lazy(() =>
     z.object({ kind: z.literal('site.population-above'), siteId: SiteIdSchema, value: z.number() }),
     z.object({ kind: z.literal('site.governor-zheng-above'), siteId: SiteIdSchema, value: z.number() }),
     z.object({ kind: z.literal('realm.faction-influence-above'), realmId: RealmIdSchema, faction: FactionIdSchema, value: z.number() }),
+    z.object({ kind: z.literal('realm.prestige.gte'), threshold: z.number() }),
+    z.object({ kind: z.literal('realm.prestige.lt'), threshold: z.number() }),
+    z.object({ kind: z.literal('realm.relation.attitude'), targetRealmId: RealmIdSchema, minAttitude: AttitudeBucketSchema }),
+    z.object({ kind: z.literal('realm.zhouInvestiture.has'), rank: ZhouInvestitureRankSchema.optional() }),
+    z.object({ kind: z.literal('realm.zhouInvestiture.absent') }),
+    z.object({ kind: z.literal('realm.id.equals'), value: RealmIdSchema }),
   ]),
 )
 
@@ -532,11 +540,14 @@ export const EventChainTriggerSchema = z.discriminatedUnion('type', [
   }),
 ])
 
+export const EventChainScopeSchema = z.enum(['realm-scoped', 'fixed-realm', 'global'])
+
 export const EventChainSchema = z.object({
   id: z.string().min(1),
   trigger: EventChainTriggerSchema,
   oneShot: z.boolean(),
   stages: z.array(EventChainStageSchema).min(1),
+  scope: EventChainScopeSchema.optional(),
 })
 
 export const EventChainStateSchema = z.object({
@@ -545,6 +556,7 @@ export const EventChainStateSchema = z.object({
   completed: z.boolean(),
   startedAtTick: z.number().int().nonnegative(),
   choiceHistory: z.array(z.object({ stageId: z.string(), choiceId: z.string() })),
+  realmId: RealmIdSchema.optional(),
 })
 
 export const SiteOccupationSchema = z.object({

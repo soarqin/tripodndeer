@@ -461,11 +461,14 @@ export type EventChainTrigger =
       readonly realmId?: RealmId
     }
 
+export type EventChainScope = 'realm-scoped' | 'fixed-realm' | 'global'
+
 export interface EventChain {
   readonly id: EventChainId
   readonly trigger: EventChainTrigger
   readonly oneShot: boolean
   readonly stages: readonly EventChainStage[]
+  readonly scope?: EventChainScope
 }
 
 export interface EventChainState {
@@ -474,7 +477,10 @@ export interface EventChainState {
   readonly completed: boolean
   readonly startedAtTick: number
   readonly choiceHistory: ReadonlyArray<{ readonly stageId: string; readonly choiceId: string }>
+  readonly realmId?: RealmId
 }
+
+export type AttitudeBucket = 'hostile' | 'cold' | 'neutral' | 'friendly' | 'ally'
 
 export type PredicateNode =
   | { kind: 'realm.id'; value: RealmId }
@@ -493,6 +499,12 @@ export type PredicateNode =
   | { kind: 'site.population-above'; siteId: SiteId; value: number }
   | { kind: 'site.governor-zheng-above'; siteId: SiteId; value: number }
   | { kind: 'realm.faction-influence-above'; realmId: RealmId; faction: FactionId; value: number }
+  | { kind: 'realm.prestige.gte'; threshold: number }
+  | { kind: 'realm.prestige.lt'; threshold: number }
+  | { kind: 'realm.relation.attitude'; targetRealmId: RealmId; minAttitude: AttitudeBucket }
+  | { kind: 'realm.zhouInvestiture.has'; rank?: ZhouInvestitureRank }
+  | { kind: 'realm.zhouInvestiture.absent' }
+  | { kind: 'realm.id.equals'; value: RealmId }
 
 export type ReformId = string
 

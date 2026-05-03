@@ -1,6 +1,17 @@
-import type { PredicateNode, Realm, World } from '~/shared/types'
+import type { AttitudeBucket, PredicateNode, Realm, World } from '~/shared/types'
+import { relationKey } from '~/engine/systems/diplomacy/diplomacy-core'
 
 const TICKS_PER_YEAR = 36
+
+const ATTITUDE_ORDER: readonly AttitudeBucket[] = ['hostile', 'cold', 'neutral', 'friendly', 'ally']
+
+export function attitudeToBucket(value: number): AttitudeBucket {
+  if (value < -50) return 'hostile'
+  if (value < -20) return 'cold'
+  if (value < 20) return 'neutral'
+  if (value < 60) return 'friendly'
+  return 'ally'
+}
 
 export function evaluatePredicate(world: World, realm: Realm, node: PredicateNode): boolean {
   switch (node.kind) {
@@ -87,5 +98,33 @@ export function evaluatePredicate(world: World, realm: Realm, node: PredicateNod
       const influence = factionState.influences.get(node.faction) ?? 0
       return influence > node.value
     }
+
+    case 'realm.prestige.gte':
+      return (realm.prestige ?? 0) >= node.threshold
+
+    case 'realm.prestige.lt':
+      return (realm.prestige ?? 0) < node.threshold
+
+    case 'realm.relation.attitude': {
+      if (realm.id === node.targetRealmId) return false
+      const key = relationKey(realm.id, node.targetRealmId)
+      const relation = world.relations.get(key)
+      const attitudeValue = relation?.attitude ?? 0
+      const bucket = attitudeToBucket(attitudeValue)
+      return ATTITUDE_ORDER.indexOf(bucket) >= ATTITUDE_ORDER.indexOf(node.minAttitude)
+    }
+
+    case 'realm.zhouInvestiture.has': {
+      const investiture = world.zhouInvestiture.get(realm.id)
+      if (!investiture) return false
+      if (node.rank) return investiture.rank === node.rank
+      return true
+    }
+
+    case 'realm.zhouInvestiture.absent':
+      return !world.zhouInvestiture.has(realm.id)
+
+    case 'realm.id.equals':
+      return realm.id === node.value
   }
 }
