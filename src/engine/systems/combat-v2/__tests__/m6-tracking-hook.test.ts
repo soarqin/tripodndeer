@@ -238,6 +238,12 @@ describe('combatV2Step M6 tracking (M6_ENABLED=true)', () => {
     expect(result.world.realms.get('realm_han')?.warVictoriesThisYear ?? 0).toBe(0)
   })
 
+})
+
+describe('combatV2Step M6 tracking — multi-academy and determinism', () => {
+  beforeEach(() => setCombatVarianceEnabled(false))
+  afterEach(() => setCombatVarianceEnabled(true))
+
   it('only sets dormant on the matching academy when multiple academies exist', async () => {
     const { combatV2Step } = await import('../combat-v2-step')
     const attacker = makeArmy({

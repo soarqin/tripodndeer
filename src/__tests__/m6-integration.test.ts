@@ -403,7 +403,7 @@ describe('M6 integration edge cases', () => {
           makeSite({
             id: 'site_lu_capital',
             ownerId: lu.id,
-            cultural: 'chinese_lu',
+            cultural: 'chinese_han',
             identity: 80,
             adjacency: ['site_qi_capital'],
           }),

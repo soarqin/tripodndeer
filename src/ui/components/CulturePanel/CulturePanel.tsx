@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useGameStore } from '~/ui/store/game-store'
+import type { World, Realm } from '~/shared/types'
 import styles from './CulturePanel.module.css'
 
 type CultureTab = 'cultural' | 'ideology' | 'academy'
@@ -39,7 +40,7 @@ export function CulturePanel() {
   )
 }
 
-function CulturalMapTab({ world, playerRealmId }: { world: any, playerRealmId: string }) {
+function CulturalMapTab({ world, playerRealmId }: { world: World | null | undefined, playerRealmId: string | undefined }) {
   if (!world) return null
   const playerSites = [...world.sites.values()].filter(s => s.ownerId === playerRealmId)
   return (
@@ -58,7 +59,7 @@ function CulturalMapTab({ world, playerRealmId }: { world: any, playerRealmId: s
   )
 }
 
-function IdeologyRadarTab({ realm }: { realm: any }) {
+function IdeologyRadarTab({ realm }: { realm: Realm | null | undefined }) {
   if (!realm) return null
   const ideologies = ['fa', 'ru', 'dao', 'mo', 'zonghen', 'bing'] as const
   const size = 200
@@ -93,7 +94,7 @@ function IdeologyRadarTab({ realm }: { realm: any }) {
   )
 }
 
-function AcademyListTab({ world }: { world: any }) {
+function AcademyListTab({ world }: { world: World | null | undefined }) {
   if (!world) return null
   const academies = [...world.academies.values()]
   return (

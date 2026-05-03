@@ -70,7 +70,7 @@ function makeSitesMap(sites: readonly Site[]): ReadonlyMap<SiteId, Site> {
   return new Map(sites.map((s) => [s.id, s]))
 }
 
-describe('culturalIdentityPhase', () => {
+describe('culturalIdentityPhase — diffusion and conquest', () => {
   it('keeps identity stable when all neighbours share the same cultural tag', () => {
     const sites = makeSitesMap([
       makeSite({
@@ -172,6 +172,9 @@ describe('culturalIdentityPhase', () => {
     expect(result.events.some((e) => e.type === 'culturalTagFlipped')).toBe(true)
   })
 
+})
+
+describe('culturalIdentityPhase — tribute and feature flag', () => {
   it('pulls tributary site identity toward suzerain culture via active treaty', () => {
     const realmTributary = makeRealm('realm_han')
     const realmSuzerain = makeRealm('realm_qin')
@@ -317,6 +320,9 @@ describe('culturalIdentityPhase', () => {
     expect(result.events.some((e) => e.type === 'culturalTagFlipped')).toBe(false)
   })
 
+})
+
+describe('culturalIdentityPhase — tracker and adjacency', () => {
   it('clears low-identity tracker when identity recovers above threshold', () => {
     const sites = makeSitesMap([
       makeSite({
