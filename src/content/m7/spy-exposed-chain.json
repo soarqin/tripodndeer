@@ -1,0 +1,33 @@
+{
+  "id": "spy_exposed_high_risk_v1",
+  "scope": "realm-scoped",
+  "oneShot": false,
+  "trigger": {
+    "type": "state",
+    "realmId": "$currentRealm",
+    "predicate": {
+      "kind": "realm.id.equals",
+      "value": "$currentRealm"
+    }
+  },
+  "stages": [
+    {
+      "id": "spy_exposed_response",
+      "text": "高风险间谍行动暴露 — 我国间者于敌国行事不慎，被对方擒获。当如何应对？",
+      "choices": [
+        {
+          "id": "deny",
+          "label": "抵赖",
+          "effects": []
+        },
+        {
+          "id": "admit",
+          "label": "承认",
+          "effects": [
+            { "type": "realm.relation.delta", "realmId": "$currentRealm", "targetRealmId": "$targetRealm", "delta": 5 }
+          ]
+        }
+      ]
+    }
+  ]
+}
