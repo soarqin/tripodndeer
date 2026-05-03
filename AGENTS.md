@@ -240,6 +240,9 @@ const world: World = {
   rulers: new Map(),          // ← M5 新增
   eventChainStates: new Map(), // ← M5 新增
   academies: new Map(),       // ← M6 新增
+  intelligenceCoverage: new Map(),  // ← M7 新增
+  spyMissions: new Map(),           // ← M7 新增
+  counterIntelStates: new Map(),    // ← M7 新增
   playerRealmId: 'realm_qin',
   rngState: { seed: 42, counter: 0 },
   phases: [],
