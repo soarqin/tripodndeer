@@ -105,16 +105,11 @@ function makeMission(
 
 describe('M7 integration: edge cases', () => {
   it('1. spy realm conquered: active mission auto-cancels (spy general removed with realm)', () => {
-    // When spy realm is conquered, the spy general is realistically removed too.
-    // The phase detects spy_missing → cancels mission deterministically.
     const mission = makeMission('mission_spy_realm_lost')
     const world = makeEmptyWorld({
       tick: 10,
-      realms: new Map([
-        // SPY_REALM removed (conquered)
-        [TARGET_REALM, makeRealm(TARGET_REALM)],
-      ]),
-      generals: new Map(), // spy general removed too
+      realms: new Map([[TARGET_REALM, makeRealm(TARGET_REALM)]]),
+      generals: new Map(),
       spyMissions: new Map([[mission.id, mission]]),
     })
 
@@ -127,25 +122,16 @@ describe('M7 integration: edge cases', () => {
     const payload = cancelEvent!.payload as Record<string, unknown>
     expect(payload.reason).toBe('spy_missing')
     expect(payload.missionId).toBe(mission.id)
-
-    // No effect should be applied: coverage map untouched
     expect(result.world.intelligenceCoverage.size).toBe(0)
   })
 
   it('2. target realm conquered: active mission resolves but effects gracefully no-op', () => {
-    // Spy still exists, but target realm is gone (conquered between mission start and resolveTick).
-    // The mission resolves to success (high recon success rate) but applyEventEffect for missing
-    // factionInfluences silently no-ops, so target realm state remains untouched.
     const spy = makeSpy('gen_qin_spy', SPY_REALM, 18)
     const mission = makeMission('mission_target_realm_lost', { action: 'rumor' })
     const world = makeEmptyWorld({
       tick: 10,
-      realms: new Map([
-        [SPY_REALM, makeRealm(SPY_REALM)],
-        // TARGET_REALM removed (conquered)
-      ]),
+      realms: new Map([[SPY_REALM, makeRealm(SPY_REALM)]]),
       generals: new Map<GeneralId, General>([[spy.id, spy]]),
-      // factionInfluences for TARGET_REALM also removed
       factionInfluences: new Map(),
       spyMissions: new Map([[mission.id, mission]]),
     })
@@ -153,17 +139,12 @@ describe('M7 integration: edge cases', () => {
     const result = espionagePhase(world, SUCCESS_RNG)
     const finalMission = result.world.spyMissions.get(mission.id)!
 
-    // Mission resolves (not cancelled — current implementation only cancels on spy missing)
     expect(['success', 'failed', 'exposed']).toContain(finalMission.status)
-
-    // Critical: no crash, no orphan factionInfluences entry created
     expect(result.world.factionInfluences.size).toBe(0)
     expect(result.world.factionInfluences.get(TARGET_REALM)).toBeUndefined()
   })
 
   it('3. spy general dies: active mission auto-cancels via spy_missing', () => {
-    // characterLifecyclePhase removes dead spy from generals map.
-    // Espionage phase detects spy_missing and cancels mission.
     const mission = makeMission('mission_spy_died')
     const world = makeEmptyWorld({
       tick: 10,
@@ -171,7 +152,7 @@ describe('M7 integration: edge cases', () => {
         [SPY_REALM, makeRealm(SPY_REALM)],
         [TARGET_REALM, makeRealm(TARGET_REALM)],
       ]),
-      generals: new Map(), // spy general died
+      generals: new Map(),
       spyMissions: new Map([[mission.id, mission]]),
     })
 
@@ -183,8 +164,6 @@ describe('M7 integration: edge cases', () => {
     expect(cancelEvent).toBeDefined()
     const payload = cancelEvent!.payload as Record<string, unknown>
     expect(payload.reason).toBe('spy_missing')
-
-    // No coverage gained
     expect(result.world.intelligenceCoverage.size).toBe(0)
   })
 
@@ -215,10 +194,8 @@ describe('M7 integration: edge cases', () => {
 
     const result = gatedPhase(world, SUCCESS_RNG)
 
-    // World identity preserved — same reference, no mutation
     expect(result.world).toBe(world)
     expect(result.events).toHaveLength(0)
-    // Mission still in_progress (untouched)
     expect(result.world.spyMissions.get(mission.id)!.status).toBe('in_progress')
 
     vi.doUnmock('~/content/m2/balance')
@@ -226,8 +203,6 @@ describe('M7 integration: edge cases', () => {
   })
 
   it('5. multiple missions same tick: resolved in ID-sorted order (RNG contract)', () => {
-    // Two missions with different insertion order should produce identical results
-    // when keyed by ID after sorting. Verifies RNG reproducibility contract.
     const spy = makeSpy('gen_qin_spy', SPY_REALM, 18)
     const m1 = makeMission('mission_aaa', { action: 'reconnaissance' })
     const m2 = makeMission('mission_zzz', { action: 'reconnaissance' })
@@ -251,7 +226,6 @@ describe('M7 integration: edge cases', () => {
       tick: 10,
       realms,
       generals,
-      // Reverse insertion order
       spyMissions: new Map([
         [m2.id, m2],
         [m1.id, m1],
@@ -262,16 +236,13 @@ describe('M7 integration: edge cases', () => {
     const resultA = espionagePhase(worldA, rngSeed)
     const resultB = espionagePhase(worldB, rngSeed)
 
-    // Same RNG state after both — proves sort by ID is the contract
     expect(resultA.nextRng).toEqual(resultB.nextRng)
-    // Same status outcomes per mission ID
     expect(resultA.world.spyMissions.get(m1.id)!.status).toBe(
       resultB.world.spyMissions.get(m1.id)!.status,
     )
     expect(resultA.world.spyMissions.get(m2.id)!.status).toBe(
       resultB.world.spyMissions.get(m2.id)!.status,
     )
-    // Both missions advanced past in_progress
     expect(['success', 'failed', 'exposed']).toContain(
       resultA.world.spyMissions.get(m1.id)!.status,
     )
@@ -281,12 +252,10 @@ describe('M7 integration: edge cases', () => {
   })
 
   it('6. mission complete: spy is reusable for next mission (D-A3 sequential reuse)', () => {
-    // After a mission resolves (status != in_progress), planEspionageAction
-    // may dispatch the same spy on a new mission. Verifies D-A3 contract.
     const spy = makeSpy('gen_qin_spy', SPY_REALM, 18)
     const completedMission: SpyMission = {
       ...makeMission('mission_completed_first'),
-      status: 'success', // already resolved
+      status: 'success',
     }
 
     const realms = new Map<RealmId, Realm>([
@@ -310,17 +279,14 @@ describe('M7 integration: edge cases', () => {
     const realm = world.realms.get(SPY_REALM)!
     const result = planEspionageAction(world, realm, { seed: 7, counter: 0 })
 
-    // Spy can take a new mission because the previous mission is no longer in_progress
     expect(result.ok).toBe(true)
     const allMissions = [...result.world.spyMissions.values()]
-    // Old completed mission preserved + new in_progress mission added
     expect(allMissions).toHaveLength(2)
     const newMission = allMissions.find((m) => m.id !== completedMission.id)!
     expect(newMission.status).toBe('in_progress')
     expect(newMission.spyGeneralId).toBe(spy.id)
     expect(newMission.spyRealmId).toBe(SPY_REALM)
     expect(newMission.startTick).toBe(20)
-    // The prior mission remains in success state (history preserved)
     expect(result.world.spyMissions.get(completedMission.id)!.status).toBe('success')
   })
 })
