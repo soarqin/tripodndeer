@@ -6,6 +6,7 @@ interface BottomBarProps {
   onNeizheng?: () => void
   onRencai?: () => void
   onWaijiao?: () => void
+  onWenhua?: () => void
 }
 
 const BUTTONS = [
@@ -14,12 +15,12 @@ const BUTTONS = [
   { id: 'waijiao',  label: '外交', enabled: true },
   { id: 'neizheng', label: '内政', enabled: true },
   { id: 'jingji',   label: '经济', enabled: false },
-  { id: 'wenhua',   label: '文化', enabled: false },
+  { id: 'wenhua',   label: '文化', enabled: true },
   { id: 'diebao',   label: '谍报', enabled: false },
   { id: 'rencai',   label: '人才', enabled: true },
 ]
 
-export function BottomBar({ onWanggong, onJunshi, onNeizheng, onRencai, onWaijiao }: BottomBarProps) {
+export function BottomBar({ onWanggong, onJunshi, onNeizheng, onRencai, onWaijiao, onWenhua }: BottomBarProps) {
   return (
     <nav className={styles.bar} data-testid="bottom-bar">
       {BUTTONS.map(({ id, label, enabled }) => (
@@ -29,7 +30,7 @@ export function BottomBar({ onWanggong, onJunshi, onNeizheng, onRencai, onWaijia
           className={enabled ? styles.btnEnabled : styles.btnDisabled}
           disabled={!enabled}
           aria-disabled={!enabled}
-          onClick={enabled ? (id === 'wanggong' ? onWanggong : id === 'junshi' ? onJunshi : id === 'neizheng' ? onNeizheng : id === 'rencai' ? onRencai : id === 'waijiao' ? onWaijiao : undefined) : undefined}
+          onClick={enabled ? (id === 'wanggong' ? onWanggong : id === 'junshi' ? onJunshi : id === 'neizheng' ? onNeizheng : id === 'rencai' ? onRencai : id === 'waijiao' ? onWaijiao : id === 'wenhua' ? onWenhua : undefined) : undefined}
         >
           {label}
         </button>

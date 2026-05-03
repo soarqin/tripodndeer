@@ -108,7 +108,7 @@ interface GameActions {
   clearLastBattleResolution: () => void
   openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) => void
   closeContextMenu: () => void
-  setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | null) => void
+  setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | null) => void
   openDiplomacyPanel: (realmId: RealmId) => void
   closeDiplomacyPanel: () => void
   openPeacePanel: () => void
@@ -298,7 +298,7 @@ function createUiActions(
       set((state) => {
         state.contextMenu = null
       }),
-    setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | null) =>
+    setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | null) =>
       set((state) => {
         state.activePanel = panel
       }),

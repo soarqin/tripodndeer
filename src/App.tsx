@@ -116,6 +116,7 @@ export function App(): React.JSX.Element {
         onNeizheng={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'neizheng' ? null : 'neizheng')}
         onRencai={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'rencai' ? null : 'rencai')}
         onWaijiao={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'waijiao' ? null : 'waijiao')}
+        onWenhua={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'culture' ? null : 'culture')}
       />
       <TimeControlBar />
       {import.meta.env.DEV && (
