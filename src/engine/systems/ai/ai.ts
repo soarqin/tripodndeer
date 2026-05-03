@@ -74,6 +74,16 @@ export function aiPlanStep(
       events.push(...diplomacy.events)
     }
 
+    if (M7_ENABLED) {
+      const espionageWorld = worldWithAiPhaseState(world, phaseState)
+      const espionage = planEspionageAction(espionageWorld, realm, currentRng)
+      if (espionage.ok) {
+        phaseState = phaseStateWithEspionageResult(phaseState, espionage.world)
+        events.push(...espionage.events)
+        currentRng = espionage.nextRng
+      }
+    }
+
     const roll = nextRng(currentRng)
     currentRng = roll.nextState
 
@@ -114,6 +124,7 @@ interface AiPhaseState {
   readonly treaties: World['treaties']
   readonly diplomacyHistory: World['diplomacyHistory']
   readonly coalitions: World['coalitions']
+  readonly spyMissions: World['spyMissions']
 }
 
 function createAiPhaseState(world: World): AiPhaseState {
@@ -127,6 +138,7 @@ function createAiPhaseState(world: World): AiPhaseState {
     treaties: world.treaties,
     diplomacyHistory: world.diplomacyHistory,
     coalitions: world.coalitions,
+    spyMissions: world.spyMissions,
   }
 }
 
@@ -142,6 +154,7 @@ function worldWithAiPhaseState(world: World, phaseState: AiPhaseState): World {
     treaties: phaseState.treaties,
     diplomacyHistory: phaseState.diplomacyHistory,
     coalitions: phaseState.coalitions,
+    spyMissions: phaseState.spyMissions,
   }
 }
 
@@ -154,6 +167,13 @@ function phaseStateWithDiplomacyResult(phaseState: AiPhaseState, world: World): 
     treaties: world.treaties,
     diplomacyHistory: world.diplomacyHistory,
     coalitions: world.coalitions,
+  }
+}
+
+function phaseStateWithEspionageResult(phaseState: AiPhaseState, world: World): AiPhaseState {
+  return {
+    ...phaseState,
+    spyMissions: world.spyMissions,
   }
 }
 
