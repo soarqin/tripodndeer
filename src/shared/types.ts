@@ -800,6 +800,7 @@ export interface World {
   zhouInvestiture: ReadonlyMap<RealmId, ZhouInvestitureState>
   generals: ReadonlyMap<GeneralId, General>
   rulers: ReadonlyMap<RealmId, RulerState>
+  academies: ReadonlyMap<AcademyId, Academy>
   eventChainStates: ReadonlyMap<EventChainId, EventChainState>
   reformStates: ReadonlyMap<RealmId, ReformState>
   disasterStates: ReadonlyMap<RealmId, DisasterState>

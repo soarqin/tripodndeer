@@ -1,4 +1,15 @@
-import type { General, GeneralId, Realm, RealmId, RNGState, Site, SiteId, World } from '~/shared/types'
+import type {
+  Academy,
+  AcademyId,
+  General,
+  GeneralId,
+  Realm,
+  RealmId,
+  RNGState,
+  Site,
+  SiteId,
+  World,
+} from '~/shared/types'
 
 export const TEST_WORLD_DATE = {
   yearBC: 260,
@@ -69,6 +80,7 @@ export function makeEmptyWorld(overrides: MakeEmptyWorldOverrides = {}): World {
     zhouInvestiture: new Map(),
     generals: new Map(),
     rulers: new Map(),
+    academies: new Map(),
     eventChainStates: new Map(),
     reformStates: new Map(),
     disasterStates: new Map(),
@@ -148,4 +160,22 @@ function makeMinimalRealm(id: RealmId): Realm {
     ideologyLean: { fa: 0, ru: 0, dao: 0, mo: 0, zonghen: 0, bing: 0 },
     warVictoriesThisYear: 0,
   }
+}
+
+export interface MakeM6WorldOptions {
+  readonly realms?: ReadonlyMap<RealmId, Realm>
+  readonly sites?: ReadonlyMap<SiteId, Site>
+  readonly generals?: ReadonlyMap<GeneralId, General>
+  readonly academies?: ReadonlyMap<AcademyId, Academy>
+  readonly playerRealmId?: RealmId
+}
+
+export function makeM6World(opts: MakeM6WorldOptions = {}): World {
+  return makeEmptyWorld({
+    realms: opts.realms,
+    sites: opts.sites,
+    generals: opts.generals,
+    academies: opts.academies ?? new Map(),
+    playerRealmId: opts.playerRealmId,
+  })
 }

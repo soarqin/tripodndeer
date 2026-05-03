@@ -110,6 +110,7 @@ function baseWorld(overrides: Partial<World> = {}): World {
     sieges: new Map(),
     edicts: new Map(),
     governorAssignments: new Map(),
+    academies: new Map(),
     playerRealmId: qin,
     rngState: { seed: 0, counter: 0 },
     phases: [],
