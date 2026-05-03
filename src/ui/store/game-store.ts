@@ -71,7 +71,7 @@ interface GameState {
   selectedArmyId: ArmyId | null
   lastBattleResolution: BattleResolution | null
   contextMenu: { siteId: SiteId; x: number; y: number } | null
-  activePanel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | null
+  activePanel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | 'espionage' | null
   diplomacyTargetRealmId: RealmId | null
   isPeacePanelOpen: boolean
   transientBanner: { text: string; createdAt: number } | null
@@ -298,7 +298,7 @@ function createUiActions(
       set((state) => {
         state.contextMenu = null
       }),
-    setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | null) =>
+    setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | 'espionage' | null) =>
       set((state) => {
         state.activePanel = panel
       }),
