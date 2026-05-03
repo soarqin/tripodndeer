@@ -45,7 +45,14 @@ export const BoundaryRefSchema = z.object({
 
 export const TerrainTypeSchema = z.enum(['plains', 'hills', 'mountains', 'forest', 'swamp', 'grassland', 'desert'])
 export const IdeologySchema = z.enum(['fa', 'ru', 'dao', 'mo', 'zonghen', 'bing'])
-export const IdeologyLeanSchema = z.record(IdeologySchema, z.number())
+export const IdeologyLeanSchema = z.object({
+  fa: z.number(),
+  ru: z.number(),
+  dao: z.number(),
+  mo: z.number(),
+  zonghen: z.number(),
+  bing: z.number(),
+})
 
 export const RawSiteSchema = z.object({
   id: SiteIdSchema,

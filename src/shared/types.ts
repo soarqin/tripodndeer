@@ -51,10 +51,10 @@ export interface Site extends RawSite {
   polygon: Polygon
   adjacency: readonly SiteId[]
   economy: SiteEconomy
-  readonly cultural: CulturalTag
-  readonly culturalIdentityStrength: number
-  readonly lastConquestTick: number | null
-  readonly lowIdentitySinceTick: number | null
+  readonly cultural?: CulturalTag
+  readonly culturalIdentityStrength?: number
+  readonly lastConquestTick?: number | null
+  readonly lowIdentitySinceTick?: number | null
   occupation?: SiteOccupation
 }
 
@@ -664,9 +664,9 @@ export interface Realm {
   readonly rulerId?: GeneralId | null
   readonly traits: readonly string[]
   readonly politicalSystem: PoliticalSystem
-  readonly prestige: number
-  readonly ideologyLean: IdeologyLean
-  readonly warVictoriesThisYear: number
+  readonly prestige?: number
+  readonly ideologyLean?: IdeologyLean
+  readonly warVictoriesThisYear?: number
 }
 
 // 游戏日期（旬为最小单位）
