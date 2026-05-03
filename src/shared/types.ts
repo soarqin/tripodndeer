@@ -204,6 +204,17 @@ export type AcademyId = string
 
 export type AcademyStatus = 'active' | 'dormant'
 
+export interface Academy {
+  readonly id: AcademyId
+  readonly hostRealmId: RealmId
+  readonly hostSiteId: SiteId
+  readonly primaryIdeology: Ideology
+  readonly secondaryIdeology: Ideology | null
+  readonly founded: number
+  readonly level: 1
+  readonly status: AcademyStatus
+}
+
 export type RulerStateId = string
 // Canonical sorted pair `${lowerRealmId}__${higherRealmId}`.
 export type RelationKey = string
@@ -287,6 +298,8 @@ export interface ZhouInvestitureState {
   readonly grantedAtTick: number
   readonly expiresAtTick: number | null
   readonly source: 'zhou'
+  readonly rank?: 'duke' | 'marquis' | 'count' | 'viscount' | 'baron'
+  readonly lastTributeTick?: number
 }
 
 export type AIPersonality = 'aggressive_random' | 'aggressive' | 'cautious'
