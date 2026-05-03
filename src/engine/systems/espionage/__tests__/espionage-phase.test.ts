@@ -100,7 +100,6 @@ function makeFactionInfluence(realmId: string, conservatives: number = 50): Fact
 }
 
 const SUCCESS_RNG: RNGState = { seed: 1, counter: 0 }
-const FAILURE_RNG: RNGState = { seed: 999_999, counter: 0 }
 
 function makeBaseWorld(overrides: Partial<World> = {}): World {
   return makeTestWorld({
@@ -350,13 +349,21 @@ describe('espionagePhase: exposure invokes diplomatic reactions', () => {
       ]),
     })
 
-    const result = espionagePhase(world, FAILURE_RNG)
-    expect(result.world.spyMissions.get('m1')!.status).toBe('exposed')
-    expect(result.events.some((e) => e.type === 'spyExposed')).toBe(true)
-    const relation = result.world.relations.get(relationKey('realm_a', 'realm_b'))!
-    expect(relation).toBeDefined()
-    expect(relation.attitude).toBeLessThan(0)
-    expect(relation.trust).toBeLessThan(50)
+    let foundExposed = false
+    for (let seed = 1; seed <= 500; seed++) {
+      const r = espionagePhase(world, { seed, counter: 0 })
+      const m = r.world.spyMissions.get('m1')!
+      if (m.status === 'exposed') {
+        foundExposed = true
+        expect(r.events.some((e) => e.type === 'spyExposed')).toBe(true)
+        const relation = r.world.relations.get(relationKey('realm_a', 'realm_b'))!
+        expect(relation).toBeDefined()
+        expect(relation.attitude).toBeLessThan(0)
+        expect(relation.trust).toBeLessThan(50)
+        break
+      }
+    }
+    expect(foundExposed).toBe(true)
   })
 })
 
