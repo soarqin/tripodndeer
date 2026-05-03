@@ -221,6 +221,9 @@ describe('AI determinism', () => {
       'diplomacyEvent:relation_changed:realm_wei__realm_zhou',
       'diplomacyEvent:coalition_changed:coalition_against_realm_chu',
       'diplomacyEvent:coalition_changed:coalition_against_realm_qin',
+      'diplomacyEvent:proposal_created:realm_han__realm_zhou',
+      'diplomacyEvent:proposal_created:realm_wei__realm_zhou',
+      'diplomacyEvent:proposal_created:realm_yan__realm_zhou',
       'aiDeclaredWar:realm_yan->realm_qi',
       'aiDispatchedArmy:realm_yan->site_045',
       'diplomacyEvent:war_declared:realm_qi__realm_yan',
@@ -238,6 +241,8 @@ describe('AI determinism', () => {
       'diplomacyEvent:relation_changed:realm_qi__realm_zhou',
       'diplomacyEvent:coalition_changed:coalition_against_realm_chu',
       'diplomacyEvent:coalition_changed:coalition_against_realm_qin',
+      'diplomacyEvent:proposal_created:realm_qi__realm_zhao',
+      'diplomacyEvent:proposal_created:realm_qi__realm_zhou',
     ])
     expect([...result.world.armies.values()].filter(army => army.state !== 'idle').map(army => ({
       id: army.id,
