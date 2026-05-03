@@ -466,6 +466,7 @@ export const TraitEffectSchema = z.object({
   disasterResistanceMultiplierBp: z.number().int().optional(),
   tradeIncomeMultiplierBp: z.number().int().optional(),
   factionStabilityBonusBp: z.number().int().optional(),
+  ideologyDeltaBp: z.record(IdeologySchema, z.number()).optional(),
 })
 
 export const EventChainTriggerSchema = z.discriminatedUnion('type', [
