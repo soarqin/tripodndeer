@@ -12074,6 +12074,132 @@
       "age": 45,
       "posts": [],
       "loyaltyState": "loyal"
+    },
+    {
+      "id": "gen_su_dai",
+      "realmId": "realm_yan",
+      "name": "苏代",
+      "might": 10,
+      "command": 10,
+      "loyalty": 80,
+      "attrs": {
+        "wu": 8,
+        "zheng": 12,
+        "jiao": 16,
+        "mou": 18,
+        "xue": 14,
+        "po": 10
+      },
+      "specialty": "spy",
+      "ambition": "mid",
+      "age": 50,
+      "posts": [],
+      "loyaltyState": "loyal"
+    },
+    {
+      "id": "gen_qi_spy_a",
+      "realmId": "realm_qi",
+      "name": "齐间者甲",
+      "might": 10,
+      "command": 10,
+      "loyalty": 75,
+      "attrs": {
+        "wu": 10,
+        "zheng": 10,
+        "jiao": 12,
+        "mou": 12,
+        "xue": 10,
+        "po": 10
+      },
+      "specialty": "spy",
+      "ambition": "low",
+      "age": 35,
+      "posts": [],
+      "loyaltyState": "loyal"
+    },
+    {
+      "id": "gen_chu_spy_b",
+      "realmId": "realm_chu",
+      "name": "楚间者乙",
+      "might": 10,
+      "command": 10,
+      "loyalty": 75,
+      "attrs": {
+        "wu": 10,
+        "zheng": 10,
+        "jiao": 12,
+        "mou": 12,
+        "xue": 10,
+        "po": 10
+      },
+      "specialty": "spy",
+      "ambition": "low",
+      "age": 38,
+      "posts": [],
+      "loyaltyState": "loyal"
+    },
+    {
+      "id": "gen_zhao_spy_c",
+      "realmId": "realm_zhao",
+      "name": "赵间者丙",
+      "might": 10,
+      "command": 10,
+      "loyalty": 75,
+      "attrs": {
+        "wu": 10,
+        "zheng": 10,
+        "jiao": 12,
+        "mou": 12,
+        "xue": 10,
+        "po": 10
+      },
+      "specialty": "spy",
+      "ambition": "low",
+      "age": 40,
+      "posts": [],
+      "loyaltyState": "loyal"
+    },
+    {
+      "id": "gen_wei_spy_d",
+      "realmId": "realm_wei",
+      "name": "魏间者丁",
+      "might": 10,
+      "command": 10,
+      "loyalty": 75,
+      "attrs": {
+        "wu": 10,
+        "zheng": 10,
+        "jiao": 12,
+        "mou": 12,
+        "xue": 10,
+        "po": 10
+      },
+      "specialty": "spy",
+      "ambition": "low",
+      "age": 36,
+      "posts": [],
+      "loyaltyState": "loyal"
+    },
+    {
+      "id": "gen_qin_spy_e",
+      "realmId": "realm_qin",
+      "name": "秦间者戊",
+      "might": 10,
+      "command": 10,
+      "loyalty": 75,
+      "attrs": {
+        "wu": 10,
+        "zheng": 10,
+        "jiao": 12,
+        "mou": 12,
+        "xue": 10,
+        "po": 10
+      },
+      "specialty": "spy",
+      "ambition": "low",
+      "age": 42,
+      "posts": [],
+      "loyaltyState": "loyal"
     }
   ],
   "adjacencyEdges": [
