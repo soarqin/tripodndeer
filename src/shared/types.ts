@@ -386,6 +386,23 @@ export function makeCoverageKey(observerId: RealmId, targetId: RealmId): Coverag
   return `${observerId}__${targetId}`
 }
 
+// ─── M7 Espionage: CounterIntelState & AIEspionageOption ────────────────────
+
+export interface CounterIntelState {
+  readonly realmId: RealmId
+  readonly detectionLevel: number  // 0-10 integer
+  readonly lastUpdatedTick: number
+}
+
+// AIEspionageOption is a PARALLEL type to AIOption — does NOT extend it
+// This is Path B decision: keeps AIOption.kind union clean
+export interface AIEspionageOption {
+  readonly kind: EspionageActionKind
+  readonly spyRealmId: RealmId
+  readonly targetRealmId: RealmId
+  readonly score?: number
+}
+
 export interface WarState {
   casusBelli: CasusBelliId | null
   declaredAt: GameDate
