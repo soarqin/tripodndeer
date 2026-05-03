@@ -1,0 +1,26 @@
+{
+  "id": "rumor_success_v1",
+  "scope": "realm-scoped",
+  "oneShot": false,
+  "trigger": {
+    "type": "state",
+    "realmId": "$currentRealm",
+    "predicate": {
+      "kind": "realm.id.equals",
+      "value": "$currentRealm"
+    }
+  },
+  "stages": [
+    {
+      "id": "rumor_success_narrative",
+      "text": "流言计成 — 我国细作于敌国市井间散播流言，扰动人心，敌方派系倾轧加剧。",
+      "choices": [
+        {
+          "id": "acknowledge",
+          "label": "知悉",
+          "effects": []
+        }
+      ]
+    }
+  ]
+}
