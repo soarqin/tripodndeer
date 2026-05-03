@@ -11,9 +11,12 @@ const DEFAULT_RNG: RNGState = { seed: 0, counter: 0 }
 
 type SiteM6Fields = Pick<Site, 'cultural' | 'culturalIdentityStrength' | 'lastConquestTick' | 'lowIdentitySinceTick'>
 type SiteOverride = Omit<Site, keyof SiteM6Fields> & Partial<SiteM6Fields>
+type RealmM6Fields = Pick<Realm, 'prestige' | 'ideologyLean' | 'warVictoriesThisYear'>
+type RealmOverride = Omit<Realm, keyof RealmM6Fields> & Partial<RealmM6Fields>
 
-interface MakeEmptyWorldOverrides extends Omit<Partial<World>, 'sites'> {
+interface MakeEmptyWorldOverrides extends Omit<Partial<World>, 'sites' | 'realms'> {
   readonly sites?: ReadonlyMap<SiteId, SiteOverride>
+  readonly realms?: ReadonlyMap<RealmId, RealmOverride>
 }
 
 function normalizeSites(sites?: ReadonlyMap<SiteId, SiteOverride>): ReadonlyMap<SiteId, Site> {
@@ -32,13 +35,28 @@ function normalizeSites(sites?: ReadonlyMap<SiteId, SiteOverride>): ReadonlyMap<
   )
 }
 
+function normalizeRealms(realms?: ReadonlyMap<RealmId, RealmOverride>): ReadonlyMap<RealmId, Realm> {
+  if (!realms) return new Map()
+  return new Map(
+    [...realms].map(([id, realm]) => [
+      id,
+      {
+        ...realm,
+        prestige: realm.prestige ?? 40,
+        ideologyLean: realm.ideologyLean ?? { fa: 0, ru: 0, dao: 0, mo: 0, zonghen: 0, bing: 0 },
+        warVictoriesThisYear: realm.warVictoriesThisYear ?? 0,
+      },
+    ]),
+  )
+}
+
 export function makeEmptyWorld(overrides: MakeEmptyWorldOverrides = {}): World {
-  const { sites, ...rest } = overrides
+  const { sites, realms, ...rest } = overrides
   return {
     date: TEST_WORLD_DATE,
     tick: 0,
     sites: normalizeSites(sites),
-    realms: new Map(),
+    realms: normalizeRealms(realms),
     armies: new Map(),
     edges: new Map(),
     wars: new Map(),
@@ -126,5 +144,8 @@ function makeMinimalRealm(id: RealmId): Realm {
     },
     traits: [],
     politicalSystem: 'enfeoffment',
+    prestige: 40,
+    ideologyLean: { fa: 0, ru: 0, dao: 0, mo: 0, zonghen: 0, bing: 0 },
+    warVictoriesThisYear: 0,
   }
 }

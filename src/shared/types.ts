@@ -662,6 +662,9 @@ export interface Realm {
   readonly rulerId?: GeneralId | null
   readonly traits: readonly string[]
   readonly politicalSystem: PoliticalSystem
+  readonly prestige: number
+  readonly ideologyLean: IdeologyLean
+  readonly warVictoriesThisYear: number
 }
 
 // 游戏日期（旬为最小单位）

@@ -58,6 +58,7 @@ import type {
   EdgeId,
   General,
   GeneralId,
+  IdeologyLean,
   M0Data,
   MapEdge,
   Pass,
@@ -131,9 +132,34 @@ function buildRealmMap(realms: readonly Realm[]): Map<RealmId, Realm> {
       },
       traits: realm.traits ?? [],
       politicalSystem: realm.politicalSystem ?? 'enfeoffment',
+      prestige: prestigeForRealm(realm.id),
+      ideologyLean: zeroIdeologyLean(),
+      warVictoriesThisYear: 0,
     })
   }
   return realmMap
+}
+
+function zeroIdeologyLean(): IdeologyLean {
+  return { fa: 0, ru: 0, dao: 0, mo: 0, zonghen: 0, bing: 0 }
+}
+
+function prestigeForRealm(realmId: RealmId): number {
+  switch (realmId) {
+    case 'realm_qin':
+    case 'realm_chu':
+    case 'realm_qi':
+      return 70
+    case 'realm_yan':
+    case 'realm_zhao':
+    case 'realm_wei':
+    case 'realm_han':
+      return 55
+    case 'realm_zhou':
+      return 90
+    default:
+      return 40
+  }
 }
 
 function culturalTagForOwner(ownerId: RealmId | null): CulturalTag {

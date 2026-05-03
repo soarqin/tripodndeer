@@ -43,6 +43,8 @@ export const BoundaryRefSchema = z.object({
 })
 
 export const TerrainTypeSchema = z.enum(['plains', 'hills', 'mountains', 'forest', 'swamp', 'grassland', 'desert'])
+export const IdeologySchema = z.enum(['fa', 'ru', 'dao', 'mo', 'zonghen', 'bing'])
+export const IdeologyLeanSchema = z.record(IdeologySchema, z.number())
 
 export const RawSiteSchema = z.object({
   id: SiteIdSchema,
@@ -624,6 +626,9 @@ export const RealmSchema = z.object({
   rulerId: z.string().nullable().optional(),
   traits: z.array(z.string()).default([]),
   politicalSystem: PoliticalSystemSchema.default('enfeoffment'),
+  prestige: z.number().min(0).max(100).default(40),
+  ideologyLean: IdeologyLeanSchema.default({ fa: 0, ru: 0, dao: 0, mo: 0, zonghen: 0, bing: 0 }),
+  warVictoriesThisYear: z.number().int().nonnegative().default(0),
 })
 
 export const M0DataSchema = z.object({
