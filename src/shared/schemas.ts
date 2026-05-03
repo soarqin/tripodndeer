@@ -9,6 +9,7 @@ import type { PredicateNode } from './types'
 
 export const SiteIdSchema = z.string().min(1)
 export const RealmIdSchema = z.string().min(1)
+export const AcademyIdSchema = z.string().min(1)
 export const EdictIdSchema = z.string().min(1)
 export const ArmyIdSchema = z.string().min(1)
 export const DisasterIdSchema = z.string().min(1)
@@ -291,6 +292,7 @@ export const GeneralSchema = z.object({
   recruitedAtTick: z.number().int().nonnegative().optional(),
   posts: z.array(PostSchema).optional(),
   loyaltyState: LoyaltyStateSchema.optional(),
+  almaMater: AcademyIdSchema.optional(),
 })
 
 export const RulerStateSchema = z.object({

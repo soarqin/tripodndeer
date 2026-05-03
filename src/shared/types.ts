@@ -396,6 +396,7 @@ export interface General {
   recruitedAtTick?: number
   posts?: readonly Post[]
   loyaltyState?: LoyaltyState
+  readonly almaMater?: AcademyId
 }
 
 export interface RulerState {
