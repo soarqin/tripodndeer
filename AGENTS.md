@@ -8,7 +8,7 @@ AI agent behavioral guidelines for this codebase. Read before making any changes
 
 战国策略游戏引擎原型。Vite + React + TypeScript strict，纯函数引擎 + Zustand UI 层。
 
-**当前里程碑**: M0/M1/M2/M3/M3.1/M4(v1)/M5/M4.1/M4.2/M6 已交付。M7（谍报）为下一里程碑。
+**当前里程碑**: M0/M1/M2/M3/M3.1/M4(v1)/M5/M4.1/M4.2/M6/M7 已交付。M8 为下一里程碑。
 
 **实施顺序**: M4(✅) → M5 人物(✅) → M4.1 变法(✅) → M4.2 灾害·贸易·派系(✅) → M6 文化(✅) → M7 谍报
 
@@ -55,7 +55,7 @@ interface World {
 ### Phase Pipeline (M2)
 
 ```
-aiPlan → orderApply → march → siege → combat-v2 → culturalIdentity → manpower → rulerLifecycle → characterLifecycle → recruitment → ideologyDrift → reform → victoryCheck → diplomacyLifecycle → economy → disaster → trade → faction → historicalEvents → prestigeUpdate
+aiPlan → orderApply → march → siege → combat-v2 → culturalIdentity → manpower → espionagePhase → rulerLifecycle → characterLifecycle → recruitment → ideologyDrift → reform → victoryCheck → diplomacyLifecycle → economy → disaster → trade → faction → historicalEvents → prestigeUpdate
 ```
 
 每个 phase 是纯函数：`(World, RNGState) → { world, nextRng, events }`
@@ -131,6 +131,10 @@ AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按
 | M6_ENABLED=true (balance.ts) | `src/content/m2/__tests__/balance-m6.test.ts` |
 | ≥2 active academies at scenario start (jixia + xihe) | `src/engine/world/migrations/__tests__/v5-to-v6.test.ts` |
 | All M6 balance constants prefixed M6_ | `src/content/m2/__tests__/balance-m6.test.ts` |
+| M7_ENABLED=true（balance.ts） | `src/content/m2/__tests__/balance-m7.test.ts` |
+| ESPIONAGE_ACTION_KINDS 长度 = 4（不含 forbidden） | `src/engine/systems/espionage/__tests__/m7-deferred-actions.test.ts` |
+| 56 directional intelligenceCoverage entries at scenario start | `src/shared/__tests__/m7-world-fields.test.ts` |
+| All M7 balance constants prefixed M7_ | `src/content/m2/__tests__/balance-m7.test.ts` |
 
 ---
 
@@ -191,7 +195,23 @@ ReformDefinition JSON in src/content/m4_1/reforms/
 
 ---
 
-## Data Loading
+## Three Types of Espionage Data (DO NOT CONFUSE)
+
+```
+world.intelligenceCoverage: Map<CoverageKey, number>
+  → 定向情报覆盖度 0-100，key = `${observer}__${target}`（directional）
+  → 不要用对称 key（必须 directional）
+  → 不要在 espionagePhase 之外修改
+
+world.spyMissions: Map<SpyMissionId, SpyMission>
+  → 进行中谍报任务（含历史已完成）
+  → 不要在 espionagePhase 之外修改
+  → 不要与 world.intelligenceCoverage 混用
+
+world.counterIntelStates: Map<RealmId, CounterIntelState>
+  → 每 realm 防御姿态（detectionLevel 0-10）
+  → 不要在 espionagePhase 之外修改
+```
 
 ```
 M0 path: loadM0Data() → createInitialWorld()   ← 不要碰
@@ -306,6 +326,17 @@ const world: World = {
 
 ---
 
+## M7 Subsystems Quick Reference
+
+| 子系统 | 主文件 | 关键函数 |
+|---|---|---|
+| espionagePhase | `src/engine/systems/espionage/espionage-phase.ts` | `espionagePhase(world, rng)` |
+| planEspionageAction | `src/engine/systems/ai/ai.ts` | `planEspionageAction(world, realm, rng)` |
+| espionage-reactions | `src/engine/systems/espionage/espionage-reactions.ts` | `applyEspionageReactions(world, mission)` |
+| scoreEspionageOption | `src/engine/systems/espionage/score-espionage.ts` | `scoreEspionageOption(option, personality)` |
+
+---
+
 ## What NOT to Do
 
 ```
@@ -325,6 +356,10 @@ const world: World = {
 ❌ **不直接读 `politicalSystem` 改公式**——数值效果只通过 trait
 ❌ **不向 utility-scorer 添加变法决策**——独立 phase
 ❌ **不修改 lin_xiangru/fan_ju/lian_po JSON 格式**——保持 M5 数据完整
+❌ 不策反/不暗杀/不窃取（§12.4 禁项 — defect/assassinate/steal）
+❌ 不直接 mutate general.loyalty（用 Effect.character.loyalty）
+❌ 不扩展 AIOption.kind（用 AIEspionageOption parallel 类型）
+❌ 不新增 Realm.stability 字段（用 factionInfluences 代理）
 ```
 
 ---
@@ -339,4 +374,4 @@ const world: World = {
 - 灾害 / 贸易 / 派系（M4.2，依赖 M5 人物）✅ 已交付（M4.2）
 - `prestige` / `legitimacy` 文化威望字段（M6）✅ 已交付（M6）
 - 学宫 / 百家 / 文化扩散（M6，依赖 M5 学宫产人才）✅ 已交付（M6）
-- 谍报行动（M7，依赖 M5 间者人才）
+- 谍报行动（M7，依赖 M5 间者人才）✅ 已交付（M7）
