@@ -4,10 +4,12 @@ export const PHASE_NAMES = {
   MARCH: 'march',
   SIEGE: 'siege',
   COMBAT_V2: 'combat-v2',
+  CULTURAL_IDENTITY: 'culturalIdentity',
   MANPOWER: 'manpower',
   RULER_LIFECYCLE: 'rulerLifecycle',
   CHARACTER_LIFECYCLE: 'characterLifecycle',
   RECRUITMENT: 'recruitment',
+  IDEOLOGY_DRIFT: 'ideologyDrift',
   REFORM: 'reform',
   VICTORY_CHECK: 'victoryCheck',
   DIPLOMACY_LIFECYCLE: 'diplomacyLifecycle',
@@ -16,6 +18,7 @@ export const PHASE_NAMES = {
   TRADE: 'trade',
   FACTION: 'faction',
   HISTORICAL_EVENTS: 'historicalEvents',
+  PRESTIGE_UPDATE: 'prestigeUpdate',
 } as const
 
 export const PHASE_ORDER: readonly string[] = [
@@ -24,10 +27,12 @@ export const PHASE_ORDER: readonly string[] = [
   PHASE_NAMES.MARCH,
   PHASE_NAMES.SIEGE,
   PHASE_NAMES.COMBAT_V2,
+  PHASE_NAMES.CULTURAL_IDENTITY,
   PHASE_NAMES.MANPOWER,
   PHASE_NAMES.RULER_LIFECYCLE,
   PHASE_NAMES.CHARACTER_LIFECYCLE,
   PHASE_NAMES.RECRUITMENT,
+  PHASE_NAMES.IDEOLOGY_DRIFT,
   PHASE_NAMES.REFORM,
   PHASE_NAMES.VICTORY_CHECK,
   PHASE_NAMES.DIPLOMACY_LIFECYCLE,
@@ -36,6 +41,7 @@ export const PHASE_ORDER: readonly string[] = [
   PHASE_NAMES.TRADE,
   PHASE_NAMES.FACTION,
   PHASE_NAMES.HISTORICAL_EVENTS,
+  PHASE_NAMES.PRESTIGE_UPDATE,
 ]
 
 // Legacy phase name (kept for reference/regression testing)

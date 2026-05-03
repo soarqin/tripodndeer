@@ -5,6 +5,9 @@ import { M0DataSchema, M1DataSchemaV5 } from '@/shared/schemas'
 import { aiPlanStep } from '~/engine/systems/ai'
 import { characterLifecyclePhase } from '~/engine/systems/character'
 import { combatV2Step } from '~/engine/systems/combat-v2'
+import { culturalIdentityPhase } from '~/engine/systems/culture/cultural-identity-phase'
+import { ideologyDriftPhase } from '~/engine/systems/culture/ideology-drift-phase'
+import { prestigeUpdatePhase } from '~/engine/systems/culture/prestige-update-phase'
 import { diplomacyLifecycleStep } from '~/engine/systems/diplomacy'
 import { disasterPhase } from '~/engine/systems/disaster/disaster-phase'
 import { economyPhase } from '~/engine/systems/economy'
@@ -434,10 +437,12 @@ export function createWorldFromM1Data(
       marchStep,
       siegeStep,
       combatV2Step,
+      culturalIdentityPhase,
       manpowerTick,
       rulerLifecyclePhase,
       characterLifecyclePhase,
       recruitmentPhase,
+      ideologyDriftPhase,
       reformPhase,
       victoryCheckStep,
       diplomacyLifecycleStep,
@@ -446,6 +451,7 @@ export function createWorldFromM1Data(
       tradePhase,
       factionPhase,
       historicalEventsPhase,
+      prestigeUpdatePhase,
     ],
     pendingOrders: [],
   }

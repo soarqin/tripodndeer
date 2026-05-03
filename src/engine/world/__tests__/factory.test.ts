@@ -5,6 +5,9 @@ import { PHASE_ORDER } from '@/engine/phases'
 import { aiPlanStep } from '@/engine/systems/ai'
 import { characterLifecyclePhase } from '@/engine/systems/character'
 import { combatV2Step } from '@/engine/systems/combat-v2'
+import { culturalIdentityPhase } from '@/engine/systems/culture/cultural-identity-phase'
+import { ideologyDriftPhase } from '@/engine/systems/culture/ideology-drift-phase'
+import { prestigeUpdatePhase } from '@/engine/systems/culture/prestige-update-phase'
 import { diplomacyLifecycleStep } from '@/engine/systems/diplomacy'
 import { disasterPhase } from '@/engine/systems/disaster/disaster-phase'
 import { economyPhase } from '@/engine/systems/economy'
@@ -50,10 +53,12 @@ function phaseName(phase: TickPhase): string {
   if (phase === marchStep) return 'march'
   if (phase === siegeStep) return 'siege'
   if (phase === combatV2Step) return 'combat-v2'
+  if (phase === culturalIdentityPhase) return 'culturalIdentity'
   if (phase === manpowerTick) return 'manpower'
   if (phase === rulerLifecyclePhase) return 'rulerLifecycle'
   if (phase === characterLifecyclePhase) return 'characterLifecycle'
   if (phase === recruitmentPhase) return 'recruitment'
+  if (phase === ideologyDriftPhase) return 'ideologyDrift'
   if (phase === reformPhase) return 'reform'
   if (phase === victoryCheckStep) return 'victoryCheck'
   if (phase === diplomacyLifecycleStep) return 'diplomacyLifecycle'
@@ -62,6 +67,7 @@ function phaseName(phase: TickPhase): string {
   if (phase === tradePhase) return 'trade'
   if (phase === factionPhase) return 'faction'
   if (phase === historicalEventsPhase) return 'historicalEvents'
+  if (phase === prestigeUpdatePhase) return 'prestigeUpdate'
   return 'unknown'
 }
 
@@ -211,10 +217,12 @@ describe('createWorldFromM1Data — structure', () => {
       marchStep,
       siegeStep,
       combatV2Step,
+      culturalIdentityPhase,
       manpowerTick,
       rulerLifecyclePhase,
       characterLifecyclePhase,
       recruitmentPhase,
+      ideologyDriftPhase,
       reformPhase,
       victoryCheckStep,
       diplomacyLifecycleStep,
@@ -223,6 +231,7 @@ describe('createWorldFromM1Data — structure', () => {
       tradePhase,
       factionPhase,
       historicalEventsPhase,
+      prestigeUpdatePhase,
     ])
     expect(world.phases.map(phaseName)).toEqual(PHASE_ORDER)
 
