@@ -42,9 +42,14 @@ describe('TRAIT_EFFECT_REGISTRY', () => {
 
   it('all basis-point values are integers', () => {
     for (const [, effect] of Object.entries(TRAIT_EFFECT_REGISTRY)) {
-      const values = Object.values(effect).filter((v): v is number => v !== undefined)
+      const values = Object.values(effect).filter((v): v is number => typeof v === 'number')
       for (const value of values) {
         expect(Number.isInteger(value)).toBe(true)
+      }
+      if (effect.ideologyDeltaBp) {
+        for (const value of Object.values(effect.ideologyDeltaBp)) {
+          expect(Number.isInteger(value)).toBe(true)
+        }
       }
     }
   })

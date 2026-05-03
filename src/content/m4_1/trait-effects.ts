@@ -1,4 +1,4 @@
-import type { Realm, TraitEffect, TraitModifiers } from '~/shared/types'
+import type { Ideology, Realm, TraitEffect, TraitModifiers } from '~/shared/types'
 
 export const TRAIT_EFFECT_REGISTRY: Record<string, TraitEffect> = {
   shang_yang_reform_done: {
@@ -7,6 +7,7 @@ export const TRAIT_EFFECT_REGISTRY: Record<string, TraitEffect> = {
     recruitmentSpeedMultiplierBp: 1500,
     combatPowerMultiplierBp: 1000,
     tradeIncomeMultiplierBp: 1500,
+    ideologyDeltaBp: { fa: 3000 },
   },
   hu_fu_qi_she_done: {
     manpowerCapMultiplierBp: 1500,
@@ -27,16 +28,19 @@ export const TRAIT_EFFECT_REGISTRY: Record<string, TraitEffect> = {
   chu_wu_qi_legacy_done: {
     taxIncomeMultiplierBp: 1500,
     manpowerCapMultiplierBp: 1000,
+    ideologyDeltaBp: { fa: 2000 },
   },
   qi_jixia_reform_done: {
     generalRecruitmentWeightBp: 2000,
     taxIncomeMultiplierBp: 1000,
     factionStabilityBonusBp: 500,
     tradeIncomeMultiplierBp: 500,
+    ideologyDeltaBp: { ru: 2000, dao: 1500 },
   },
   han_shen_buhai_done: {
     taxIncomeMultiplierBp: 1500,
     recruitmentSpeedMultiplierBp: 1000,
+    ideologyDeltaBp: { fa: 3000 },
   },
   reform_failed_scar: {
     taxIncomeMultiplierBp: -1000,
@@ -58,6 +62,7 @@ const ZERO_MODIFIERS: TraitModifiers = {
 
 export function getTraitModifiers(realm: Realm): TraitModifiers {
   let result: TraitModifiers = { ...ZERO_MODIFIERS }
+  let ideology: Partial<Record<Ideology, number>> | undefined
   for (const trait of realm.traits) {
     const effect = TRAIT_EFFECT_REGISTRY[trait]
     if (!effect) continue
@@ -72,6 +77,12 @@ export function getTraitModifiers(realm: Realm): TraitModifiers {
       tradeIncomeMultiplierBp: result.tradeIncomeMultiplierBp + (effect.tradeIncomeMultiplierBp ?? 0),
       factionStabilityBonusBp: result.factionStabilityBonusBp + (effect.factionStabilityBonusBp ?? 0),
     }
+    if (effect.ideologyDeltaBp) {
+      ideology = ideology ?? {}
+      for (const [key, value] of Object.entries(effect.ideologyDeltaBp) as [Ideology, number][]) {
+        ideology[key] = (ideology[key] ?? 0) + value
+      }
+    }
   }
-  return result
+  return ideology ? { ...result, ideologyDeltaBp: ideology } : result
 }

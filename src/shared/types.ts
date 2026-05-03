@@ -612,6 +612,7 @@ export interface TraitModifiers {
   readonly disasterResistanceMultiplierBp: number
   readonly tradeIncomeMultiplierBp: number
   readonly factionStabilityBonusBp: number
+  readonly ideologyDeltaBp?: Partial<Record<Ideology, number>>
 }
 
 export interface SiteOccupation {
