@@ -362,6 +362,30 @@ export const ESPIONAGE_RISK_TIERS: Record<EspionageActionKind, 'low' | 'mid' | '
 } as const
 export type EspionageRiskTier = 'low' | 'mid' | 'high' | 'defensive'
 
+// ─── M7 Espionage: SpyMission & IntelligenceCoverage ────────────────────────
+
+export type SpyMissionId = string
+export type CoverageKey = string  // format: `${observerRealmId}__${targetRealmId}` (directional, NOT lex-sorted)
+export type SpyMissionStatus = 'in_progress' | 'success' | 'failed' | 'exposed' | 'cancelled'
+
+export interface SpyMission {
+  readonly id: SpyMissionId
+  readonly spyGeneralId: GeneralId
+  readonly spyRealmId: RealmId           // observer realm
+  readonly targetRealmId: RealmId
+  readonly action: EspionageActionKind
+  readonly startTick: number
+  readonly resolveTick: number           // startTick + duration
+  readonly status: SpyMissionStatus
+  readonly targetGeneralId: GeneralId | null  // only used for discord action
+}
+
+export type IntelligenceCoverage = ReadonlyMap<CoverageKey, number>  // 0-100 directional
+
+export function makeCoverageKey(observerId: RealmId, targetId: RealmId): CoverageKey {
+  return `${observerId}__${targetId}`
+}
+
 export interface WarState {
   casusBelli: CasusBelliId | null
   declaredAt: GameDate
