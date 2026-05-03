@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest'
 
 import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
 import { migrateScenarioV5ToV6 } from '~/engine/world/migrations/v5-to-v6'
-import { M1DataSchemaV6, type M1DataV6 } from '~/shared/schemas'
+import { M1DataSchemaV6, M1DataSchemaV7, type M1DataV7 } from '~/shared/schemas'
 import type { Academy } from '~/shared/types'
 
 describe('M6 persistence: V5→V6 auto-migration on load', () => {
-  it('loadM1Data() returns V6 data even though scenario.json is V5', () => {
+  it('loadM1Data() returns latest version (V7) data even though scenario.json is V5', () => {
     const data = loadM1Data()
-    expect(data.schema_version).toBe(6)
+    expect(data.schema_version).toBe(7)
     expect(data.academies).toHaveLength(2)
   })
 
@@ -27,15 +27,15 @@ describe('M6 persistence: JSON round-trip', () => {
   it('preserves academies array through JSON.stringify + JSON.parse', () => {
     const data = loadM1Data()
     const json = JSON.stringify(data)
-    const parsed = M1DataSchemaV6.parse(JSON.parse(json))
+    const parsed = M1DataSchemaV7.parse(JSON.parse(json))
 
     expect(parsed.academies).toEqual(data.academies)
-    expect(parsed.schema_version).toBe(6)
+    expect(parsed.schema_version).toBe(7)
   })
 
   it('preserves academies fully (id, host, ideology, founded, level, status)', () => {
     const data = loadM1Data()
-    const reparsed = M1DataSchemaV6.parse(JSON.parse(JSON.stringify(data)))
+    const reparsed = M1DataSchemaV7.parse(JSON.parse(JSON.stringify(data)))
 
     const jixia = reparsed.academies.find(a => a.id === 'jixia')!
     expect(jixia.hostRealmId).toBe('realm_qi')
@@ -49,7 +49,7 @@ describe('M6 persistence: JSON round-trip', () => {
 
   it('preserves cultural / culturalIdentityStrength on sites', () => {
     const data = loadM1Data()
-    const reparsed = M1DataSchemaV6.parse(JSON.parse(JSON.stringify(data)))
+    const reparsed = M1DataSchemaV7.parse(JSON.parse(JSON.stringify(data)))
 
     const linzi = reparsed.sites.find(s => s.id === 'site_005')!
     expect(linzi.cultural).toBe('chinese_qi')
@@ -59,7 +59,7 @@ describe('M6 persistence: JSON round-trip', () => {
 
   it('preserves prestige / ideologyLean / warVictoriesThisYear on realms', () => {
     const data = loadM1Data()
-    const reparsed = M1DataSchemaV6.parse(JSON.parse(JSON.stringify(data)))
+    const reparsed = M1DataSchemaV7.parse(JSON.parse(JSON.stringify(data)))
 
     const zhou = reparsed.realms.find(r => r.id === 'realm_zhou')!
     expect(zhou.prestige).toBe(90)
@@ -73,9 +73,9 @@ describe('M6 persistence: full World round-trip', () => {
     const original = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
 
     const academiesArray: Academy[] = [...original.academies.values()].map(a => ({ ...a }))
-    const serialisable: M1DataV6 = { ...loadM1Data(), academies: academiesArray }
+    const serialisable: M1DataV7 = { ...loadM1Data(), academies: academiesArray }
     const json = JSON.stringify(serialisable)
-    const reparsed = M1DataSchemaV6.parse(JSON.parse(json))
+    const reparsed = M1DataSchemaV7.parse(JSON.parse(json))
     const reloaded = createWorldFromM1Data(reparsed, 42, 'realm_qin')
 
     expect(reloaded.academies.size).toBe(original.academies.size)
@@ -87,7 +87,7 @@ describe('M6 persistence: full World round-trip', () => {
   it('World → array → JSON → parse → World preserves site cultural state', () => {
     const original = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
 
-    const reparsed = M1DataSchemaV6.parse(JSON.parse(JSON.stringify(loadM1Data())))
+    const reparsed = M1DataSchemaV7.parse(JSON.parse(JSON.stringify(loadM1Data())))
     const reloaded = createWorldFromM1Data(reparsed, 42, 'realm_qin')
 
     for (const [id, originalSite] of original.sites) {
@@ -100,7 +100,7 @@ describe('M6 persistence: full World round-trip', () => {
   it('World → array → JSON → parse → World preserves realm prestige and ideology', () => {
     const original = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
 
-    const reparsed = M1DataSchemaV6.parse(JSON.parse(JSON.stringify(loadM1Data())))
+    const reparsed = M1DataSchemaV7.parse(JSON.parse(JSON.stringify(loadM1Data())))
     const reloaded = createWorldFromM1Data(reparsed, 42, 'realm_qin')
 
     for (const [id, originalRealm] of original.realms) {

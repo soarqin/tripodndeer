@@ -1,0 +1,111 @@
+{
+  "schema_version": 6,
+  "edges": {
+    "e_001": {
+      "id": "e_001",
+      "curveType": "polyline",
+      "travel_cost": 1,
+      "anchors": [[0, 0], [10, 0]]
+    },
+    "e_002": {
+      "id": "e_002",
+      "curveType": "polyline",
+      "travel_cost": 1,
+      "anchors": [[10, 0], [10, 10]]
+    },
+    "e_003": {
+      "id": "e_003",
+      "curveType": "polyline",
+      "travel_cost": 1,
+      "anchors": [[10, 10], [0, 0]]
+    }
+  },
+  "sites": [
+    {
+      "id": "site_a",
+      "name": "Site A",
+      "position": [5, 5],
+      "boundary": [
+        { "edge": "e_001", "reverse": false },
+        { "edge": "e_002", "reverse": false },
+        { "edge": "e_003", "reverse": false }
+      ],
+      "cultural": "chinese_qin",
+      "culturalIdentityStrength": 100,
+      "lastConquestTick": null,
+      "lowIdentitySinceTick": null
+    }
+  ],
+  "realms": [
+    {
+      "id": "realm_qin",
+      "displayName": "Qin",
+      "fullTitle": "Qin Realm",
+      "color": "#cc3333",
+      "capital": "site_a",
+      "initialSites": ["site_a"],
+      "initialArmies": [],
+      "aiPersonality": "aggressive",
+      "rulerId": null,
+      "traits": [],
+      "politicalSystem": "enfeoffment",
+      "prestige": 70,
+      "ideologyLean": { "fa": 0, "ru": 0, "dao": 0, "mo": 0, "zonghen": 0, "bing": 0 },
+      "warVictoriesThisYear": 0
+    },
+    {
+      "id": "realm_chu",
+      "displayName": "Chu",
+      "fullTitle": "Chu Realm",
+      "color": "#3366cc",
+      "capital": "site_a",
+      "initialSites": [],
+      "initialArmies": [],
+      "aiPersonality": "cautious",
+      "rulerId": null,
+      "traits": [],
+      "politicalSystem": "enfeoffment",
+      "prestige": 70,
+      "ideologyLean": { "fa": 0, "ru": 0, "dao": 0, "mo": 0, "zonghen": 0, "bing": 0 },
+      "warVictoriesThisYear": 0
+    },
+    {
+      "id": "realm_qi",
+      "displayName": "Qi",
+      "fullTitle": "Qi Realm",
+      "color": "#33cc66",
+      "capital": "site_a",
+      "initialSites": [],
+      "initialArmies": [],
+      "aiPersonality": "aggressive_random",
+      "rulerId": null,
+      "traits": [],
+      "politicalSystem": "enfeoffment",
+      "prestige": 70,
+      "ideologyLean": { "fa": 0, "ru": 0, "dao": 0, "mo": 0, "zonghen": 0, "bing": 0 },
+      "warVictoriesThisYear": 0
+    }
+  ],
+  "initialOwnership": {
+    "site_a": "realm_qin"
+  },
+  "initialArmies": [],
+  "initialWars": [],
+  "generals": [],
+  "passes": [],
+  "adjacencyEdges": [],
+  "peaceProposals": [],
+  "relations": [],
+  "diplomaticProposals": [],
+  "treaties": [],
+  "diplomacyHistory": [],
+  "coalitions": [],
+  "zhouInvestiture": [],
+  "rulers": [],
+  "eventChainStates": [],
+  "reformStates": [],
+  "disasterStates": [],
+  "tradeRoutes": [],
+  "factionInfluences": [],
+  "academies": []
+}

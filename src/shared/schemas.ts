@@ -793,6 +793,9 @@ export const CounterIntelStateSchema = z.object({
 
 export const M1DataSchemaV7 = M1DataSchemaV6.extend({
   schema_version: z.literal(7),
+  intelligenceCoverage: z.record(CoverageKeySchema, z.number().min(0).max(100)).optional().default({}),
+  counterIntelStates: z.array(CounterIntelStateSchema).optional().default([]),
+  spyMissions: z.array(SpyMissionSchema).optional().default([]),
 })
 
 export type M1DataV7 = z.infer<typeof M1DataSchemaV7>
