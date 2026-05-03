@@ -352,6 +352,16 @@ export type FactionImbalanceEventId = string
 
 export type Post = 'ruler' | 'chancellor' | 'general' | 'governor'
 
+export const ESPIONAGE_ACTION_KINDS = ['reconnaissance', 'rumor', 'discord', 'counter_intel'] as const
+export type EspionageActionKind = typeof ESPIONAGE_ACTION_KINDS[number]
+export const ESPIONAGE_RISK_TIERS: Record<EspionageActionKind, 'low' | 'mid' | 'high' | 'defensive'> = {
+  reconnaissance: 'low',
+  rumor: 'mid',
+  discord: 'high',
+  counter_intel: 'defensive',
+} as const
+export type EspionageRiskTier = 'low' | 'mid' | 'high' | 'defensive'
+
 export interface WarState {
   casusBelli: CasusBelliId | null
   declaredAt: GameDate
