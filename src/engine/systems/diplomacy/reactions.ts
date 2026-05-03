@@ -54,7 +54,7 @@ export function applyThirdPartyReactions(
   return { world: { ...world, relations, diplomacyHistory: history }, events }
 }
 
-function applyRelationDelta(
+export function applyRelationDelta(
   world: World,
   relations: Map<string, DiplomaticRelation>,
   history: readonly DiplomacyEvent[],
