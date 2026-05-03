@@ -4,7 +4,13 @@ import type {
   PeaceProposalId,
   World,
 } from '~/shared/types'
+import {
+  M6_ENABLED,
+  M6_IDEOLOGY_DISTANCE_WEIGHT,
+  M6_PRESTIGE_DIFFERENTIAL_WEIGHT,
+} from '~/content/m2/balance'
 import { endWar, warKey } from '~/engine/wars'
+import { cosineSimilarity } from '~/engine/systems/culture/ideology-distance'
 import { applyCession, applyIndemnity, applyTribute } from './peace-terms'
 
 /**
@@ -126,5 +132,22 @@ export function scoreProposalAcceptance(
     g => g.realmId === targetRealmId,
   ).length
 
-  return occupiedCount * 30 + warWeariness * 0.5 - targetGenerals * 5
+  const baseScore = occupiedCount * 30 + warWeariness * 0.5 - targetGenerals * 5
+
+  if (!M6_ENABLED) return baseScore
+
+  const proposerRealm = world.realms.get(proposingRealmId)
+  if (!proposerRealm || !targetRealm) return baseScore
+
+  const proposerPrestige = proposerRealm.prestige ?? 0
+  const targetPrestige = targetRealm.prestige ?? 0
+  const prestigeDelta = M6_PRESTIGE_DIFFERENTIAL_WEIGHT * (proposerPrestige - targetPrestige)
+
+  const proposerLean = proposerRealm.ideologyLean
+  const targetLean = targetRealm.ideologyLean
+  const ideologyDelta = proposerLean && targetLean
+    ? M6_IDEOLOGY_DISTANCE_WEIGHT * cosineSimilarity(proposerLean, targetLean)
+    : 0
+
+  return Math.max(0, Math.min(100, baseScore + prestigeDelta + ideologyDelta))
 }
