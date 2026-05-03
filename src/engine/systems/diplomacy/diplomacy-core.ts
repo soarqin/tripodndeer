@@ -31,8 +31,12 @@ import {
   DIPLOMACY_TRUST_MAX,
   DIPLOMACY_TRUST_MIN,
   DIPLOMACY_ZHOU_INVESTITURE_ACCEPTANCE_MODIFIER,
+  M6_ENABLED,
+  M6_IDEOLOGY_DISTANCE_WEIGHT,
+  M6_PRESTIGE_DIFFERENTIAL_WEIGHT,
 } from '~/content/m2/balance'
 import { isAtWar } from '~/engine/wars'
+import { cosineSimilarity } from '~/engine/systems/culture/ideology-distance'
 
 export const DIPLOMATIC_ACTIONS: readonly DiplomaticActionKind[] = [
   'alliance',
@@ -171,7 +175,7 @@ export function scoreDiplomacyAcceptance(world: World, request: DiplomacyActionR
     : 0
   const actionCost = DIPLOMACY_ACTION_COSTS[request.kind]
 
-  return roundScore(DIPLOMACY_ACCEPTANCE_BASE
+  const baseScore = DIPLOMACY_ACCEPTANCE_BASE
     + (attitude - DIPLOMACY_ACCEPTANCE_ATTITUDE_THRESHOLD) * DIPLOMACY_ACCEPTANCE_ATTITUDE_WEIGHT
     + (trust - DIPLOMACY_ACCEPTANCE_TRUST_THRESHOLD) * DIPLOMACY_ACCEPTANCE_TRUST_WEIGHT
     + warModifier
@@ -179,7 +183,34 @@ export function scoreDiplomacyAcceptance(world: World, request: DiplomacyActionR
     + treatyConflictModifier
     + threatModifier
     + investitureModifier
-    - actionCost)
+    - actionCost
+
+  const m6Modifier = getM6Modifier(world, request)
+  const score = m6Modifier === 0 ? baseScore : Math.max(0, Math.min(100, baseScore + m6Modifier))
+
+  return roundScore(score)
+}
+
+function getM6Modifier(world: World, request: DiplomacyActionRequest): number {
+  if (!M6_ENABLED) return 0
+  if (request.kind === 'declare_war') return 0
+
+  const proposerRealm = world.realms.get(request.proposingRealmId)
+  const targetRealm = world.realms.get(request.targetRealmId)
+  if (!proposerRealm || !targetRealm) return 0
+
+  const proposerPrestige = proposerRealm.prestige ?? 0
+  const targetPrestige = targetRealm.prestige ?? 0
+  const prestigeDelta = M6_PRESTIGE_DIFFERENTIAL_WEIGHT * (proposerPrestige - targetPrestige)
+
+  const proposerLean = proposerRealm.ideologyLean
+  const targetLean = targetRealm.ideologyLean
+  if (!proposerLean || !targetLean) return prestigeDelta
+
+  const similarity = cosineSimilarity(proposerLean, targetLean)
+  const ideologyDelta = M6_IDEOLOGY_DISTANCE_WEIGHT * similarity
+
+  return prestigeDelta + ideologyDelta
 }
 
 function createDiplomaticProposal(world: World, request: DiplomacyActionRequest): DiplomaticProposal {
