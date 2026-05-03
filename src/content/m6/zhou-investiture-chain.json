@@ -1,0 +1,46 @@
+{
+  "id": "zhou_investiture_v1",
+  "scope": "realm-scoped",
+  "oneShot": true,
+  "trigger": {
+    "type": "state",
+    "realmId": "$currentRealm",
+    "predicate": {
+      "kind": "and",
+      "children": [
+        { "kind": "realm.zhouInvestiture.absent" },
+        { "kind": "realm.relation.attitude", "targetRealmId": "realm_zhou", "minAttitude": "friendly" },
+        { "kind": "realm.prestige.gte", "threshold": 50 }
+      ]
+    }
+  },
+  "stages": [
+    {
+      "id": "request_investiture",
+      "text": "请求册封 — 周王可赐予爵位，以正名分。",
+      "choices": [
+        {
+          "id": "accept_duke",
+          "label": "请封公爵",
+          "effects": [
+            { "type": "zhouInvestiture.grant", "realmId": "$currentRealm", "rank": "duke" },
+            { "type": "realm.prestige.delta", "realmId": "$currentRealm", "delta": 10 }
+          ]
+        },
+        {
+          "id": "accept_marquis",
+          "label": "请封侯爵",
+          "effects": [
+            { "type": "zhouInvestiture.grant", "realmId": "$currentRealm", "rank": "marquis" },
+            { "type": "realm.prestige.delta", "realmId": "$currentRealm", "delta": 7 }
+          ]
+        },
+        {
+          "id": "decline",
+          "label": "暂不请封",
+          "effects": []
+        }
+      ]
+    }
+  ]
+}
