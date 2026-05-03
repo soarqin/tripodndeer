@@ -35,6 +35,7 @@ import type {
   ArmyId,
   CoalitionId,
   CoalitionState,
+  CulturalTag,
   DisasterState,
   DiplomaticProposal,
   DiplomaticProposalId,
@@ -135,6 +136,29 @@ function buildRealmMap(realms: readonly Realm[]): Map<RealmId, Realm> {
   return realmMap
 }
 
+function culturalTagForOwner(ownerId: RealmId | null): CulturalTag {
+  switch (ownerId) {
+    case 'realm_qin':
+      return 'chinese_qin'
+    case 'realm_chu':
+      return 'chinese_chu'
+    case 'realm_qi':
+      return 'chinese_qi'
+    case 'realm_zhou':
+      return 'chinese_zhou_central'
+    case 'realm_yan':
+      return 'chinese_yan'
+    case 'realm_zhao':
+      return 'chinese_zhao'
+    case 'realm_wei':
+      return 'chinese_wei'
+    case 'realm_han':
+      return 'chinese_han'
+    default:
+      return 'di_xirong'
+  }
+}
+
 function buildSites(
   sitesInput: readonly M0Data['sites'][number][],
   edges: Record<EdgeId, MapEdge>,
@@ -157,6 +181,10 @@ function buildSites(
       ownerId,
       polygon,
       adjacency,
+      cultural: culturalTagForOwner(ownerId),
+      culturalIdentityStrength: 100,
+      lastConquestTick: null,
+      lowIdentitySinceTick: null,
       economy: {
         population: M4_DEFAULT_SITE_POPULATION,
         households,

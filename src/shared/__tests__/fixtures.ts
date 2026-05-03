@@ -1,4 +1,4 @@
-import type { General, GeneralId, Realm, RealmId, RNGState, World } from '~/shared/types'
+import type { General, GeneralId, Realm, RealmId, RNGState, Site, SiteId, World } from '~/shared/types'
 
 export const TEST_WORLD_DATE = {
   yearBC: 260,
@@ -9,11 +9,35 @@ export const TEST_WORLD_DATE = {
 
 const DEFAULT_RNG: RNGState = { seed: 0, counter: 0 }
 
-export function makeEmptyWorld(overrides: Partial<World> = {}): World {
+type SiteM6Fields = Pick<Site, 'cultural' | 'culturalIdentityStrength' | 'lastConquestTick' | 'lowIdentitySinceTick'>
+type SiteOverride = Omit<Site, keyof SiteM6Fields> & Partial<SiteM6Fields>
+
+interface MakeEmptyWorldOverrides extends Omit<Partial<World>, 'sites'> {
+  readonly sites?: ReadonlyMap<SiteId, SiteOverride>
+}
+
+function normalizeSites(sites?: ReadonlyMap<SiteId, SiteOverride>): ReadonlyMap<SiteId, Site> {
+  if (!sites) return new Map()
+  return new Map(
+    [...sites].map(([id, site]) => [
+      id,
+      {
+        ...site,
+        cultural: site.cultural ?? 'di_xirong',
+        culturalIdentityStrength: site.culturalIdentityStrength ?? 100,
+        lastConquestTick: site.lastConquestTick ?? null,
+        lowIdentitySinceTick: site.lowIdentitySinceTick ?? null,
+      },
+    ]),
+  )
+}
+
+export function makeEmptyWorld(overrides: MakeEmptyWorldOverrides = {}): World {
+  const { sites, ...rest } = overrides
   return {
     date: TEST_WORLD_DATE,
     tick: 0,
-    sites: new Map(),
+    sites: normalizeSites(sites),
     realms: new Map(),
     armies: new Map(),
     edges: new Map(),
@@ -41,7 +65,7 @@ export function makeEmptyWorld(overrides: Partial<World> = {}): World {
     rngState: { ...DEFAULT_RNG },
     phases: [],
     pendingOrders: [],
-    ...overrides,
+    ...rest,
   }
 }
 

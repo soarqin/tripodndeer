@@ -51,6 +51,10 @@ export interface Site extends RawSite {
   polygon: Polygon
   adjacency: readonly SiteId[]
   economy: SiteEconomy
+  readonly cultural: CulturalTag
+  readonly culturalIdentityStrength: number
+  readonly lastConquestTick: number | null
+  readonly lowIdentitySinceTick: number | null
   occupation?: SiteOccupation
 }
 
