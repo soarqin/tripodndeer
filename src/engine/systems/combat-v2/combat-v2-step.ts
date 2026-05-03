@@ -1,15 +1,20 @@
 import type {
+  Academy,
+  AcademyId,
   Army,
   GameEvent,
   General,
   GeneralId,
   Pass,
   PassId,
+  Realm,
+  RealmId,
   RNGState,
   Site,
   SiteId,
   World,
 } from '~/shared/types'
+import { M6_ENABLED } from '~/content/m2/balance'
 import { resolveCombat } from './combat-v2'
 import type { BattleContext, Composition } from './combat-v2'
 
@@ -84,6 +89,8 @@ export function combatV2Step(
   const sites = new Map(world.sites)
   const armies = new Map(world.armies)
   const passes = new Map<PassId, Pass>(world.passes)
+  const realms = new Map<RealmId, Realm>(world.realms)
+  const academies = new Map<AcademyId, Academy>(world.academies)
   let generals = world.generals
 
   for (const army of world.armies.values()) {
@@ -146,11 +153,42 @@ export function combatV2Step(
       for (const defender of defenders) armies.delete(defender.id)
 
       const prevOwner = destSite.ownerId
-      sites.set(destination, { ...destSite, ownerId: currentAttacker.realmId })
+      const conquered = prevOwner !== currentAttacker.realmId
+      const updatedSite: Site = M6_ENABLED && conquered
+        ? { ...destSite, ownerId: currentAttacker.realmId, lastConquestTick: world.tick }
+        : { ...destSite, ownerId: currentAttacker.realmId }
+      sites.set(destination, updatedSite)
       events.push({
         type: 'siteConquered',
         payload: { siteId: destination, byRealm: currentAttacker.realmId, fromRealm: prevOwner },
       })
+
+      if (M6_ENABLED) {
+        const attackerRealm = realms.get(currentAttacker.realmId)
+        if (attackerRealm) {
+          realms.set(currentAttacker.realmId, {
+            ...attackerRealm,
+            warVictoriesThisYear: (attackerRealm.warVictoriesThisYear ?? 0) + 1,
+          })
+        }
+
+        if (conquered) {
+          const matchingAcademies = [...academies.values()]
+            .filter((academy) => academy.hostSiteId === destination && academy.status !== 'dormant')
+            .sort((a, b) => a.id.localeCompare(b.id))
+          for (const academy of matchingAcademies) {
+            academies.set(academy.id, { ...academy, status: 'dormant' })
+            events.push({
+              type: 'academyDormant',
+              payload: {
+                academyId: academy.id,
+                siteId: destination,
+                byRealm: currentAttacker.realmId,
+              },
+            })
+          }
+        }
+      }
 
       if (isPassAssault && passOnEdge) {
         const prevController = passOnEdge.controllerId
@@ -184,5 +222,9 @@ export function combatV2Step(
     }
   }
 
-  return { world: { ...world, sites, armies, generals, passes }, nextRng: rng, events }
+  return {
+    world: { ...world, sites, armies, generals, passes, realms, academies },
+    nextRng: rng,
+    events,
+  }
 }
