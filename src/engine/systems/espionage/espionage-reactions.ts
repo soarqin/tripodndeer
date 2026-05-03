@@ -12,6 +12,16 @@ export interface SpyExposedEvent {
   }
 }
 
+export interface SpyExposedHighRiskEvent {
+  readonly type: 'spyExposedHighRisk'
+  readonly payload: {
+    readonly missionId: SpyMission['id']
+    readonly spyRealmId: SpyMission['spyRealmId']
+    readonly targetRealmId: SpyMission['targetRealmId']
+    readonly action: SpyMission['action']
+  }
+}
+
 export function applyEspionageReactions(
   world: World,
   exposedMission: SpyMission,
@@ -40,6 +50,18 @@ export function applyEspionageReactions(
       action: exposedMission.action,
     },
   })
+
+  if (exposedMission.action === 'rumor' || exposedMission.action === 'discord') {
+    events.push({
+      type: 'spyExposedHighRisk',
+      payload: {
+        missionId: exposedMission.id,
+        spyRealmId: exposedMission.spyRealmId,
+        targetRealmId: exposedMission.targetRealmId,
+        action: exposedMission.action,
+      },
+    })
+  }
 
   return {
     world: { ...world, relations, diplomacyHistory: result.history },
