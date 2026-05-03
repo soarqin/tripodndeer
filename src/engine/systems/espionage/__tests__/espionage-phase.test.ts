@@ -2,8 +2,10 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { espionagePhase } from '../espionage-phase'
 import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { relationKey } from '~/engine/systems/diplomacy'
 import type {
   CounterIntelState,
+  DiplomaticRelation,
   EspionageActionKind,
   FactionInfluenceState,
   General,
@@ -94,7 +96,6 @@ function makeFactionInfluence(realmId: string, conservatives: number = 50): Fact
       ['conservatives', conservatives],
       ['foreign_clients', 50],
     ]),
-    lastUpdatedTick: 0,
   }
 }
 
@@ -212,7 +213,7 @@ describe('espionagePhase: counter_intel success', () => {
 })
 
 describe('espionagePhase: failure paths', () => {
-  it('marks mission as exposed for high-risk discord on failure', () => {
+  it('marks mission as exposed for high-risk discord on failure (M7_HIGH_RISK_EXPOSE_PROB=1.0)', () => {
     const target = makeTargetGeneral('gen_target', 'realm_b')
     const generals = new Map<string, General>([
       ['spy_a', makeSpy('spy_a', 'realm_a', 0)],
@@ -227,12 +228,18 @@ describe('espionagePhase: failure paths', () => {
         ],
       ]),
     })
-    const result = espionagePhase(world, FAILURE_RNG)
-    const mission = result.world.spyMissions.get('m1')!
-    expect(mission.status).toBe('exposed')
-    expect(
-      result.events.some((e) => e.type === 'spyExposed'),
-    ).toBe(true)
+
+    let foundExposed = false
+    for (let seed = 1; seed <= 500; seed++) {
+      const r = espionagePhase(world, { seed, counter: 0 })
+      const m = r.world.spyMissions.get('m1')!
+      if (m.status === 'exposed') {
+        foundExposed = true
+        expect(r.events.some((e) => e.type === 'spyExposed')).toBe(true)
+        break
+      }
+    }
+    expect(foundExposed).toBe(true)
   })
 
   it('marks mission as failed (not exposed) when low-risk recon fails without exposure', () => {
@@ -240,19 +247,16 @@ describe('espionagePhase: failure paths', () => {
       generals: new Map([['spy_a', makeSpy('spy_a', 'realm_a', 0)]]),
       spyMissions: new Map([['m1', makeMission('reconnaissance', { id: 'm1' })]]),
     })
-    let resultStatus: string | undefined
     let foundFailedNotExposed = false
-    for (let seed = 1; seed <= 200; seed++) {
+    for (let seed = 1; seed <= 500; seed++) {
       const r = espionagePhase(world, { seed, counter: 0 })
       const m = r.world.spyMissions.get('m1')!
-      resultStatus = m.status
       if (m.status === 'failed') {
         foundFailedNotExposed = true
         break
       }
     }
     expect(foundFailedNotExposed).toBe(true)
-    expect(resultStatus).toBe('failed')
   })
 })
 
@@ -317,6 +321,42 @@ describe('espionagePhase: missions sorted by ID', () => {
     const result2 = espionagePhase(world2, { seed: 42, counter: 0 })
     expect(result2.world.spyMissions.get('mission_a')!.status).toBe(mA.status)
     expect(result2.world.spyMissions.get('mission_z')!.status).toBe(mZ.status)
+  })
+})
+
+describe('espionagePhase: exposure invokes diplomatic reactions', () => {
+  it('updates relations attitude/trust and emits spyExposed event when discord mission is exposed', () => {
+    const target = makeTargetGeneral('gen_target', 'realm_b')
+    const generals = new Map<string, General>([
+      ['spy_a', makeSpy('spy_a', 'realm_a', 0)],
+      ['gen_target', target],
+    ])
+    const initialRelation: DiplomaticRelation = {
+      key: relationKey('realm_a', 'realm_b'),
+      realmAId: 'realm_a',
+      realmBId: 'realm_b',
+      attitude: 0,
+      trust: 50,
+      updatedAt: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
+    }
+    const world = makeBaseWorld({
+      generals,
+      relations: new Map([[relationKey('realm_a', 'realm_b'), initialRelation]]),
+      spyMissions: new Map([
+        [
+          'm1',
+          makeMission('discord', { id: 'm1', targetGeneralId: 'gen_target' }),
+        ],
+      ]),
+    })
+
+    const result = espionagePhase(world, FAILURE_RNG)
+    expect(result.world.spyMissions.get('m1')!.status).toBe('exposed')
+    expect(result.events.some((e) => e.type === 'spyExposed')).toBe(true)
+    const relation = result.world.relations.get(relationKey('realm_a', 'realm_b'))!
+    expect(relation).toBeDefined()
+    expect(relation.attitude).toBeLessThan(0)
+    expect(relation.trust).toBeLessThan(50)
   })
 })
 

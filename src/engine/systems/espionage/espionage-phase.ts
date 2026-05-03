@@ -9,6 +9,7 @@ import type {
 import { makeCoverageKey } from '~/shared/types'
 import { nextRng } from '~/engine/random'
 import { applyEventEffect } from '../events/event-chain-engine'
+import { applyEspionageReactions } from './espionage-reactions'
 import {
   M7_COUNTER_DETECTION_BONUS_PER_LEVEL,
   M7_COUNTER_INTEL_MAX_LEVEL,
@@ -176,17 +177,12 @@ export function espionagePhase(
       currentRng = rng2
 
       if (exposeRoll < exposeProb) {
-        newMissions.set(mission.id, { ...mission, status: 'exposed' })
+        const exposedMission: SpyMission = { ...mission, status: 'exposed' }
+        newMissions.set(mission.id, exposedMission)
         currentWorld = { ...currentWorld, spyMissions: newMissions }
-        events.push({
-          type: 'spyExposed',
-          payload: {
-            missionId: mission.id,
-            spyRealmId: mission.spyRealmId,
-            targetRealmId: mission.targetRealmId,
-            action: mission.action,
-          },
-        })
+        const reactionResult = applyEspionageReactions(currentWorld, exposedMission)
+        currentWorld = reactionResult.world
+        for (const ev of reactionResult.events) events.push(ev)
       } else {
         newMissions.set(mission.id, { ...mission, status: 'failed' })
         currentWorld = { ...currentWorld, spyMissions: newMissions }
