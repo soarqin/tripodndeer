@@ -184,6 +184,26 @@ export type PeaceProposalId = string
 export type AdjacencyEdgeId = string
 export type PassId = string
 export type GeneralId = string
+export type CulturalTag =
+  | 'chinese_qin'
+  | 'chinese_chu'
+  | 'chinese_qi'
+  | 'chinese_zhou_central'
+  | 'chinese_yan'
+  | 'chinese_zhao'
+  | 'chinese_wei'
+  | 'chinese_han'
+  | 'yi_dong'
+  | 'di_xirong'
+
+export type Ideology = 'fa' | 'ru' | 'dao' | 'mo' | 'zonghen' | 'bing'
+
+export type IdeologyLean = Readonly<Record<Ideology, number>>
+
+export type AcademyId = string
+
+export type AcademyStatus = 'active' | 'dormant'
+
 export type RulerStateId = string
 // Canonical sorted pair `${lowerRealmId}__${higherRealmId}`.
 export type RelationKey = string
