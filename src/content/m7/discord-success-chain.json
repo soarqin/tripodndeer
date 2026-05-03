@@ -1,0 +1,26 @@
+{
+  "id": "discord_success_v1",
+  "scope": "realm-scoped",
+  "oneShot": false,
+  "trigger": {
+    "type": "state",
+    "realmId": "$currentRealm",
+    "predicate": {
+      "kind": "realm.id.equals",
+      "value": "$currentRealm"
+    }
+  },
+  "stages": [
+    {
+      "id": "discord_success_narrative",
+      "text": "离间计成 — 我国细作于敌国朝堂之间挑拨君臣，致使敌将忠心动摇。",
+      "choices": [
+        {
+          "id": "acknowledge",
+          "label": "知悉",
+          "effects": []
+        }
+      ]
+    }
+  ]
+}
