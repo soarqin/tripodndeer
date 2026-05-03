@@ -10,7 +10,7 @@ import {
 import styles from './DiplomacyPanel.module.css'
 import { useState } from 'react'
 import { cosineSimilarity } from '~/engine/systems/culture/ideology-distance'
-import { M6_PRESTIGE_DIFFERENTIAL_WEIGHT, M6_IDEOLOGY_DISTANCE_WEIGHT } from '~/content/m2/balance'
+import { M6_PRESTIGE_DIFFERENTIAL_WEIGHT, M6_IDEOLOGY_DISTANCE_WEIGHT, M7_FAILURE_ATTITUDE_DELTA, M7_FAILURE_TRUST_DELTA } from '~/content/m2/balance'
 
 const ACTION_LABELS: Record<string, string> = {
   envoy: '遣使',
@@ -132,6 +132,9 @@ export function DiplomacyPanel() {
             <p>状态: {displaySummary.atWar ? '交战中' : '和平'}</p>
             {zhouInvestiture && <p>周天子册封: {zhouInvestiture.recognizedTitle}</p>}
             {coalitionPressure.length > 0 && <p>面临合纵压力</p>}
+            <p className={styles.spyPenaltyNote} title="间者被发现时的外交惩罚">
+              谍者暴露惩罚: {M7_FAILURE_ATTITUDE_DELTA} 态度 / {M7_FAILURE_TRUST_DELTA} 信任
+            </p>
           </div>
 
           <div className={styles.section} data-testid="diplomacy-active-treaties">
