@@ -8,9 +8,9 @@ AI agent behavioral guidelines for this codebase. Read before making any changes
 
 战国策略游戏引擎原型。Vite + React + TypeScript strict，纯函数引擎 + Zustand UI 层。
 
-**当前里程碑**: M0/M1/M2/M3/M3.1/M4(v1)/M5/M4.1/M4.2 已交付。M6（文化与意识形态）为下一里程碑。
+**当前里程碑**: M0/M1/M2/M3/M3.1/M4(v1)/M5/M4.1/M4.2/M6 已交付。M7（谍报）为下一里程碑。
 
-**实施顺序**: M4(✅) → M5 人物(✅) → M4.1 变法(✅) → M4.2 灾害·贸易·派系(✅) → M6 文化 → M7 谍报
+**实施顺序**: M4(✅) → M5 人物(✅) → M4.1 变法(✅) → M4.2 灾害·贸易·派系(✅) → M6 文化(✅) → M7 谍报
 
 ---
 
@@ -44,6 +44,7 @@ interface World {
   generals: ReadonlyMap<GeneralId, General>
   peaceProposals: ReadonlyMap<PeaceProposalId, PeaceProposal>
   sieges: ReadonlyMap<SiegeId, Siege>
+  academies: ReadonlyMap<AcademyId, Academy>  // M6 学宫
   playerRealmId: RealmId
   rngState: RNGState
   phases: readonly TickPhase[]
@@ -54,7 +55,7 @@ interface World {
 ### Phase Pipeline (M2)
 
 ```
-aiPlan → orderApply → march → siege → combat-v2 → manpower → rulerLifecycle → characterLifecycle → recruitment → reform → victoryCheck → diplomacyLifecycle → economy → disaster → trade → faction → historicalEvents
+aiPlan → orderApply → march → siege → combat-v2 → culturalIdentity → manpower → rulerLifecycle → characterLifecycle → recruitment → ideologyDrift → reform → victoryCheck → diplomacyLifecycle → economy → disaster → trade → faction → historicalEvents → prestigeUpdate
 ```
 
 每个 phase 是纯函数：`(World, RNGState) → { world, nextRng, events }`
@@ -127,6 +128,9 @@ AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按
 | All M5 balance constants prefixed M5_ | `src/content/m2/__tests__/balance-m5.test.ts` |
 | 8 archetypes covered in personality-coverage.test.ts | `src/engine/systems/ai/__tests__/personality-coverage.test.ts` |
 | M4.1_REFORMS_COUNT === 4 | `src/content/m2/__tests__/balance-m41.test.ts` |
+| M6_ENABLED=true (balance.ts) | `src/content/m2/__tests__/balance-m6.test.ts` |
+| ≥2 active academies at scenario start (jixia + xihe) | `src/engine/world/migrations/__tests__/v5-to-v6.test.ts` |
+| All M6 balance constants prefixed M6_ | `src/content/m2/__tests__/balance-m6.test.ts` |
 
 ---
 
@@ -287,6 +291,18 @@ const world: World = {
 
 ---
 
+## M6 Subsystems Quick Reference
+
+| 子系统 | 主文件 | 关键函数 |
+|---|---|---|
+| culturalIdentity | `src/engine/systems/culture/cultural-identity-phase.ts` | `culturalIdentityPhase(world, rng)` |
+| ideologyDrift | `src/engine/systems/culture/ideology-drift-phase.ts` | `ideologyDriftPhase(world, rng)` |
+| prestigeUpdate | `src/engine/systems/culture/prestige-update-phase.ts` | `prestigeUpdatePhase(world, rng)` |
+| academyProduction | `src/engine/systems/recruitment/recruitment.ts` | hook in `recruitmentPhase` |
+| 周王册封 | `src/content/m6/zhou-investiture-chain.json` | event chain |
+
+---
+
 ## What NOT to Do
 
 ```
@@ -318,6 +334,6 @@ const world: World = {
 - 8 种 AI 性格 archetype（M5）✅ 已交付
 - 变法系统（M4.1，依赖 M5 革新者人才）✅ 已交付（M4.1）
 - 灾害 / 贸易 / 派系（M4.2，依赖 M5 人物）✅ 已交付（M4.2）
-- `prestige` / `legitimacy` 文化威望字段（M6）
-- 学宫 / 百家 / 文化扩散（M6，依赖 M5 学宫产人才）
+- `prestige` / `legitimacy` 文化威望字段（M6）✅ 已交付（M6）
+- 学宫 / 百家 / 文化扩散（M6，依赖 M5 学宫产人才）✅ 已交付（M6）
 - 谍报行动（M7，依赖 M5 间者人才）
