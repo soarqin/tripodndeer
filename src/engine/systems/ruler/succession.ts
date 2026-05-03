@@ -1,13 +1,27 @@
 import type { General, GeneralId, RealmId, World } from '~/shared/types'
+import {
+  M6_ENABLED,
+  M6_LEGITIMACY_BONUS_MULTIPLIER,
+  M6_LEGITIMACY_BONUS_THRESHOLD,
+} from '~/content/m2/balance'
 
-function candidateScore(general: General, world: World, realmId: RealmId): number {
+export function candidateScore(general: General, world: World, realmId: RealmId): number {
   const baseScore = general.loyalty * 1000 + (general.attrs?.zheng ?? 0) + (general.attrs?.jiao ?? 0)
   const factionState = world.factionInfluences.get(realmId)
+  let score = baseScore
   if (factionState && general.faction) {
     const factionInfluence = factionState.influences.get(general.faction) ?? 50
-    return baseScore * (1 + factionInfluence / 100)
+    score = baseScore * (1 + factionInfluence / 100)
   }
-  return baseScore
+
+  if (M6_ENABLED) {
+    const realm = world.realms.get(realmId)
+    if (realm && (realm.prestige ?? 0) >= M6_LEGITIMACY_BONUS_THRESHOLD) {
+      score *= M6_LEGITIMACY_BONUS_MULTIPLIER
+    }
+  }
+
+  return score
 }
 
 export function selectHeir(world: World, deceasedRealmId: RealmId): GeneralId | null {
