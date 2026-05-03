@@ -1,0 +1,35 @@
+{
+  "id": "counter_success_v1",
+  "scope": "realm-scoped",
+  "oneShot": false,
+  "trigger": {
+    "type": "state",
+    "realmId": "$currentRealm",
+    "predicate": {
+      "kind": "realm.id.equals",
+      "value": "$currentRealm"
+    }
+  },
+  "stages": [
+    {
+      "id": "counter_success_response",
+      "text": "反间得手 — 我国反间司擒获敌国细作。当如何处置？",
+      "choices": [
+        {
+          "id": "execute",
+          "label": "处死",
+          "effects": [
+            { "type": "character.loyalty", "generalId": "$capturedSpyId", "delta": -100 }
+          ]
+        },
+        {
+          "id": "release",
+          "label": "放归",
+          "effects": [
+            { "type": "realm.relation.delta", "realmId": "$currentRealm", "targetRealmId": "$targetRealm", "delta": 5 }
+          ]
+        }
+      ]
+    }
+  ]
+}
