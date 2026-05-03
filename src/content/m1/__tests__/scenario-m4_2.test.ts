@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest'
 import { loadM1Data } from '~/engine/world/factory'
 
 describe('M4.2 scenario data', () => {
-  it('loads scenario with schema_version 5', async () => {
+  it('loads scenario with schema_version 6', async () => {
     const data = await loadM1Data()
-    expect(data.schema_version).toBe(5)
+    expect(data.schema_version).toBe(6)
   })
   
   it('has factionInfluences for all 7 realms', async () => {

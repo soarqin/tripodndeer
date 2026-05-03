@@ -1,7 +1,7 @@
 import m0Data from '@/content/m0/sites.json'
 import m1Data from '@/content/m1/scenario.json'
 import { INITIAL_DATE } from '@/shared/constants'
-import { M0DataSchema, M1DataSchemaV5 } from '@/shared/schemas'
+import { M0DataSchema, M1DataSchemaV6 } from '@/shared/schemas'
 import { aiPlanStep } from '~/engine/systems/ai'
 import { characterLifecyclePhase } from '~/engine/systems/character'
 import { combatV2Step } from '~/engine/systems/combat-v2'
@@ -31,6 +31,8 @@ import {
   M4_HOUSEHOLD_DIVISOR,
 } from '~/content/m2/balance'
 import type {
+  Academy,
+  AcademyId,
   AdjacencyEdge,
   AdjacencyEdgeId,
   BoundaryRef,
@@ -79,8 +81,8 @@ import type {
   WarState,
   World,
 } from '@/shared/types'
-import type { M1DataV5 } from '@/shared/schemas'
-import { migrateScenarioV4ToV5 } from './migrations/v4-to-v5'
+import type { M1DataV6 } from '@/shared/schemas'
+import { migrateScenarioV5ToV6 } from './migrations/v5-to-v6'
 
 /** 将一个 site 的 boundary 引用展开为具体的 polygon 顶点列表 */
 function expandPolygon(
@@ -237,13 +239,13 @@ export function loadM0Data(): M0Data {
 }
 
 /** 加载并验证 M1 场景数据（静态 import + Zod 校验） */
-export function loadM1Data(): M1DataV5 {
+export function loadM1Data(): M1DataV6 {
   const raw = m1Data as unknown
   const version = (raw as { schema_version?: number } | null)?.schema_version
-  if (version === undefined || version < 5) {
-    return migrateScenarioV4ToV5(raw)
+  if (version === undefined || version < 6) {
+    return migrateScenarioV5ToV6(raw)
   }
-  return M1DataSchemaV5.parse(raw)
+  return M1DataSchemaV6.parse(raw)
 }
 
 /** 构造初始 World（含 Zod 校验 + ownership 引用完整性 + polygon/adjacency 派发） */
@@ -291,11 +293,11 @@ export function createInitialWorld(data: M0Data, seed: number): World {
 }
 
 export function createWorldFromM1Data(
-  data: M1DataV5,
+  data: M1DataV6,
   seed: number,
   playerRealmId: RealmId,
 ): World {
-  M1DataSchemaV5.parse(data)
+  M1DataSchemaV6.parse(data)
 
   const realms = buildRealmMap(data.realms)
   const sites = buildSites(data.sites, data.edges, data.initialOwnership, realms)
@@ -401,6 +403,11 @@ export function createWorldFromM1Data(
     })
   }
 
+  const academies = new Map<AcademyId, Academy>()
+  for (const academy of (data.academies ?? []) as Academy[]) {
+    academies.set(academy.id, academy)
+  }
+
   return {
     date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
     tick: 0,
@@ -418,7 +425,7 @@ export function createWorldFromM1Data(
     zhouInvestiture,
     generals,
     rulers,
-    academies: new Map(),
+    academies,
     eventChainStates,
     reformStates,
     disasterStates,

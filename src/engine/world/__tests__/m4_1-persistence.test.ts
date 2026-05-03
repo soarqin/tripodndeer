@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
-import { M1DataSchemaV5, type M1DataV5 } from '~/shared/schemas'
+import { M1DataSchemaV6, type M1DataV6 } from '~/shared/schemas'
 
-type V5ReformState = M1DataV5['reformStates'][number]
+type V6ReformState = M1DataV6['reformStates'][number]
 
-const SAMPLE_REFORM_STATE: V5ReformState = {
+const SAMPLE_REFORM_STATE: V6ReformState = {
   realmId: 'realm_qin',
   reformId: 'reform_hu_fu_qi_she',
   currentStageId: 'wuling_proposal',
@@ -17,23 +17,23 @@ const SAMPLE_REFORM_STATE: V5ReformState = {
   ],
 }
 
-function buildV5WithReform(reformStates: V5ReformState[]): M1DataV5 {
+function buildV6WithReform(reformStates: V6ReformState[]): M1DataV6 {
   const base = loadM1Data()
   return { ...base, reformStates }
 }
 
 describe('M4.1 persistence: JSON round-trip', () => {
   it('preserves reformStates array through JSON.stringify + JSON.parse', () => {
-    const data = buildV5WithReform([SAMPLE_REFORM_STATE])
+    const data = buildV6WithReform([SAMPLE_REFORM_STATE])
     const json = JSON.stringify(data)
-    const parsed = M1DataSchemaV5.parse(JSON.parse(json))
+    const parsed = M1DataSchemaV6.parse(JSON.parse(json))
 
     expect(parsed.reformStates).toEqual([SAMPLE_REFORM_STATE])
-    expect(parsed.schema_version).toBe(5)
+    expect(parsed.schema_version).toBe(6)
   })
 
   it('preserves multiple reform states in deterministic order', () => {
-    const second: V5ReformState = {
+    const second: V6ReformState = {
       realmId: 'realm_zhao',
       reformId: 'reform_hu_fu_qi_she',
       currentStageId: 'stage1',
@@ -42,15 +42,15 @@ describe('M4.1 persistence: JSON round-trip', () => {
       status: 'paused',
       choiceHistory: [],
     }
-    const data = buildV5WithReform([SAMPLE_REFORM_STATE, second])
-    const parsed = M1DataSchemaV5.parse(JSON.parse(JSON.stringify(data)))
+    const data = buildV6WithReform([SAMPLE_REFORM_STATE, second])
+    const parsed = M1DataSchemaV6.parse(JSON.parse(JSON.stringify(data)))
 
     expect(parsed.reformStates).toHaveLength(2)
     expect(parsed.reformStates).toEqual([SAMPLE_REFORM_STATE, second])
   })
 
   it('preserves choiceHistory entries with full fidelity', () => {
-    const richState: V5ReformState = {
+    const richState: V6ReformState = {
       ...SAMPLE_REFORM_STATE,
       choiceHistory: [
         { stageId: 'stage1', choiceId: 'choice_a', tick: 1 },
@@ -58,16 +58,16 @@ describe('M4.1 persistence: JSON round-trip', () => {
         { stageId: 'stage3', choiceId: 'choice_c', tick: 73 },
       ],
     }
-    const data = buildV5WithReform([richState])
-    const parsed = M1DataSchemaV5.parse(JSON.parse(JSON.stringify(data)))
+    const data = buildV6WithReform([richState])
+    const parsed = M1DataSchemaV6.parse(JSON.parse(JSON.stringify(data)))
 
     expect(parsed.reformStates[0]?.choiceHistory).toEqual(richState.choiceHistory)
   })
 })
 
 describe('M4.1 persistence: createWorldFromM1Data populates reformStates Map', () => {
-  it('loads reformStates from M1DataV5 into world.reformStates Map keyed by realmId', () => {
-    const data = buildV5WithReform([SAMPLE_REFORM_STATE])
+  it('loads reformStates from M1DataV6 into world.reformStates Map keyed by realmId', () => {
+    const data = buildV6WithReform([SAMPLE_REFORM_STATE])
     const world = createWorldFromM1Data(data, 42, 'realm_qin')
 
     expect(world.reformStates.size).toBe(1)
@@ -75,16 +75,16 @@ describe('M4.1 persistence: createWorldFromM1Data populates reformStates Map', (
   })
 
   it('empty reformStates array yields empty world.reformStates Map', () => {
-    const data = buildV5WithReform([])
+    const data = buildV6WithReform([])
     const world = createWorldFromM1Data(data, 42, 'realm_qin')
 
     expect(world.reformStates.size).toBe(0)
   })
 
   it('full round-trip: World → array → JSON → parse → World preserves reform state', () => {
-    const original = createWorldFromM1Data(buildV5WithReform([SAMPLE_REFORM_STATE]), 42, 'realm_qin')
+    const original = createWorldFromM1Data(buildV6WithReform([SAMPLE_REFORM_STATE]), 42, 'realm_qin')
 
-    const reformStatesArray: V5ReformState[] = [...original.reformStates.values()].map((s) => ({
+    const reformStatesArray: V6ReformState[] = [...original.reformStates.values()].map((s) => ({
       realmId: s.realmId,
       reformId: s.reformId,
       currentStageId: s.currentStageId,
@@ -93,14 +93,14 @@ describe('M4.1 persistence: createWorldFromM1Data populates reformStates Map', (
       status: s.status,
       choiceHistory: [...s.choiceHistory],
     }))
-    const serialisable: M1DataV5 = buildV5WithReform(reformStatesArray)
+    const serialisable: M1DataV6 = buildV6WithReform(reformStatesArray)
     const json = JSON.stringify(serialisable)
-    const reparsed = M1DataSchemaV5.parse(JSON.parse(json))
+    const reparsed = M1DataSchemaV6.parse(JSON.parse(json))
     const reloaded = createWorldFromM1Data(reparsed, 42, 'realm_qin')
 
     expect(reloaded.reformStates.get('realm_qin')).toEqual(
       original.reformStates.get('realm_qin'),
     )
-    expect(reparsed.schema_version).toBe(5)
+    expect(reparsed.schema_version).toBe(6)
   })
 })

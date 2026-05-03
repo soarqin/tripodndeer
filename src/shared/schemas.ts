@@ -748,6 +748,13 @@ export const M1DataSchemaV5 = M1DataSchemaV4.extend({
 
 export type M1DataV5 = z.infer<typeof M1DataSchemaV5>
 
+export const M1DataSchemaV6 = M1DataSchemaV5.extend({
+  schema_version: z.literal(6),
+  academies: z.array(AcademySchema).optional().default([]),
+})
+
+export type M1DataV6 = z.infer<typeof M1DataSchemaV6>
+
 // World Schema (for runtime World validation)
 export const WorldSchema = z.object({
   date: z.object({

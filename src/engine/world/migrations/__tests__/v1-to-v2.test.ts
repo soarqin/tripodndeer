@@ -1,7 +1,7 @@
 import scenarioV1 from '@/content/m1/scenario.json'
 import { createWorldFromM1Data } from '@/engine/world/factory'
 import { migrateScenarioV1ToV2 } from '../v1-to-v2'
-import { migrateScenarioV4ToV5 } from '../v4-to-v5'
+import { migrateScenarioV5ToV6 } from '../v5-to-v6'
 import { M1DataSchema, M1DataSchemaV2 } from '@/shared/schemas'
 import { describe, expect, it } from 'vitest'
 import { ZodError } from 'zod'
@@ -26,7 +26,7 @@ describe('migrateScenarioV1ToV2', () => {
       expect(realm.stats).toEqual({ manpowerPool: 50000, manpowerCap: 80000, warWeariness: 0 })
     }
 
-    const world = createWorldFromM1Data(migrateScenarioV4ToV5(migrated), 99, 'realm_qin')
+    const world = createWorldFromM1Data(migrateScenarioV5ToV6(migrated), 99, 'realm_qin')
     expect(world.sites.size).toBe(50)
     expect(world.realms.size).toBe(8)
     expect(world.armies.size).toBe(16)
