@@ -15,6 +15,10 @@ const BANNER_TEXT_BY_EVENT_TYPE: Record<string, string> = {
   generalDied: '将领阵亡',
   passCaptured: '关隘易主',
   warDeclared: '宣战',
+  spyDetectedLowRisk: '敌方间者活动',
+  rumorSuccess: '谣言扩散',
+  discordSuccess: '挑拨成功',
+  counterIntelSuccess: '反谍捕获',
 }
 
 export function EventBanner() {
