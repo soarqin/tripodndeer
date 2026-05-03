@@ -2,7 +2,22 @@ import { useGameStore } from '~/ui/store'
 import { selectPlayerRealm, selectAllPlayerArmies, selectActivePanel } from '~/ui/store/selectors'
 import { RulerPanel } from '../RulerPanel'
 import { FactionStatusView } from '../FactionStatusView'
+import type { IdeologyLean } from '~/shared/types'
 import styles from './RealmOverviewPanel.module.css'
+
+function getTopIdeology(lean?: IdeologyLean): string {
+  if (!lean) return '无'
+  let top = '无'
+  let max = -1
+  for (const [k, v] of Object.entries(lean)) {
+    if (v > max) {
+      max = v
+      top = k
+    }
+  }
+  return top
+}
+
 export function RealmOverviewPanel() {
   const activePanel = useGameStore(selectActivePanel)
   const realm = useGameStore(selectPlayerRealm)
@@ -56,6 +71,14 @@ export function RealmOverviewPanel() {
         <div className={styles.stat}>
           <span className={styles.label}>敌对</span>
           <span className={styles.value}>{warCount} 国</span>
+        </div>
+        <div className={styles.stat} data-testid="prestige-value">
+          <span className={styles.label}>威望</span>
+          <span className={styles.value}>{realm.prestige ?? 0}</span>
+        </div>
+        <div className={styles.stat} data-testid="ideology-top">
+          <span className={styles.label}>主导</span>
+          <span className={styles.value}>{getTopIdeology(realm.ideologyLean)}</span>
         </div>
       </div>
       {world.rulers.has(realm.id) && <RulerPanel />}

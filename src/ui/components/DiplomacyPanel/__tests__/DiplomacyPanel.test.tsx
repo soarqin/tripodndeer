@@ -47,6 +47,7 @@ describe('DiplomacyPanel', () => {
       feedbackList: [],
       coalitionPressure: [],
       zhouInvestiture: null,
+      world: { realms: new Map() },
       closeDiplomacyPanel: mockCloseDiplomacyPanel,
       submitPlayerDiplomacyAction: mockSubmitPlayerDiplomacyAction,
       openPeacePanel: mockOpenPeacePanel

@@ -9,6 +9,8 @@ import {
 } from '~/ui/store/selectors'
 import styles from './DiplomacyPanel.module.css'
 import { useState } from 'react'
+import { cosineSimilarity } from '~/engine/systems/culture/ideology-distance'
+import { M6_PRESTIGE_DIFFERENTIAL_WEIGHT, M6_IDEOLOGY_DISTANCE_WEIGHT } from '~/content/m2/balance'
 
 const ACTION_LABELS: Record<string, string> = {
   envoy: '遣使',
@@ -47,9 +49,26 @@ export function DiplomacyPanel() {
   const coalitionPressure = useGameStore(selectCoalitionPressure)
   const zhouInvestiture = useGameStore(selectPlayerZhouInvestiture)
 
+  const targetRealm = useGameStore(state => targetRealmId ? state.world.realms.get(targetRealmId) : undefined)
+
   const [localFeedback, setLocalFeedback] = useState<{ ok: boolean; message: string } | null>(null)
 
   if ((!targetRealmId && activePanel !== 'waijiao') || !playerRealm) return null
+
+  let ideologyBonus = 0
+  let prestigeDiff = 0
+  if (targetRealm) {
+    const proposerPrestige = playerRealm.prestige ?? 0
+    const targetPrestige = targetRealm.prestige ?? 0
+    prestigeDiff = Math.round(M6_PRESTIGE_DIFFERENTIAL_WEIGHT * (proposerPrestige - targetPrestige))
+
+    const proposerLean = playerRealm.ideologyLean
+    const targetLean = targetRealm.ideologyLean
+    if (proposerLean && targetLean) {
+      const similarity = cosineSimilarity(proposerLean, targetLean)
+      ideologyBonus = Math.round(M6_IDEOLOGY_DISTANCE_WEIGHT * similarity)
+    }
+  }
 
   const summary = targetRealmId ? relationSummaries.find(s => s.counterpartRealmId === targetRealmId) : undefined
   
@@ -191,6 +210,14 @@ export function DiplomacyPanel() {
                 ) : (
                   <>
                     <p>最新状态: {STATUS_LABELS[latestFeedback.status] || '处理中'}</p>
+                    {latestFeedback.acceptanceScore !== null && (
+                      <p>
+                        接受度:{' '}
+                        <span title={`意识形态相近 +${ideologyBonus} / 威望差 ${prestigeDiff}`}>
+                          {latestFeedback.acceptanceScore}
+                        </span>
+                      </p>
+                    )}
                     {latestFeedback.reason && <p>原因: {REJECTION_REASONS[latestFeedback.reason] || '行动暂不可用'}</p>}
                   </>
                 )}
