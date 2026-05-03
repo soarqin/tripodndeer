@@ -40,6 +40,8 @@ import type {
   ArmyId,
   CoalitionId,
   CoalitionState,
+  CounterIntelState,
+  CoverageKey,
   CulturalTag,
   DisasterState,
   DiplomaticProposal,
@@ -56,6 +58,8 @@ import type {
   ZhouInvestitureState,
   RelationKey,
   RulerState,
+  SpyMission,
+  SpyMissionId,
   TradeRoute,
   TradeRouteId,
   Treaty,
@@ -81,6 +85,7 @@ import type {
   WarState,
   World,
 } from '@/shared/types'
+import { makeCoverageKey } from '@/shared/types'
 import type { M1DataV6 } from '@/shared/schemas'
 import { migrateScenarioV5ToV6 } from './migrations/v5-to-v6'
 
@@ -233,6 +238,34 @@ function buildEdgesMap(edges: Record<EdgeId, MapEdge>): Map<EdgeId, MapEdge> {
   return new Map(Object.entries(edges))
 }
 
+function buildInitialIntelligenceCoverage(
+  realmIds: readonly RealmId[],
+): Map<CoverageKey, number> {
+  const sorted = [...realmIds].sort((a, b) => a.localeCompare(b))
+  const coverage = new Map<CoverageKey, number>()
+  for (const observer of sorted) {
+    for (const target of sorted) {
+      if (observer === target) continue
+      coverage.set(makeCoverageKey(observer, target), 0)
+    }
+  }
+  return coverage
+}
+
+function buildInitialCounterIntelStates(
+  realmIds: readonly RealmId[],
+): Map<RealmId, CounterIntelState> {
+  const states = new Map<RealmId, CounterIntelState>()
+  for (const realmId of realmIds) {
+    states.set(realmId, {
+      realmId,
+      detectionLevel: 0,
+      lastUpdatedTick: 0,
+    })
+  }
+  return states
+}
+
 /** 加载并验证 M0 地图数据（静态 import + Zod 校验） */
 export function loadM0Data(): M0Data {
   return M0DataSchema.parse(m0Data)
@@ -285,6 +318,9 @@ export function createInitialWorld(data: M0Data, seed: number): World {
     sieges: new Map<SiegeId, Siege>(),
     edicts: new Map<EdictId, EdictState>(),
     governorAssignments: new Map<SiteId, GovernorAssignment>(),
+    intelligenceCoverage: buildInitialIntelligenceCoverage(data.realms.map(r => r.id)),
+    spyMissions: new Map<SpyMissionId, SpyMission>(),
+    counterIntelStates: buildInitialCounterIntelStates(data.realms.map(r => r.id)),
     playerRealmId: data.realms[0]?.id ?? '',
     rngState: { seed, counter: 0 },
     phases: [],
@@ -436,6 +472,9 @@ export function createWorldFromM1Data(
     sieges: new Map<SiegeId, Siege>(),
     edicts: new Map<EdictId, EdictState>(),
     governorAssignments: new Map<SiteId, GovernorAssignment>(),
+    intelligenceCoverage: buildInitialIntelligenceCoverage(data.realms.map(r => r.id)),
+    spyMissions: new Map<SpyMissionId, SpyMission>(),
+    counterIntelStates: buildInitialCounterIntelStates(data.realms.map(r => r.id)),
     playerRealmId,
     rngState: { seed, counter: 0 },
     phases: [

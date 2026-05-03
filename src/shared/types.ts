@@ -885,6 +885,9 @@ export interface World {
   sieges: ReadonlyMap<SiegeId, Siege>
   edicts: ReadonlyMap<EdictId, EdictState>
   governorAssignments: ReadonlyMap<SiteId, GovernorAssignment>
+  intelligenceCoverage: IntelligenceCoverage
+  spyMissions: ReadonlyMap<SpyMissionId, SpyMission>
+  counterIntelStates: ReadonlyMap<RealmId, CounterIntelState>
   playerRealmId: RealmId
   rngState: RNGState // PRNG 状态在 World，不在 module 闭包
   phases: readonly TickPhase[] // Tick 阶段数组（M0 仅 1 个，但形状必须是数组）
