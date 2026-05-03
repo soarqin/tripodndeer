@@ -12,6 +12,7 @@ import type {
 import { createInitialRng } from '~/engine/random'
 import { diplomacyLifecycleStep, relationKey } from '~/engine/systems/diplomacy'
 import { warKey } from '~/engine/wars'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { aiPlanStep } from '../index'
 
 const DATE = { yearBC: 300, season: 'spring', month: 1, xun: 'shang' } as const
@@ -110,7 +111,7 @@ function antiQinCoalition(memberRealmIds: readonly RealmId[] = [han, wei, zhao])
 }
 
 function baseWorld(overrides: Partial<World> = {}): World {
-  return {
+  return makeEmptyWorld({
     date: DATE,
     tick: 3,
     sites: new Map([
@@ -125,34 +126,10 @@ function baseWorld(overrides: Partial<World> = {}): World {
       [wei, makeRealm(wei)],
       [zhao, makeRealm(zhao)],
     ]),
-    armies: new Map(),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    rulers: new Map(),
-    eventChainStates: new Map(),
-    reformStates: new Map(),
-    disasterStates: new Map(),
-    tradeRoutes: new Map(),
-    factionInfluences: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
     playerRealmId: qin,
     rngState: createInitialRng(7),
-    phases: [],
-    pendingOrders: [],
     ...overrides,
-  }
+  })
 }
 
 function serializeDiplomacy(world: World): string {

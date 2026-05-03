@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { economyPhase } from '../economy-phase'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   GameDate,
   Realm,
@@ -52,38 +53,13 @@ function makeSite(id: string, ownerId: string | null, population: number): Site 
 }
 
 function makeWorld(realm: Realm, sites: readonly Site[]): World {
-  return {
+  return makeEmptyWorld({
     date: shangDate,
-    tick: 0,
     sites: new Map(sites.map((s) => [s.id, s])),
     realms: new Map([[realm.id, realm]]),
-    armies: new Map(),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    rulers: new Map(),
-    eventChainStates: new Map(),
-    reformStates: new Map(),
-    disasterStates: new Map(),
-    tradeRoutes: new Map(),
-    factionInfluences: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
     playerRealmId: realm.id,
     rngState: rng,
-    phases: [],
-    pendingOrders: [],
-  }
+  })
 }
 
 describe('economy trait integration', () => {

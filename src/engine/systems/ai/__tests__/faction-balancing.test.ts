@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { evaluateFactionBalanceAction } from '../faction-balancing'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   EdictState,
   FactionId,
@@ -39,38 +40,14 @@ function makeWorld(opts: {
   edicts?: ReadonlyMap<string, EdictState>
   tick?: number
 }): World {
-  return {
-    date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
+  return makeEmptyWorld({
     tick: opts.tick ?? 100,
-    sites: new Map(),
     realms: new Map([[opts.realm.id, opts.realm]]),
-    armies: new Map(),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    rulers: new Map(),
-    eventChainStates: new Map(),
-    reformStates: new Map(),
-    disasterStates: new Map(),
-    tradeRoutes: new Map(),
     factionInfluences: opts.factionInfluences ?? new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
     edicts: opts.edicts ?? new Map(),
-    governorAssignments: new Map(),
     playerRealmId: opts.playerRealmId ?? 'realm_player',
     rngState: { seed: 42, counter: 0 },
-    phases: [],
-    pendingOrders: [],
-  } as unknown as World
+  })
 }
 
 describe('evaluateFactionBalanceAction', () => {

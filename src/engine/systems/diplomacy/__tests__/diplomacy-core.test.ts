@@ -11,6 +11,7 @@ import type {
   World,
 } from '~/shared/types'
 import { warKey } from '~/engine/wars'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import {
   clampAttitude,
   clampRelation,
@@ -126,7 +127,7 @@ function makeRelation(overrides: Partial<DiplomaticRelation> = {}): DiplomaticRe
 }
 
 function baseWorld(overrides: Partial<World> = {}): World {
-  return {
+  return makeEmptyWorld({
     date: DATE,
     tick: 4,
     sites: new Map([
@@ -142,33 +143,10 @@ function baseWorld(overrides: Partial<World> = {}): World {
       ['army_qin', makeArmy('army_qin', qin, 5000)],
       ['army_han', makeArmy('army_han', han, 1000)],
     ]),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
     relations: new Map([[relationKey(qin, han), makeRelation()]]),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    rulers: new Map(),
-    eventChainStates: new Map(),
-    reformStates: new Map(),
-    disasterStates: new Map(),
-    tradeRoutes: new Map(),
-    factionInfluences: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
     playerRealmId: qin,
-    rngState: { seed: 0, counter: 0 },
-    phases: [],
-    pendingOrders: [],
     ...overrides,
-  }
+  })
 }
 
 describe('diplomacy relation helpers', () => {

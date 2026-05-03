@@ -3,6 +3,7 @@ import type { Army, GameEvent, MapEdge, Realm, RNGState, Site, WarState, World }
 import { createInitialRng } from '~/engine/random'
 import { warKey } from '~/engine/wars'
 import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { aiPlanStep } from '../index'
 
 function makeWarState(): WarState {
@@ -83,7 +84,7 @@ function baseWorld(overrides: Partial<World> = {}): World {
     anchors: [],
   }
 
-  return {
+  return makeEmptyWorld({
     date: { yearBC: 300, season: 'spring', month: 1, xun: 'shang' },
     tick: 3,
     sites: new Map([
@@ -106,32 +107,10 @@ function baseWorld(overrides: Partial<World> = {}): World {
       ['edge_ai_enemy', sharedEdge],
       ['edge_enemy_distant', distantEdge],
     ]),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    rulers: new Map(),
-    eventChainStates: new Map(),
-    reformStates: new Map(),
-    disasterStates: new Map(),
-    tradeRoutes: new Map(),
-    factionInfluences: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
     playerRealmId,
     rngState: createInitialRng(1),
-    phases: [],
-    pendingOrders: [],
     ...overrides,
-  }
+  })
 }
 
 describe('aiPlanStep cadence and realm eligibility', () => {

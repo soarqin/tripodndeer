@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { setCombatVarianceEnabled } from '~/engine/random'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { Army, General, RNGState, Site, World } from '~/shared/types'
 import { resolveCombat as resolveLegacyCombat } from '../../combat/combat'
 import { resolveCombat } from '../combat-v2'
@@ -56,38 +57,13 @@ function makeWorld(
   generals: readonly General[] = [],
   yearBC = 260,
 ): World {
-  return {
+  return makeEmptyWorld({
     date: { yearBC, season: 'spring', month: 1, xun: 'shang' },
-    tick: 0,
     sites: new Map(sites.map((site) => [site.id, site])),
-    realms: new Map(),
     armies: new Map(armies.map((army) => [army.id, army])),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
     generals: new Map(generals.map((general) => [general.id, general])),
-    rulers: new Map(),
-    eventChainStates: new Map(),
-    reformStates: new Map(),
-    disasterStates: new Map(),
-    tradeRoutes: new Map(),
-    factionInfluences: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
-    playerRealmId: 'realm_qin',
     rngState: rng,
-    phases: [],
-    pendingOrders: [],
-  }
+  })
 }
 
 function makeContext(overrides: Partial<BattleContext> = {}): BattleContext {

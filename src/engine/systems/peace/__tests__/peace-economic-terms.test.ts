@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { economyPhase } from '~/engine/systems/economy/economy-phase'
 import { warKey } from '~/engine/wars'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { GameDate, PeaceProposal, Realm, RNGState, WarState, World } from '~/shared/types'
 import { acceptProposal, createPeaceProposal } from '../index'
 
@@ -37,42 +38,18 @@ function makeWarState(): WarState {
 }
 
 function baseWorld(overrides: Partial<World> = {}): World {
-  return {
+  return makeEmptyWorld({
     date: DATE,
     tick: 12,
-    sites: new Map(),
     realms: new Map([
       [proposingRealmId, makeRealm(proposingRealmId, 0)],
       [targetRealmId, makeRealm(targetRealmId, 0)],
     ]),
-    armies: new Map(),
-    edges: new Map(),
     wars: new Map([[warKey(proposingRealmId, targetRealmId), makeWarState()]]),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    rulers: new Map(),
-    eventChainStates: new Map(),
-    reformStates: new Map(),
-    disasterStates: new Map(),
-    tradeRoutes: new Map(),
-    factionInfluences: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
     playerRealmId: proposingRealmId,
     rngState: RNG,
-    phases: [],
-    pendingOrders: [],
     ...overrides,
-  }
+  })
 }
 
 function withRealms(proposerTreasury: number, targetTreasury: number, proposerFood = 0, targetFood = 0): World {

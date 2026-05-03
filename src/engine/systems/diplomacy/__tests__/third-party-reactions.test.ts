@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Army, DiplomaticRelation, GameDate, Realm, Site, Treaty, World } from '~/shared/types'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { applyDiplomacyAction, applyThirdPartyReactions, relationKey } from '../index'
 
 const DATE: GameDate = { yearBC: 260, season: 'spring', month: 1, xun: 'shang' }
@@ -68,7 +69,7 @@ function makeTreaty(overrides: Partial<Treaty> = {}): Treaty {
 }
 
 function baseWorld(overrides: Partial<World> = {}): World {
-  return {
+  return makeEmptyWorld({
     date: DATE,
     tick: 8,
     sites: new Map([
@@ -89,33 +90,10 @@ function baseWorld(overrides: Partial<World> = {}): World {
       ['army_wei', makeArmy('army_wei', wei)],
       ['army_zhao', makeArmy('army_zhao', zhao)],
     ]),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    rulers: new Map(),
-    eventChainStates: new Map(),
-    reformStates: new Map(),
-    disasterStates: new Map(),
-    tradeRoutes: new Map(),
-    factionInfluences: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
     playerRealmId: qin,
     rngState: { seed: 42, counter: 0 },
-    phases: [],
-    pendingOrders: [],
     ...overrides,
-  }
+  })
 }
 
 describe('third-party diplomacy reactions', () => {

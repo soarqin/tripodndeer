@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { economyPhase } from '../economy-phase'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   EdictKind,
   EdictState,
@@ -109,7 +110,7 @@ function makeGovernorGeneral(id: string, realmId: string, zheng: number): Genera
 }
 
 function makeWorld(date: GameDate = shangDate): World {
-  return {
+  return makeEmptyWorld({
     date,
     tick: 12,
     sites: new Map([
@@ -122,33 +123,8 @@ function makeWorld(date: GameDate = shangDate): World {
       ['realm_zhao', makeRealm('realm_zhao', 7, 500, 10)],
       ['realm_qin', makeRealm('realm_qin', 3, 3, 50)],
     ]),
-    armies: new Map(),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    rulers: new Map(),
-    eventChainStates: new Map(),
-    reformStates: new Map(),
-    disasterStates: new Map(),
-    tradeRoutes: new Map(),
-    factionInfluences: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
-    playerRealmId: 'realm_qin',
     rngState: rng,
-    phases: [],
-    pendingOrders: [],
-  }
+  })
 }
 
 describe('economyPhase monthly settlement', () => {

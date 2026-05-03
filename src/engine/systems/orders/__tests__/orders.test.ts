@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Army, General, MapEdge, Order, RNGState, Realm, Site, WarState, World } from '~/shared/types'
 import { warKey } from '~/engine/wars'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 
 function makeWarState(): WarState {
   return {
@@ -89,9 +90,7 @@ function baseWorld(overrides: Partial<World> = {}): World {
     anchors: [],
   }
 
-  return {
-    date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
-    tick: 0,
+  return makeEmptyWorld({
     sites: new Map([
       ['site_a', makeSite('site_a', playerRealmId, ['site_b'], ['edge_a_b'])],
       ['site_b', makeSite('site_b', enemyRealmId, ['site_a', 'site_c'], ['edge_a_b', 'edge_b_c'])],
@@ -106,32 +105,9 @@ function baseWorld(overrides: Partial<World> = {}): World {
       ['edge_a_b', sharedEdge],
       ['edge_b_c', otherEdge],
     ]),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    rulers: new Map(),
-    eventChainStates: new Map(),
-    reformStates: new Map(),
-    disasterStates: new Map(),
-    tradeRoutes: new Map(),
-    factionInfluences: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
     playerRealmId,
-    rngState: { seed: 0, counter: 0 },
-    phases: [],
-    pendingOrders: [],
     ...overrides,
-  }
+  })
 }
 
 const rng: RNGState = { seed: 0, counter: 0 }

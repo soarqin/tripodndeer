@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Army, GameDate, Realm, Site, World } from '~/shared/types'
 import { warKey } from '~/engine/wars'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { applyDiplomacyAction, createCoalitionId, diplomacyLifecycleStep, updateCoalitionPressure } from '../index'
 
 const DATE: GameDate = { yearBC: 260, season: 'spring', month: 1, xun: 'shang' }
@@ -45,7 +46,7 @@ function makeArmy(id: string, realmId: string, manpower: number): Army {
 }
 
 function baseWorld(overrides: Partial<World> = {}): World {
-  return {
+  return makeEmptyWorld({
     date: DATE,
     tick: 12,
     sites: new Map([
@@ -71,33 +72,10 @@ function baseWorld(overrides: Partial<World> = {}): World {
       ['army_zhao', makeArmy('army_zhao', zhao, 1000)],
       ['army_yan', makeArmy('army_yan', yan, 1000)],
     ]),
-    edges: new Map(),
-    wars: new Map(),
-    peaceProposals: new Map(),
-    relations: new Map(),
-    diplomaticProposals: new Map(),
-    treaties: new Map(),
-    diplomacyHistory: [],
-    coalitions: new Map(),
-    zhouInvestiture: new Map(),
-    generals: new Map(),
-    rulers: new Map(),
-    eventChainStates: new Map(),
-    reformStates: new Map(),
-    disasterStates: new Map(),
-    tradeRoutes: new Map(),
-    factionInfluences: new Map(),
-    passes: new Map(),
-    adjacencyEdges: new Map(),
-    sieges: new Map(),
-    edicts: new Map(),
-    governorAssignments: new Map(),
     playerRealmId: qin,
     rngState: { seed: 42, counter: 0 },
-    phases: [],
-    pendingOrders: [],
     ...overrides,
-  }
+  })
 }
 
 function serializeDiplomacy(world: World): string {
