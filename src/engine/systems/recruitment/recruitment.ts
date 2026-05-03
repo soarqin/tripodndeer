@@ -1,9 +1,13 @@
 import type {
+  Academy,
   Ambition,
   CharacterRecruitedEvent,
   GameEvent,
   General,
   GeneralId,
+  Ideology,
+  IdeologyLean,
+  RealmId,
   RNGState,
   Specialty,
   World,
@@ -13,6 +17,9 @@ import { isYearStart } from '~/engine/calendar'
 import {
   M5_RECRUITMENT_PER_REALM_PER_YEAR,
   M5_SPECIALTY_WEIGHTS_RECRUITMENT,
+  M6_ACADEMY_HOST_RATIO,
+  M6_ACADEMY_NEAR_RATIO,
+  M6_ENABLED,
 } from '~/content/m2/balance'
 
 const NAME_POOL: readonly string[] = [
@@ -23,6 +30,9 @@ const NAME_POOL: readonly string[] = [
   '正', '直', '刚', '毅', '明', '达', '通', '博', '雅', '清',
   '洁', '纯', '朴', '诚', '实', '厚', '重', '慎', '谦', '和',
 ]
+
+const ALL_IDEOLOGIES: readonly Ideology[] = ['fa', 'ru', 'dao', 'mo', 'zonghen', 'bing']
+const ZERO_LEAN: IdeologyLean = { fa: 0, ru: 0, dao: 0, mo: 0, zonghen: 0, bing: 0 }
 
 function pickSpecialty(rng: RNGState): { specialty: Specialty; nextRng: RNGState } {
   const roll = nextRng(rng)
@@ -63,6 +73,86 @@ function rollAmbition(rng: RNGState): { ambition: Ambition; nextRng: RNGState } 
   return { ambition, nextRng: roll.nextState }
 }
 
+function cosineSimilarity(a: IdeologyLean, b: IdeologyLean): number {
+  let dot = 0
+  let magA = 0
+  let magB = 0
+  for (const k of ALL_IDEOLOGIES) {
+    dot += a[k] * b[k]
+    magA += a[k] ** 2
+    magB += b[k] ** 2
+  }
+  if (magA === 0 || magB === 0) return 0
+  return dot / (Math.sqrt(magA) * Math.sqrt(magB))
+}
+
+function rankRealmsByIdeology(world: World, hostRealmId: RealmId): readonly RealmId[] {
+  const host = world.realms.get(hostRealmId)
+  if (!host) return []
+  const hostLean = host.ideologyLean ?? ZERO_LEAN
+  return [...world.realms.values()]
+    .filter((r) => r.id !== hostRealmId)
+    .map((r) => ({ id: r.id, sim: cosineSimilarity(hostLean, r.ideologyLean ?? ZERO_LEAN) }))
+    .sort((a, b) => {
+      if (b.sim !== a.sim) return b.sim - a.sim
+      return a.id.localeCompare(b.id)
+    })
+    .map((x) => x.id)
+}
+
+function pickAcademyTarget(world: World, hostRealmId: RealmId, roll: number): RealmId {
+  if (roll < M6_ACADEMY_HOST_RATIO) return hostRealmId
+
+  const ranked = rankRealmsByIdeology(world, hostRealmId)
+  if (ranked.length === 0) return hostRealmId
+
+  if (roll < M6_ACADEMY_HOST_RATIO + M6_ACADEMY_NEAR_RATIO) {
+    return ranked[0]!
+  }
+  return ranked[1] ?? ranked[0] ?? hostRealmId
+}
+
+interface RolledTalent {
+  readonly attrs: General['attrs']
+  readonly specialty: Specialty
+  readonly ambition: Ambition
+  readonly name: string
+  readonly nextRng: RNGState
+}
+
+function rollTalent(rng: RNGState, existingNames: Set<string>): RolledTalent {
+  let currentRng = rng
+  const wu = rollAttr(currentRng); currentRng = wu.nextRng
+  const zheng = rollAttr(currentRng); currentRng = zheng.nextRng
+  const jiao = rollAttr(currentRng); currentRng = jiao.nextRng
+  const mou = rollAttr(currentRng); currentRng = mou.nextRng
+  const xue = rollAttr(currentRng); currentRng = xue.nextRng
+  const po = rollAttr(currentRng); currentRng = po.nextRng
+
+  const specialtyRoll = pickSpecialty(currentRng); currentRng = specialtyRoll.nextRng
+  const ambitionRoll = rollAmbition(currentRng); currentRng = ambitionRoll.nextRng
+  const nameRoll = pickName(currentRng, existingNames); currentRng = nameRoll.nextRng
+
+  return {
+    attrs: {
+      wu: wu.value,
+      zheng: zheng.value,
+      jiao: jiao.value,
+      mou: mou.value,
+      xue: xue.value,
+      po: po.value,
+    },
+    specialty: specialtyRoll.specialty,
+    ambition: ambitionRoll.ambition,
+    name: nameRoll.name,
+    nextRng: currentRng,
+  }
+}
+
+function makeAcademyGeneralId(academy: Academy, tick: number, slot: number): GeneralId {
+  return `gen_academy_${academy.id}_${tick}_${slot}`
+}
+
 export function recruitmentPhase(
   world: World,
   rng: RNGState,
@@ -79,39 +169,63 @@ export function recruitmentPhase(
   const sortedRealmIds = [...world.realms.keys()].sort((a, b) => a.localeCompare(b))
 
   for (const realmId of sortedRealmIds) {
+    if (M6_ENABLED) {
+      const realmAcademies = [...world.academies.values()]
+        .filter((a) => a.hostRealmId === realmId && a.status === 'active')
+        .sort((a, b) => a.id.localeCompare(b.id))
+
+      let academySlot = 0
+      for (const academy of realmAcademies) {
+        const targetRoll = nextRng(currentRng); currentRng = targetRoll.nextState
+        const targetRealmId = pickAcademyTarget(world, realmId, targetRoll.value)
+
+        const talent = rollTalent(currentRng, existingNames); currentRng = talent.nextRng
+        existingNames.add(talent.name)
+
+        const generalId = makeAcademyGeneralId(academy, world.tick, academySlot)
+        academySlot += 1
+
+        const newGeneral: General = {
+          id: generalId,
+          realmId: targetRealmId,
+          name: talent.name,
+          might: talent.attrs!.wu,
+          command: talent.attrs!.wu,
+          loyalty: 80,
+          attrs: talent.attrs,
+          specialty: talent.specialty,
+          ambition: talent.ambition,
+          age: 25,
+          recruitedAtTick: world.tick,
+          posts: [],
+          loyaltyState: 'loyal',
+          almaMater: academy.id,
+        }
+
+        generals.set(generalId, newGeneral)
+        events.push({
+          type: 'characterRecruited',
+          payload: { generalId, realmId: targetRealmId, name: talent.name },
+        })
+      }
+    }
+
     for (let i = 0; i < M5_RECRUITMENT_PER_REALM_PER_YEAR; i++) {
-      const wu = rollAttr(currentRng); currentRng = wu.nextRng
-      const zheng = rollAttr(currentRng); currentRng = zheng.nextRng
-      const jiao = rollAttr(currentRng); currentRng = jiao.nextRng
-      const mou = rollAttr(currentRng); currentRng = mou.nextRng
-      const xue = rollAttr(currentRng); currentRng = xue.nextRng
-      const po = rollAttr(currentRng); currentRng = po.nextRng
-
-      const specialtyRoll = pickSpecialty(currentRng); currentRng = specialtyRoll.nextRng
-      const ambitionRoll = rollAmbition(currentRng); currentRng = ambitionRoll.nextRng
-
-      const nameRoll = pickName(currentRng, existingNames); currentRng = nameRoll.nextRng
-      existingNames.add(nameRoll.name)
+      const talent = rollTalent(currentRng, existingNames); currentRng = talent.nextRng
+      existingNames.add(talent.name)
 
       const generalId: GeneralId = `gen_wild_${realmId}_${world.tick}_${i}`
 
       const newGeneral: General = {
         id: generalId,
         realmId,
-        name: nameRoll.name,
-        might: wu.value,
-        command: wu.value,
+        name: talent.name,
+        might: talent.attrs!.wu,
+        command: talent.attrs!.wu,
         loyalty: 80,
-        attrs: {
-          wu: wu.value,
-          zheng: zheng.value,
-          jiao: jiao.value,
-          mou: mou.value,
-          xue: xue.value,
-          po: po.value,
-        },
-        specialty: specialtyRoll.specialty,
-        ambition: ambitionRoll.ambition,
+        attrs: talent.attrs,
+        specialty: talent.specialty,
+        ambition: talent.ambition,
         age: 25,
         recruitedAtTick: world.tick,
         posts: [],
@@ -121,7 +235,7 @@ export function recruitmentPhase(
       generals.set(generalId, newGeneral)
       events.push({
         type: 'characterRecruited',
-        payload: { generalId, realmId, name: nameRoll.name },
+        payload: { generalId, realmId, name: talent.name },
       })
     }
   }
