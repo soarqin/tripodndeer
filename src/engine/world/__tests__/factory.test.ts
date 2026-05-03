@@ -11,6 +11,7 @@ import { prestigeUpdatePhase } from '@/engine/systems/culture/prestige-update-ph
 import { diplomacyLifecycleStep } from '@/engine/systems/diplomacy'
 import { disasterPhase } from '@/engine/systems/disaster/disaster-phase'
 import { economyPhase } from '@/engine/systems/economy'
+import { espionagePhase } from '@/engine/systems/espionage/espionage-phase'
 import { factionPhase } from '@/engine/systems/faction/faction-phase'
 import { historicalEventsPhase } from '@/engine/systems/events'
 import { manpowerTick } from '@/engine/systems/manpower'
@@ -55,6 +56,7 @@ function phaseName(phase: TickPhase): string {
   if (phase === combatV2Step) return 'combat-v2'
   if (phase === culturalIdentityPhase) return 'culturalIdentity'
   if (phase === manpowerTick) return 'manpower'
+  if (phase === espionagePhase) return 'espionage'
   if (phase === rulerLifecyclePhase) return 'rulerLifecycle'
   if (phase === characterLifecyclePhase) return 'characterLifecycle'
   if (phase === recruitmentPhase) return 'recruitment'
@@ -219,6 +221,7 @@ describe('createWorldFromM1Data — structure', () => {
       combatV2Step,
       culturalIdentityPhase,
       manpowerTick,
+      espionagePhase,
       rulerLifecyclePhase,
       characterLifecyclePhase,
       recruitmentPhase,

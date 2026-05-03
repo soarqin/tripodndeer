@@ -11,6 +11,7 @@ import { prestigeUpdatePhase } from '~/engine/systems/culture/prestige-update-ph
 import { diplomacyLifecycleStep } from '~/engine/systems/diplomacy'
 import { disasterPhase } from '~/engine/systems/disaster/disaster-phase'
 import { economyPhase } from '~/engine/systems/economy'
+import { espionagePhase } from '~/engine/systems/espionage/espionage-phase'
 import { factionPhase } from '~/engine/systems/faction/faction-phase'
 import { historicalEventsPhase } from '~/engine/systems/events'
 import { manpowerTick } from '~/engine/systems/manpower'
@@ -489,6 +490,7 @@ export function createWorldFromM1Data(
       combatV2Step,
       culturalIdentityPhase,
       manpowerTick,
+      espionagePhase,
       rulerLifecyclePhase,
       characterLifecyclePhase,
       recruitmentPhase,

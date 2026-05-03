@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { PHASE_NAMES, PHASE_ORDER } from '../index'
 
 describe('phase chain constants', () => {
-  it('PHASE_ORDER has exactly 20 phases', () => {
-    expect(PHASE_ORDER.length).toBe(20)
+  it('PHASE_ORDER has exactly 21 phases', () => {
+    expect(PHASE_ORDER.length).toBe(21)
   })
 
   it('PHASE_ORDER is in correct order', () => {
@@ -14,19 +14,20 @@ describe('phase chain constants', () => {
     expect(PHASE_ORDER[4]).toBe(PHASE_NAMES.COMBAT_V2)
     expect(PHASE_ORDER[5]).toBe(PHASE_NAMES.CULTURAL_IDENTITY)
     expect(PHASE_ORDER[6]).toBe(PHASE_NAMES.MANPOWER)
-    expect(PHASE_ORDER[7]).toBe(PHASE_NAMES.RULER_LIFECYCLE)
-    expect(PHASE_ORDER[8]).toBe(PHASE_NAMES.CHARACTER_LIFECYCLE)
-    expect(PHASE_ORDER[9]).toBe(PHASE_NAMES.RECRUITMENT)
-    expect(PHASE_ORDER[10]).toBe(PHASE_NAMES.IDEOLOGY_DRIFT)
-    expect(PHASE_ORDER[11]).toBe(PHASE_NAMES.REFORM)
-    expect(PHASE_ORDER[12]).toBe(PHASE_NAMES.VICTORY_CHECK)
-    expect(PHASE_ORDER[13]).toBe(PHASE_NAMES.DIPLOMACY_LIFECYCLE)
-    expect(PHASE_ORDER[14]).toBe(PHASE_NAMES.ECONOMY)
-    expect(PHASE_ORDER[15]).toBe(PHASE_NAMES.DISASTER)
-    expect(PHASE_ORDER[16]).toBe(PHASE_NAMES.TRADE)
-    expect(PHASE_ORDER[17]).toBe(PHASE_NAMES.FACTION)
-    expect(PHASE_ORDER[18]).toBe(PHASE_NAMES.HISTORICAL_EVENTS)
-    expect(PHASE_ORDER[19]).toBe(PHASE_NAMES.PRESTIGE_UPDATE)
+    expect(PHASE_ORDER[7]).toBe(PHASE_NAMES.ESPIONAGE)
+    expect(PHASE_ORDER[8]).toBe(PHASE_NAMES.RULER_LIFECYCLE)
+    expect(PHASE_ORDER[9]).toBe(PHASE_NAMES.CHARACTER_LIFECYCLE)
+    expect(PHASE_ORDER[10]).toBe(PHASE_NAMES.RECRUITMENT)
+    expect(PHASE_ORDER[11]).toBe(PHASE_NAMES.IDEOLOGY_DRIFT)
+    expect(PHASE_ORDER[12]).toBe(PHASE_NAMES.REFORM)
+    expect(PHASE_ORDER[13]).toBe(PHASE_NAMES.VICTORY_CHECK)
+    expect(PHASE_ORDER[14]).toBe(PHASE_NAMES.DIPLOMACY_LIFECYCLE)
+    expect(PHASE_ORDER[15]).toBe(PHASE_NAMES.ECONOMY)
+    expect(PHASE_ORDER[16]).toBe(PHASE_NAMES.DISASTER)
+    expect(PHASE_ORDER[17]).toBe(PHASE_NAMES.TRADE)
+    expect(PHASE_ORDER[18]).toBe(PHASE_NAMES.FACTION)
+    expect(PHASE_ORDER[19]).toBe(PHASE_NAMES.HISTORICAL_EVENTS)
+    expect(PHASE_ORDER[20]).toBe(PHASE_NAMES.PRESTIGE_UPDATE)
   })
 
   it('CULTURAL_IDENTITY comes after COMBAT_V2 and before MANPOWER', () => {
@@ -35,6 +36,14 @@ describe('phase chain constants', () => {
     const manpowerIdx = PHASE_ORDER.indexOf(PHASE_NAMES.MANPOWER)
     expect(culturalIdx).toBe(combatIdx + 1)
     expect(manpowerIdx).toBe(culturalIdx + 1)
+  })
+
+  it('ESPIONAGE comes after MANPOWER and before RULER_LIFECYCLE (D-G8)', () => {
+    const manpowerIdx = PHASE_ORDER.indexOf(PHASE_NAMES.MANPOWER)
+    const espionageIdx = PHASE_ORDER.indexOf(PHASE_NAMES.ESPIONAGE)
+    const rulerIdx = PHASE_ORDER.indexOf(PHASE_NAMES.RULER_LIFECYCLE)
+    expect(espionageIdx).toBe(manpowerIdx + 1)
+    expect(rulerIdx).toBe(espionageIdx + 1)
   })
 
   it('IDEOLOGY_DRIFT comes after RECRUITMENT and before REFORM', () => {
