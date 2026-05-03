@@ -1,0 +1,39 @@
+{
+  "id": "lanling_academy_founding",
+  "scope": "fixed-realm",
+  "oneShot": true,
+  "trigger": {
+    "type": "date",
+    "between": [{ "yearBC": 258 }, { "yearBC": 258 }],
+    "realmId": "realm_chu"
+  },
+  "stages": [
+    {
+      "id": "xunzi_arrives",
+      "text": "荀子至兰陵 — 荀子来到楚国兰陵，欲建学宫传授儒学。",
+      "choices": [
+        {
+          "id": "accept",
+          "label": "接受荀子建院",
+          "effects": [
+            {
+              "type": "academy.create",
+              "academyId": "academy_lanling",
+              "hostRealmId": "realm_chu",
+              "hostSiteId": "site_024",
+              "primaryIdeology": "ru"
+            },
+            { "type": "realm.prestige.delta", "realmId": "realm_chu", "delta": 5 }
+          ]
+        },
+        {
+          "id": "decline",
+          "label": "拒绝",
+          "effects": [
+            { "type": "realm.relation.delta", "realmId": "realm_chu", "targetRealmId": "realm_qi", "delta": -5 }
+          ]
+        }
+      ]
+    }
+  ]
+}
