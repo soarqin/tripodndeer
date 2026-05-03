@@ -1,0 +1,67 @@
+.culturePanel {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  width: 320px;
+  background: var(--panel-bg, rgba(20, 20, 20, 0.9));
+  border: 1px solid var(--panel-border, #444);
+  color: var(--text-primary, #eee);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--panel-border, #444);
+}
+
+.tabs button {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-secondary, #aaa);
+  padding: 8px 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tabs button.active {
+  color: var(--text-primary, #eee);
+  border-bottom: 2px solid var(--accent-color, #d4af37);
+}
+
+.content {
+  padding: 12px;
+}
+
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.siteRow, .academyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.identityBarContainer {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 8px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.identityBar {
+  height: 100%;
+  background: var(--accent-color, #d4af37);
+}

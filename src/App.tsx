@@ -12,6 +12,7 @@ import { SiteContextMenu } from '@/ui/components/SiteContextMenu'
 import { EconomyPanel } from '@/ui/components/EconomyPanel'
 import { CharacterPanel } from '@/ui/components/CharacterPanel'
 import { BattlePanel } from '@/ui/components/BattlePanel'
+import { CulturePanel } from '@/ui/components/CulturePanel'
 import { Modal } from '@/ui/components/Modal'
 import { SuccessionModal } from '@/ui/components/SuccessionModal'
 import { DisasterReliefModal } from '@/ui/components/DisasterReliefModal'
@@ -40,6 +41,8 @@ export function App(): React.JSX.Element {
   const isPeacePanelOpen = useGameStore((state) => state.isPeacePanelOpen)
   const diplomacyTargetRealmId = useGameStore((state) => state.diplomacyTargetRealmId)
   const closePeacePanel = useGameStore((state) => state.closePeacePanel)
+
+  const activePanel = useGameStore((state) => state.activePanel)
 
   React.useEffect(() => {
     if (import.meta.env.DEV) {
@@ -88,6 +91,7 @@ export function App(): React.JSX.Element {
         <CharacterPanel />
         <ArmyListPanel />
         <DiplomacyPanel />
+        {activePanel === 'culture' && <CulturePanel />}
         {isPeacePanelOpen && diplomacyTargetRealmId && (
           <PeacePanel
             targetRealmId={diplomacyTargetRealmId}
