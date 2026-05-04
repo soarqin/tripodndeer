@@ -61,7 +61,7 @@ describe('drawArmies', () => {
       ['realm_qin', makeRealm('realm_qin', '#1A1A1A')],
       ['realm_han', makeRealm('realm_han', '#D8741A')],
     ])
-    drawArmies(ctx, armies, sites, realms, null)
+    drawArmies(ctx, armies, sites, realms, null, 'realm_qin', new Map(), new Set(), false)
     expect(ctx.arc).toHaveBeenCalledTimes(2)
   })
 
@@ -70,7 +70,7 @@ describe('drawArmies', () => {
     const armies = new Map([['army_1', makeArmy('army_1', 'site_1', 'realm_qin')]])
     const sites = new Map([['site_1', makeSite('site_1')]])
     const realms = new Map([['realm_qin', makeRealm('realm_qin', '#1A1A1A')]])
-    drawArmies(ctx, armies, sites, realms, 'army_1')
+    drawArmies(ctx, armies, sites, realms, 'army_1', 'realm_qin', new Map(), new Set(), false)
     expect(ctx.stroke).toHaveBeenCalled()
   })
 
@@ -79,7 +79,7 @@ describe('drawArmies', () => {
     const armies = new Map([['army_1', makeArmy('army_1', 'site_1', 'realm_qin')]])
     const sites = new Map([['site_1', makeSite('site_1')]])
     const realms = new Map([['realm_qin', makeRealm('realm_qin', '#1A1A1A')]])
-    drawArmies(ctx, armies, sites, realms, null)
+    drawArmies(ctx, armies, sites, realms, null, 'realm_qin', new Map(), new Set(), false)
     expect(ctx.stroke).not.toHaveBeenCalled()
   })
 
@@ -88,7 +88,7 @@ describe('drawArmies', () => {
     const armies = new Map([['army_1', makeArmy('army_1', 'missing_site', 'realm_qin')]])
     const sites = new Map<string, Site>()
     const realms = new Map([['realm_qin', makeRealm('realm_qin', '#1A1A1A')]])
-    drawArmies(ctx, armies, sites, realms, null)
+    drawArmies(ctx, armies, sites, realms, null, 'realm_qin', new Map(), new Set(), false)
     expect(ctx.arc).not.toHaveBeenCalled()
   })
 })

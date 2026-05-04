@@ -51,7 +51,7 @@ export function drawArmiesAndPasses(
   passes: ReadonlyMap<string, Pass>,
   adjacencyEdges: ReadonlyMap<string, AdjacencyEdge>,
 ) {
-  drawArmies(ctx, armies, sites, realms, selectedArmyId)
+  drawArmies(ctx, armies, sites, realms, selectedArmyId, '', new Map(), new Set(), false)
 
   ctx.save()
   for (const pass of passes.values()) {
