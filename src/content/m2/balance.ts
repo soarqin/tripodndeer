@@ -542,7 +542,7 @@ export const M8_WAR_DECLARATION_BIAS: Record<PersonalityArchetype, number> = {
   schemer: 0.1,
   learned: -0.2,
   tyrant: 0.35,
-  incompetent: 0.0,
+  incompetent: 0.01,
   benevolent: -0.35,
   builder: -0.25,
 }

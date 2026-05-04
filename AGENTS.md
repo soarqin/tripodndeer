@@ -32,19 +32,19 @@ src/content/  ← 静态数据（JSON + balance.ts）
 
 ```typescript
 interface World {
-  date: GameDate          // 旬为最小单位
+  date: GameDate // 旬为最小单位
   tick: number
   sites: ReadonlyMap<SiteId, Site>
   realms: ReadonlyMap<RealmId, Realm>
   armies: ReadonlyMap<ArmyId, Army>
-  edges: ReadonlyMap<EdgeId, MapEdge>        // 几何/渲染边（不要混用）
-  adjacencyEdges: ReadonlyMap<AdjacencyEdgeId, AdjacencyEdge>  // 仅关隘边
+  edges: ReadonlyMap<EdgeId, MapEdge> // 几何/渲染边（不要混用）
+  adjacencyEdges: ReadonlyMap<AdjacencyEdgeId, AdjacencyEdge> // 仅关隘边
   wars: ReadonlyMap<WarKey, WarState>
   passes: ReadonlyMap<PassId, Pass>
   generals: ReadonlyMap<GeneralId, General>
   peaceProposals: ReadonlyMap<PeaceProposalId, PeaceProposal>
   sieges: ReadonlyMap<SiegeId, Siege>
-  academies: ReadonlyMap<AcademyId, Academy>  // M6 学宫
+  academies: ReadonlyMap<AcademyId, Academy> // M6 学宫
   playerRealmId: RealmId
   rngState: RNGState
   phases: readonly TickPhase[]
@@ -80,14 +80,17 @@ aiPlan → orderApply → march → siege → combat-v2 → culturalIdentity →
 import { TERRAIN_DEFENSE } from '~/content/m2/balance'
 
 // ❌ 错误
-const MOUNTAIN_DEFENSE = 0.5  // 硬编码在 engine 文件
+const MOUNTAIN_DEFENSE = 0.5 // 硬编码在 engine 文件
 ```
 
 ### Pure Functions + Immutable Maps
 
 ```typescript
 // ✅ 正确：返回新 Map
-function endWar(wars: ReadonlyMap<WarKey, WarState>, key: WarKey): ReadonlyMap<WarKey, WarState> {
+function endWar(
+  wars: ReadonlyMap<WarKey, WarState>,
+  key: WarKey
+): ReadonlyMap<WarKey, WarState> {
   const next = new Map(wars)
   next.delete(key)
   return next
@@ -108,7 +111,7 @@ wars.delete(key)
 AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按 ID 字典序排序：
 
 ```typescript
-[...world.realms.values()].sort((a, b) => a.id.localeCompare(b.id))
+;[...world.realms.values()].sort((a, b) => a.id.localeCompare(b.id))
 ```
 
 这是 contract，改变顺序会破坏 RNG 可复现性。
@@ -117,26 +120,30 @@ AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按
 
 ## Critical Invariants
 
-| 不变量 | 守护测试 |
-|---|---|
-| M1 scenario 恰好 50 个 site | `tools/__tests__/generate-m1-map.test.ts` |
-| engine 层零 React 依赖 | `src/engine/__tests__/architecture-purity.test.ts` |
-| 源文件无 `as any` / `@ts-ignore` | `src/__tests__/no-any.test.ts` |
-| 禁止引入特定依赖 | `src/__tests__/banned-deps.test.ts` |
-| 5 个关隘 edgeId 在 adjacencyEdges 中存在 | `src/engine/world/__tests__/passes-edge-existence.test.ts` |
-| Each realm has rulerId or null | `src/content/m1/__tests__/scenario-rulers.test.ts` |
-| All M5 balance constants prefixed M5_ | `src/content/m2/__tests__/balance-m5.test.ts` |
-| 8 archetypes covered in personality-coverage.test.ts | `src/engine/systems/ai/__tests__/personality-coverage.test.ts` |
-| M4.1_REFORMS_COUNT === 4 | `src/content/m2/__tests__/balance-m41.test.ts` |
-| M6_ENABLED=true (balance.ts) | `src/content/m2/__tests__/balance-m6.test.ts` |
-| ≥2 active academies at scenario start (jixia + xihe) | `src/engine/world/migrations/__tests__/v5-to-v6.test.ts` |
-| All M6 balance constants prefixed M6_ | `src/content/m2/__tests__/balance-m6.test.ts` |
-| M7_ENABLED=true（balance.ts） | `src/content/m2/__tests__/balance-m7.test.ts` |
-| ESPIONAGE_ACTION_KINDS 长度 = 4（不含 forbidden） | `src/engine/systems/espionage/__tests__/m7-deferred-actions.test.ts` |
-| 56 directional intelligenceCoverage entries at scenario start | `src/shared/__tests__/m7-world-fields.test.ts` |
-| All M7 balance constants prefixed M7_ | `src/content/m2/__tests__/balance-m7.test.ts` |
-| army-render fog gating: enemy armies hidden when coverage < 30 (M7_COVERAGE_TIER_1) | `src/rendering/map/__tests__/army-render-gating.test.ts` |
-| Initial coverage seeded by adjacency: adjacent realms = 30, non-adjacent = 0 | `src/engine/world/__tests__/factory-coverage.test.ts` |
+| 不变量                                                                              | 守护测试                                                             |
+| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| M1 scenario 恰好 50 个 site                                                         | `tools/__tests__/generate-m1-map.test.ts`                            |
+| engine 层零 React 依赖                                                              | `src/engine/__tests__/architecture-purity.test.ts`                   |
+| 源文件无 `as any` / `@ts-ignore`                                                    | `src/__tests__/no-any.test.ts`                                       |
+| 禁止引入特定依赖                                                                    | `src/__tests__/banned-deps.test.ts`                                  |
+| 5 个关隘 edgeId 在 adjacencyEdges 中存在                                            | `src/engine/world/__tests__/passes-edge-existence.test.ts`           |
+| Each realm has rulerId or null                                                      | `src/content/m1/__tests__/scenario-rulers.test.ts`                   |
+| All M5 balance constants prefixed M5\_                                              | `src/content/m2/__tests__/balance-m5.test.ts`                        |
+| 8 archetypes covered in personality-coverage.test.ts                                | `src/engine/systems/ai/__tests__/personality-coverage.test.ts`       |
+| M4.1_REFORMS_COUNT === 4                                                            | `src/content/m2/__tests__/balance-m41.test.ts`                       |
+| M6_ENABLED=true (balance.ts)                                                        | `src/content/m2/__tests__/balance-m6.test.ts`                        |
+| ≥2 active academies at scenario start (jixia + xihe)                                | `src/engine/world/migrations/__tests__/v5-to-v6.test.ts`             |
+| All M6 balance constants prefixed M6\_                                              | `src/content/m2/__tests__/balance-m6.test.ts`                        |
+| M7_ENABLED=true（balance.ts）                                                       | `src/content/m2/__tests__/balance-m7.test.ts`                        |
+| ESPIONAGE_ACTION_KINDS 长度 = 4（不含 forbidden）                                   | `src/engine/systems/espionage/__tests__/m7-deferred-actions.test.ts` |
+| 56 directional intelligenceCoverage entries at scenario start                       | `src/shared/__tests__/m7-world-fields.test.ts`                       |
+| All M7 balance constants prefixed M7\_                                              | `src/content/m2/__tests__/balance-m7.test.ts`                        |
+| army-render fog gating: enemy armies hidden when coverage < 30 (M7_COVERAGE_TIER_1) | `src/rendering/map/__tests__/army-render-gating.test.ts`             |
+| Initial coverage seeded by adjacency: adjacent realms = 30, non-adjacent = 0        | `src/engine/world/__tests__/factory-coverage.test.ts`                |
+| All M8 balance constants prefixed M8_                                              | `src/content/m2/__tests__/balance-m8.test.ts`                        |
+| M8_PERSONALITY_DIMENSIONS_COUNT === 8                                               | `src/content/m2/__tests__/balance-m8.test.ts`                        |
+| getPersonality fallback uniform to 'incompetent'                                    | `src/engine/systems/ai/__tests__/utility-scorer.test.ts`             |
+| 8 archetype 字面值与 docs/design/07-ai.md §2.3 一一对应                             | `src/content/m2/__tests__/balance-m8.test.ts`                        |
 
 ---
 
@@ -256,18 +263,18 @@ const world: World = {
   realms: new Map(),
   armies: new Map(),
   edges: new Map(),
-  adjacencyEdges: new Map(),  // ← M2 新增
+  adjacencyEdges: new Map(), // ← M2 新增
   wars: new Map(),
-  passes: new Map(),          // ← M2 新增
-  generals: new Map(),        // ← M2 新增
-  peaceProposals: new Map(),  // ← M2 新增
-  sieges: new Map(),          // ← M2 新增
-  rulers: new Map(),          // ← M5 新增
+  passes: new Map(), // ← M2 新增
+  generals: new Map(), // ← M2 新增
+  peaceProposals: new Map(), // ← M2 新增
+  sieges: new Map(), // ← M2 新增
+  rulers: new Map(), // ← M5 新增
   eventChainStates: new Map(), // ← M5 新增
-  academies: new Map(),       // ← M6 新增
-  intelligenceCoverage: new Map(),  // ← M7 新增
-  spyMissions: new Map(),           // ← M7 新增
-  counterIntelStates: new Map(),    // ← M7 新增
+  academies: new Map(), // ← M6 新增
+  intelligenceCoverage: new Map(), // ← M7 新增
+  spyMissions: new Map(), // ← M7 新增
+  counterIntelStates: new Map(), // ← M7 新增
   playerRealmId: 'realm_qin',
   rngState: { seed: 42, counter: 0 },
   phases: [],
@@ -279,66 +286,66 @@ const world: World = {
 
 ## M2 Subsystems Quick Reference
 
-| 子系统 | 主文件 | 关键函数 |
-|---|---|---|
-| combat-v2 | `src/engine/systems/combat-v2/combat-v2.ts` | `resolveCombat(ctx)` |
-| 战法 | `src/engine/systems/combat-v2/tactics/index.ts` | `pickTactic(ctx)` |
-| 攻城 | `src/engine/systems/siege/siege.ts` | `siegeStep`, `startSiege` |
-| 兵源 | `src/engine/systems/manpower/manpower.ts` | `manpowerTick` |
-| 议和 | `src/engine/systems/peace/proposal-lifecycle.ts` | `acceptProposal`, `rejectProposal` |
-| 战争 | `src/engine/wars/wars.ts` | `declareWarWithCasus`, `endWar` |
-| AI | `src/engine/systems/ai/utility-scorer.ts` | `pickAction`, `getPersonality` |
-| AI 战术 | `src/engine/systems/ai/tactics/` | siege / cut-supply / retreat |
+| 子系统    | 主文件                                           | 关键函数                           |
+| --------- | ------------------------------------------------ | ---------------------------------- |
+| combat-v2 | `src/engine/systems/combat-v2/combat-v2.ts`      | `resolveCombat(ctx)`               |
+| 战法      | `src/engine/systems/combat-v2/tactics/index.ts`  | `pickTactic(ctx)`                  |
+| 攻城      | `src/engine/systems/siege/siege.ts`              | `siegeStep`, `startSiege`          |
+| 兵源      | `src/engine/systems/manpower/manpower.ts`        | `manpowerTick`                     |
+| 议和      | `src/engine/systems/peace/proposal-lifecycle.ts` | `acceptProposal`, `rejectProposal` |
+| 战争      | `src/engine/wars/wars.ts`                        | `declareWarWithCasus`, `endWar`    |
+| AI        | `src/engine/systems/ai/utility-scorer.ts`        | `pickAction`, `getPersonality`     |
+| AI 战术   | `src/engine/systems/ai/tactics/`                 | siege / cut-supply / retreat       |
 
 ---
 
 ## M5 Subsystems Quick Reference
 
-| 子系统 | 主文件 | 关键函数 |
-|---|---|---|
-| rulerLifecycle | `src/engine/systems/ruler/ruler-lifecycle.ts` | `rulerLifecyclePhase(world, rng)` |
-| characterLifecycle | `src/engine/systems/character/character-lifecycle.ts` | `characterLifecyclePhase(world, rng)` |
-| recruitment | `src/engine/systems/recruitment/recruitment.ts` | `recruitmentPhase(world, rng)` |
-| 继承 | `src/engine/systems/ruler/succession.ts` | `selectHeir(world, realmId)` |
-| 势力分裂 | `src/engine/systems/ruler/realm-split.ts` | `splitRealm(world, oldRealmId, config)` |
-| 事件链 | `src/engine/systems/events/event-chain-engine.ts` | `applyEventEffect(world, effect)` |
-| Modal UI | `src/ui/components/Modal/Modal.tsx` | `<Modal title content actions dismissable />` |
+| 子系统             | 主文件                                                | 关键函数                                      |
+| ------------------ | ----------------------------------------------------- | --------------------------------------------- |
+| rulerLifecycle     | `src/engine/systems/ruler/ruler-lifecycle.ts`         | `rulerLifecyclePhase(world, rng)`             |
+| characterLifecycle | `src/engine/systems/character/character-lifecycle.ts` | `characterLifecyclePhase(world, rng)`         |
+| recruitment        | `src/engine/systems/recruitment/recruitment.ts`       | `recruitmentPhase(world, rng)`                |
+| 继承               | `src/engine/systems/ruler/succession.ts`              | `selectHeir(world, realmId)`                  |
+| 势力分裂           | `src/engine/systems/ruler/realm-split.ts`             | `splitRealm(world, oldRealmId, config)`       |
+| 事件链             | `src/engine/systems/events/event-chain-engine.ts`     | `applyEventEffect(world, effect)`             |
+| Modal UI           | `src/ui/components/Modal/Modal.tsx`                   | `<Modal title content actions dismissable />` |
 
 ---
 
 ## M4.1 Subsystems Quick Reference
 
-| 子系统 | 主文件 | 关键函数 |
-|---|---|---|
-| reformPhase | `src/engine/systems/reform/reform-phase.ts` | `reformPhase(world, rng)` |
-| predicate evaluator | `src/engine/systems/reform/predicate.ts` | `evaluatePredicate(world, realm, node)` |
-| stage progression | `src/engine/systems/reform/stage-progression.ts` | `applyReformChoice`, `completeReform` |
-| TraitEffectRegistry | `src/content/m4_1/trait-effects.ts` | `getTraitModifiers(realm)` |
-| reform JSONs | `src/content/m4_1/reforms/` | 4 reform definitions |
-| v3→v4 migration | `src/engine/world/migrations/v3-to-v4.ts` | `migrateScenarioV3ToV4` |
+| 子系统              | 主文件                                           | 关键函数                                |
+| ------------------- | ------------------------------------------------ | --------------------------------------- |
+| reformPhase         | `src/engine/systems/reform/reform-phase.ts`      | `reformPhase(world, rng)`               |
+| predicate evaluator | `src/engine/systems/reform/predicate.ts`         | `evaluatePredicate(world, realm, node)` |
+| stage progression   | `src/engine/systems/reform/stage-progression.ts` | `applyReformChoice`, `completeReform`   |
+| TraitEffectRegistry | `src/content/m4_1/trait-effects.ts`              | `getTraitModifiers(realm)`              |
+| reform JSONs        | `src/content/m4_1/reforms/`                      | 4 reform definitions                    |
+| v3→v4 migration     | `src/engine/world/migrations/v3-to-v4.ts`        | `migrateScenarioV3ToV4`                 |
 
 ---
 
 ## M6 Subsystems Quick Reference
 
-| 子系统 | 主文件 | 关键函数 |
-|---|---|---|
-| culturalIdentity | `src/engine/systems/culture/cultural-identity-phase.ts` | `culturalIdentityPhase(world, rng)` |
-| ideologyDrift | `src/engine/systems/culture/ideology-drift-phase.ts` | `ideologyDriftPhase(world, rng)` |
-| prestigeUpdate | `src/engine/systems/culture/prestige-update-phase.ts` | `prestigeUpdatePhase(world, rng)` |
-| academyProduction | `src/engine/systems/recruitment/recruitment.ts` | hook in `recruitmentPhase` |
-| 周王册封 | `src/content/m6/zhou-investiture-chain.json` | event chain |
+| 子系统            | 主文件                                                  | 关键函数                            |
+| ----------------- | ------------------------------------------------------- | ----------------------------------- |
+| culturalIdentity  | `src/engine/systems/culture/cultural-identity-phase.ts` | `culturalIdentityPhase(world, rng)` |
+| ideologyDrift     | `src/engine/systems/culture/ideology-drift-phase.ts`    | `ideologyDriftPhase(world, rng)`    |
+| prestigeUpdate    | `src/engine/systems/culture/prestige-update-phase.ts`   | `prestigeUpdatePhase(world, rng)`   |
+| academyProduction | `src/engine/systems/recruitment/recruitment.ts`         | hook in `recruitmentPhase`          |
+| 周王册封          | `src/content/m6/zhou-investiture-chain.json`            | event chain                         |
 
 ---
 
 ## M7 Subsystems Quick Reference
 
-| 子系统 | 主文件 | 关键函数 |
-|---|---|---|
-| espionagePhase | `src/engine/systems/espionage/espionage-phase.ts` | `espionagePhase(world, rng)` |
-| planEspionageAction | `src/engine/systems/ai/ai.ts` | `planEspionageAction(world, realm, rng)` |
-| espionage-reactions | `src/engine/systems/espionage/espionage-reactions.ts` | `applyEspionageReactions(world, mission)` |
-| scoreEspionageOption | `src/engine/systems/espionage/score-espionage.ts` | `scoreEspionageOption(option, personality)` |
+| 子系统               | 主文件                                                | 关键函数                                    |
+| -------------------- | ----------------------------------------------------- | ------------------------------------------- |
+| espionagePhase       | `src/engine/systems/espionage/espionage-phase.ts`     | `espionagePhase(world, rng)`                |
+| planEspionageAction  | `src/engine/systems/ai/ai.ts`                         | `planEspionageAction(world, realm, rng)`    |
+| espionage-reactions  | `src/engine/systems/espionage/espionage-reactions.ts` | `applyEspionageReactions(world, mission)`   |
+| scoreEspionageOption | `src/engine/systems/espionage/score-espionage.ts`     | `scoreEspionageOption(option, personality)` |
 
 ---
 
@@ -382,3 +389,19 @@ const world: World = {
 - `prestige` / `legitimacy` 文化威望字段（M6）✅ 已交付（M6）
 - 学宫 / 百家 / 文化扩散（M6，依赖 M5 学宫产人才）✅ 已交付（M6）
 - 谍报行动（M7，依赖 M5 间者人才）✅ 已交付（M7）
+
+## M8+ Deferred Items
+
+以下功能明确延后，**不要在对应里程碑之前实现**：
+
+- 三层决策模型（Strategic/Operational/Tactical）（M8.x）
+- 外交 AI 记忆（"被欺骗的记忆"）（M8.x）
+- AI vs AI 自动对战 infra（M8.x）
+- 期望胜率分布平衡基准（M8.x）
+- 5 档难度分层（M8.x）
+- Dev mode AI introspection UI（M10）
+- Personality drift 随事件演化（M8.x）
+- Archetype 重命名 benevolent→opportunist / builder→zealot（M9 剧本里程碑）
+- UI 呈现 archetype（RulerOverviewPanel 加 archetype 标签）（M10）
+- 移除 realm.aiPersonality legacy 字段（M8.x）
+- Opportunist/Zealot 名册扩展（M9）
