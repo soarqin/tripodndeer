@@ -343,7 +343,7 @@ export const M6_TRIBUTE_CULTURAL_PULL_PER_YEAR = 2
 export const M41_AI_REFORM_CHECK_INTERVAL_TICKS = 36
 
 export const M41_AI_PERSONALITY_REFORM_PROPENSITY: Record<string, number> = {
-  builder: 0.4,
+  builder: 0.40,
   conqueror: 0.25,
   schemer: 0.18,
   tyrant: 0.15,

@@ -103,7 +103,7 @@ describe('M41_AI_PERSONALITY_REFORM_PROPENSITY', () => {
   })
 
   it('keeps builder highest and incompetent below steward', () => {
-    expect(M41_AI_PERSONALITY_REFORM_PROPENSITY.builder).toBe(0.4)
+    expect(M41_AI_PERSONALITY_REFORM_PROPENSITY.builder).toBe(0.40)
     const entries = Object.entries(M41_AI_PERSONALITY_REFORM_PROPENSITY) as Array<[string, number]>
     for (const [archetype, value] of entries) {
       if (archetype === 'builder') continue

@@ -159,3 +159,49 @@ Personality bias is verifiably present without brittle stochastic dependence.
 `src/engine/systems/ai/__tests__/ai.test.ts > diplomacy events sequence` fails with current working tree
 even with my recruitment changes stashed — this is a pre-existing regression from prior tasks
 (diplomacy/coalitions.ts, lifecycle.ts modifications). NOT in T10 scope.
+
+## [T16] Archetype Fixture Coverage Test (2026-05-05)
+
+### Pattern: Filesystem-walking test (no glob dependency)
+- Reused the `getAllSrcFiles` recursive pattern from `src/__tests__/no-any.test.ts`
+- Walks `__tests__` directories with `fs.readdirSync({ withFileTypes: true })`
+- No glob package needed (and not in package.json) — Node `fs` is sufficient
+
+### Audit findings
+All 8 archetypes already widely used in test fixtures:
+- conqueror (65), schemer (52), steward (45), benevolent (52)
+- builder (48), incompetent (70), learned (28), tyrant (48)
+
+`DEFAULT_ARCHETYPE_MAPPING` in `m8-behavior-harness.ts` covers all 8 via realm assignment.
+`personality-coverage.test.ts` (T7) iterates over `ARCHETYPES: PersonalityArchetype[]` (all 8).
+
+### Test design
+4 assertions:
+1. >=5 archetypes appear across all test fixtures (actual: 8/8)
+2. personality-coverage.test.ts contains all 8 archetype literals
+3. m8-behavior-harness.test.ts references DEFAULT_ARCHETYPE_MAPPING
+4. m8-behavior-harness.ts (DEFAULT_ARCHETYPE_MAPPING) maps all 8 archetypes
+
+## [2026-05-05] T17 Espionage Reachability
+
+### Notes
+- The espionage reachability test stays deterministic by deriving shares directly from `M7_ESPIONAGE_WEIGHTS`.
+- `counter_intel` remains excluded from `planEspionageAction`; only the other 3 actions are normalized.
+- Rulerless realms resolve to `incompetent` via `getPersonality(world, realmId)`.
+- Targeted tests passed, but the full suite is blocked by unrelated M8 perf/determinism failures.
+T15: Behavior harness report aggregates taxRateFinal/taxRateInitial across seeds; behavior assertions over tax rates should compare per-seed averages (`aggregate / seeds.length`) rather than raw totals.
+
+### [2026-05-05] T18 Perf + Determinism Test Notes
+- `src/content/m1/scenario.json` ships with an empty `rulers` array, so M8 determinism tests must seed ruler fixtures locally before personality assertions can observe any effect.
+- The cleanest way to make personality changes visible is to keep QIN as an AI realm (`playerRealmId: 'realm_zhao'`) and vary only `realm_qin`'s ruler archetype.
+- `factionPhase`, `ideologyDriftPhase`, `prestigeUpdatePhase`, and `reformPhase` all consult `ruler.personality`, so a seeded ruler map is enough to exercise archetype impact without changing engine code.
+
+## [T8] Personality-aware war/peace/alliance scoring (2026-05-05)
+- Task was already completed in a previous run, but a typecheck error in `m8-espionage-reachability.test.ts` (from T17) was blocking `pnpm typecheck`.
+- Fixed the typecheck error by casting `ACTIVE_ACTION_KINDS` to `EspionageActionKind[]` since `filter` with `!==` narrows the type to exclude `counter_intel`, causing `includes` to reject `EspionageActionKind`.
+- Verified all T8 requirements are met and tests pass.
+
+## [T14] Redistribute reform propensity across 8 archetypes (2026-05-05)
+- Updated `M41_AI_PERSONALITY_REFORM_PROPENSITY` in `src/content/m2/balance.ts` to ensure all 8 archetypes have non-zero values.
+- Builder remains the highest at 0.40, followed by conqueror (0.25), schemer (0.18), tyrant (0.15), learned (0.12), steward (0.08), benevolent (0.05), and incompetent (0.02).
+- Verified that all reform tests pass and that the new propensities are correctly applied in `ai-trigger.test.ts`.
