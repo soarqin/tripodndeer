@@ -80,6 +80,7 @@ function makeWorld(opts: {
   ruler?: RulerState | null
   generals?: General[]
   factionInfluences?: ReadonlyMap<string, FactionInfluenceState>
+  playerRealmId?: string
 } = {}): World {
   const realm = makeRealm(opts.realm)
   const date = { yearBC: 260, season: 'spring', month: 1, xun: opts.xun ?? 'shang' } as const
@@ -97,7 +98,7 @@ function makeWorld(opts: {
     rulers,
     generals: generalsMap,
     factionInfluences: opts.factionInfluences ?? new Map(),
-    playerRealmId: realm.id,
+    playerRealmId: opts.playerRealmId ?? realm.id,
   })
 }
 
@@ -350,5 +351,37 @@ describe('factionPhase: robustness', () => {
     const initialSum = 6 * M42_FACTION_INFLUENCE_INITIAL
     expect(sum).not.toBe(initialSum)
     expect(Math.abs(sum - initialSum)).toBeGreaterThan(0)
+  })
+})
+
+describe('factionPhase: edict issuance wiring (T12)', () => {
+  it('factionPhase with tyrant realm + imbalance issues a new edict via evaluateFactionBalanceAction', () => {
+    const initialInfluences: FactionInfluenceState = {
+      realmId: 'realm_qin',
+      influences: new Map<FactionId, number>([
+        ['military_meritocracy', 95],
+        ['noble_clans', 5],
+        ['royal_kin', 50],
+        ['reformists', 50],
+        ['conservatives', 50],
+        ['foreign_clients', 50],
+      ]),
+    }
+    const world = makeWorld({
+      ruler: makeRuler('tyrant'),
+      realm: { politicalSystem: 'enfeoffment' as PoliticalSystem },
+      factionInfluences: new Map([['realm_qin', initialInfluences]]),
+      playerRealmId: 'realm_player_other',
+    })
+
+    expect(world.edicts.size).toBe(0)
+
+    const result = factionPhase(world, RNG)
+
+    expect(result.world.edicts.size).toBe(1)
+    const newEdict = [...result.world.edicts.values()][0]!
+    expect(newEdict.realmId).toBe('realm_qin')
+    expect(newEdict.status).toBe('active')
+    expect(newEdict.kind).toBe('edict_grain_reserve')
   })
 })
