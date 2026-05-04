@@ -7,7 +7,9 @@ import {
   DIPLOMACY_THREAT_ARMY_MANPOWER_DIVISOR,
   DIPLOMACY_THREAT_MANPOWER_DIVISOR,
   DIPLOMACY_THREAT_SITE_POWER,
+  M8_COALITION_JOIN_BIAS,
 } from '~/content/m2/balance'
+import { getPersonality } from '~/engine/systems/ai/utility-scorer'
 import { isAtWar } from '~/engine/wars'
 import { appendDiplomacyHistory } from './history'
 
@@ -74,9 +76,11 @@ function getCoalitionMembers(
     .filter(realmId => realmId !== targetRealmId)
     .filter(realmId => {
       const threat = scoreCoalitionThreat(world, targetRealmId, realmId)
-      const threshold = current?.status === 'active' || current?.status === 'forming'
+      const personality = getPersonality(world, realmId)
+      const thresholdBase = current?.status === 'active' || current?.status === 'forming'
         ? DIPLOMACY_COALITION_DISSOLVE_THREAT_THRESHOLD
         : DIPLOMACY_COALITION_THREAT_THRESHOLD
+      const threshold = thresholdBase - M8_COALITION_JOIN_BIAS[personality]
       return threat >= threshold
     })
 }

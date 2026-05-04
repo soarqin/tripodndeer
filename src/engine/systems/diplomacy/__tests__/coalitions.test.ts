@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import type { Army, GameDate, Realm, Site, World } from '~/shared/types'
+import type {
+  Army,
+  CoalitionState,
+  GameDate,
+  PersonalityArchetype,
+  Realm,
+  RealmId,
+  RulerState,
+  Site,
+  World,
+} from '~/shared/types'
 import { warKey } from '~/engine/wars'
 import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { applyDiplomacyAction, createCoalitionId, diplomacyLifecycleStep, updateCoalitionPressure } from '../index'
@@ -45,6 +55,19 @@ function makeArmy(id: string, realmId: string, manpower: number): Army {
   }
 }
 
+function makeRuler(realmId: RealmId, personality: PersonalityArchetype): RulerState {
+  return {
+    realmId,
+    generalId: `general_${realmId}_ruler`,
+    age: 40,
+    lifespan: 70,
+    health: 80,
+    personality,
+    successionLawId: 'primogeniture',
+    inOfficeSinceTick: 0,
+  }
+}
+
 function baseWorld(overrides: Partial<World> = {}): World {
   return makeEmptyWorld({
     date: DATE,
@@ -86,7 +109,65 @@ function serializeDiplomacy(world: World): string {
   })
 }
 
+function antiQinThreatWorld(threat: number, memberPersonality: PersonalityArchetype, current?: CoalitionState): World {
+  const memberRealmIds = [han, wei, zhao, yan]
+  return baseWorld({
+    realms: new Map([
+      [han, makeRealm(han, 1000)],
+      [qin, makeRealm(qin, (threat - 18) * 1000)],
+      [wei, makeRealm(wei, 1000)],
+      [zhao, makeRealm(zhao, 1000)],
+      [yan, makeRealm(yan, 1000)],
+    ]),
+    armies: new Map([
+      ['army_qin', makeArmy('army_qin', qin, 0)],
+      ['army_han', makeArmy('army_han', han, 1000)],
+      ['army_wei', makeArmy('army_wei', wei, 1000)],
+      ['army_zhao', makeArmy('army_zhao', zhao, 1000)],
+      ['army_yan', makeArmy('army_yan', yan, 1000)],
+    ]),
+    rulers: new Map(memberRealmIds.map(realmId => [realmId, makeRuler(realmId, memberPersonality)])),
+    coalitions: current ? new Map([[current.id, current]]) : new Map(),
+  })
+}
+
+function coalitionRatio(world: World, memberRealmIds: readonly RealmId[]): number {
+  const coalition = updateCoalitionPressure(world).world.coalitions.get(createCoalitionId(qin))
+  return (coalition?.memberRealmIds.length ?? 0) / memberRealmIds.length
+}
+
 describe('coalition pressure', () => {
+  it('applies personality bias to coalition join and leave pressure ratios', () => {
+    const memberRealmIds = [han, wei, zhao, yan]
+    const current: CoalitionState = {
+      id: createCoalitionId(qin),
+      targetRealmId: qin,
+      memberRealmIds,
+      status: 'active',
+      formedAt: DATE,
+      dissolvedAt: null,
+    }
+
+    const schemerJoinNearThreshold = coalitionRatio(antiQinThreatWorld(69.8, 'schemer'), memberRealmIds)
+    const learnedJoinNearThreshold = coalitionRatio(antiQinThreatWorld(69.8, 'learned'), memberRealmIds)
+    const tyrantJoinNearThreshold = coalitionRatio(antiQinThreatWorld(69.8, 'tyrant'), memberRealmIds)
+    const conquerorJoinAtThreshold = coalitionRatio(antiQinThreatWorld(70, 'conqueror'), memberRealmIds)
+    const incompetentJoinAtThreshold = coalitionRatio(antiQinThreatWorld(70, 'incompetent'), memberRealmIds)
+    const learnedJoinAtThreshold = coalitionRatio(antiQinThreatWorld(70, 'learned'), memberRealmIds)
+    const benevolentJoinAtThreshold = coalitionRatio(antiQinThreatWorld(70, 'benevolent'), memberRealmIds)
+    const learnedJoinAboveThreshold = coalitionRatio(antiQinThreatWorld(70.2, 'learned'), memberRealmIds)
+    const tyrantJoinAboveThreshold = coalitionRatio(antiQinThreatWorld(70.2, 'tyrant'), memberRealmIds)
+    const schemerStayBelowDissolveThreshold = coalitionRatio(antiQinThreatWorld(44.8, 'schemer', current), memberRealmIds)
+    const benevolentStayBelowDissolveThreshold = coalitionRatio(antiQinThreatWorld(44.8, 'benevolent', current), memberRealmIds)
+
+    expect(schemerJoinNearThreshold).toBeGreaterThan(learnedJoinNearThreshold)
+    expect(schemerJoinNearThreshold).toBeGreaterThan(tyrantJoinNearThreshold)
+    expect(conquerorJoinAtThreshold).toBeGreaterThan(learnedJoinAtThreshold)
+    expect(incompetentJoinAtThreshold).toBeGreaterThan(benevolentJoinAtThreshold)
+    expect(learnedJoinAboveThreshold).toBeGreaterThan(tyrantJoinAboveThreshold)
+    expect(schemerStayBelowDissolveThreshold).toBeGreaterThan(benevolentStayBelowDissolveThreshold)
+  })
+
   it('forms, updates, and dissolves flat coalition state at deterministic threshold crossings', () => {
     const formed = updateCoalitionPressure(baseWorld())
     const coalitionId = createCoalitionId(qin)
