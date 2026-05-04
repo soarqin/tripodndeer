@@ -125,22 +125,25 @@ describe('reformPhase: AI trigger', () => {
     })
   })
 
-  it('does not start reform for steward ruler (propensity 0)', () => {
+  it('can start reform for steward ruler when RNG rolls below propensity', () => {
     const world = makeWorldWithBuilder({
       rulers: new Map([['realm_qin', makeRuler('steward')]]),
     })
     const result = reformPhase(world, { seed: 1, counter: 0 }, [makeSimpleReformDef()])
-    expect(result.world.reformStates.has('realm_qin')).toBe(false)
-    expect(result.events).toEqual([])
+    expect(result.world.reformStates.has('realm_qin')).toBe(true)
+    expect(result.events).toContainEqual({
+      type: 'reformStarted',
+      payload: { realmId: 'realm_qin', reformId: 'test_reform' },
+    })
   })
 
-  it('does not consume RNG for steward (propensity short-circuit)', () => {
+  it('consumes RNG for steward when trigger is attempted', () => {
     const world = makeWorldWithBuilder({
       rulers: new Map([['realm_qin', makeRuler('steward')]]),
     })
     const rng = { seed: 42, counter: 0 }
     const result = reformPhase(world, rng, [makeSimpleReformDef()])
-    expect(result.nextRng).toEqual(rng)
+    expect(result.nextRng).not.toEqual(rng)
   })
 
   it('skips player realm even when trigger satisfied', () => {

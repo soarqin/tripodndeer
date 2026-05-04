@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { M41_AI_PERSONALITY_REFORM_PROPENSITY } from '~/content/m2/balance'
 import { reformPhase } from '../reform-phase'
 import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
 import type {
@@ -96,29 +97,21 @@ describe('reformPhase AI trigger: conqueror propensity 0.25', () => {
   })
 })
 
-describe('reformPhase AI trigger: zero-propensity personalities', () => {
-  it('steward: 0 triggers over 1000 samples', () => {
-    expect(countTriggers('steward', 1000)).toBe(0)
+describe('M41_AI_PERSONALITY_REFORM_PROPENSITY', () => {
+  it('gives all 8 archetypes non-zero propensity', () => {
+    expect(Object.values(M41_AI_PERSONALITY_REFORM_PROPENSITY).every((v) => v > 0)).toBe(true)
   })
 
-  it('schemer: 0 triggers over 100 samples', () => {
-    expect(countTriggers('schemer', 100)).toBe(0)
-  })
-
-  it('learned: 0 triggers over 100 samples', () => {
-    expect(countTriggers('learned', 100)).toBe(0)
-  })
-
-  it('tyrant: 0 triggers over 100 samples', () => {
-    expect(countTriggers('tyrant', 100)).toBe(0)
-  })
-
-  it('incompetent: 0 triggers over 100 samples', () => {
-    expect(countTriggers('incompetent', 100)).toBe(0)
-  })
-
-  it('benevolent: 0 triggers over 100 samples', () => {
-    expect(countTriggers('benevolent', 100)).toBe(0)
+  it('keeps builder highest and incompetent below steward', () => {
+    expect(M41_AI_PERSONALITY_REFORM_PROPENSITY.builder).toBe(0.4)
+    const entries = Object.entries(M41_AI_PERSONALITY_REFORM_PROPENSITY) as Array<[string, number]>
+    for (const [archetype, value] of entries) {
+      if (archetype === 'builder') continue
+      expect(M41_AI_PERSONALITY_REFORM_PROPENSITY.builder).toBeGreaterThan(value!)
+    }
+    expect(M41_AI_PERSONALITY_REFORM_PROPENSITY.incompetent).toBeLessThan(
+      M41_AI_PERSONALITY_REFORM_PROPENSITY.steward!,
+    )
   })
 })
 
