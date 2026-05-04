@@ -1,4 +1,4 @@
-import type { EspionageActionKind, PersonalityArchetype } from '~/shared/types'
+import type { EdictKind, EspionageActionKind, PersonalityArchetype, Specialty } from '~/shared/types'
 
 export type UnitType = 'infantry' | 'chariot' | 'cavalry' | 'crossbow'
 export type TerrainType = 'plains' | 'hills' | 'mountains' | 'forest' | 'swamp' | 'grassland' | 'desert'
@@ -403,4 +403,108 @@ export const M7_ESPIONAGE_WEIGHTS: Record<PersonalityArchetype, Record<Espionage
   incompetent: { reconnaissance: 0.5, rumor: 0.5, discord: 0.5, counter_intel: 0.5 },
   benevolent:  { reconnaissance: 0.5, rumor: 0.1, discord: 0.1, counter_intel: 2.5 },
   builder:     { reconnaissance: 1.0, rumor: 0.3, discord: 0.3, counter_intel: 1.5 },
+}
+
+// === M8 Personality Differentiation ===
+export const M8_PERSONALITY_DIMENSIONS_COUNT = 8
+
+export const M8_PERSONALITY_ARCHETYPE_LIST = [
+  'conqueror', 'steward', 'schemer', 'learned',
+  'tyrant', 'incompetent', 'benevolent', 'builder',
+] as const
+
+// War declaration aggressiveness (higher = more likely to declare war)
+export const M8_WAR_DECLARATION_BIAS: Record<PersonalityArchetype, number> = {
+  conqueror:   0.8,
+  steward:    -0.5,
+  schemer:     0.2,
+  learned:    -0.3,
+  tyrant:      0.7,
+  incompetent:-0.2,
+  benevolent: -0.6,
+  builder:    -0.4,
+}
+
+// Peace acceptance threshold modifier (higher = more willing to accept peace)
+export const M8_PEACE_ACCEPTANCE_THRESHOLD: Record<PersonalityArchetype, number> = {
+  conqueror:  -0.4,
+  steward:     0.3,
+  schemer:     0.1,
+  learned:     0.2,
+  tyrant:     -0.5,
+  incompetent: 0.0,
+  benevolent:  0.5,
+  builder:     0.2,
+}
+
+// Alliance acceptance propensity (higher = more likely to form/accept alliances)
+export const M8_ALLIANCE_PROPENSITY: Record<PersonalityArchetype, number> = {
+  conqueror:  -0.2,
+  steward:     0.3,
+  schemer:     0.5,
+  learned:     0.4,
+  tyrant:     -0.6,
+  incompetent:-0.1,
+  benevolent:  0.6,
+  builder:     0.1,
+}
+
+// Coalition join threshold modifier (higher = more willing to join coalitions)
+export const M8_COALITION_JOIN_BIAS: Record<PersonalityArchetype, number> = {
+  conqueror:   0.1,
+  steward:    -0.2,
+  schemer:     0.5,
+  learned:    -0.1,
+  tyrant:     -0.4,
+  incompetent:-0.1,
+  benevolent: -0.2,
+  builder:     0.0,
+}
+
+// Preferred recruitment specialty weights (multiplied with default weights, then normalized)
+export const M8_RECRUITMENT_SPECIALTY_PREFERENCE: Record<PersonalityArchetype, Record<Specialty, number>> = {
+  conqueror:   { commander: 3.0, warrior: 3.0, strategist: 1.0, administrator: 0.5, reformer: 0.5, diplomat: 0.5, spy: 0.8, scholar: 0.3, engineer: 0.5 },
+  steward:     { commander: 0.5, warrior: 0.5, strategist: 0.8, administrator: 3.0, reformer: 1.0, diplomat: 1.5, spy: 0.5, scholar: 1.0, engineer: 1.0 },
+  schemer:     { commander: 0.8, warrior: 0.5, strategist: 2.5, administrator: 1.0, reformer: 0.8, diplomat: 2.0, spy: 2.5, scholar: 0.8, engineer: 0.5 },
+  learned:     { commander: 0.3, warrior: 0.3, strategist: 1.5, administrator: 1.5, reformer: 1.5, diplomat: 1.5, spy: 0.5, scholar: 3.0, engineer: 1.0 },
+  tyrant:      { commander: 3.0, warrior: 2.5, strategist: 0.8, administrator: 0.5, reformer: 0.5, diplomat: 0.3, spy: 2.0, scholar: 0.3, engineer: 0.8 },
+  incompetent: { commander: 1.0, warrior: 1.0, strategist: 1.0, administrator: 1.0, reformer: 1.0, diplomat: 1.0, spy: 1.0, scholar: 1.0, engineer: 1.0 },
+  benevolent:  { commander: 0.3, warrior: 0.5, strategist: 0.8, administrator: 3.0, reformer: 1.0, diplomat: 1.5, spy: 0.3, scholar: 2.5, engineer: 1.5 },
+  builder:     { commander: 0.5, warrior: 0.5, strategist: 1.0, administrator: 1.5, reformer: 3.0, diplomat: 1.0, spy: 0.5, scholar: 1.5, engineer: 3.0 },
+}
+
+// Preferred tax rate target (0-50, AI moves toward this ±2%/month)
+export const M8_TAX_RATE_TARGET: Record<PersonalityArchetype, number> = {
+  conqueror:   30,
+  steward:     20,
+  schemer:     22,
+  learned:     18,
+  tyrant:      40,
+  incompetent: 15,
+  benevolent:  10,
+  builder:     18,
+}
+
+// Treasury reserve floor (AI issues grain_reserve / increases tax when below)
+export const M8_TREASURY_RESERVE_FLOOR: Record<PersonalityArchetype, number> = {
+  conqueror:   8000,
+  steward:     5000,
+  schemer:     6000,
+  learned:     4000,
+  tyrant:      10000,
+  incompetent: 2000,
+  benevolent:  3000,
+  builder:     7000,
+}
+
+// Edict bias: issuance frequency multiplier + preferred edict override
+export const M8_EDICT_ENACTMENT_BIAS: Record<PersonalityArchetype, { issuanceMultiplier: number; preferredEdict: EdictKind | null }> = {
+  conqueror:   { issuanceMultiplier: 1.5, preferredEdict: 'edict_grain_reserve' },
+  steward:     { issuanceMultiplier: 1.0, preferredEdict: 'edict_tax_relief' },
+  schemer:     { issuanceMultiplier: 1.3, preferredEdict: null },
+  learned:     { issuanceMultiplier: 0.9, preferredEdict: 'edict_tax_relief' },
+  tyrant:      { issuanceMultiplier: 1.5, preferredEdict: 'edict_grain_reserve' },
+  incompetent: { issuanceMultiplier: 0.5, preferredEdict: null },
+  benevolent:  { issuanceMultiplier: 0.9, preferredEdict: 'edict_tax_relief' },
+  builder:     { issuanceMultiplier: 1.4, preferredEdict: null },
 }
