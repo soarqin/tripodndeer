@@ -1,4 +1,5 @@
 import scenarioV1 from '@/content/m1/scenario.json'
+import { M7_COVERAGE_TIER_1 } from '@/content/m2/balance'
 import { makeCoverageKey } from '@/shared/types'
 import { describe, expect, it } from 'vitest'
 import { migrateScenarioV5ToV6 } from '../v5-to-v6'
@@ -24,11 +25,19 @@ describe('migrateScenarioV6ToV7 — intelligenceCoverage', () => {
     expect(Object.keys(v7.intelligenceCoverage)).toHaveLength(56)
   })
 
-  it('initializes every coverage value to 0', () => {
+  it('initializes every coverage value to 0 or M7_COVERAGE_TIER_1 (adjacency-aware seeding)', () => {
     const v7 = migrateScenarioV6ToV7(scenarioV1)
     for (const value of Object.values(v7.intelligenceCoverage)) {
-      expect(value).toBe(0)
+      expect([0, M7_COVERAGE_TIER_1]).toContain(value)
     }
+  })
+
+  it('seeds at least one adjacent realm pair with M7_COVERAGE_TIER_1', () => {
+    const v7 = migrateScenarioV6ToV7(scenarioV1)
+    const tier1Count = Object.values(v7.intelligenceCoverage).filter(
+      v => v === M7_COVERAGE_TIER_1,
+    ).length
+    expect(tier1Count).toBeGreaterThan(0)
   })
 
   it('uses directional keys (qin→chu different from chu→qin)', () => {
@@ -37,8 +46,8 @@ describe('migrateScenarioV6ToV7 — intelligenceCoverage', () => {
     const chuToQin = makeCoverageKey('realm_chu', 'realm_qin')
 
     expect(qinToChu).not.toBe(chuToQin)
-    expect(v7.intelligenceCoverage[qinToChu]).toBe(0)
-    expect(v7.intelligenceCoverage[chuToQin]).toBe(0)
+    expect(v7.intelligenceCoverage[qinToChu]).toBeDefined()
+    expect(v7.intelligenceCoverage[chuToQin]).toBeDefined()
   })
 
   it('does not include self-coverage (qin→qin)', () => {
@@ -60,7 +69,9 @@ describe('migrateScenarioV6ToV7 — intelligenceCoverage', () => {
       for (const target of realmIds) {
         if (observer === target) continue
         const key = makeCoverageKey(observer, target)
-        expect(v7.intelligenceCoverage[key]).toBe(0)
+        const value = v7.intelligenceCoverage[key]
+        expect(value).toBeDefined()
+        expect([0, M7_COVERAGE_TIER_1]).toContain(value)
       }
     }
   })

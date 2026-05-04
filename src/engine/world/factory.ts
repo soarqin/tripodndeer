@@ -11,6 +11,7 @@ import { prestigeUpdatePhase } from '~/engine/systems/culture/prestige-update-ph
 import { diplomacyLifecycleStep } from '~/engine/systems/diplomacy'
 import { disasterPhase } from '~/engine/systems/disaster/disaster-phase'
 import { economyPhase } from '~/engine/systems/economy'
+import { computeRealmAdjacency } from '~/engine/systems/espionage/adjacency'
 import { espionagePhase } from '~/engine/systems/espionage/espionage-phase'
 import { factionPhase } from '~/engine/systems/faction/faction-phase'
 import { historicalEventsPhase } from '~/engine/systems/events'
@@ -30,6 +31,7 @@ import {
   M4_DEFAULT_SITE_POPULATION,
   M4_DEFAULT_TAX_RATE,
   M4_HOUSEHOLD_DIVISOR,
+  M7_COVERAGE_TIER_1,
 } from '~/content/m2/balance'
 import type {
   Academy,
@@ -241,13 +243,15 @@ function buildEdgesMap(edges: Record<EdgeId, MapEdge>): Map<EdgeId, MapEdge> {
 
 function buildInitialIntelligenceCoverage(
   realmIds: readonly RealmId[],
+  adjacency: ReadonlyMap<RealmId, ReadonlySet<RealmId>>,
 ): Map<CoverageKey, number> {
   const sorted = [...realmIds].sort((a, b) => a.localeCompare(b))
   const coverage = new Map<CoverageKey, number>()
   for (const observer of sorted) {
     for (const target of sorted) {
       if (observer === target) continue
-      coverage.set(makeCoverageKey(observer, target), 0)
+      const isAdjacent = adjacency.get(observer)?.has(target) ?? false
+      coverage.set(makeCoverageKey(observer, target), isAdjacent ? M7_COVERAGE_TIER_1 : 0)
     }
   }
   return coverage
@@ -290,6 +294,7 @@ export function createInitialWorld(data: M0Data, seed: number): World {
   const realms = buildRealmMap(data.realms)
   const sites = buildSites(data.sites, data.edges, data.initialOwnership, realms)
   const edgesMap = buildEdgesMap(data.edges)
+  const adjacency = computeRealmAdjacency(data.sites, data.initialOwnership)
 
   return {
     date: { ...INITIAL_DATE },
@@ -319,7 +324,7 @@ export function createInitialWorld(data: M0Data, seed: number): World {
     sieges: new Map<SiegeId, Siege>(),
     edicts: new Map<EdictId, EdictState>(),
     governorAssignments: new Map<SiteId, GovernorAssignment>(),
-    intelligenceCoverage: buildInitialIntelligenceCoverage(data.realms.map(r => r.id)),
+    intelligenceCoverage: buildInitialIntelligenceCoverage(data.realms.map(r => r.id), adjacency),
     spyMissions: new Map<SpyMissionId, SpyMission>(),
     counterIntelStates: buildInitialCounterIntelStates(data.realms.map(r => r.id)),
     playerRealmId: data.realms[0]?.id ?? '',
@@ -343,6 +348,7 @@ export function createWorldFromM1Data(
   const realms = buildRealmMap(data.realms)
   const sites = buildSites(data.sites, data.edges, data.initialOwnership, realms)
   const edges = buildEdgesMap(data.edges)
+  const adjacency = computeRealmAdjacency(data.sites, data.initialOwnership)
 
   const armies = new Map<ArmyId, Army>()
   for (const realm of data.realms) {
@@ -477,7 +483,7 @@ export function createWorldFromM1Data(
     sieges: new Map<SiegeId, Siege>(),
     edicts: new Map<EdictId, EdictState>(),
     governorAssignments: new Map<SiteId, GovernorAssignment>(),
-    intelligenceCoverage: buildInitialIntelligenceCoverage(data.realms.map(r => r.id)),
+    intelligenceCoverage: buildInitialIntelligenceCoverage(data.realms.map(r => r.id), adjacency),
     spyMissions: new Map<SpyMissionId, SpyMission>(),
     counterIntelStates: buildInitialCounterIntelStates(data.realms.map(r => r.id)),
     playerRealmId,

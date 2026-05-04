@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { M7_COVERAGE_TIER_1 } from '~/content/m2/balance'
 import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
 import { makeCoverageKey } from '../types'
 import { makeEmptyWorld } from './fixtures'
@@ -20,11 +21,11 @@ describe('M7 World fields (intelligenceCoverage / spyMissions / counterIntelStat
     expect(world.intelligenceCoverage.has(chuToQinKey)).toBe(true)
   })
 
-  it('all intelligenceCoverage entries initialized to 0', () => {
+  it('all intelligenceCoverage entries initialized to 0 or M7_COVERAGE_TIER_1 (adjacency-aware seeding)', () => {
     const data = loadM1Data()
     const world = createWorldFromM1Data(data, 42, 'realm_qin')
     for (const value of world.intelligenceCoverage.values()) {
-      expect(value).toBe(0)
+      expect([0, M7_COVERAGE_TIER_1]).toContain(value)
     }
   })
 

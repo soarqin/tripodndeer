@@ -1,3 +1,5 @@
+import { M7_COVERAGE_TIER_1 } from '~/content/m2/balance'
+import { computeRealmAdjacency } from '~/engine/systems/espionage/adjacency'
 import {
   M1DataSchemaV6,
   M1DataSchemaV7,
@@ -19,12 +21,16 @@ export function migrateScenarioV6ToV7(rawData: unknown): M1DataV7 {
   const v6 = ensureV6(rawData)
 
   const realmIds = v6.realms.map(r => r.id).sort((a, b) => a.localeCompare(b))
+  const adjacency = computeRealmAdjacency(v6.sites, v6.initialOwnership)
 
   const intelligenceCoverage: Record<string, number> = {}
   for (const observerId of realmIds) {
     for (const targetId of realmIds) {
       if (observerId === targetId) continue
-      intelligenceCoverage[makeCoverageKey(observerId, targetId)] = 0
+      const isAdjacent = adjacency.get(observerId)?.has(targetId) ?? false
+      intelligenceCoverage[makeCoverageKey(observerId, targetId)] = isAdjacent
+        ? M7_COVERAGE_TIER_1
+        : 0
     }
   }
 
