@@ -277,14 +277,21 @@ describe('economyPhase AI personality finance decisions', () => {
 
   it('keeps AI taxRate within [0, 50] across all archetypes', () => {
     for (const personality of M8_PERSONALITY_ARCHETYPE_LIST) {
-      const low = runMonthlyEconomy(makeAIEconomyWorld(personality, 1), 12)
-      const high = runMonthlyEconomy(makeAIEconomyWorld(personality, 49), 12)
+      const low = runMonthlyEconomy(makeAIEconomyWorld(personality, 1), 100)
+      const high = runMonthlyEconomy(makeAIEconomyWorld(personality, 49), 100)
 
       expect(low.realms.get('realm_ai')?.economy.taxRate).toBeGreaterThanOrEqual(0)
       expect(low.realms.get('realm_ai')?.economy.taxRate).toBeLessThanOrEqual(50)
       expect(high.realms.get('realm_ai')?.economy.taxRate).toBeGreaterThanOrEqual(0)
       expect(high.realms.get('realm_ai')?.economy.taxRate).toBeLessThanOrEqual(50)
     }
+  })
+
+  it('barely moves incompetent realm taxRate (skips drift entirely)', () => {
+    const start = 25
+    const result = runMonthlyEconomy(makeAIEconomyWorld('incompetent', start), 12)
+
+    expect(result.realms.get('realm_ai')?.economy.taxRate).toBe(start)
   })
 })
 
