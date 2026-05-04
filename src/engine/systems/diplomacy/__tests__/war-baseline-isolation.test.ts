@@ -67,8 +67,8 @@ describe('war declaration baseline isolation (M3 unchanged)', () => {
     const enriched = baseWorld({ ideologyLean: sharedLean }, { ideologyLean: sharedLean })
 
     const request = { kind: 'declare_war' as const, proposingRealmId: qin, targetRealmId: han }
-    const baselineScore = scoreDiplomacyAcceptance(baseline, request)
-    const enrichedScore = scoreDiplomacyAcceptance(enriched, request)
+    const baselineScore = scoreDiplomacyAcceptance(baseline, request, 'incompetent')
+    const enrichedScore = scoreDiplomacyAcceptance(enriched, request, 'incompetent')
 
     expect(enrichedScore).toBe(baselineScore)
   })
@@ -78,8 +78,8 @@ describe('war declaration baseline isolation (M3 unchanged)', () => {
     const enriched = baseWorld({ prestige: 100 }, { prestige: 0 })
 
     const request = { kind: 'declare_war' as const, proposingRealmId: qin, targetRealmId: han }
-    const baselineScore = scoreDiplomacyAcceptance(baseline, request)
-    const enrichedScore = scoreDiplomacyAcceptance(enriched, request)
+    const baselineScore = scoreDiplomacyAcceptance(baseline, request, 'incompetent')
+    const enrichedScore = scoreDiplomacyAcceptance(enriched, request, 'incompetent')
 
     expect(enrichedScore).toBe(baselineScore)
   })
@@ -100,7 +100,7 @@ describe('war declaration baseline isolation (M3 unchanged)', () => {
     const enriched = baseWorld({ prestige: 100, ideologyLean: sharedLean }, { prestige: 0, ideologyLean: sharedLean })
 
     const request = { kind: 'declare_war' as const, proposingRealmId: qin, targetRealmId: han }
-    expect(scoreDisabled(enriched, request)).toBe(scoreDisabled(baseline, request))
+    expect(scoreDisabled(enriched, request, 'incompetent')).toBe(scoreDisabled(baseline, request, 'incompetent'))
 
     vi.doUnmock('~/content/m2/balance')
     vi.resetModules()
@@ -124,23 +124,23 @@ describe('war declaration baseline isolation (M3 unchanged)', () => {
       kind: 'peace',
       proposingRealmId: qin,
       targetRealmId: han,
-    })
+    }, 'incompetent')
     const peaceEnriched = scoreDiplomacyAcceptance(enriched, {
       kind: 'peace',
       proposingRealmId: qin,
       targetRealmId: han,
-    })
+    }, 'incompetent')
 
     const warBaseline = scoreDiplomacyAcceptance(baseline, {
       kind: 'declare_war',
       proposingRealmId: qin,
       targetRealmId: han,
-    })
+    }, 'incompetent')
     const warEnriched = scoreDiplomacyAcceptance(enriched, {
       kind: 'declare_war',
       proposingRealmId: qin,
       targetRealmId: han,
-    })
+    }, 'incompetent')
 
     expect(peaceEnriched).toBeGreaterThan(peaceBaseline)
     expect(warEnriched).toBe(warBaseline)

@@ -7,6 +7,7 @@ import type {
   EspionageActionKind,
   GameEvent,
   GeneralId,
+  PersonalityArchetype,
   Realm,
   RealmId,
   RelationKey,
@@ -28,6 +29,9 @@ import {
 } from '~/engine/systems/diplomacy'
 import { scoreEspionageOption } from '~/engine/systems/espionage/score-espionage'
 import {
+  M8_ALLIANCE_PROPENSITY,
+  M8_PEACE_ACCEPTANCE_THRESHOLD,
+  M8_WAR_DECLARATION_BIAS,
   M7_DISCORD_DURATION_TICKS,
   M7_ENABLED,
   M7_RECON_DURATION_TICKS,
@@ -335,7 +339,8 @@ function planDiplomacyAction(
       readonly events: readonly GameEvent[]
     }
   | { readonly ok: false } {
-  const candidates = collectDiplomacyCandidates(world, realm.id)
+  const personality = getPersonality(world, realm.id)
+  const candidates = collectDiplomacyCandidates(world, realm.id, personality)
   for (const candidate of candidates) {
     const result = applyDiplomacyAction(world, {
       kind: candidate.kind,
@@ -349,7 +354,8 @@ function planDiplomacyAction(
 
 function collectDiplomacyCandidates(
   world: World,
-  realmId: RealmId
+  realmId: RealmId,
+  personality: PersonalityArchetype
 ): readonly DiplomacyCandidate[] {
   const candidates: DiplomacyCandidate[] = []
 
@@ -373,15 +379,16 @@ function collectDiplomacyCandidates(
     )) {
       if (memberRealmId === realmId || !world.realms.has(memberRealmId))
         continue
-      pushCandidate(world, candidates, realmId, memberRealmId, 'alliance')
-      pushCandidate(world, candidates, realmId, memberRealmId, 'non_aggression')
+      pushCandidate(world, candidates, realmId, memberRealmId, 'alliance', personality)
+      pushCandidate(world, candidates, realmId, memberRealmId, 'non_aggression', personality)
     }
     pushCandidate(
       world,
       candidates,
       realmId,
       coalition.targetRealmId,
-      'declare_war'
+      'declare_war',
+      personality
     )
   }
 
@@ -390,17 +397,17 @@ function collectDiplomacyCandidates(
   )) {
     const targetRealmId = getWarOpponent(war[0], realmId)
     if (targetRealmId && world.realms.has(targetRealmId))
-      pushCandidate(world, candidates, realmId, targetRealmId, 'peace')
+      pushCandidate(world, candidates, realmId, targetRealmId, 'peace', personality)
   }
 
   for (const relation of sortedRelations(world.relations)) {
     const targetRealmId = getRelationPartner(relation, realmId)
     if (!targetRealmId || !world.realms.has(targetRealmId)) continue
     if (relation.attitude >= 35 && relation.trust >= 65) {
-      pushCandidate(world, candidates, realmId, targetRealmId, 'alliance')
-      pushCandidate(world, candidates, realmId, targetRealmId, 'non_aggression')
+      pushCandidate(world, candidates, realmId, targetRealmId, 'alliance', personality)
+      pushCandidate(world, candidates, realmId, targetRealmId, 'non_aggression', personality)
     } else if (relation.attitude <= -50 && relation.trust <= 35) {
-      pushCandidate(world, candidates, realmId, targetRealmId, 'declare_war')
+      pushCandidate(world, candidates, realmId, targetRealmId, 'declare_war', personality)
     }
   }
 
@@ -417,7 +424,8 @@ function pushCandidate(
   candidates: DiplomacyCandidate[],
   proposingRealmId: RealmId,
   targetRealmId: RealmId,
-  kind: DiplomaticActionKind
+  kind: DiplomaticActionKind,
+  personality: PersonalityArchetype
 ): void {
   if (hasPendingProposalForPair(world, proposingRealmId, targetRealmId)) return
 
@@ -425,9 +433,24 @@ function pushCandidate(
   const validation = validateDiplomacyAction(world, request)
   if (!validation.ok) return
 
-  const score = scoreDiplomacyAcceptance(world, request)
+  const receiverPersonality = getPersonality(world, targetRealmId)
+  const acceptanceScore = scoreDiplomacyAcceptance(world, request, receiverPersonality)
+  const score = scoreDiplomacyCandidate(acceptanceScore, kind, personality)
   if (score < 0) return
   candidates.push({ kind, targetRealmId, score })
+}
+
+function scoreDiplomacyCandidate(
+  acceptanceScore: number,
+  kind: DiplomaticActionKind,
+  personality: PersonalityArchetype
+): number {
+  if (kind === 'declare_war') return acceptanceScore * (1 + M8_WAR_DECLARATION_BIAS[personality])
+  if (kind === 'peace') return acceptanceScore * (1 + M8_PEACE_ACCEPTANCE_THRESHOLD[personality])
+  if (kind === 'alliance' || kind === 'non_aggression') {
+    return acceptanceScore * (1 + M8_ALLIANCE_PROPENSITY[personality])
+  }
+  return acceptanceScore
 }
 
 function hasPendingProposalForPair(

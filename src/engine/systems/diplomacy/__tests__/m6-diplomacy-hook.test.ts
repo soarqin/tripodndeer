@@ -70,8 +70,8 @@ describe('M6 diplomacy modifiers (peace/non_aggression/alliance)', () => {
     const highPrestige = baseWorld({ prestige: 80 }, { prestige: 0 })
 
     const request = { kind: 'peace' as const, proposingRealmId: qin, targetRealmId: han }
-    const lowScore = scoreDiplomacyAcceptance(lowPrestige, request)
-    const highScore = scoreDiplomacyAcceptance(highPrestige, request)
+    const lowScore = scoreDiplomacyAcceptance(lowPrestige, request, 'incompetent')
+    const highScore = scoreDiplomacyAcceptance(highPrestige, request, 'incompetent')
 
     expect(highScore).toBeGreaterThan(lowScore)
   })
@@ -85,8 +85,8 @@ describe('M6 diplomacy modifiers (peace/non_aggression/alliance)', () => {
     const dissimilarWorld = baseWorld({ ideologyLean: proposerLean }, { ideologyLean: dissimilarLean })
 
     const request = { kind: 'non_aggression' as const, proposingRealmId: qin, targetRealmId: han }
-    const similarScore = scoreDiplomacyAcceptance(similarWorld, request)
-    const dissimilarScore = scoreDiplomacyAcceptance(dissimilarWorld, request)
+    const similarScore = scoreDiplomacyAcceptance(similarWorld, request, 'incompetent')
+    const dissimilarScore = scoreDiplomacyAcceptance(dissimilarWorld, request, 'incompetent')
 
     expect(similarScore).toBeGreaterThan(dissimilarScore)
   })
@@ -100,8 +100,8 @@ describe('M6 diplomacy modifiers (peace/non_aggression/alliance)', () => {
     const oppositeWorld = baseWorld({ ideologyLean: proposerLean }, { ideologyLean: oppositeLean })
 
     const request = { kind: 'non_aggression' as const, proposingRealmId: qin, targetRealmId: han }
-    const similarScore = scoreDiplomacyAcceptance(similarWorld, request)
-    const oppositeScore = scoreDiplomacyAcceptance(oppositeWorld, request)
+    const similarScore = scoreDiplomacyAcceptance(similarWorld, request, 'incompetent')
+    const oppositeScore = scoreDiplomacyAcceptance(oppositeWorld, request, 'incompetent')
 
     expect(oppositeScore).toBeLessThan(similarScore)
   })
@@ -111,8 +111,8 @@ describe('M6 diplomacy modifiers (peace/non_aggression/alliance)', () => {
     const highPrestige = baseWorld({ prestige: 100 }, { prestige: 0 })
 
     const request = { kind: 'declare_war' as const, proposingRealmId: qin, targetRealmId: han }
-    const lowScore = scoreDiplomacyAcceptance(lowPrestige, request)
-    const highScore = scoreDiplomacyAcceptance(highPrestige, request)
+    const lowScore = scoreDiplomacyAcceptance(lowPrestige, request, 'incompetent')
+    const highScore = scoreDiplomacyAcceptance(highPrestige, request, 'incompetent')
 
     expect(highScore).toBe(lowScore)
   })
@@ -125,8 +125,8 @@ describe('M6 diplomacy modifiers (peace/non_aggression/alliance)', () => {
     const oppositeWorld = baseWorld({ ideologyLean: sharedLean }, { ideologyLean: oppositeLean })
 
     const request = { kind: 'declare_war' as const, proposingRealmId: qin, targetRealmId: han }
-    const similarScore = scoreDiplomacyAcceptance(similarWorld, request)
-    const oppositeScore = scoreDiplomacyAcceptance(oppositeWorld, request)
+    const similarScore = scoreDiplomacyAcceptance(similarWorld, request, 'incompetent')
+    const oppositeScore = scoreDiplomacyAcceptance(oppositeWorld, request, 'incompetent')
 
     expect(similarScore).toBe(oppositeScore)
   })
@@ -141,7 +141,7 @@ describe('M6 diplomacy modifiers (peace/non_aggression/alliance)', () => {
     )
 
     const request = { kind: 'envoy' as const, proposingRealmId: qin, targetRealmId: han }
-    const score = scoreDiplomacyAcceptance(world, request)
+    const score = scoreDiplomacyAcceptance(world, request, 'incompetent')
 
     expect(score).toBeLessThanOrEqual(100)
     expect(score).toBeGreaterThanOrEqual(0)
@@ -173,8 +173,8 @@ describe('M6 diplomacy modifiers (peace/non_aggression/alliance)', () => {
     const withM6 = baseWorld({ prestige: 100, ideologyLean: proposerLean }, { prestige: 0, ideologyLean: targetLean })
 
     const request = { kind: 'peace' as const, proposingRealmId: qin, targetRealmId: han }
-    const baselineScore = scoreDisabled(noModifiers, request)
-    const m6DisabledScore = scoreDisabled(withM6, request)
+    const baselineScore = scoreDisabled(noModifiers, request, 'incompetent')
+    const m6DisabledScore = scoreDisabled(withM6, request, 'incompetent')
 
     expect(m6DisabledScore).toBe(baselineScore)
 

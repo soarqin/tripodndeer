@@ -249,7 +249,9 @@ describe('scoreDiplomacyAcceptance', () => {
     const world = baseWorld()
     const request = { kind: 'non_aggression' as const, proposingRealmId: qin, targetRealmId: han }
 
-    expect(scoreDiplomacyAcceptance(world, request)).toBe(scoreDiplomacyAcceptance(world, request))
+    expect(scoreDiplomacyAcceptance(world, request, 'incompetent')).toBe(
+      scoreDiplomacyAcceptance(world, request, 'incompetent')
+    )
   })
 
   it('uses relation, war, truce, treaty conflicts, threat, and action costs', () => {
@@ -261,9 +263,55 @@ describe('scoreDiplomacyAcceptance', () => {
       treaties: new Map([['truce_1', makeTreaty({ id: 'truce_1' })], ['tribute_1', makeTreaty({ id: 'tribute_1', kind: 'tribute' })]]),
     })
 
-    expect(scoreDiplomacyAcceptance(hostile, request)).toBeLessThan(scoreDiplomacyAcceptance(friendly, request))
-    expect(scoreDiplomacyAcceptance(friendly, { ...request, kind: 'envoy' })).toBeGreaterThan(
-      scoreDiplomacyAcceptance(friendly, { ...request, kind: 'alliance' }),
+    expect(scoreDiplomacyAcceptance(hostile, request, 'incompetent')).toBeLessThan(
+      scoreDiplomacyAcceptance(friendly, request, 'incompetent')
+    )
+    expect(scoreDiplomacyAcceptance(friendly, { ...request, kind: 'envoy' }, 'incompetent')).toBeGreaterThan(
+      scoreDiplomacyAcceptance(friendly, { ...request, kind: 'alliance' }, 'incompetent'),
+    )
+  })
+
+  it('applies personality ratios to peace, alliance, and war scoring', () => {
+    const highTrustWorld = baseWorld({
+      relations: new Map([[relationKey(qin, han), makeRelation({ attitude: 100, trust: 100 })]]),
+    })
+    const peaceWorld = baseWorld({
+      relations: new Map([[relationKey(qin, han), makeRelation({ attitude: 100, trust: 100 })]]),
+      wars: new Map([[warKey(qin, han), makeWarState()]]),
+    })
+    const peace = { kind: 'peace' as const, proposingRealmId: qin, targetRealmId: han }
+    const alliance = { kind: 'alliance' as const, proposingRealmId: qin, targetRealmId: han }
+    const nonAggression = { kind: 'non_aggression' as const, proposingRealmId: qin, targetRealmId: han }
+    const declareWar = { kind: 'declare_war' as const, proposingRealmId: qin, targetRealmId: han }
+
+    expect(scoreDiplomacyAcceptance(peaceWorld, peace, 'conqueror')).toBeLessThan(
+      scoreDiplomacyAcceptance(peaceWorld, peace, 'benevolent')
+    )
+    expect(scoreDiplomacyAcceptance(peaceWorld, peace, 'tyrant')).toBeLessThan(
+      scoreDiplomacyAcceptance(peaceWorld, peace, 'steward')
+    )
+    expect(scoreDiplomacyAcceptance(peaceWorld, peace, 'learned')).toBeGreaterThan(
+      scoreDiplomacyAcceptance(peaceWorld, peace, 'incompetent')
+    )
+
+    expect(scoreDiplomacyAcceptance(highTrustWorld, alliance, 'schemer')).toBeGreaterThan(
+      scoreDiplomacyAcceptance(highTrustWorld, alliance, 'incompetent')
+    )
+    expect(scoreDiplomacyAcceptance(highTrustWorld, alliance, 'benevolent')).toBeGreaterThan(
+      scoreDiplomacyAcceptance(highTrustWorld, alliance, 'tyrant')
+    )
+    expect(scoreDiplomacyAcceptance(highTrustWorld, nonAggression, 'steward')).toBeGreaterThan(
+      scoreDiplomacyAcceptance(highTrustWorld, nonAggression, 'conqueror')
+    )
+
+    expect(scoreDiplomacyAcceptance(highTrustWorld, declareWar, 'conqueror')).toBeGreaterThan(
+      scoreDiplomacyAcceptance(highTrustWorld, declareWar, 'steward')
+    )
+    expect(scoreDiplomacyAcceptance(highTrustWorld, declareWar, 'tyrant')).toBeGreaterThan(
+      scoreDiplomacyAcceptance(highTrustWorld, declareWar, 'benevolent')
+    )
+    expect(scoreDiplomacyAcceptance(highTrustWorld, declareWar, 'schemer')).toBeGreaterThan(
+      scoreDiplomacyAcceptance(highTrustWorld, declareWar, 'learned')
     )
   })
 })

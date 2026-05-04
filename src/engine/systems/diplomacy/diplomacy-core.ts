@@ -4,6 +4,7 @@ import type {
   DiplomaticProposalId,
   DiplomaticRelation,
   Order,
+  PersonalityArchetype,
   RealmId,
   RelationKey,
   Treaty,
@@ -34,9 +35,13 @@ import {
   M6_ENABLED,
   M6_IDEOLOGY_DISTANCE_WEIGHT,
   M6_PRESTIGE_DIFFERENTIAL_WEIGHT,
+  M8_ALLIANCE_PROPENSITY,
+  M8_PEACE_ACCEPTANCE_THRESHOLD,
+  M8_WAR_DECLARATION_BIAS,
 } from '~/content/m2/balance'
 import { isAtWar } from '~/engine/wars'
 import { cosineSimilarity } from '~/engine/systems/culture/ideology-distance'
+import { getPersonality } from '~/engine/systems/ai/utility-scorer'
 
 export const DIPLOMATIC_ACTIONS: readonly DiplomaticActionKind[] = [
   'alliance',
@@ -136,7 +141,11 @@ export function validateDiplomacyAction(world: World, request: DiplomacyActionRe
         type: 'order',
         relationKey: key,
         order: { type: 'declare-war', targetRealmId: request.targetRealmId },
-        acceptanceScore: scoreDiplomacyAcceptance(world, request),
+        acceptanceScore: scoreDiplomacyAcceptance(
+          world,
+          request,
+          getPersonality(world, request.targetRealmId)
+        ),
       },
     }
   }
@@ -152,12 +161,20 @@ export function validateDiplomacyAction(world: World, request: DiplomacyActionRe
       type: 'proposal',
       relationKey: key,
       proposal: createDiplomaticProposal(world, request),
-      acceptanceScore: scoreDiplomacyAcceptance(world, request),
+      acceptanceScore: scoreDiplomacyAcceptance(
+        world,
+        request,
+        getPersonality(world, request.targetRealmId)
+      ),
     },
   }
 }
 
-export function scoreDiplomacyAcceptance(world: World, request: DiplomacyActionRequest): number {
+export function scoreDiplomacyAcceptance(
+  world: World,
+  request: DiplomacyActionRequest,
+  personality: PersonalityArchetype
+): number {
   const key = relationKey(request.proposingRealmId, request.targetRealmId)
   const relation = world.relations.get(key)
   const attitude = relation ? clampAttitude(relation.attitude) : DIPLOMACY_ACCEPTANCE_ATTITUDE_THRESHOLD
@@ -185,10 +202,26 @@ export function scoreDiplomacyAcceptance(world: World, request: DiplomacyActionR
     + investitureModifier
     - actionCost
 
+  const personalityScore = baseScore + getM8PersonalityModifier(request.kind, personality, baseScore)
   const m6Modifier = getM6Modifier(world, request)
-  const score = m6Modifier === 0 ? baseScore : Math.max(0, Math.min(100, baseScore + m6Modifier))
+  const score = m6Modifier === 0
+    ? personalityScore
+    : Math.max(0, Math.min(100, personalityScore + m6Modifier))
 
   return roundScore(score)
+}
+
+function getM8PersonalityModifier(
+  kind: DiplomaticActionKind,
+  personality: PersonalityArchetype,
+  baseScore: number
+): number {
+  if (kind === 'declare_war') return M8_WAR_DECLARATION_BIAS[personality] * baseScore
+  if (kind === 'peace') return M8_PEACE_ACCEPTANCE_THRESHOLD[personality] * baseScore
+  if (kind === 'alliance' || kind === 'non_aggression') {
+    return M8_ALLIANCE_PROPENSITY[personality] * baseScore
+  }
+  return 0
 }
 
 function getM6Modifier(world: World, request: DiplomacyActionRequest): number {

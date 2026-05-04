@@ -133,11 +133,11 @@ describe('Zhou investiture diplomacy scoring', () => {
       zhouInvestiture: new Map([[qin, makeInvestiture({ recognizedTitle: '王', expiresAtTick: 4 })]]),
     })
 
-    expect(scoreDiplomacyAcceptance(withActiveInvestiture, request)).toBeCloseTo(
-      scoreDiplomacyAcceptance(withoutInvestiture, request) + DIPLOMACY_ZHOU_INVESTITURE_ACCEPTANCE_MODIFIER,
+    expect(scoreDiplomacyAcceptance(withActiveInvestiture, request, 'incompetent')).toBeCloseTo(
+      scoreDiplomacyAcceptance(withoutInvestiture, request, 'incompetent') + DIPLOMACY_ZHOU_INVESTITURE_ACCEPTANCE_MODIFIER,
     )
-    expect(scoreDiplomacyAcceptance(withExpiredInvestiture, request)).toBeCloseTo(
-      scoreDiplomacyAcceptance(withoutInvestiture, request),
+    expect(scoreDiplomacyAcceptance(withExpiredInvestiture, request, 'incompetent')).toBeCloseTo(
+      scoreDiplomacyAcceptance(withoutInvestiture, request, 'incompetent'),
     )
   })
 

@@ -6,6 +6,7 @@ import type {
   DiplomaticRelation,
   DiplomaticTreatyKind,
   GameEvent,
+  PersonalityArchetype,
   RelationKey,
   RNGState,
   Treaty,
@@ -15,14 +16,17 @@ import type {
   World,
 } from '~/shared/types'
 import {
+  DIPLOMACY_ACCEPTANCE_BASE,
   DIPLOMACY_NON_AGGRESSION_DURATION_TICKS,
   DIPLOMACY_RELATION_DRIFT_DELTA,
   DIPLOMACY_RELATION_DRIFT_INTERVAL_TICKS,
   DIPLOMACY_RELATION_NEUTRAL_ATTITUDE,
   DIPLOMACY_RELATION_NEUTRAL_TRUST,
   DIPLOMACY_TRUCE_DURATION_TICKS,
+  M8_PEACE_ACCEPTANCE_THRESHOLD,
 } from '~/content/m2/balance'
 import { endWar, warKey } from '~/engine/wars'
+import { getPersonality } from '~/engine/systems/ai/utility-scorer'
 import { updateCoalitionPressure } from './coalitions'
 import { clampRelation, relationKey, scoreDiplomacyAcceptance } from './diplomacy-core'
 import { pushDiplomacyHistory } from './history'
@@ -35,8 +39,6 @@ interface LifecycleState {
   readonly history: DiplomacyEvent[]
   readonly events: GameEvent[]
 }
-
-const ACCEPTANCE_THRESHOLD = 0
 
 export function diplomacyLifecycleStep(
   world: World,
@@ -82,19 +84,30 @@ function resolveProposals(world: World, state: LifecycleState): void {
       continue
     }
 
-    const score = scoreDiplomacyAcceptance(worldWithLifecycleState(world, state), {
+    const proposalWorld = worldWithLifecycleState(world, state)
+    const personality = getPersonality(proposalWorld, proposal.targetRealmId)
+    const score = scoreDiplomacyAcceptance(proposalWorld, {
       kind: proposal.kind,
       proposingRealmId: proposal.proposingRealmId,
       targetRealmId: proposal.targetRealmId,
       proposalId: proposal.id,
-    })
+    }, personality)
+    const threshold = getAcceptanceThreshold(proposal.kind, personality)
 
-    if (score >= ACCEPTANCE_THRESHOLD) {
+    if (score >= threshold) {
       acceptProposal(world, state, proposal)
     } else {
       removeProposal(world, state, proposal, 'rejected')
     }
   }
+}
+
+function getAcceptanceThreshold(
+  kind: DiplomaticActionKind,
+  personality: PersonalityArchetype
+): number {
+  if (kind === 'peace') return M8_PEACE_ACCEPTANCE_THRESHOLD[personality]
+  return DIPLOMACY_ACCEPTANCE_BASE
 }
 
 function updateTreaties(world: World, state: LifecycleState): void {
