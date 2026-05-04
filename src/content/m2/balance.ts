@@ -238,9 +238,9 @@ export const M5_PERSONALITY_WEIGHTS: Record<string, Record<string, number>> = {
     economy: 1.0,
   },
   learned: {
-    attack: 0.5,
+    attack: 0.4,
     retreat: 1.2,
-    'siege-continue': 0.5,
+    'siege-continue': 0.6,
     'cut-supply': 1.0,
     recruit: 1.0,
     diplomacy: 2.0,
@@ -276,8 +276,8 @@ export const M5_PERSONALITY_WEIGHTS: Record<string, Record<string, number>> = {
   builder: {
     attack: 0.6,
     retreat: 1.0,
-    'siege-continue': 0.5,
-    'cut-supply': 1.2,
+    'siege-continue': 0.4,
+    'cut-supply': 1.0,
     recruit: 1.5,
     diplomacy: 1.5,
     economy: 3.0,
@@ -345,12 +345,12 @@ export const M41_AI_REFORM_CHECK_INTERVAL_TICKS = 36
 export const M41_AI_PERSONALITY_REFORM_PROPENSITY: Record<string, number> = {
   builder: 0.4,
   conqueror: 0.25,
-  steward: 0,
-  schemer: 0,
-  learned: 0,
-  tyrant: 0,
-  incompetent: 0,
-  benevolent: 0,
+  schemer: 0.18,
+  tyrant: 0.15,
+  learned: 0.12,
+  steward: 0.08,
+  benevolent: 0.05,
+  incompetent: 0.02,
 }
 
 export const M41_REFORM_FAILURE_TREASURY_LOSS = 2000
