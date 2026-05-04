@@ -7,6 +7,7 @@ import type {
   GeneralId,
   Ideology,
   IdeologyLean,
+  PersonalityArchetype,
   RealmId,
   RNGState,
   Specialty,
@@ -14,12 +15,14 @@ import type {
 } from '~/shared/types'
 import { nextRng } from '~/engine/random'
 import { isYearStart } from '~/engine/calendar'
+import { getPersonality } from '~/engine/systems/ai/utility-scorer'
 import {
   M5_RECRUITMENT_PER_REALM_PER_YEAR,
   M5_SPECIALTY_WEIGHTS_RECRUITMENT,
   M6_ACADEMY_HOST_RATIO,
   M6_ACADEMY_NEAR_RATIO,
   M6_ENABLED,
+  M8_RECRUITMENT_SPECIALTY_PREFERENCE,
 } from '~/content/m2/balance'
 
 const NAME_POOL: readonly string[] = [
@@ -32,19 +35,56 @@ const NAME_POOL: readonly string[] = [
 ]
 
 const ALL_IDEOLOGIES: readonly Ideology[] = ['fa', 'ru', 'dao', 'mo', 'zonghen', 'bing']
+const ALL_SPECIALTIES = Object.keys(M8_RECRUITMENT_SPECIALTY_PREFERENCE.incompetent) as Specialty[]
 const ZERO_LEAN: IdeologyLean = { fa: 0, ru: 0, dao: 0, mo: 0, zonghen: 0, bing: 0 }
 
-function pickSpecialty(rng: RNGState): { specialty: Specialty; nextRng: RNGState } {
-  const roll = nextRng(rng)
-  const entries = Object.entries(M5_SPECIALTY_WEIGHTS_RECRUITMENT)
+function weightedSpecialtyEntries(
+  baseWeights: Readonly<Record<string, number>>,
+  personality: PersonalityArchetype,
+): readonly (readonly [Specialty, number])[] {
+  const rawEntries = ALL_SPECIALTIES.map((specialty) => [
+    specialty,
+    (baseWeights[specialty] ?? 0) * M8_RECRUITMENT_SPECIALTY_PREFERENCE[personality][specialty],
+  ] as const)
+  const totalWeight = rawEntries.reduce((sum, [, weight]) => sum + weight, 0)
+
+  return rawEntries.map(([specialty, weight]) => [specialty, weight / totalWeight] as const)
+}
+
+function pickSpecialtyFromRoll(
+  roll: number,
+  baseWeights: Readonly<Record<string, number>>,
+  personality: PersonalityArchetype,
+): Specialty {
+  const entries = weightedSpecialtyEntries(baseWeights, personality)
   let cumulative = 0
   for (const [specialty, weight] of entries) {
     cumulative += weight
-    if (roll.value < cumulative) {
-      return { specialty: specialty as Specialty, nextRng: roll.nextState }
+    if (roll < cumulative) {
+      return specialty
     }
   }
-  return { specialty: entries[entries.length - 1]![0] as Specialty, nextRng: roll.nextState }
+  return entries[entries.length - 1]![0]
+}
+
+export function pickSpecialty(
+  rng: RNGState,
+  baseWeights: Readonly<Record<string, number>> = M5_SPECIALTY_WEIGHTS_RECRUITMENT,
+  personality: PersonalityArchetype = 'incompetent',
+): Specialty {
+  const roll = nextRng(rng)
+  return pickSpecialtyFromRoll(roll.value, baseWeights, personality)
+}
+
+function rollSpecialty(
+  rng: RNGState,
+  personality: PersonalityArchetype,
+): { specialty: Specialty; nextRng: RNGState } {
+  const roll = nextRng(rng)
+  return {
+    specialty: pickSpecialtyFromRoll(roll.value, M5_SPECIALTY_WEIGHTS_RECRUITMENT, personality),
+    nextRng: roll.nextState,
+  }
 }
 
 function pickName(rng: RNGState, existingNames: Set<string>): { name: string; nextRng: RNGState } {
@@ -120,7 +160,11 @@ interface RolledTalent {
   readonly nextRng: RNGState
 }
 
-function rollTalent(rng: RNGState, existingNames: Set<string>): RolledTalent {
+function rollTalent(
+  rng: RNGState,
+  existingNames: Set<string>,
+  personality: PersonalityArchetype,
+): RolledTalent {
   let currentRng = rng
   const wu = rollAttr(currentRng); currentRng = wu.nextRng
   const zheng = rollAttr(currentRng); currentRng = zheng.nextRng
@@ -129,7 +173,7 @@ function rollTalent(rng: RNGState, existingNames: Set<string>): RolledTalent {
   const xue = rollAttr(currentRng); currentRng = xue.nextRng
   const po = rollAttr(currentRng); currentRng = po.nextRng
 
-  const specialtyRoll = pickSpecialty(currentRng); currentRng = specialtyRoll.nextRng
+  const specialtyRoll = rollSpecialty(currentRng, personality); currentRng = specialtyRoll.nextRng
   const ambitionRoll = rollAmbition(currentRng); currentRng = ambitionRoll.nextRng
   const nameRoll = pickName(currentRng, existingNames); currentRng = nameRoll.nextRng
 
@@ -169,6 +213,8 @@ export function recruitmentPhase(
   const sortedRealmIds = [...world.realms.keys()].sort((a, b) => a.localeCompare(b))
 
   for (const realmId of sortedRealmIds) {
+    const personality = getPersonality(world, realmId)
+
     if (M6_ENABLED) {
       const realmAcademies = [...world.academies.values()]
         .filter((a) => a.hostRealmId === realmId && a.status === 'active')
@@ -179,7 +225,7 @@ export function recruitmentPhase(
         const targetRoll = nextRng(currentRng); currentRng = targetRoll.nextState
         const targetRealmId = pickAcademyTarget(world, realmId, targetRoll.value)
 
-        const talent = rollTalent(currentRng, existingNames); currentRng = talent.nextRng
+        const talent = rollTalent(currentRng, existingNames, personality); currentRng = talent.nextRng
         existingNames.add(talent.name)
 
         const generalId = makeAcademyGeneralId(academy, world.tick, academySlot)
@@ -211,7 +257,7 @@ export function recruitmentPhase(
     }
 
     for (let i = 0; i < M5_RECRUITMENT_PER_REALM_PER_YEAR; i++) {
-      const talent = rollTalent(currentRng, existingNames); currentRng = talent.nextRng
+      const talent = rollTalent(currentRng, existingNames, personality); currentRng = talent.nextRng
       existingNames.add(talent.name)
 
       const generalId: GeneralId = `gen_wild_${realmId}_${world.tick}_${i}`

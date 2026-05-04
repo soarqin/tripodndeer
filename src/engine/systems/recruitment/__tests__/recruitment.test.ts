@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { recruitmentPhase } from '../recruitment'
+import { pickSpecialty, recruitmentPhase } from '../recruitment'
 import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
 import { PHASE_NAMES, PHASE_ORDER } from '~/engine/phases'
 import type {
@@ -10,10 +10,14 @@ import type {
   Realm,
   RealmId,
   RNGState,
+  PersonalityArchetype,
   Specialty,
   World,
 } from '~/shared/types'
-import { M5_RECRUITMENT_PER_REALM_PER_YEAR } from '~/content/m2/balance'
+import {
+  M5_RECRUITMENT_PER_REALM_PER_YEAR,
+  M5_SPECIALTY_WEIGHTS_RECRUITMENT,
+} from '~/content/m2/balance'
 
 const yearStart: GameDate = { yearBC: 260, season: 'spring', month: 1, xun: 'shang' }
 const midYear: GameDate = { yearBC: 260, season: 'summer', month: 2, xun: 'zhong' }
@@ -38,6 +42,31 @@ function makeRealm(id: RealmId): Realm {
 function worldWithRealms(realmIds: readonly RealmId[], date: GameDate = yearStart): World {
   const realms = new Map(realmIds.map((id) => [id, makeRealm(id)]))
   return makeTestWorld({ date, realms })
+}
+
+function specialtyCounts(personality: PersonalityArchetype): Map<Specialty, number> {
+  const counts = new Map<Specialty, number>()
+  let currentRng: RNGState = { seed: 42, counter: 0 }
+  for (let i = 0; i < 50; i++) {
+    const result = pickSpecialty(
+      currentRng,
+      M5_SPECIALTY_WEIGHTS_RECRUITMENT,
+      personality,
+    )
+    counts.set(result.specialty, (counts.get(result.specialty) ?? 0) + 1)
+    currentRng = result.nextRng
+  }
+  return counts
+}
+
+function countAny(counts: ReadonlyMap<Specialty, number>, specialties: readonly Specialty[]): number {
+  return specialties.reduce((sum, specialty) => sum + (counts.get(specialty) ?? 0), 0)
+}
+  return counts
+}
+
+function countAny(counts: ReadonlyMap<Specialty, number>, specialties: readonly Specialty[]): number {
+  return specialties.reduce((sum, specialty) => sum + (counts.get(specialty) ?? 0), 0)
 }
 
 describe('recruitmentPhase', () => {
@@ -226,5 +255,55 @@ describe('recruitmentPhase', () => {
     expect(result.world.generals.has('gen_existing_1')).toBe(true)
     expect(result.world.generals.get('gen_existing_1')?.name).toBe('Existing')
     expect(result.world.generals.size).toBe(1 + M5_RECRUITMENT_PER_REALM_PER_YEAR)
+  })
+})
+
+describe('pickSpecialty personality preferences', () => {
+  it('conqueror prefers commander/warrior', () => {
+    const counts = specialtyCounts('conqueror')
+
+    expect(countAny(counts, ['commander', 'warrior'])).toBeGreaterThan(25)
+  })
+
+  it('learned prefers scholar', () => {
+    const counts = specialtyCounts('learned')
+
+    expect(counts.get('scholar') ?? 0).toBeGreaterThan(15)
+  })
+
+  it('schemer prefers spy/strategist/diplomat', () => {
+    const counts = specialtyCounts('schemer')
+
+    expect(countAny(counts, ['spy', 'strategist', 'diplomat'])).toBeGreaterThan(20)
+  })
+
+  it('steward prefers administrator', () => {
+    const counts = specialtyCounts('steward')
+
+    expect(counts.get('administrator') ?? 0).toBeGreaterThan(15)
+  })
+
+  it('builder prefers reformer/engineer', () => {
+    const counts = specialtyCounts('builder')
+
+    expect(countAny(counts, ['reformer', 'engineer'])).toBeGreaterThan(20)
+  })
+
+  it('benevolent prefers administrator/scholar', () => {
+    const counts = specialtyCounts('benevolent')
+
+    expect(countAny(counts, ['administrator', 'scholar'])).toBeGreaterThan(20)
+  })
+
+  it('incompetent has no specialty over 20 percent', () => {
+    const counts = specialtyCounts('incompetent')
+
+    expect(Math.max(...counts.values())).toBeLessThanOrEqual(10)
+  })
+
+  it('tyrant prefers commander/spy', () => {
+    const counts = specialtyCounts('tyrant')
+
+    expect(countAny(counts, ['commander', 'spy'])).toBeGreaterThan(20)
   })
 })
