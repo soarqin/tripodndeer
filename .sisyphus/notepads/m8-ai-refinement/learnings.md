@@ -55,3 +55,7 @@
 ### T7 Personality Coverage Migration — 2026-05-05
 - `personality-coverage.test.ts` now keeps the old truth table only as `LEGACY_SNAPSHOT_REFERENCE`; assertions derive behavior through `pickAction`/`scoreOption` with fixed seeds.
 - Current action-kind profiles still collapse multiple archetypes, so the ≥24 pair threshold is checked against selected-action or weighted-score profile differences until later balance work expands action selection separation.
+
+### T13 Tactical Scoring — 2026-05-05
+- `M5_PERSONALITY_WEIGHTS` now explicitly covers `cut-supply`; `idle` remains omitted so `scoreOption` keeps the documented `?? 1.0` fallback.
+- Tactical pair coverage is best guarded over `attack`, `siege-continue`, `retreat`, and `cut-supply` so all 28 archetype pairs must differ in at least one tactical column.
