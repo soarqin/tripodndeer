@@ -8,7 +8,7 @@ AI agent behavioral guidelines for this codebase. Read before making any changes
 
 战国策略游戏引擎原型。Vite + React + TypeScript strict，纯函数引擎 + Zustand UI 层。
 
-**当前里程碑**: M0/M1/M2/M3/M3.1/M4(v1)/M5/M4.1/M4.2/M6/M7 已交付。M8 为下一里程碑。
+**当前里程碑**: M0/M1/M2/M3/M3.1/M4(v1)/M5/M4.1/M4.2/M6/M7/M7.1 已交付。M8 为下一里程碑。
 
 **实施顺序**: M4(✅) → M5 人物(✅) → M4.1 变法(✅) → M4.2 灾害·贸易·派系(✅) → M6 文化(✅) → M7 谍报
 
@@ -135,6 +135,8 @@ AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按
 | ESPIONAGE_ACTION_KINDS 长度 = 4（不含 forbidden） | `src/engine/systems/espionage/__tests__/m7-deferred-actions.test.ts` |
 | 56 directional intelligenceCoverage entries at scenario start | `src/shared/__tests__/m7-world-fields.test.ts` |
 | All M7 balance constants prefixed M7_ | `src/content/m2/__tests__/balance-m7.test.ts` |
+| army-render fog gating: enemy armies hidden when coverage < 30 (M7_COVERAGE_TIER_1) | `src/rendering/map/__tests__/army-render-gating.test.ts` |
+| Initial coverage seeded by adjacency: adjacent realms = 30, non-adjacent = 0 | `src/engine/world/__tests__/factory-coverage.test.ts` |
 
 ---
 
@@ -202,6 +204,9 @@ world.intelligenceCoverage: Map<CoverageKey, number>
   → 定向情报覆盖度 0-100，key = `${observer}__${target}`（directional）
   → 不要用对称 key（必须 directional）
   → 不要在 espionagePhase 之外修改
+  → 渲染层通过 getCoverageTier() 决定 enemy army 可见性
+  → 自己 realm + 盟友（active alliance）永远全可见
+  → adjacent realms 初始 coverage = 30，non-adjacent = 0
 
 world.spyMissions: Map<SpyMissionId, SpyMission>
   → 进行中谍报任务（含历史已完成）
@@ -360,6 +365,8 @@ const world: World = {
 ❌ 不直接 mutate general.loyalty（用 Effect.character.loyalty）
 ❌ 不扩展 AIOption.kind（用 AIEspionageOption parallel 类型）
 ❌ 不新增 Realm.stability 字段（用 factionInfluences 代理）
+❌ 不在 army-render 之外的渲染层 gate visibility（M7.1 仅 army 范围）
+❌ 不直接修改 M7_COVERAGE_TIER_* 数值（30/60/90 是设计契约）
 ```
 
 ---
