@@ -389,11 +389,8 @@ export const M7_COVERAGE_TIER_2 = 60
 export const M7_COVERAGE_TIER_3 = 90
 export const M7_COVERAGE_MIN = 0
 export const M7_COVERAGE_MAX = 100
-export const M7_COVERAGE_DECAY_PER_TICK = 0.5
 
 // AI mission cadence
-export const M7_AI_ESPIONAGE_CHECK_INTERVAL_TICKS = 9
-export const M7_MAX_CONCURRENT_MISSIONS_PER_REALM = 3
 export const M7_COUNTER_INTEL_MAX_LEVEL = 10
 
 // 8 archetype × 4 action weight matrix

@@ -26,9 +26,9 @@ import {
 import { ESPIONAGE_ACTION_KINDS } from '~/shared/types'
 
 describe('M7 balance constants', () => {
-  it('exports at least 25 M7_ constants', () => {
+  it('exports at least 22 M7_ constants', () => {
     const m7Keys = Object.keys(balance).filter((key) => key.startsWith('M7_'))
-    expect(m7Keys.length).toBeGreaterThanOrEqual(25)
+    expect(m7Keys.length).toBeGreaterThanOrEqual(22)
   })
 
   it('M7_ENABLED is a boolean feature flag', () => {
