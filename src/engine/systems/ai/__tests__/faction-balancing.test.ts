@@ -124,7 +124,7 @@ function countIssuedEdicts(personality: PersonalityArchetype, maxInfluence: numb
   return issued
 }
 
-describe('evaluateFactionBalanceAction', () => {
+describe('evaluateFactionBalanceAction - basic', () => {
   it('AI issues edict when imbalance exceeds proximity threshold (>60)', () => {
     const realm = makeRealm('realm_qin')
     const world = makeWorld({
@@ -297,6 +297,9 @@ describe('evaluateFactionBalanceAction', () => {
     expect(result).toBe(world)
   })
 
+})
+
+describe('evaluateFactionBalanceAction - personality bias', () => {
   it('tyrant favors grain reserve edicts in high-imbalance runs', () => {
     let grainReserveCount = 0
 
