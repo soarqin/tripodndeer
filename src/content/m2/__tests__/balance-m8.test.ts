@@ -25,15 +25,22 @@ describe('M8 balance invariants', () => {
   })
 
   it('All M8_* Record tables cover exactly 8 archetypes', () => {
-    for (const archetype of ARCHETYPES) {
-      expect(M8_WAR_DECLARATION_BIAS[archetype]).toBeDefined()
-      expect(M8_PEACE_ACCEPTANCE_THRESHOLD[archetype]).toBeDefined()
-      expect(M8_ALLIANCE_PROPENSITY[archetype]).toBeDefined()
-      expect(M8_COALITION_JOIN_BIAS[archetype]).toBeDefined()
-      expect(M8_RECRUITMENT_SPECIALTY_PREFERENCE[archetype]).toBeDefined()
-      expect(M8_TAX_RATE_TARGET[archetype]).toBeDefined()
-      expect(M8_TREASURY_RESERVE_FLOOR[archetype]).toBeDefined()
-      expect(M8_EDICT_ENACTMENT_BIAS[archetype]).toBeDefined()
+    const tables = [
+      M8_WAR_DECLARATION_BIAS,
+      M8_PEACE_ACCEPTANCE_THRESHOLD,
+      M8_ALLIANCE_PROPENSITY,
+      M8_COALITION_JOIN_BIAS,
+      M8_RECRUITMENT_SPECIALTY_PREFERENCE,
+      M8_TAX_RATE_TARGET,
+      M8_TREASURY_RESERVE_FLOOR,
+      M8_EDICT_ENACTMENT_BIAS,
+    ]
+
+    for (const table of tables) {
+      expect(Object.keys(table)).toHaveLength(8)
+      for (const archetype of ARCHETYPES) {
+        expect(table[archetype as keyof typeof table]).toBeDefined()
+      }
     }
   })
 
