@@ -71,9 +71,12 @@ export function pickSpecialty(
   rng: RNGState,
   baseWeights: Readonly<Record<string, number>> = M5_SPECIALTY_WEIGHTS_RECRUITMENT,
   personality: PersonalityArchetype = 'incompetent',
-): Specialty {
+): { specialty: Specialty; nextRng: RNGState } {
   const roll = nextRng(rng)
-  return pickSpecialtyFromRoll(roll.value, baseWeights, personality)
+  return {
+    specialty: pickSpecialtyFromRoll(roll.value, baseWeights, personality),
+    nextRng: roll.nextState,
+  }
 }
 
 function rollSpecialty(
