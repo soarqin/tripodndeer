@@ -65,7 +65,7 @@ export function diplomacyLifecycleStep(
     relations: state.relations,
     diplomacyHistory: state.history,
   }
-  const coalitionResult = updateCoalitionPressure(nextWorld)
+  const coalitionResult = updateCoalitionPressure(nextWorld, realmId => getPersonality(nextWorld, realmId))
 
   return { world: coalitionResult.world, nextRng: rng, events: [...state.events, ...coalitionResult.events] }
 }

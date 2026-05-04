@@ -1,4 +1,4 @@
-import type { CoalitionId, CoalitionState, DiplomacyEvent, GameEvent, RealmId, WarState, World } from '~/shared/types'
+import type { CoalitionId, CoalitionState, DiplomacyEvent, GameEvent, PersonalityArchetype, RealmId, WarState, World } from '~/shared/types'
 import {
   DIPLOMACY_COALITION_DISSOLVE_THREAT_THRESHOLD,
   DIPLOMACY_COALITION_MIN_MEMBERS,
@@ -9,11 +9,17 @@ import {
   DIPLOMACY_THREAT_SITE_POWER,
   M8_COALITION_JOIN_BIAS,
 } from '~/content/m2/balance'
-import { getPersonality } from '~/engine/systems/ai/utility-scorer'
 import { isAtWar } from '~/engine/wars'
 import { appendDiplomacyHistory } from './history'
 
-export function updateCoalitionPressure(world: World): { readonly world: World; readonly events: readonly GameEvent[] } {
+export type CoalitionPersonalityResolver = (realmId: RealmId) => PersonalityArchetype
+
+const DEFAULT_PERSONALITY_RESOLVER: CoalitionPersonalityResolver = () => 'incompetent'
+
+export function updateCoalitionPressure(
+  world: World,
+  getRealmPersonality: CoalitionPersonalityResolver = DEFAULT_PERSONALITY_RESOLVER,
+): { readonly world: World; readonly events: readonly GameEvent[] } {
   const coalitions = new Map(world.coalitions)
   let history = [...world.diplomacyHistory]
   const events: GameEvent[] = []
@@ -23,7 +29,7 @@ export function updateCoalitionPressure(world: World): { readonly world: World; 
     const coalitionId = createCoalitionId(targetRealmId)
     touched.add(coalitionId)
     const current = coalitions.get(coalitionId)
-    const memberRealmIds = getCoalitionMembers(world, targetRealmId, current)
+    const memberRealmIds = getCoalitionMembers(world, targetRealmId, current, getRealmPersonality)
 
     if (memberRealmIds.length === 0) {
       if (current && current.status !== 'dissolved') {
@@ -71,16 +77,18 @@ function getCoalitionMembers(
   world: World,
   targetRealmId: RealmId,
   current: CoalitionState | undefined,
+  getRealmPersonality: CoalitionPersonalityResolver,
 ): readonly RealmId[] {
   return sortedRealmIds(world)
     .filter(realmId => realmId !== targetRealmId)
     .filter(realmId => {
       const threat = scoreCoalitionThreat(world, targetRealmId, realmId)
-      const personality = getPersonality(world, realmId)
+      const personality = getRealmPersonality(realmId)
+      const bias = M8_COALITION_JOIN_BIAS[personality] ?? 0
       const thresholdBase = current?.status === 'active' || current?.status === 'forming'
         ? DIPLOMACY_COALITION_DISSOLVE_THREAT_THRESHOLD
         : DIPLOMACY_COALITION_THREAT_THRESHOLD
-      const threshold = thresholdBase - M8_COALITION_JOIN_BIAS[personality]
+      const threshold = thresholdBase * (1 - bias)
       return threat >= threshold
     })
 }

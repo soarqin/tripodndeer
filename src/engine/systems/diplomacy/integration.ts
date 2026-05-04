@@ -5,6 +5,7 @@ import type {
 } from '~/shared/types'
 import { DIPLOMACY_BETRAYAL_TRUST_DELTA } from '~/content/m2/balance'
 import { cutTradeRoutesBetween, declareWarWithCasus } from '~/engine/wars'
+import { getPersonality } from '~/engine/systems/ai/utility-scorer'
 import { updateCoalitionPressure } from './coalitions'
 import {
   clampRelation,
@@ -78,7 +79,7 @@ export function applyDiplomacyAction(world: World, request: DiplomacyActionReque
     actorRealmId: request.proposingRealmId,
     targetRealmId: request.targetRealmId,
   })
-  const coalitions = updateCoalitionPressure(reactions.world)
+  const coalitions = updateCoalitionPressure(reactions.world, realmId => getPersonality(reactions.world, realmId))
   return {
     ok: true,
     world: coalitions.world,

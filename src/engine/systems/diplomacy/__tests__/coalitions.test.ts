@@ -132,7 +132,8 @@ function antiQinThreatWorld(threat: number, memberPersonality: PersonalityArchet
 }
 
 function coalitionRatio(world: World, memberRealmIds: readonly RealmId[]): number {
-  const coalition = updateCoalitionPressure(world).world.coalitions.get(createCoalitionId(qin))
+  const resolver = (realmId: RealmId): PersonalityArchetype => world.rulers.get(realmId)?.personality ?? 'incompetent'
+  const coalition = updateCoalitionPressure(world, resolver).world.coalitions.get(createCoalitionId(qin))
   return (coalition?.memberRealmIds.length ?? 0) / memberRealmIds.length
 }
 
@@ -148,24 +149,24 @@ describe('coalition pressure', () => {
       dissolvedAt: null,
     }
 
-    const schemerJoinNearThreshold = coalitionRatio(antiQinThreatWorld(69.8, 'schemer'), memberRealmIds)
-    const learnedJoinNearThreshold = coalitionRatio(antiQinThreatWorld(69.8, 'learned'), memberRealmIds)
-    const tyrantJoinNearThreshold = coalitionRatio(antiQinThreatWorld(69.8, 'tyrant'), memberRealmIds)
-    const conquerorJoinAtThreshold = coalitionRatio(antiQinThreatWorld(70, 'conqueror'), memberRealmIds)
-    const incompetentJoinAtThreshold = coalitionRatio(antiQinThreatWorld(70, 'incompetent'), memberRealmIds)
-    const learnedJoinAtThreshold = coalitionRatio(antiQinThreatWorld(70, 'learned'), memberRealmIds)
-    const benevolentJoinAtThreshold = coalitionRatio(antiQinThreatWorld(70, 'benevolent'), memberRealmIds)
-    const learnedJoinAboveThreshold = coalitionRatio(antiQinThreatWorld(70.2, 'learned'), memberRealmIds)
-    const tyrantJoinAboveThreshold = coalitionRatio(antiQinThreatWorld(70.2, 'tyrant'), memberRealmIds)
-    const schemerStayBelowDissolveThreshold = coalitionRatio(antiQinThreatWorld(44.8, 'schemer', current), memberRealmIds)
-    const benevolentStayBelowDissolveThreshold = coalitionRatio(antiQinThreatWorld(44.8, 'benevolent', current), memberRealmIds)
+    const schemerJoinAtMid = coalitionRatio(antiQinThreatWorld(60, 'schemer'), memberRealmIds)
+    const learnedJoinAtMid = coalitionRatio(antiQinThreatWorld(60, 'learned'), memberRealmIds)
+    const tyrantJoinAtMid = coalitionRatio(antiQinThreatWorld(60, 'tyrant'), memberRealmIds)
+    const conquerorJoinAtBase = coalitionRatio(antiQinThreatWorld(70, 'conqueror'), memberRealmIds)
+    const learnedJoinAtBase = coalitionRatio(antiQinThreatWorld(70, 'learned'), memberRealmIds)
+    const incompetentJoinAtBase = coalitionRatio(antiQinThreatWorld(70, 'incompetent'), memberRealmIds)
+    const benevolentJoinAtBase = coalitionRatio(antiQinThreatWorld(70, 'benevolent'), memberRealmIds)
+    const learnedJoinAtHigh = coalitionRatio(antiQinThreatWorld(84, 'learned'), memberRealmIds)
+    const tyrantJoinAtHigh = coalitionRatio(antiQinThreatWorld(84, 'tyrant'), memberRealmIds)
+    const schemerStayBelowDissolve = coalitionRatio(antiQinThreatWorld(40, 'schemer', current), memberRealmIds)
+    const benevolentStayBelowDissolve = coalitionRatio(antiQinThreatWorld(40, 'benevolent', current), memberRealmIds)
 
-    expect(schemerJoinNearThreshold).toBeGreaterThan(learnedJoinNearThreshold)
-    expect(schemerJoinNearThreshold).toBeGreaterThan(tyrantJoinNearThreshold)
-    expect(conquerorJoinAtThreshold).toBeGreaterThan(learnedJoinAtThreshold)
-    expect(incompetentJoinAtThreshold).toBeGreaterThan(benevolentJoinAtThreshold)
-    expect(learnedJoinAboveThreshold).toBeGreaterThan(tyrantJoinAboveThreshold)
-    expect(schemerStayBelowDissolveThreshold).toBeGreaterThan(benevolentStayBelowDissolveThreshold)
+    expect(schemerJoinAtMid).toBeGreaterThan(learnedJoinAtMid)
+    expect(schemerJoinAtMid).toBeGreaterThan(tyrantJoinAtMid)
+    expect(conquerorJoinAtBase).toBeGreaterThan(learnedJoinAtBase)
+    expect(incompetentJoinAtBase).toBeGreaterThan(benevolentJoinAtBase)
+    expect(learnedJoinAtHigh).toBeGreaterThan(tyrantJoinAtHigh)
+    expect(schemerStayBelowDissolve).toBeGreaterThan(benevolentStayBelowDissolve)
   })
 
   it('forms, updates, and dissolves flat coalition state at deterministic threshold crossings', () => {
