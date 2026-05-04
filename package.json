@@ -11,7 +11,7 @@
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:perf": "vitest run --config vitest.perf.config.ts src/__tests__/perf.test.ts src/__tests__/m5-perf.test.ts",
+    "test:perf": "vitest run --config vitest.perf.config.ts src/__tests__/perf.test.ts src/__tests__/m5-perf.test.ts src/__tests__/m8-perf-determinism.test.ts",
     "test:behavior": "vitest run --config vitest.behavior.config.ts",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
