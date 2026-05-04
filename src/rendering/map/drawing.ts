@@ -50,8 +50,12 @@ export function drawArmiesAndPasses(
   selectedArmyId: string | null,
   passes: ReadonlyMap<string, Pass>,
   adjacencyEdges: ReadonlyMap<string, AdjacencyEdge>,
+  playerRealmId: string,
+  intelligenceCoverage: ReadonlyMap<string, number>,
+  activeAllies: ReadonlySet<string>,
+  m7Enabled: boolean,
 ) {
-  drawArmies(ctx, armies, sites, realms, selectedArmyId, '', new Map(), new Set(), false)
+  drawArmies(ctx, armies, sites, realms, selectedArmyId, playerRealmId, intelligenceCoverage, activeAllies, m7Enabled)
 
   ctx.save()
   for (const pass of passes.values()) {

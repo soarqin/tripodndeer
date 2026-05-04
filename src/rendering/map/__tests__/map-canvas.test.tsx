@@ -81,6 +81,8 @@ vi.mock('@/ui/store/game-store', () => {
       armies: mockArmies,
       passes: mockPasses,
       adjacencyEdges: mockAdjacencyEdges,
+      intelligenceCoverage: new Map<string, number>(),
+      treaties: new Map(),
     },
     selectedArmyId: null,
   }

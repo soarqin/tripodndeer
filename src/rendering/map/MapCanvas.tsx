@@ -1,6 +1,8 @@
 import React, { useRef, useCallback, useMemo } from 'react'
 import { useSites, useRealms, useEdges } from '@/ui/store/selectors'
 import { useGameStore } from '@/ui/store/game-store'
+import { getActiveAllies } from '@/engine/systems/espionage/ally-detection'
+import { M7_ENABLED } from '@/content/m2/balance'
 import { buildTileCache } from './tile-cache'
 import { useSiteTransitions, useCanvasAnimation, TransitionMap } from './transitions'
 import { drawMap, drawArmiesAndPasses, CANVAS_WIDTH, CANVAS_HEIGHT } from './drawing'
@@ -16,6 +18,11 @@ export function MapCanvas(): React.JSX.Element {
   const passes = useGameStore(s => s.world.passes)
   const adjacencyEdges = useGameStore(s => s.world.adjacencyEdges)
   const selectedArmyId = useGameStore(s => s.selectedArmyId)
+  const playerRealmId = useGameStore(s => s.playerRealmId)
+  const intelligenceCoverage = useGameStore(s => s.world.intelligenceCoverage)
+  const treaties = useGameStore(s => s.world.treaties)
+
+  const activeAllies = getActiveAllies(treaties, playerRealmId)
 
   // Build tile cache once (or when sites/realms change — rare)
   const tileCache = useMemo(() => buildTileCache(sites, realms, edges), [sites, realms, edges])
@@ -28,8 +35,8 @@ export function MapCanvas(): React.JSX.Element {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
     drawMap(ctx, sites, tileCache, transitionsRef.current, performance.now())
-    drawArmiesAndPasses(ctx, armies, sites, realms, selectedArmyId, passes, adjacencyEdges)
-  }, [sites, tileCache, armies, realms, selectedArmyId, passes, adjacencyEdges])
+    drawArmiesAndPasses(ctx, armies, sites, realms, selectedArmyId, passes, adjacencyEdges, playerRealmId, intelligenceCoverage, activeAllies, M7_ENABLED)
+  }, [sites, tileCache, armies, realms, selectedArmyId, passes, adjacencyEdges, playerRealmId, intelligenceCoverage, activeAllies])
 
   useCanvasAnimation(draw, transitionsRef)
 
