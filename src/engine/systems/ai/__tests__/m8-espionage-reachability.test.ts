@@ -15,7 +15,7 @@ const QIN: RealmId = 'realm_qin'
 const SAMPLE_SIZE = 50
 const ACTIVE_ACTION_KINDS = ESPIONAGE_ACTION_KINDS.filter(
   (kind) => kind !== 'counter_intel',
-)
+) as EspionageActionKind[]
 type EmptyWorldOverrides = NonNullable<Parameters<typeof makeEmptyWorld>[0]>
 type EmptyWorldRealm = EmptyWorldOverrides['realms'] extends ReadonlyMap<
   RealmId,
