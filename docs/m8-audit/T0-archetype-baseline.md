@@ -134,6 +134,26 @@
 - **`cut-supply`**: 关键战术，目前所有性格对其偏好一致（错误）。
 - **`idle`**: 决定 AI “懒政”或“休养生息”的概率，目前无法通过人格调节。
 
+### 6.3 权重矩阵完整审计 (Full Matrix Audit)
+
+以下是 `M5_PERSONALITY_WEIGHTS` 的当前状态，标注了冗余列与缺失项：
+
+| Archetype | attack | retreat | siege-continue | recruit (Dead) | diplomacy (Dead) | economy (Dead) |
+|---|---|---|---|---|---|---|
+| `conqueror` | 3.0 | 0.5 | 2.0 | 1.5 | 0.5 | 0.5 |
+| `steward` | 0.5 | 1.5 | 0.5 | 1.0 | 1.5 | 3.0 |
+| `schemer` | 1.5 | 1.0 | 1.5 | 1.0 | 2.0 | 1.0 |
+| `learned` | 0.5 | 1.0 | 0.5 | 1.0 | 2.0 | 2.5 |
+| `tyrant` | 2.5 | 0.3 | 2.5 | 1.5 | 0.3 | 0.5 |
+| `incompetent` | 1.0 | 1.5 | 0.5 | 0.5 | 1.0 | 1.0 |
+| `benevolent` | 0.3 | 2.0 | 0.3 | 1.0 | 2.5 | 2.0 |
+| `builder` | 0.5 | 1.0 | 0.5 | 1.5 | 1.5 | 3.0 |
+
+**缺失列**: `cut-supply`, `idle`。由于矩阵中未定义这两列，所有性格在执行这些行动时权重均为默认值 `1.0`。
+
+### 6.4 战术塌缩 (Tactical Collapse)
+从上表可见，`builder` 与 `learned` 的战术权重（attack, retreat, siege-continue）完全一致。这意味着在战场上你无法区分一个“建设者”和一个“学者”。
+
 ## 7. personality-coverage.test.ts Evaluation (测试评估)
 
 通过对 `src/engine/systems/ai/__tests__/personality-coverage.test.ts` 的审计，发现了“战术塌缩”（Tactical Collapse）现象。
