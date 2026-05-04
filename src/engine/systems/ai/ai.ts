@@ -7,7 +7,6 @@ import type {
   EspionageActionKind,
   GameEvent,
   GeneralId,
-  PersonalityArchetype,
   Realm,
   RealmId,
   RelationKey,
@@ -22,7 +21,11 @@ import { findTravelCost } from '~/engine/systems/march'
 import { nextRng } from '~/engine/random'
 import { startSiege } from '~/engine/systems/siege'
 import { isAtWar } from '~/engine/wars'
-import { applyDiplomacyAction, scoreDiplomacyAcceptance, validateDiplomacyAction } from '~/engine/systems/diplomacy'
+import {
+  applyDiplomacyAction,
+  scoreDiplomacyAcceptance,
+  validateDiplomacyAction,
+} from '~/engine/systems/diplomacy'
 import { scoreEspionageOption } from '~/engine/systems/espionage/score-espionage'
 import {
   M7_DISCORD_DURATION_TICKS,
@@ -54,7 +57,7 @@ import {
  */
 export function aiPlanStep(
   world: World,
-  rng: RNGState,
+  rng: RNGState
 ): { world: World; nextRng: RNGState; events: readonly GameEvent[] } {
   if (world.tick % 3 !== 0) {
     return { world, nextRng: rng, events: [] }
@@ -64,7 +67,9 @@ export function aiPlanStep(
   let currentRng = rng
   let phaseState = createAiPhaseState(world)
 
-  for (const realm of [...world.realms.values()].sort((a, b) => a.id.localeCompare(b.id))) {
+  for (const realm of [...world.realms.values()].sort((a, b) =>
+    a.id.localeCompare(b.id)
+  )) {
     if (realm.id === world.playerRealmId) continue
 
     const diplomacyWorld = worldWithAiPhaseState(world, phaseState)
@@ -96,7 +101,11 @@ export function aiPlanStep(
     if (options.length === 1) continue
 
     const personality = getPersonality(world, realm.id)
-    const { action, nextRng: pickRng } = pickAction(options, personality, currentRng)
+    const { action, nextRng: pickRng } = pickAction(
+      options,
+      personality,
+      currentRng
+    )
     currentRng = pickRng
 
     if (action.kind === 'idle') continue
@@ -158,7 +167,10 @@ function worldWithAiPhaseState(world: World, phaseState: AiPhaseState): World {
   }
 }
 
-function phaseStateWithDiplomacyResult(phaseState: AiPhaseState, world: World): AiPhaseState {
+function phaseStateWithDiplomacyResult(
+  phaseState: AiPhaseState,
+  world: World
+): AiPhaseState {
   return {
     ...phaseState,
     wars: world.wars,
@@ -170,14 +182,20 @@ function phaseStateWithDiplomacyResult(phaseState: AiPhaseState, world: World): 
   }
 }
 
-function phaseStateWithEspionageResult(phaseState: AiPhaseState, world: World): AiPhaseState {
+function phaseStateWithEspionageResult(
+  phaseState: AiPhaseState,
+  world: World
+): AiPhaseState {
   return {
     ...phaseState,
     spyMissions: world.spyMissions,
   }
 }
 
-function phaseStateWithBattlefieldResult(phaseState: AiPhaseState, world: World): AiPhaseState {
+function phaseStateWithBattlefieldResult(
+  phaseState: AiPhaseState,
+  world: World
+): AiPhaseState {
   return {
     ...phaseState,
     armies: new Map(world.armies),
@@ -186,10 +204,18 @@ function phaseStateWithBattlefieldResult(phaseState: AiPhaseState, world: World)
   }
 }
 
-function collectTacticalOptions(world: World, phaseState: AiPhaseState, realmId: RealmId): AIOption[] {
-  const candidateTargets = findCandidateTargets(world, phaseState.armies, realmId)
+function collectTacticalOptions(
+  world: World,
+  phaseState: AiPhaseState,
+  realmId: RealmId
+): AIOption[] {
+  const candidateTargets = findCandidateTargets(
+    world,
+    phaseState.armies,
+    realmId
+  )
 
-  const options: AIOption[] = candidateTargets.map(candidate => ({
+  const options: AIOption[] = candidateTargets.map((candidate) => ({
     kind: 'attack',
     targetSiteId: candidate.targetSiteId,
     armyId: candidate.armyId,
@@ -199,7 +225,7 @@ function collectTacticalOptions(world: World, phaseState: AiPhaseState, realmId:
 
   const worldSnapshot = worldWithAiPhaseState(world, phaseState)
   for (const army of [...phaseState.armies.values()]
-    .filter(a => a.realmId === realmId)
+    .filter((a) => a.realmId === realmId)
     .sort((a, b) => a.id.localeCompare(b.id))) {
     const siegeOpt = evaluateSiegeOption(army, worldSnapshot)
     if (siegeOpt) options.push(siegeOpt)
@@ -216,8 +242,11 @@ function applyTacticalAction(
   world: World,
   phaseState: AiPhaseState,
   realmId: RealmId,
-  action: AIOption,
-): { readonly phaseState: AiPhaseState; readonly events: readonly GameEvent[] } {
+  action: AIOption
+): {
+  readonly phaseState: AiPhaseState
+  readonly events: readonly GameEvent[]
+} {
   if (!action.targetSiteId || !action.armyId) return { phaseState, events: [] }
 
   if (action.kind === 'attack' || action.kind === 'cut-supply') {
@@ -228,7 +257,7 @@ function applyTacticalAction(
       {
         targetSiteId: action.targetSiteId,
         armyId: action.armyId,
-      },
+      }
     )
     return {
       phaseState: phaseStateWithDiplomacyResult(phaseState, dispatch.world),
@@ -237,17 +266,23 @@ function applyTacticalAction(
   }
 
   if (action.kind === 'siege-continue') {
-    const newWorld = startSiege(worldWithAiPhaseState(world, phaseState), action.armyId, action.targetSiteId)
+    const newWorld = startSiege(
+      worldWithAiPhaseState(world, phaseState),
+      action.armyId,
+      action.targetSiteId
+    )
     return {
       phaseState: phaseStateWithBattlefieldResult(phaseState, newWorld),
-      events: [{
-        type: 'aiStartedSiege',
-        payload: {
-          realmId,
-          armyId: action.armyId,
-          siteId: action.targetSiteId,
+      events: [
+        {
+          type: 'aiStartedSiege',
+          payload: {
+            realmId,
+            armyId: action.armyId,
+            siteId: action.targetSiteId,
+          },
         },
-      }],
+      ],
     }
   }
 
@@ -258,19 +293,26 @@ function applyTacticalAction(
       ...army,
       state: 'retreating',
       destination: action.targetSiteId,
-      ticksRemaining: findTravelCost(world, army.location, action.targetSiteId, realmId),
+      ticksRemaining: findTravelCost(
+        world,
+        army.location,
+        action.targetSiteId,
+        realmId
+      ),
       source: army.location,
     })
     return {
       phaseState,
-      events: [{
-        type: 'aiRetreatedArmy',
-        payload: {
-          realmId,
-          armyId: action.armyId,
-          targetSiteId: action.targetSiteId,
+      events: [
+        {
+          type: 'aiRetreatedArmy',
+          payload: {
+            realmId,
+            armyId: action.armyId,
+            targetSiteId: action.targetSiteId,
+          },
         },
-      }],
+      ],
     }
   }
 
@@ -285,8 +327,14 @@ interface DiplomacyCandidate {
 
 function planDiplomacyAction(
   world: World,
-  realm: Realm,
-): { readonly ok: true; readonly world: World; readonly events: readonly GameEvent[] } | { readonly ok: false } {
+  realm: Realm
+):
+  | {
+      readonly ok: true
+      readonly world: World
+      readonly events: readonly GameEvent[]
+    }
+  | { readonly ok: false } {
   const candidates = collectDiplomacyCandidates(world, realm.id)
   for (const candidate of candidates) {
     const result = applyDiplomacyAction(world, {
@@ -299,26 +347,50 @@ function planDiplomacyAction(
   return { ok: false }
 }
 
-function collectDiplomacyCandidates(world: World, realmId: RealmId): readonly DiplomacyCandidate[] {
+function collectDiplomacyCandidates(
+  world: World,
+  realmId: RealmId
+): readonly DiplomacyCandidate[] {
   const candidates: DiplomacyCandidate[] = []
 
-  for (const coalition of [...world.coalitions.values()].sort((a, b) => a.id.localeCompare(b.id))) {
-    if ((coalition.status !== 'active' && coalition.status !== 'forming') || !coalition.memberRealmIds.includes(realmId)) {
+  for (const coalition of [...world.coalitions.values()].sort((a, b) =>
+    a.id.localeCompare(b.id)
+  )) {
+    if (
+      (coalition.status !== 'active' && coalition.status !== 'forming') ||
+      !coalition.memberRealmIds.includes(realmId)
+    ) {
       continue
     }
-    if (!world.realms.has(coalition.targetRealmId) || isAtWar(world.wars, realmId, coalition.targetRealmId)) continue
+    if (
+      !world.realms.has(coalition.targetRealmId) ||
+      isAtWar(world.wars, realmId, coalition.targetRealmId)
+    )
+      continue
 
-    for (const memberRealmId of [...coalition.memberRealmIds].sort((a, b) => a.localeCompare(b))) {
-      if (memberRealmId === realmId || !world.realms.has(memberRealmId)) continue
+    for (const memberRealmId of [...coalition.memberRealmIds].sort((a, b) =>
+      a.localeCompare(b)
+    )) {
+      if (memberRealmId === realmId || !world.realms.has(memberRealmId))
+        continue
       pushCandidate(world, candidates, realmId, memberRealmId, 'alliance')
       pushCandidate(world, candidates, realmId, memberRealmId, 'non_aggression')
     }
-    pushCandidate(world, candidates, realmId, coalition.targetRealmId, 'declare_war')
+    pushCandidate(
+      world,
+      candidates,
+      realmId,
+      coalition.targetRealmId,
+      'declare_war'
+    )
   }
 
-  for (const war of [...world.wars.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+  for (const war of [...world.wars.entries()].sort(([a], [b]) =>
+    a.localeCompare(b)
+  )) {
     const targetRealmId = getWarOpponent(war[0], realmId)
-    if (targetRealmId && world.realms.has(targetRealmId)) pushCandidate(world, candidates, realmId, targetRealmId, 'peace')
+    if (targetRealmId && world.realms.has(targetRealmId))
+      pushCandidate(world, candidates, realmId, targetRealmId, 'peace')
   }
 
   for (const relation of sortedRelations(world.relations)) {
@@ -332,9 +404,12 @@ function collectDiplomacyCandidates(world: World, realmId: RealmId): readonly Di
     }
   }
 
-  return candidates.sort((a, b) => b.score - a.score
-    || a.kind.localeCompare(b.kind)
-    || a.targetRealmId.localeCompare(b.targetRealmId))
+  return candidates.sort(
+    (a, b) =>
+      b.score - a.score ||
+      a.kind.localeCompare(b.kind) ||
+      a.targetRealmId.localeCompare(b.targetRealmId)
+  )
 }
 
 function pushCandidate(
@@ -342,7 +417,7 @@ function pushCandidate(
   candidates: DiplomacyCandidate[],
   proposingRealmId: RealmId,
   targetRealmId: RealmId,
-  kind: DiplomaticActionKind,
+  kind: DiplomaticActionKind
 ): void {
   if (hasPendingProposalForPair(world, proposingRealmId, targetRealmId)) return
 
@@ -355,12 +430,22 @@ function pushCandidate(
   candidates.push({ kind, targetRealmId, score })
 }
 
-function hasPendingProposalForPair(world: World, a: RealmId, b: RealmId): boolean {
+function hasPendingProposalForPair(
+  world: World,
+  a: RealmId,
+  b: RealmId
+): boolean {
   const key = relationKeyForRealms(a, b)
   return [...world.diplomaticProposals.values()]
     .sort((left, right) => left.id.localeCompare(right.id))
-    .some(proposal => proposal.status === 'pending'
-      && relationKeyForRealms(proposal.proposingRealmId, proposal.targetRealmId) === key)
+    .some(
+      (proposal) =>
+        proposal.status === 'pending' &&
+        relationKeyForRealms(
+          proposal.proposingRealmId,
+          proposal.targetRealmId
+        ) === key
+    )
 }
 
 function relationKeyForRealms(a: RealmId, b: RealmId): RelationKey {
@@ -374,24 +459,29 @@ function getWarOpponent(key: WarKey, realmId: RealmId): RealmId | null {
   return null
 }
 
-function getRelationPartner(relation: DiplomaticRelation, realmId: RealmId): RealmId | null {
+function getRelationPartner(
+  relation: DiplomaticRelation,
+  realmId: RealmId
+): RealmId | null {
   if (relation.realmAId === realmId) return relation.realmBId
   if (relation.realmBId === realmId) return relation.realmAId
   return null
 }
 
-function sortedRelations(relations: ReadonlyMap<RelationKey, DiplomaticRelation>): readonly DiplomaticRelation[] {
+function sortedRelations(
+  relations: ReadonlyMap<RelationKey, DiplomaticRelation>
+): readonly DiplomaticRelation[] {
   return [...relations.values()].sort((a, b) => a.key.localeCompare(b.key))
 }
 
 function findCandidateTargets(
   world: World,
   armies: ReadonlyMap<ArmyId, Army>,
-  realmId: RealmId,
+  realmId: RealmId
 ): Array<{ targetSiteId: SiteId; armyId: ArmyId }> {
   const candidateTargets: Array<{ targetSiteId: SiteId; armyId: ArmyId }> = []
   const idleArmies = [...armies.values()]
-    .filter(army => army.realmId === realmId && army.state === 'idle')
+    .filter((army) => army.realmId === realmId && army.state === 'idle')
     .sort((a, b) => a.id.localeCompare(b.id))
 
   for (const army of idleArmies) {
@@ -413,7 +503,7 @@ function dispatchCandidate(
   world: World,
   armies: Map<ArmyId, Army>,
   realmId: RealmId,
-  candidate: { targetSiteId: SiteId; armyId: ArmyId },
+  candidate: { targetSiteId: SiteId; armyId: ArmyId }
 ): { world: World; events: GameEvent[] } {
   const { targetSiteId, armyId } = candidate
   const targetSite = world.sites.get(targetSiteId)
@@ -422,7 +512,11 @@ function dispatchCandidate(
 
   const events: GameEvent[] = []
   let nextWorld = world
-  if (targetSite.ownerId && world.realms.has(targetSite.ownerId) && !isAtWar(nextWorld.wars, realmId, targetSite.ownerId)) {
+  if (
+    targetSite.ownerId &&
+    world.realms.has(targetSite.ownerId) &&
+    !isAtWar(nextWorld.wars, realmId, targetSite.ownerId)
+  ) {
     const declaration = applyDiplomacyAction(nextWorld, {
       kind: 'declare_war',
       proposingRealmId: realmId,
@@ -443,11 +537,19 @@ function dispatchCandidate(
     ticksRemaining: findTravelCost(world, army.location, targetSiteId, realmId),
     source: army.location,
   })
-  events.push({ type: 'aiDispatchedArmy', payload: { realmId, armyId, targetSiteId } })
-  if (nextWorld !== world) events.push(...nextWorld.diplomacyHistory.slice(world.diplomacyHistory.length).map(event => ({
-    type: 'diplomacyEvent',
-    payload: event,
-  })))
+  events.push({
+    type: 'aiDispatchedArmy',
+    payload: { realmId, armyId, targetSiteId },
+  })
+  if (nextWorld !== world)
+    events.push(
+      ...nextWorld.diplomacyHistory
+        .slice(world.diplomacyHistory.length)
+        .map((event) => ({
+          type: 'diplomacyEvent',
+          payload: event,
+        }))
+    )
 
   return { world: nextWorld, events }
 }
@@ -456,7 +558,7 @@ function computeEspionageBaseScore(
   _world: World,
   _realm: Realm,
   _targetRealm: Realm,
-  _action: EspionageActionKind,
+  _action: EspionageActionKind
 ): number {
   return 50
 }
@@ -474,9 +576,12 @@ function getMissionDuration(action: EspionageActionKind): number {
   }
 }
 
-function pickDiscordTarget(world: World, targetRealmId: RealmId): GeneralId | null {
+function pickDiscordTarget(
+  world: World,
+  targetRealmId: RealmId
+): GeneralId | null {
   const candidates = [...world.generals.values()]
-    .filter(g => g.realmId === targetRealmId && g.specialty !== 'spy')
+    .filter((g) => g.realmId === targetRealmId && g.specialty !== 'spy')
     .sort((a, b) => a.id.localeCompare(b.id))
   return candidates[0]?.id ?? null
 }
@@ -484,30 +589,36 @@ function pickDiscordTarget(world: World, targetRealmId: RealmId): GeneralId | nu
 export function planEspionageAction(
   world: World,
   realm: Realm,
-  rng: RNGState,
+  rng: RNGState
 ): { ok: boolean; world: World; events: GameEvent[]; nextRng: RNGState } {
   if (!M7_ENABLED) return { ok: false, world, events: [], nextRng: rng }
 
   const spyGeneral = [...world.generals.values()]
     .sort((a, b) => a.id.localeCompare(b.id))
-    .find(g => g.realmId === realm.id && g.specialty === 'spy')
+    .find((g) => g.realmId === realm.id && g.specialty === 'spy')
   if (!spyGeneral) return { ok: false, world, events: [], nextRng: rng }
 
   const hasActiveMission = [...world.spyMissions.values()].some(
-    m => m.spyRealmId === realm.id && m.status === 'in_progress',
+    (m) => m.spyRealmId === realm.id && m.status === 'in_progress'
   )
   if (hasActiveMission) return { ok: false, world, events: [], nextRng: rng }
 
-  const ruler = world.rulers.get(realm.id)
-  const personality: PersonalityArchetype = ruler?.personality ?? 'incompetent'
+  const personality = getPersonality(world, realm.id)
 
   const candidates: AIEspionageOption[] = []
-  const sortedRealms = [...world.realms.values()].sort((a, b) => a.id.localeCompare(b.id))
+  const sortedRealms = [...world.realms.values()].sort((a, b) =>
+    a.id.localeCompare(b.id)
+  )
   for (const targetRealm of sortedRealms) {
     if (targetRealm.id === realm.id) continue
     for (const action of ESPIONAGE_ACTION_KINDS) {
       if (action === 'counter_intel') continue
-      const baseScore = computeEspionageBaseScore(world, realm, targetRealm, action)
+      const baseScore = computeEspionageBaseScore(
+        world,
+        realm,
+        targetRealm,
+        action
+      )
       candidates.push({
         kind: action,
         spyRealmId: realm.id,
@@ -517,9 +628,10 @@ export function planEspionageAction(
     }
   }
 
-  if (candidates.length === 0) return { ok: false, world, events: [], nextRng: rng }
+  if (candidates.length === 0)
+    return { ok: false, world, events: [], nextRng: rng }
 
-  const scored: AIEspionageOption[] = candidates.map(c => ({
+  const scored: AIEspionageOption[] = candidates.map((c) => ({
     ...c,
     score: scoreEspionageOption(c, personality),
   }))
@@ -533,7 +645,8 @@ export function planEspionageAction(
   })
 
   const best = scored[0]!
-  if ((best.score ?? 0) <= 0) return { ok: false, world, events: [], nextRng: rng }
+  if ((best.score ?? 0) <= 0)
+    return { ok: false, world, events: [], nextRng: rng }
 
   const duration = getMissionDuration(best.kind)
   const missionId = `mission_${realm.id}_${world.tick}`
@@ -546,7 +659,10 @@ export function planEspionageAction(
     startTick: world.tick,
     resolveTick: world.tick + duration,
     status: 'in_progress',
-    targetGeneralId: best.kind === 'discord' ? pickDiscordTarget(world, best.targetRealmId) : null,
+    targetGeneralId:
+      best.kind === 'discord'
+        ? pickDiscordTarget(world, best.targetRealmId)
+        : null,
   }
 
   const newMissions = new Map(world.spyMissions)
