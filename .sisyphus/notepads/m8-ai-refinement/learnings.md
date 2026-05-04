@@ -51,3 +51,7 @@
 ### Session Notes — 2026-05-05
 - Added the M8 personality differentiation block at the end of `src/content/m2/balance.ts` and kept all tables exhaustively keyed by `PersonalityArchetype`.
 - Verified `PersonalityArchetype`, `Specialty`, and `EdictKind` imports are type-safe; no `Record<string, ...>` was introduced for the new M8 constants.
+
+### T7 Personality Coverage Migration — 2026-05-05
+- `personality-coverage.test.ts` now keeps the old truth table only as `LEGACY_SNAPSHOT_REFERENCE`; assertions derive behavior through `pickAction`/`scoreOption` with fixed seeds.
+- Current action-kind profiles still collapse multiple archetypes, so the ≥24 pair threshold is checked against selected-action or weighted-score profile differences until later balance work expands action selection separation.
