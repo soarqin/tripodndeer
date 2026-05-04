@@ -8,8 +8,10 @@ import type {
   GameDate,
   General,
   GovernorAssignment,
+  PersonalityArchetype,
   Realm,
   RNGState,
+  RulerState,
   Site,
   World,
 } from '~/shared/types'
@@ -21,6 +23,7 @@ import {
   M4_HOUSEHOLD_DIVISOR,
   M5_GOVERNOR_FOOD_BONUS_PER_ZHENG,
   M5_GOVERNOR_TAX_BONUS_PER_ZHENG,
+  M8_PERSONALITY_ARCHETYPE_LIST,
 } from '~/content/m2/balance'
 
 const shangDate: GameDate = { yearBC: 260, season: 'spring', month: 1, xun: 'shang' }
@@ -97,6 +100,19 @@ function makeGeneral(id: string, realmId: string, might: number, command: number
   }
 }
 
+function makeRuler(realmId: string, personality: PersonalityArchetype): RulerState {
+  return {
+    realmId,
+    generalId: `${realmId}_ruler`,
+    age: 40,
+    lifespan: 70,
+    health: 100,
+    personality,
+    successionLawId: 'primogeniture',
+    inOfficeSinceTick: 0,
+  }
+}
+
 function makeGovernorGeneral(id: string, realmId: string, zheng: number): General {
   return {
     id,
@@ -123,8 +139,39 @@ function makeWorld(date: GameDate = shangDate): World {
       ['realm_zhao', makeRealm('realm_zhao', 7, 500, 10)],
       ['realm_qin', makeRealm('realm_qin', 3, 3, 50)],
     ]),
+    rulers: new Map([
+      ['realm_zhao', makeRuler('realm_zhao', 'incompetent')],
+      ['realm_qin', makeRuler('realm_qin', 'incompetent')],
+    ]),
     rngState: rng,
   })
+}
+
+function makeAIEconomyWorld(personality: PersonalityArchetype, taxRate: number): World {
+  return makeEmptyWorld({
+    date: shangDate,
+    tick: 12,
+    sites: new Map(),
+    realms: new Map([
+      ['realm_player', makeRealm('realm_player', 1000, 1000, 20)],
+      ['realm_ai', makeRealm('realm_ai', 1000, 1000, taxRate)],
+    ]),
+    rulers: new Map([
+      ['realm_player', makeRuler('realm_player', 'incompetent')],
+      ['realm_ai', makeRuler('realm_ai', personality)],
+    ]),
+    playerRealmId: 'realm_player',
+    rngState: rng,
+  })
+}
+
+function runMonthlyEconomy(world: World, months: number): World {
+  let nextWorld = world
+  for (let month = 0; month < months; month += 1) {
+    nextWorld = economyPhase(nextWorld, rng).world
+  }
+
+  return nextWorld
 }
 
 describe('economyPhase monthly settlement', () => {
@@ -213,6 +260,32 @@ describe('economyPhase monthly settlement', () => {
     }
   })
 
+})
+
+describe('economyPhase AI personality finance decisions', () => {
+  it('drifts tyrant realm taxRate upward after 12 monthly settlements', () => {
+    const result = runMonthlyEconomy(makeAIEconomyWorld('tyrant', 20), 12)
+
+    expect(result.realms.get('realm_ai')?.economy.taxRate).toBeGreaterThanOrEqual(35)
+  })
+
+  it('drifts benevolent realm taxRate downward after 12 monthly settlements', () => {
+    const result = runMonthlyEconomy(makeAIEconomyWorld('benevolent', 30), 12)
+
+    expect(result.realms.get('realm_ai')?.economy.taxRate).toBeLessThanOrEqual(15)
+  })
+
+  it('keeps AI taxRate within [0, 50] across all archetypes', () => {
+    for (const personality of M8_PERSONALITY_ARCHETYPE_LIST) {
+      const low = runMonthlyEconomy(makeAIEconomyWorld(personality, 1), 12)
+      const high = runMonthlyEconomy(makeAIEconomyWorld(personality, 49), 12)
+
+      expect(low.realms.get('realm_ai')?.economy.taxRate).toBeGreaterThanOrEqual(0)
+      expect(low.realms.get('realm_ai')?.economy.taxRate).toBeLessThanOrEqual(50)
+      expect(high.realms.get('realm_ai')?.economy.taxRate).toBeGreaterThanOrEqual(0)
+      expect(high.realms.get('realm_ai')?.economy.taxRate).toBeLessThanOrEqual(50)
+    }
+  })
 })
 
 describe('economyPhase edicts', () => {

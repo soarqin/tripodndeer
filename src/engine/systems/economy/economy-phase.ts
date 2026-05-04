@@ -19,6 +19,7 @@ import {
 } from '~/engine/systems/statecraft/governors'
 import { settlePeaceTributes } from '~/engine/systems/peace'
 import { getTraitModifiers } from '~/content/m4_1/trait-effects'
+import { applyAIEconomyDecision } from '~/engine/systems/ai/economy-decision'
 
 export function economyPhase(
   world: World,
@@ -28,25 +29,32 @@ export function economyPhase(
     return { world, nextRng: rng, events: [] }
   }
 
-  const realms = new Map(world.realms)
+  let workingWorld = world
   const sites = new Map(world.sites)
   let edicts = world.edicts
 
   for (const realm of sortedRealms(world.realms)) {
+    if (realm.id !== world.playerRealmId) {
+      workingWorld = applyAIEconomyDecision(workingWorld, realm.id)
+    }
+
+    const currentRealm = workingWorld.realms.get(realm.id) ?? realm
     const edictModifiers = getEdictSettlementModifiers(edicts, realm.id)
     const settlement = settleRealm(
-      realm,
+      currentRealm,
       sortedSitesForRealm(world.sites, realm.id),
       sites,
       edictModifiers,
       world.governorAssignments,
       world.generals,
     )
+    const realms = new Map(workingWorld.realms)
     realms.set(realm.id, settlement.realm)
+    workingWorld = { ...workingWorld, realms }
     edicts = settleRealmEdictsAfterMonthlySettlement(edicts, realm.id)
   }
 
-  const settledWorld = settlePeaceTributes({ ...world, realms, sites, edicts })
+  const settledWorld = settlePeaceTributes({ ...workingWorld, sites, edicts })
   const events = buildSettlementEvents(world, settledWorld)
 
   return { world: settledWorld, nextRng: rng, events }
