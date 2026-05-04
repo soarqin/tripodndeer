@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:perf": "vitest run --config vitest.perf.config.ts src/__tests__/perf.test.ts src/__tests__/m5-perf.test.ts",
+    "test:behavior": "vitest run --config vitest.behavior.config.ts",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
