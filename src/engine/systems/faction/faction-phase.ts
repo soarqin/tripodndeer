@@ -14,6 +14,7 @@ import {
   M42_FACTION_INFLUENCE_MIN,
 } from '~/content/m2/balance'
 import { getTraitModifiers } from '~/content/m4_1/trait-effects'
+import { evaluateFactionBalanceAction } from '~/engine/systems/ai/faction-balancing'
 import { detectImbalanceEvents } from './imbalance-detection'
 
 const ALL_FACTION_IDS: readonly FactionId[] = [
@@ -128,6 +129,7 @@ export function factionPhase(
     const factionInfluences = new Map(currentWorld.factionInfluences)
     factionInfluences.set(realm.id, newFactionState)
     currentWorld = { ...currentWorld, factionInfluences }
+    currentWorld = evaluateFactionBalanceAction(currentWorld, realm)
   }
 
   const imbalanceResult = detectImbalanceEvents(currentWorld, rng)
