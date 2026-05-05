@@ -1,0 +1,308 @@
+{
+  "provinces": [
+    {
+      "id": "province_neishi",
+      "name": "内史",
+      "regionId": "region_yongzhou",
+      "realmId": "realm_qin",
+      "siteIds": [],
+      "historicalNotes": "秦国首都区，咸阳所在。《史记·秦本纪》载秦孝公迁都咸阳后设内史管辖京畿。"
+    },
+    {
+      "id": "province_longxi",
+      "name": "陇西",
+      "regionId": "region_yongzhou",
+      "realmId": "realm_qin",
+      "siteIds": [],
+      "historicalNotes": "秦西部边郡。《史记·秦本纪》载秦昭襄王时置，为秦国向西发展的基地。"
+    },
+    {
+      "id": "province_hanzhong",
+      "name": "汉中",
+      "regionId": "region_liangzhou",
+      "realmId": "realm_qin",
+      "siteIds": [],
+      "historicalNotes": "汉水上游。《史记·张仪列传》载秦惠文王更元十三年取楚汉中地置郡。"
+    },
+    {
+      "id": "province_bajun",
+      "name": "巴郡",
+      "regionId": "region_liangzhou",
+      "realmId": "realm_qin",
+      "siteIds": [],
+      "historicalNotes": "巴国故地。《史记·秦本纪》载秦惠文王九年司马错灭巴蜀后置。"
+    },
+    {
+      "id": "province_shujun",
+      "name": "蜀郡",
+      "regionId": "region_liangzhou",
+      "realmId": "realm_qin",
+      "siteIds": [],
+      "historicalNotes": "蜀国故地。《史记·货殖列传》载秦灭蜀后置，李冰曾任蜀郡守，修筑都江堰。"
+    },
+    {
+      "id": "province_shangjun",
+      "name": "上郡",
+      "regionId": "region_yongzhou",
+      "realmId": "realm_qin",
+      "siteIds": [],
+      "historicalNotes": "秦北部边郡。《史记·秦本纪》载秦惠文王十年魏献上郡十五县，秦始置郡。"
+    },
+    {
+      "id": "province_beidi",
+      "name": "北地",
+      "regionId": "region_yongzhou",
+      "realmId": "realm_qin",
+      "siteIds": [],
+      "historicalNotes": "秦西北边郡。《史记·秦本纪》载秦昭襄王三十五年置，防御义渠等部族。"
+    },
+    {
+      "id": "province_jiangjun",
+      "name": "江郡",
+      "regionId": "region_jingzhou",
+      "realmId": "realm_chu",
+      "siteIds": [],
+      "historicalNotes": "楚国核心，郢都所在。《史记·楚世家》载楚国长期经营江汉平原，为楚之根基。"
+    },
+    {
+      "id": "province_huainan",
+      "name": "淮南",
+      "regionId": "region_yangzhou",
+      "realmId": "realm_chu",
+      "siteIds": [],
+      "historicalNotes": "淮河南岸。《战国策·楚策》载楚国东扩后，淮南成为其重要粮仓与战略纵深。"
+    },
+    {
+      "id": "province_jiujiang",
+      "name": "九江",
+      "regionId": "region_yangzhou",
+      "realmId": "realm_chu",
+      "siteIds": [],
+      "historicalNotes": "淮河中游。《史记·楚世家》载楚国在此设有重镇，防御东部诸侯。"
+    },
+    {
+      "id": "province_handong",
+      "name": "汉东",
+      "regionId": "region_jingzhou",
+      "realmId": "realm_chu",
+      "siteIds": [],
+      "historicalNotes": "汉水以东。《左传》载“汉东之国，随为大”，后尽归于楚。"
+    },
+    {
+      "id": "province_yiling",
+      "name": "夷陵",
+      "regionId": "region_jingzhou",
+      "realmId": "realm_chu",
+      "siteIds": [],
+      "historicalNotes": "楚西部要地。《史记·楚世家》载白起拔郢前，夷陵为楚国西部屏障。"
+    },
+    {
+      "id": "province_linzijun",
+      "name": "临淄郡",
+      "regionId": "region_qingzhou",
+      "realmId": "realm_qi",
+      "siteIds": [],
+      "historicalNotes": "齐都临淄所在。《史记·货殖列传》载临淄繁华冠于天下，为齐国政治经济中心。"
+    },
+    {
+      "id": "province_jimo",
+      "name": "即墨",
+      "regionId": "region_qingzhou",
+      "realmId": "realm_qi",
+      "siteIds": [],
+      "historicalNotes": "齐东部重镇。《史记·田单列传》载燕将乐毅破齐，唯即墨与莒不下。"
+    },
+    {
+      "id": "province_langya",
+      "name": "琅琊",
+      "regionId": "region_qingzhou",
+      "realmId": "realm_qi",
+      "siteIds": [],
+      "historicalNotes": "齐东南沿海。《史记·秦始皇本纪》载齐王建曾在此筑馆，为齐国重要港口。"
+    },
+    {
+      "id": "province_jibei",
+      "name": "济北",
+      "regionId": "region_yanzhou",
+      "realmId": "realm_qi",
+      "siteIds": [],
+      "historicalNotes": "济水以北。《史记·齐世家》载齐国在此与赵、魏接壤，为边防重地。"
+    },
+    {
+      "id": "province_beihai",
+      "name": "北海",
+      "regionId": "region_qingzhou",
+      "realmId": "realm_qi",
+      "siteIds": [],
+      "historicalNotes": "齐北部沿海。《战国策·齐策》载齐国北临渤海，产盐之利极厚。"
+    },
+    {
+      "id": "province_yanjun",
+      "name": "燕郡",
+      "regionId": "region_jizhou",
+      "realmId": "realm_yan",
+      "siteIds": [],
+      "historicalNotes": "燕都蓟所在。《史记·燕世家》载燕国以此为中心，统治幽燕之地。"
+    },
+    {
+      "id": "province_liaodong",
+      "name": "辽东",
+      "regionId": "region_jizhou",
+      "realmId": "realm_yan",
+      "siteIds": [],
+      "historicalNotes": "燕东部边郡。《史记·燕世家》载燕将秦开北破东胡后置，筑长城以守。"
+    },
+    {
+      "id": "province_shanggu",
+      "name": "上谷",
+      "regionId": "region_jizhou",
+      "realmId": "realm_yan",
+      "siteIds": [],
+      "historicalNotes": "燕北部边郡。《史记·燕世家》载燕国在此设郡，防御北方游牧民族。"
+    },
+    {
+      "id": "province_yuyang",
+      "name": "渔阳",
+      "regionId": "region_jizhou",
+      "realmId": "realm_yan",
+      "siteIds": [],
+      "historicalNotes": "燕北部边郡。《史记·燕世家》载燕国在此屯兵，为北方边防要塞。"
+    },
+    {
+      "id": "province_yingchuan",
+      "name": "颍川",
+      "regionId": "region_yuzhou",
+      "realmId": "realm_han",
+      "siteIds": [],
+      "historicalNotes": "韩国核心，新郑所在。《史记·韩世家》载韩国以此为基，地处中原腹地。"
+    },
+    {
+      "id": "province_henan",
+      "name": "河南",
+      "regionId": "region_yuzhou",
+      "realmId": "realm_han",
+      "siteIds": [],
+      "historicalNotes": "洛阳周边。《史记·韩世家》载韩国曾占有河南部分土地，与周天子相邻。"
+    },
+    {
+      "id": "province_shangdang_han",
+      "name": "上党（韩）",
+      "regionId": "region_jizhou",
+      "realmId": "realm_han",
+      "siteIds": [],
+      "historicalNotes": "韩国北部。《史记·韩世家》载上党郡守冯亭不愿降秦，转投赵国，引发长平之战。"
+    },
+    {
+      "id": "province_handanjun",
+      "name": "邯郸郡",
+      "regionId": "region_jizhou",
+      "realmId": "realm_zhao",
+      "siteIds": [],
+      "historicalNotes": "赵都邯郸所在。《史记·赵世家》载赵敬侯迁都邯郸，此后成为赵国核心。"
+    },
+    {
+      "id": "province_taiyuan",
+      "name": "太原",
+      "regionId": "region_jizhou",
+      "realmId": "realm_zhao",
+      "siteIds": [],
+      "historicalNotes": "晋阳所在。《史记·赵世家》载赵氏发迹于晋阳，太原为其根本之地。"
+    },
+    {
+      "id": "province_yanmen",
+      "name": "雁门",
+      "regionId": "region_jizhou",
+      "realmId": "realm_zhao",
+      "siteIds": [],
+      "historicalNotes": "赵北部边郡。《史记·赵世家》载赵武灵王胡服骑射后置，李牧曾守此御匈奴。"
+    },
+    {
+      "id": "province_yunzhong",
+      "name": "云中",
+      "regionId": "region_jizhou",
+      "realmId": "realm_zhao",
+      "siteIds": [],
+      "historicalNotes": "赵西北边郡。《史记·赵世家》载赵武灵王破林胡、楼烦后置。"
+    },
+    {
+      "id": "province_daijun",
+      "name": "代郡",
+      "regionId": "region_jizhou",
+      "realmId": "realm_zhao",
+      "siteIds": [],
+      "historicalNotes": "赵北部。《史记·赵世家》载赵灭代国后置，为赵国北方重镇。"
+    },
+    {
+      "id": "province_hedong",
+      "name": "河东",
+      "regionId": "region_jizhou",
+      "realmId": "realm_wei",
+      "siteIds": [],
+      "historicalNotes": "安邑所在。《史记·魏世家》载魏国初期都安邑，河东为其核心领土。"
+    },
+    {
+      "id": "province_hexi",
+      "name": "河西",
+      "regionId": "region_yongzhou",
+      "realmId": "realm_wei",
+      "siteIds": [],
+      "historicalNotes": "黄河以西。《史记·魏世家》载吴起守河西，秦人不敢东向。"
+    },
+    {
+      "id": "province_henei",
+      "name": "河内",
+      "regionId": "region_jizhou",
+      "realmId": "realm_wei",
+      "siteIds": [],
+      "historicalNotes": "黄河以北。《史记·魏世家》载魏国在此拥有大量城邑，为中原要冲。"
+    },
+    {
+      "id": "province_daliang",
+      "name": "大梁",
+      "regionId": "region_yuzhou",
+      "realmId": "realm_wei",
+      "siteIds": [],
+      "historicalNotes": "魏迁都后核心。《史记·魏世家》载魏惠王迁都大梁，此后魏国重心东移。"
+    },
+    {
+      "id": "province_wangji",
+      "name": "王畿",
+      "regionId": "region_yuzhou",
+      "realmId": "realm_zhou",
+      "siteIds": [],
+      "historicalNotes": "周天子直辖，洛邑周边。《史记·周本纪》载周室衰微，仅余王畿之地。"
+    },
+    {
+      "id": "province_kuaiji",
+      "name": "会稽",
+      "regionId": "region_yangzhou",
+      "realmId": "realm_yue",
+      "siteIds": [],
+      "historicalNotes": "越国核心。《史记·越王句践世家》载句践栖于会稽，后励精图治称霸。"
+    },
+    {
+      "id": "province_shanqiu",
+      "name": "商丘",
+      "regionId": "region_yanzhou",
+      "realmId": "realm_song",
+      "siteIds": [],
+      "historicalNotes": "宋国核心。《史记·宋微子世家》载宋国以此为都，地处交通要道。"
+    },
+    {
+      "id": "province_qufu",
+      "name": "曲阜",
+      "regionId": "region_yanzhou",
+      "realmId": "realm_lu",
+      "siteIds": [],
+      "historicalNotes": "鲁国核心。《史记·鲁周公世家》载鲁国守礼乐之邦，以此为文化中心。"
+    },
+    {
+      "id": "province_lingshou",
+      "name": "灵寿",
+      "regionId": "region_jizhou",
+      "realmId": "realm_zhongshan",
+      "siteIds": [],
+      "historicalNotes": "中山国核心。《史记·赵世家》载中山国复国后迁都灵寿，后为赵所灭。"
+    }
+  ]
+}
