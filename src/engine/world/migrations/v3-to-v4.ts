@@ -4,12 +4,12 @@ import {
   type M1DataV3,
   type M1DataV4,
 } from '~/shared/schemas'
-import { migrateScenarioV2ToV3 } from './v2-to-v3'
+import { migrateScenarioV1ToV3 } from './v1-to-v3'
 
 function ensureV3(rawData: unknown): M1DataV3 {
   const version = (rawData as { schema_version?: number } | null)?.schema_version
   if (version === undefined || version < 3) {
-    return migrateScenarioV2ToV3(rawData)
+    return migrateScenarioV1ToV3(rawData)
   }
   return M1DataSchemaV3.parse(rawData)
 }

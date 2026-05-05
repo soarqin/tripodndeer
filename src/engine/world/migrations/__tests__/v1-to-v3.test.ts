@@ -1,11 +1,18 @@
 import scenarioRaw from '@/content/m1/scenario.json'
 import { createWorldFromM1Data } from '@/engine/world/factory'
-import { migrateScenarioV2ToV3 } from '../v2-to-v3'
-import { migrateScenarioV5ToV6 } from '../v5-to-v6'
-import { M1DataSchemaV2, type M1DataV2 } from '@/shared/schemas'
+import { M1DataSchema, M1DataSchemaV2, type M1DataV2 } from '@/shared/schemas'
 import { describe, expect, it } from 'vitest'
+import { ZodError } from 'zod'
+import { migrateScenarioV1ToV3 } from '../v1-to-v3'
+import { migrateScenarioV5ToV6 } from '../v5-to-v6'
 
 const scenarioV2 = M1DataSchemaV2.parse({ ...scenarioRaw, schema_version: 2 })
+
+function makeV1Input(): Record<string, unknown> {
+  const v1 = { ...scenarioRaw } as Record<string, unknown>
+  delete v1.schema_version
+  return v1
+}
 
 function makeV2(overrides: Partial<M1DataV2> = {}): M1DataV2 {
   return M1DataSchemaV2.parse({
@@ -14,7 +21,100 @@ function makeV2(overrides: Partial<M1DataV2> = {}): M1DataV2 {
   })
 }
 
-describe('migrateScenarioV2ToV3 — generals', () => {
+describe('migrateScenarioV1ToV3 — v1/v2 chain', () => {
+  it('migrates v1 data with no schema_version', () => {
+    const migrated = migrateScenarioV1ToV3(makeV1Input())
+
+    expect(migrated.schema_version).toBe(3)
+    expect(migrated.generals).toEqual([])
+    expect(migrated.passes).toEqual([])
+    expect(migrated.adjacencyEdges).toEqual([])
+    expect(migrated.peaceProposals).toEqual([])
+    expect(migrated.relations).toEqual([])
+    expect(migrated.diplomaticProposals).toEqual([])
+    expect(migrated.treaties).toEqual([])
+    expect(migrated.diplomacyHistory).toEqual([])
+    expect(migrated.coalitions).toEqual([])
+    expect(migrated.zhouInvestiture).toEqual([])
+    expect(migrated.rulers.length).toBeGreaterThan(0)
+    expect(migrated.eventChainStates).toEqual([])
+    expect(migrated.realms).toHaveLength(8)
+    for (const realm of migrated.realms) {
+      expect(realm.stats).toEqual({ manpowerPool: 50000, manpowerCap: 80000, warWeariness: 0 })
+    }
+
+    const world = createWorldFromM1Data(migrateScenarioV5ToV6(migrated), 99, 'realm_qin')
+    expect(world.sites.size).toBe(50)
+    expect(world.realms.size).toBe(8)
+    expect(world.armies.size).toBe(16)
+    expect(world.relations.size).toBe(0)
+    expect(world.diplomaticProposals.size).toBe(0)
+    expect(world.treaties.size).toBe(0)
+    expect(world.diplomacyHistory).toEqual([])
+    expect(world.coalitions.size).toBe(0)
+    expect(world.zhouInvestiture.size).toBe(0)
+    expect(world.generals.size).toBe(0)
+    expect(world.passes.size).toBe(0)
+    expect(world.adjacencyEdges.size).toBe(0)
+    expect(world.peaceProposals.size).toBe(0)
+    expect(world.sieges.size).toBe(0)
+  })
+
+  it('migrates v1 data with explicit schema_version 1', () => {
+    const migrated = migrateScenarioV1ToV3({ ...makeV1Input(), schema_version: 1 })
+
+    expect(migrated.schema_version).toBe(3)
+    expect(migrated.realms).toHaveLength(8)
+    expect(migrated.realms.every(realm => realm.stats?.manpowerCap === 80000)).toBe(true)
+  })
+
+  it('accepts already migrated v2 data', () => {
+    const v2 = M1DataSchemaV2.parse({
+      ...scenarioRaw,
+      schema_version: 2,
+      realms: scenarioRaw.realms.map(realm => ({
+        ...realm,
+        stats: { manpowerPool: 50000, manpowerCap: 80000, warWeariness: 0 },
+      })),
+      generals: [],
+      passes: [],
+      adjacencyEdges: [],
+      peaceProposals: [],
+      relations: [],
+      diplomaticProposals: [],
+      treaties: [],
+      diplomacyHistory: [],
+      coalitions: [],
+      zhouInvestiture: [],
+    })
+
+    const v3 = migrateScenarioV1ToV3(v2)
+    expect(v3.schema_version).toBe(3)
+    expect(v3.realms[0]?.stats).toEqual({ manpowerPool: 50000, manpowerCap: 80000, warWeariness: 0 })
+  })
+
+  it('throws ZodError on corrupted v1 data', () => {
+    const bad = {
+      ...makeV1Input(),
+      realms: scenarioRaw.realms.map((realm, index) =>
+        index === 0 ? { ...realm, capital: undefined } : realm,
+      ),
+    }
+
+    expect(() => migrateScenarioV1ToV3(bad)).toThrow(ZodError)
+    expect(() => M1DataSchema.parse(bad)).toThrow(ZodError)
+  })
+
+  it('chains v1→v2→v3 when raw data has no schema_version', () => {
+    const v3 = migrateScenarioV1ToV3(makeV1Input())
+
+    expect(v3.schema_version).toBe(3)
+    expect(Array.isArray(v3.rulers)).toBe(true)
+    expect(Array.isArray(v3.eventChainStates)).toBe(true)
+  })
+})
+
+describe('migrateScenarioV1ToV3 — generals', () => {
   it('derives attrs from might/strategy/learning when missing', () => {
     const data = makeV2({
       generals: [
@@ -31,7 +131,7 @@ describe('migrateScenarioV2ToV3 — generals', () => {
       ],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     const gen = v3.generals.find(g => g.id === 'gen_test')!
 
     expect(gen.attrs).toEqual({
@@ -58,7 +158,7 @@ describe('migrateScenarioV2ToV3 — generals', () => {
       ],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     const gen = v3.generals.find(g => g.id === 'gen_basic')!
 
     expect(gen.attrs).toEqual({
@@ -85,7 +185,7 @@ describe('migrateScenarioV2ToV3 — generals', () => {
       ],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     const gen = v3.generals.find(g => g.id === 'gen_admin')!
 
     expect(gen.specialty).toBe('administrator')
@@ -105,7 +205,7 @@ describe('migrateScenarioV2ToV3 — generals', () => {
       ],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     const gen = v3.generals.find(g => g.id === 'gen_cmd')!
 
     expect(gen.specialty).toBe('commander')
@@ -126,7 +226,7 @@ describe('migrateScenarioV2ToV3 — generals', () => {
       ],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     const gen = v3.generals.find(g => g.id === 'gen_dip')!
 
     expect(gen.specialty).toBe('diplomat')
@@ -146,7 +246,7 @@ describe('migrateScenarioV2ToV3 — generals', () => {
       ],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     const gen = v3.generals.find(g => g.id === 'gen_minimal')!
 
     expect(gen.ambition).toBe('mid')
@@ -154,10 +254,9 @@ describe('migrateScenarioV2ToV3 — generals', () => {
     expect(gen.posts).toEqual([])
     expect(gen.loyaltyState).toBe('loyal')
   })
-
 })
 
-describe('migrateScenarioV2ToV3 — realms', () => {
+describe('migrateScenarioV1ToV3 — realms', () => {
   it('realm without rulerId picks general with posts=[ruler]', () => {
     const data = makeV2({
       realms: scenarioV2.realms.map(r => ({ ...r, rulerId: undefined })),
@@ -183,7 +282,7 @@ describe('migrateScenarioV2ToV3 — realms', () => {
       ],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     const qin = v3.realms.find(r => r.id === 'realm_qin')!
 
     expect(qin.rulerId).toBe('gen_king_qin')
@@ -212,7 +311,7 @@ describe('migrateScenarioV2ToV3 — realms', () => {
       ],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     const qin = v3.realms.find(r => r.id === 'realm_qin')!
 
     expect(qin.rulerId).toBe('gen_high')
@@ -224,15 +323,14 @@ describe('migrateScenarioV2ToV3 — realms', () => {
       generals: [],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     for (const realm of v3.realms) {
       expect(realm.rulerId).toBeNull()
     }
   })
-
 })
 
-describe('migrateScenarioV2ToV3 — rulers', () => {
+describe('migrateScenarioV1ToV3 — rulers', () => {
   it('maps aiPersonality=aggressive to ruler.personality=conqueror', () => {
     const data = makeV2({
       realms: [
@@ -255,7 +353,7 @@ describe('migrateScenarioV2ToV3 — rulers', () => {
       ],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     const ruler = v3.rulers.find(r => r.realmId === scenarioV2.realms[0]!.id)!
 
     expect(ruler.personality).toBe('conqueror')
@@ -283,7 +381,7 @@ describe('migrateScenarioV2ToV3 — rulers', () => {
       ],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     const ruler = v3.rulers.find(r => r.realmId === scenarioV2.realms[0]!.id)!
 
     expect(ruler.personality).toBe('steward')
@@ -311,14 +409,14 @@ describe('migrateScenarioV2ToV3 — rulers', () => {
       ],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     const ruler = v3.rulers.find(r => r.realmId === scenarioV2.realms[0]!.id)!
 
     expect(ruler.personality).toBe('schemer')
   })
 
   it('builds ruler defaults: age=45, lifespan=65, health=80, successionLawId=primogeniture', () => {
-    const v3 = migrateScenarioV2ToV3(scenarioV2)
+    const v3 = migrateScenarioV1ToV3(scenarioV2)
     const ruler = v3.rulers[0]!
 
     expect(ruler.age).toBe(45)
@@ -333,39 +431,27 @@ describe('migrateScenarioV2ToV3 — rulers', () => {
       generals: [],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
 
     expect(v3.rulers).toEqual([])
   })
-
 })
 
-describe('migrateScenarioV2ToV3 — schema and integration', () => {
+describe('migrateScenarioV1ToV3 — schema and integration', () => {
   it('outputs eventChainStates as empty array', () => {
-    const v3 = migrateScenarioV2ToV3(scenarioV2)
+    const v3 = migrateScenarioV1ToV3(scenarioV2)
 
     expect(v3.eventChainStates).toEqual([])
   })
 
   it('sets schema_version to 3', () => {
-    const v3 = migrateScenarioV2ToV3(scenarioV2)
+    const v3 = migrateScenarioV1ToV3(scenarioV2)
 
     expect(v3.schema_version).toBe(3)
-  })
-
-  it('chains v1→v2→v3 when raw data has no schema_version', () => {
-    const v1Like = { ...scenarioRaw } as Record<string, unknown>
-    delete v1Like.schema_version
-
-    const v3 = migrateScenarioV2ToV3(v1Like)
-
-    expect(v3.schema_version).toBe(3)
-    expect(Array.isArray(v3.rulers)).toBe(true)
-    expect(Array.isArray(v3.eventChainStates)).toBe(true)
   })
 
   it('populates world.rulers Map for realms with rulers', () => {
-    const v3 = migrateScenarioV2ToV3(scenarioV2)
+    const v3 = migrateScenarioV1ToV3(scenarioV2)
     const v6 = migrateScenarioV5ToV6(v3)
     const world = createWorldFromM1Data(v6, 99, 'realm_qin')
 
@@ -380,7 +466,7 @@ describe('migrateScenarioV2ToV3 — schema and integration', () => {
   })
 
   it('initializes world.eventChainStates as empty Map', () => {
-    const v3 = migrateScenarioV2ToV3(scenarioV2)
+    const v3 = migrateScenarioV1ToV3(scenarioV2)
     const v6 = migrateScenarioV5ToV6(v3)
     const world = createWorldFromM1Data(v6, 99, 'realm_qin')
 
@@ -417,7 +503,7 @@ describe('migrateScenarioV2ToV3 — schema and integration', () => {
       ],
     })
 
-    const v3 = migrateScenarioV2ToV3(data)
+    const v3 = migrateScenarioV1ToV3(data)
     const realm = v3.realms[0]!
 
     expect(realm.rulerId).toBe('gen_existing')

@@ -6,7 +6,7 @@ import { rulerLifecyclePhase } from '~/engine/systems/ruler/ruler-lifecycle'
 import { characterLifecyclePhase } from '~/engine/systems/character/character-lifecycle'
 import { recruitmentPhase } from '~/engine/systems/recruitment/recruitment'
 import { splitRealm } from '~/engine/systems/ruler/realm-split'
-import { migrateScenarioV2ToV3 } from '~/engine/world/migrations/v2-to-v3'
+import { migrateScenarioV1ToV3 } from '~/engine/world/migrations/v1-to-v3'
 import { combatV2Step } from '~/engine/systems/combat-v2/combat-v2-step'
 import { economyPhase } from '~/engine/systems/economy/economy-phase'
 import { setCombatVarianceEnabled } from '~/engine/random'
@@ -396,7 +396,7 @@ describe('M5 edge case integration tests', () => {
         ],
       })
 
-      const v3 = migrateScenarioV2ToV3(data)
+      const v3 = migrateScenarioV1ToV3(data)
       const ruler = v3.rulers.find((r) => r.realmId === realm.id)
 
       expect(ruler).toBeDefined()
