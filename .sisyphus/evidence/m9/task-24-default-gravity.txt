@@ -1,0 +1,10 @@
+    146| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 26 passed (28)
+   Start at  17:28:33
+   Duration  7.18s (transform 632ms, setup 0ms, collect 1.74s, tests 6.23s, environment 1ms, prepare 317ms)
+
+ ELIFECYCLE  Command failed with exit code 1.

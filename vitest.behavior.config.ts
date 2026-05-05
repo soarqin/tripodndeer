@@ -16,7 +16,10 @@ export default defineConfig({
       ['src/rendering/**', 'jsdom'],
     ],
     environment: 'node',
-    include: ['src/engine/systems/ai/__tests__/m8-behavior*.test.ts'],
+    include: [
+      'src/engine/systems/ai/__tests__/m8-behavior*.test.ts',
+      'src/__tests__/m9-history-default-gravity.test.ts',
+    ],
     exclude: ['node_modules', 'dist', 'e2e/**'],
   },
 })

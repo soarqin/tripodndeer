@@ -24,6 +24,7 @@ export default defineConfig({
       'dist',
       'e2e/**',
       'src/__tests__/perf.test.ts',
+      'src/__tests__/m9-history-default-gravity.test.ts',
       'src/engine/systems/ai/__tests__/m8-behavior*.test.ts',
     ],
   },
