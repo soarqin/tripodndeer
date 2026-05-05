@@ -188,6 +188,11 @@ export type PeaceProposalId = string
 export type AdjacencyEdgeId = string
 export type PassId = string
 export type GeneralId = string
+export type ProvinceId = string
+export type RegionId = string
+export type CharId = string
+export type LocaleString = string
+export type RealmStatus = 'active' | 'deactivated'
 export type CulturalTag =
   | 'chinese_qin'
   | 'chinese_chu'
@@ -423,6 +428,15 @@ export interface AdjacencyEdge {
   passId: PassId
 }
 
+export interface CharacterAttributes {
+  wu: number
+  zheng: number
+  jiao: number
+  mou: number
+  xue: number
+  po: number
+}
+
 export interface General {
   id: GeneralId
   realmId: RealmId
@@ -432,14 +446,7 @@ export interface General {
   loyalty: number
   strategy?: number
   learning?: number
-  attrs?: {
-    wu: number
-    zheng: number
-    jiao: number
-    mou: number
-    xue: number
-    po: number
-  }
+  attrs?: CharacterAttributes
   specialty?: Specialty
   ambition?: Ambition
   faction?: FactionId
@@ -486,6 +493,7 @@ export type Effect =
   | { readonly type: 'academy.create'; readonly academyId: AcademyId; readonly hostRealmId: RealmId; readonly hostSiteId: SiteId; readonly primaryIdeology: Ideology }
   | { readonly type: 'academy.dormant'; readonly academyId: AcademyId }
   | { readonly type: 'zhouInvestiture.grant'; readonly realmId: RealmId; readonly rank: ZhouInvestitureRank }
+  | { readonly type: 'realm.deactivate'; readonly realmId: RealmId; readonly reason: 'conquered' | 'extinguished' | 'merged'; readonly absorbingRealmId?: RealmId }
 
 export interface EventChainChoice {
   readonly id: string
@@ -741,6 +749,8 @@ export interface Realm {
   readonly prestige?: number
   readonly ideologyLean?: IdeologyLean
   readonly warVictoriesThisYear?: number
+  readonly status?: RealmStatus
+  readonly rulingHouse?: string
 }
 
 // 游戏日期（旬为最小单位）
@@ -847,6 +857,40 @@ export interface GovernorAssignmentRevokedEvent {
   }
 }
 
+// ─── M9 Warring States Content: Province / Region / CharacterTemplate ──────
+
+export interface Province {
+  readonly id: ProvinceId
+  readonly name: string
+  readonly regionId: RegionId
+  readonly realmId: RealmId
+  readonly siteIds: readonly SiteId[]
+  readonly historicalCapital?: SiteId
+  readonly historicalNotes: string
+}
+
+export interface Region {
+  readonly id: RegionId
+  readonly name: string
+  readonly description?: string
+  readonly provinceIds: readonly ProvinceId[]
+}
+
+export interface CharacterTemplate {
+  readonly id: CharId
+  readonly givenName: string
+  readonly familyName: string
+  readonly realmId: RealmId
+  readonly birthYearBC: number
+  readonly deathYearBC: number | null
+  readonly birthplace: SiteId | string
+  readonly specialty: Specialty
+  readonly attributes: CharacterAttributes
+  readonly historicalNotes: string
+  readonly source: '史记' | '战国策' | '左传' | '其他' | 'approximated'
+  readonly aliases?: readonly string[]
+}
+
 // 时间速度档位
 export type SpeedTier = 'pause' | '1x' | '2x' | '3x' | '4x' | '5x'
 
@@ -888,6 +932,10 @@ export interface World {
   intelligenceCoverage: IntelligenceCoverage
   spyMissions: ReadonlyMap<SpyMissionId, SpyMission>
   counterIntelStates: ReadonlyMap<RealmId, CounterIntelState>
+  provinces: ReadonlyMap<ProvinceId, Province>
+  regions: ReadonlyMap<RegionId, Region>
+  characterTemplates: ReadonlyMap<CharId, CharacterTemplate>
+  localization: ReadonlyMap<string, string>
   playerRealmId: RealmId
   rngState: RNGState // PRNG 状态在 World，不在 module 闭包
   phases: readonly TickPhase[] // Tick 阶段数组（M0 仅 1 个，但形状必须是数组）

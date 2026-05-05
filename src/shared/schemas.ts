@@ -312,6 +312,10 @@ export const GeneralAttrsSchema = z.object({
   po: z.number().int().min(0).max(20),
 })
 
+export const CharacterAttributesSchema = GeneralAttrsSchema
+
+export const RealmStatusSchema = z.enum(['active', 'deactivated'])
+
 export const GeneralSchema = z.object({
   id: z.string().min(1),
   realmId: RealmIdSchema,
@@ -366,6 +370,12 @@ export const EffectSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('academy.create'), academyId: AcademyIdSchema, hostRealmId: RealmIdSchema, hostSiteId: SiteIdSchema, primaryIdeology: IdeologySchema }),
   z.object({ type: z.literal('academy.dormant'), academyId: AcademyIdSchema }),
   z.object({ type: z.literal('zhouInvestiture.grant'), realmId: RealmIdSchema, rank: ZhouInvestitureRankSchema }),
+  z.object({
+    type: z.literal('realm.deactivate'),
+    realmId: RealmIdSchema,
+    reason: z.enum(['conquered', 'extinguished', 'merged']),
+    absorbingRealmId: RealmIdSchema.optional(),
+  }),
 ])
 
 export type Effect = z.infer<typeof EffectSchema>
@@ -693,6 +703,8 @@ export const RealmSchema = z.object({
   prestige: z.number().min(0).max(100).default(40),
   ideologyLean: IdeologyLeanSchema.default({ fa: 0, ru: 0, dao: 0, mo: 0, zonghen: 0, bing: 0 }),
   warVictoriesThisYear: z.number().int().nonnegative().default(0),
+  status: RealmStatusSchema.optional(),
+  rulingHouse: z.string().optional(),
 })
 
 export const M0DataSchema = z.object({
@@ -800,6 +812,42 @@ export const M1DataSchemaV7 = M1DataSchemaV6.extend({
 
 export type M1DataV7 = z.infer<typeof M1DataSchemaV7>
 
+export const ProvinceIdSchema = z.string().min(1)
+export const RegionIdSchema = z.string().min(1)
+export const CharIdSchema = z.string().min(1)
+
+export const ProvinceSchema = z.object({
+  id: ProvinceIdSchema,
+  name: z.string().min(1),
+  regionId: RegionIdSchema,
+  realmId: RealmIdSchema,
+  siteIds: z.array(SiteIdSchema).readonly(),
+  historicalCapital: SiteIdSchema.optional(),
+  historicalNotes: z.string(),
+})
+
+export const RegionSchema = z.object({
+  id: RegionIdSchema,
+  name: z.string().min(1),
+  description: z.string().optional(),
+  provinceIds: z.array(ProvinceIdSchema).readonly(),
+})
+
+export const CharacterTemplateSchema = z.object({
+  id: CharIdSchema,
+  givenName: z.string().min(1),
+  familyName: z.string().min(1),
+  realmId: RealmIdSchema,
+  birthYearBC: z.number().int(),
+  deathYearBC: z.number().int().nullable(),
+  birthplace: z.string().min(1),
+  specialty: SpecialtySchema,
+  attributes: CharacterAttributesSchema,
+  historicalNotes: z.string(),
+  source: z.enum(['史记', '战国策', '左传', '其他', 'approximated']),
+  aliases: z.array(z.string()).readonly().optional(),
+})
+
 // World Schema (for runtime World validation)
 export const WorldSchema = z.object({
   date: z.object({
@@ -837,6 +885,10 @@ export const WorldSchema = z.object({
   intelligenceCoverage: z.instanceof(Map),
   spyMissions: z.instanceof(Map),
   counterIntelStates: z.instanceof(Map),
+  provinces: z.instanceof(Map),
+  regions: z.instanceof(Map),
+  characterTemplates: z.instanceof(Map),
+  localization: z.instanceof(Map),
   playerRealmId: z.string(),
   rngState: z.object({ seed: z.number(), counter: z.number() }),
   phases: z.array(z.function()),
