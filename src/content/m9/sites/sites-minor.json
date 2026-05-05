@@ -1,0 +1,2644 @@
+{
+  "sites": [
+    {
+      "id": "site_qin_minor_01",
+      "name": "秦北小邑01",
+      "type": "regular_city",
+      "provinceId": "province_neishi",
+      "regionId": "region_yongzhou",
+      "position": [
+        80.0,
+        250.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 3700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_02",
+      "name": "秦南小邑01",
+      "type": "regular_city",
+      "provinceId": "province_longxi",
+      "regionId": "region_yongzhou",
+      "position": [
+        85.3,
+        285.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 4400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_03",
+      "name": "秦东小邑01",
+      "type": "regular_city",
+      "provinceId": "province_hanzhong",
+      "regionId": "region_liangzhou",
+      "position": [
+        90.7,
+        320.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 5100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_04",
+      "name": "秦西小邑01",
+      "type": "regular_city",
+      "provinceId": "province_bajun",
+      "regionId": "region_liangzhou",
+      "position": [
+        96.0,
+        355.0
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 5800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_05",
+      "name": "秦中小邑01",
+      "type": "fortress",
+      "provinceId": "province_shujun",
+      "regionId": "region_liangzhou",
+      "position": [
+        101.3,
+        390.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 6500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_06",
+      "name": "秦北小邑02",
+      "type": "regular_city",
+      "provinceId": "province_shangjun",
+      "regionId": "region_yongzhou",
+      "position": [
+        106.7,
+        250.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 7200,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_07",
+      "name": "秦南小邑02",
+      "type": "regular_city",
+      "provinceId": "province_beidi",
+      "regionId": "region_yongzhou",
+      "position": [
+        112.0,
+        285.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 7900,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_08",
+      "name": "秦东小邑02",
+      "type": "regular_city",
+      "provinceId": "province_neishi",
+      "regionId": "region_yongzhou",
+      "position": [
+        117.3,
+        320.0
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 8600,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_09",
+      "name": "秦西小邑02",
+      "type": "regular_city",
+      "provinceId": "province_longxi",
+      "regionId": "region_yongzhou",
+      "position": [
+        122.7,
+        355.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 9300,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_10",
+      "name": "秦中小邑02",
+      "type": "fortress",
+      "provinceId": "province_hanzhong",
+      "regionId": "region_liangzhou",
+      "position": [
+        128.0,
+        390.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 10000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_11",
+      "name": "秦北小邑03",
+      "type": "regular_city",
+      "provinceId": "province_bajun",
+      "regionId": "region_liangzhou",
+      "position": [
+        133.3,
+        250.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 10700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_12",
+      "name": "秦南小邑03",
+      "type": "regular_city",
+      "provinceId": "province_shujun",
+      "regionId": "region_liangzhou",
+      "position": [
+        138.7,
+        285.0
+      ],
+      "terrain": "hills",
+      "defense_value": 2,
+      "population_base": 11400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_13",
+      "name": "秦东小邑03",
+      "type": "regular_city",
+      "provinceId": "province_shangjun",
+      "regionId": "region_yongzhou",
+      "position": [
+        144.0,
+        320.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 12100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_14",
+      "name": "秦西小邑03",
+      "type": "regular_city",
+      "provinceId": "province_beidi",
+      "regionId": "region_yongzhou",
+      "position": [
+        149.3,
+        355.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 12800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_qin_minor_15",
+      "name": "秦中小邑03",
+      "type": "fortress",
+      "provinceId": "province_neishi",
+      "regionId": "region_yongzhou",
+      "position": [
+        154.7,
+        390.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 13500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "战国时期秦国小邑，《史记》载秦国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_01",
+      "name": "楚北小邑01",
+      "type": "regular_city",
+      "provinceId": "province_jiangjun",
+      "regionId": "region_jingzhou",
+      "position": [
+        240.0,
+        340.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 3700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_02",
+      "name": "楚南小邑01",
+      "type": "regular_city",
+      "provinceId": "province_huainan",
+      "regionId": "region_yangzhou",
+      "position": [
+        248.7,
+        360.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 4400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_03",
+      "name": "楚东小邑01",
+      "type": "regular_city",
+      "provinceId": "province_jiujiang",
+      "regionId": "region_yangzhou",
+      "position": [
+        257.3,
+        380.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 5100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_04",
+      "name": "楚西小邑01",
+      "type": "regular_city",
+      "provinceId": "province_handong",
+      "regionId": "region_jingzhou",
+      "position": [
+        266.0,
+        400.0
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 5800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_05",
+      "name": "楚中小邑01",
+      "type": "fortress",
+      "provinceId": "province_yiling",
+      "regionId": "region_jingzhou",
+      "position": [
+        274.7,
+        420.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 6500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_06",
+      "name": "楚北小邑02",
+      "type": "regular_city",
+      "provinceId": "province_jiangjun",
+      "regionId": "region_jingzhou",
+      "position": [
+        283.3,
+        340.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 7200,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_07",
+      "name": "楚南小邑02",
+      "type": "regular_city",
+      "provinceId": "province_huainan",
+      "regionId": "region_yangzhou",
+      "position": [
+        292.0,
+        360.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 7900,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_08",
+      "name": "楚东小邑02",
+      "type": "regular_city",
+      "provinceId": "province_jiujiang",
+      "regionId": "region_yangzhou",
+      "position": [
+        300.7,
+        380.0
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 8600,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_09",
+      "name": "楚西小邑02",
+      "type": "regular_city",
+      "provinceId": "province_handong",
+      "regionId": "region_jingzhou",
+      "position": [
+        309.3,
+        400.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 9300,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_10",
+      "name": "楚中小邑02",
+      "type": "fortress",
+      "provinceId": "province_yiling",
+      "regionId": "region_jingzhou",
+      "position": [
+        318.0,
+        420.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 10000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_11",
+      "name": "楚北小邑03",
+      "type": "regular_city",
+      "provinceId": "province_jiangjun",
+      "regionId": "region_jingzhou",
+      "position": [
+        326.7,
+        340.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 10700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_12",
+      "name": "楚南小邑03",
+      "type": "regular_city",
+      "provinceId": "province_huainan",
+      "regionId": "region_yangzhou",
+      "position": [
+        335.3,
+        360.0
+      ],
+      "terrain": "hills",
+      "defense_value": 2,
+      "population_base": 11400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_13",
+      "name": "楚东小邑03",
+      "type": "regular_city",
+      "provinceId": "province_jiujiang",
+      "regionId": "region_yangzhou",
+      "position": [
+        344.0,
+        380.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 12100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_14",
+      "name": "楚西小邑03",
+      "type": "regular_city",
+      "provinceId": "province_handong",
+      "regionId": "region_jingzhou",
+      "position": [
+        352.7,
+        400.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 12800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_chu_minor_15",
+      "name": "楚中小邑03",
+      "type": "fortress",
+      "provinceId": "province_yiling",
+      "regionId": "region_jingzhou",
+      "position": [
+        361.3,
+        420.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 13500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "战国时期楚国小邑，《史记》载楚国边境城邑。"
+    },
+    {
+      "id": "site_qi_minor_01",
+      "name": "齐北小邑01",
+      "type": "regular_city",
+      "provinceId": "province_linzijun",
+      "regionId": "region_qingzhou",
+      "position": [
+        350.0,
+        210.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 3700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "战国时期齐国小邑，《史记》载齐国边境城邑。"
+    },
+    {
+      "id": "site_qi_minor_02",
+      "name": "齐南小邑01",
+      "type": "regular_city",
+      "provinceId": "province_jimo",
+      "regionId": "region_qingzhou",
+      "position": [
+        355.4,
+        227.5
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 4400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "战国时期齐国小邑，《史记》载齐国边境城邑。"
+    },
+    {
+      "id": "site_qi_minor_03",
+      "name": "齐东小邑01",
+      "type": "regular_city",
+      "provinceId": "province_langya",
+      "regionId": "region_qingzhou",
+      "position": [
+        360.8,
+        245.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 5100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "战国时期齐国小邑，《史记》载齐国边境城邑。"
+    },
+    {
+      "id": "site_qi_minor_04",
+      "name": "齐西小邑01",
+      "type": "regular_city",
+      "provinceId": "province_jibei",
+      "regionId": "region_yanzhou",
+      "position": [
+        366.2,
+        262.5
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 5800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "战国时期齐国小邑，《史记》载齐国边境城邑。"
+    },
+    {
+      "id": "site_qi_minor_05",
+      "name": "齐中小邑01",
+      "type": "fortress",
+      "provinceId": "province_beihai",
+      "regionId": "region_qingzhou",
+      "position": [
+        371.7,
+        280.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 6500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "战国时期齐国小邑，《史记》载齐国边境城邑。"
+    },
+    {
+      "id": "site_qi_minor_06",
+      "name": "齐北小邑02",
+      "type": "regular_city",
+      "provinceId": "province_linzijun",
+      "regionId": "region_qingzhou",
+      "position": [
+        377.1,
+        210.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 7200,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "战国时期齐国小邑，《史记》载齐国边境城邑。"
+    },
+    {
+      "id": "site_qi_minor_07",
+      "name": "齐南小邑02",
+      "type": "regular_city",
+      "provinceId": "province_jimo",
+      "regionId": "region_qingzhou",
+      "position": [
+        382.5,
+        227.5
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 7900,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "战国时期齐国小邑，《史记》载齐国边境城邑。"
+    },
+    {
+      "id": "site_qi_minor_08",
+      "name": "齐东小邑02",
+      "type": "regular_city",
+      "provinceId": "province_langya",
+      "regionId": "region_qingzhou",
+      "position": [
+        387.9,
+        245.0
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 8600,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "战国时期齐国小邑，《史记》载齐国边境城邑。"
+    },
+    {
+      "id": "site_qi_minor_09",
+      "name": "齐西小邑02",
+      "type": "regular_city",
+      "provinceId": "province_jibei",
+      "regionId": "region_yanzhou",
+      "position": [
+        393.3,
+        262.5
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 9300,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "战国时期齐国小邑，《史记》载齐国边境城邑。"
+    },
+    {
+      "id": "site_qi_minor_10",
+      "name": "齐中小邑02",
+      "type": "fortress",
+      "provinceId": "province_beihai",
+      "regionId": "region_qingzhou",
+      "position": [
+        398.8,
+        280.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 10000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "战国时期齐国小邑，《史记》载齐国边境城邑。"
+    },
+    {
+      "id": "site_qi_minor_11",
+      "name": "齐北小邑03",
+      "type": "regular_city",
+      "provinceId": "province_linzijun",
+      "regionId": "region_qingzhou",
+      "position": [
+        404.2,
+        210.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 10700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "战国时期齐国小邑，《史记》载齐国边境城邑。"
+    },
+    {
+      "id": "site_qi_minor_12",
+      "name": "齐南小邑03",
+      "type": "regular_city",
+      "provinceId": "province_jimo",
+      "regionId": "region_qingzhou",
+      "position": [
+        409.6,
+        227.5
+      ],
+      "terrain": "hills",
+      "defense_value": 2,
+      "population_base": 11400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "战国时期齐国小邑，《史记》载齐国边境城邑。"
+    },
+    {
+      "id": "site_yan_minor_01",
+      "name": "燕北小邑01",
+      "type": "regular_city",
+      "provinceId": "province_yanjun",
+      "regionId": "region_jizhou",
+      "position": [
+        305.0,
+        130.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 3700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "战国时期燕国小邑，《史记》载燕国边境城邑。"
+    },
+    {
+      "id": "site_yan_minor_02",
+      "name": "燕南小邑01",
+      "type": "regular_city",
+      "provinceId": "province_liaodong",
+      "regionId": "region_jizhou",
+      "position": [
+        314.0,
+        141.2
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 4400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "战国时期燕国小邑，《史记》载燕国边境城邑。"
+    },
+    {
+      "id": "site_yan_minor_03",
+      "name": "燕东小邑01",
+      "type": "regular_city",
+      "provinceId": "province_shanggu",
+      "regionId": "region_jizhou",
+      "position": [
+        323.0,
+        152.5
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 5100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "战国时期燕国小邑，《史记》载燕国边境城邑。"
+    },
+    {
+      "id": "site_yan_minor_04",
+      "name": "燕西小邑01",
+      "type": "regular_city",
+      "provinceId": "province_yuyang",
+      "regionId": "region_jizhou",
+      "position": [
+        332.0,
+        163.8
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 5800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "战国时期燕国小邑，《史记》载燕国边境城邑。"
+    },
+    {
+      "id": "site_yan_minor_05",
+      "name": "燕中小邑01",
+      "type": "fortress",
+      "provinceId": "province_yanjun",
+      "regionId": "region_jizhou",
+      "position": [
+        341.0,
+        175.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 6500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "战国时期燕国小邑，《史记》载燕国边境城邑。"
+    },
+    {
+      "id": "site_yan_minor_06",
+      "name": "燕北小邑02",
+      "type": "regular_city",
+      "provinceId": "province_liaodong",
+      "regionId": "region_jizhou",
+      "position": [
+        350.0,
+        130.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 7200,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "战国时期燕国小邑，《史记》载燕国边境城邑。"
+    },
+    {
+      "id": "site_yan_minor_07",
+      "name": "燕南小邑02",
+      "type": "regular_city",
+      "provinceId": "province_shanggu",
+      "regionId": "region_jizhou",
+      "position": [
+        359.0,
+        141.2
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 7900,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "战国时期燕国小邑，《史记》载燕国边境城邑。"
+    },
+    {
+      "id": "site_yan_minor_08",
+      "name": "燕东小邑02",
+      "type": "regular_city",
+      "provinceId": "province_yuyang",
+      "regionId": "region_jizhou",
+      "position": [
+        368.0,
+        152.5
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 8600,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "战国时期燕国小邑，《史记》载燕国边境城邑。"
+    },
+    {
+      "id": "site_yan_minor_09",
+      "name": "燕西小邑02",
+      "type": "regular_city",
+      "provinceId": "province_yanjun",
+      "regionId": "region_jizhou",
+      "position": [
+        377.0,
+        163.8
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 9300,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "战国时期燕国小邑，《史记》载燕国边境城邑。"
+    },
+    {
+      "id": "site_yan_minor_10",
+      "name": "燕中小邑02",
+      "type": "fortress",
+      "provinceId": "province_liaodong",
+      "regionId": "region_jizhou",
+      "position": [
+        386.0,
+        175.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 10000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "战国时期燕国小邑，《史记》载燕国边境城邑。"
+    },
+    {
+      "id": "site_han_minor_01",
+      "name": "韩北小邑01",
+      "type": "regular_city",
+      "provinceId": "province_yingchuan",
+      "regionId": "region_yuzhou",
+      "position": [
+        230.0,
+        245.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 3700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "战国时期韩国小邑，《史记》载韩国边境城邑。"
+    },
+    {
+      "id": "site_han_minor_02",
+      "name": "韩南小邑01",
+      "type": "regular_city",
+      "provinceId": "province_henan",
+      "regionId": "region_yuzhou",
+      "position": [
+        235.0,
+        260.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 4400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "战国时期韩国小邑，《史记》载韩国边境城邑。"
+    },
+    {
+      "id": "site_han_minor_03",
+      "name": "韩东小邑01",
+      "type": "regular_city",
+      "provinceId": "province_shangdang_han",
+      "regionId": "region_jizhou",
+      "position": [
+        240.0,
+        275.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 5100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "战国时期韩国小邑，《史记》载韩国边境城邑。"
+    },
+    {
+      "id": "site_han_minor_04",
+      "name": "韩西小邑01",
+      "type": "regular_city",
+      "provinceId": "province_yingchuan",
+      "regionId": "region_yuzhou",
+      "position": [
+        245.0,
+        290.0
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 5800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "战国时期韩国小邑，《史记》载韩国边境城邑。"
+    },
+    {
+      "id": "site_han_minor_05",
+      "name": "韩中小邑01",
+      "type": "fortress",
+      "provinceId": "province_henan",
+      "regionId": "region_yuzhou",
+      "position": [
+        250.0,
+        305.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 6500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "战国时期韩国小邑，《史记》载韩国边境城邑。"
+    },
+    {
+      "id": "site_han_minor_06",
+      "name": "韩北小邑02",
+      "type": "regular_city",
+      "provinceId": "province_shangdang_han",
+      "regionId": "region_jizhou",
+      "position": [
+        255.0,
+        245.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 7200,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "战国时期韩国小邑，《史记》载韩国边境城邑。"
+    },
+    {
+      "id": "site_han_minor_07",
+      "name": "韩南小邑02",
+      "type": "regular_city",
+      "provinceId": "province_yingchuan",
+      "regionId": "region_yuzhou",
+      "position": [
+        260.0,
+        260.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 7900,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "战国时期韩国小邑，《史记》载韩国边境城邑。"
+    },
+    {
+      "id": "site_han_minor_08",
+      "name": "韩东小邑02",
+      "type": "regular_city",
+      "provinceId": "province_henan",
+      "regionId": "region_yuzhou",
+      "position": [
+        265.0,
+        275.0
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 8600,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "战国时期韩国小邑，《史记》载韩国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_01",
+      "name": "赵北小邑01",
+      "type": "regular_city",
+      "provinceId": "province_handanjun",
+      "regionId": "region_jizhou",
+      "position": [
+        225.0,
+        180.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 3700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_02",
+      "name": "赵南小邑01",
+      "type": "regular_city",
+      "provinceId": "province_taiyuan",
+      "regionId": "region_jizhou",
+      "position": [
+        230.7,
+        197.5
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 4400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_03",
+      "name": "赵东小邑01",
+      "type": "regular_city",
+      "provinceId": "province_yanmen",
+      "regionId": "region_jizhou",
+      "position": [
+        236.3,
+        215.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 5100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_04",
+      "name": "赵西小邑01",
+      "type": "regular_city",
+      "provinceId": "province_yunzhong",
+      "regionId": "region_jizhou",
+      "position": [
+        242.0,
+        232.5
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 5800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_05",
+      "name": "赵中小邑01",
+      "type": "fortress",
+      "provinceId": "province_daijun",
+      "regionId": "region_jizhou",
+      "position": [
+        247.7,
+        250.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 6500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_06",
+      "name": "赵北小邑02",
+      "type": "regular_city",
+      "provinceId": "province_handanjun",
+      "regionId": "region_jizhou",
+      "position": [
+        253.3,
+        180.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 7200,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_07",
+      "name": "赵南小邑02",
+      "type": "regular_city",
+      "provinceId": "province_taiyuan",
+      "regionId": "region_jizhou",
+      "position": [
+        259.0,
+        197.5
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 7900,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_08",
+      "name": "赵东小邑02",
+      "type": "regular_city",
+      "provinceId": "province_yanmen",
+      "regionId": "region_jizhou",
+      "position": [
+        264.7,
+        215.0
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 8600,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_09",
+      "name": "赵西小邑02",
+      "type": "regular_city",
+      "provinceId": "province_yunzhong",
+      "regionId": "region_jizhou",
+      "position": [
+        270.3,
+        232.5
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 9300,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_10",
+      "name": "赵中小邑02",
+      "type": "fortress",
+      "provinceId": "province_daijun",
+      "regionId": "region_jizhou",
+      "position": [
+        276.0,
+        250.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 10000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_11",
+      "name": "赵北小邑03",
+      "type": "regular_city",
+      "provinceId": "province_handanjun",
+      "regionId": "region_jizhou",
+      "position": [
+        281.7,
+        180.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 10700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_12",
+      "name": "赵南小邑03",
+      "type": "regular_city",
+      "provinceId": "province_taiyuan",
+      "regionId": "region_jizhou",
+      "position": [
+        287.3,
+        197.5
+      ],
+      "terrain": "hills",
+      "defense_value": 2,
+      "population_base": 11400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_13",
+      "name": "赵东小邑03",
+      "type": "regular_city",
+      "provinceId": "province_yanmen",
+      "regionId": "region_jizhou",
+      "position": [
+        293.0,
+        215.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 12100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_14",
+      "name": "赵西小邑03",
+      "type": "regular_city",
+      "provinceId": "province_yunzhong",
+      "regionId": "region_jizhou",
+      "position": [
+        298.7,
+        232.5
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 12800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_zhao_minor_15",
+      "name": "赵中小邑03",
+      "type": "fortress",
+      "provinceId": "province_daijun",
+      "regionId": "region_jizhou",
+      "position": [
+        304.3,
+        250.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 13500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "战国时期赵国小邑，《史记》载赵国边境城邑。"
+    },
+    {
+      "id": "site_wei_minor_01",
+      "name": "魏北小邑01",
+      "type": "regular_city",
+      "provinceId": "province_hedong",
+      "regionId": "region_jizhou",
+      "position": [
+        195.0,
+        260.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 3700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "战国时期魏国小邑，《史记》载魏国边境城邑。"
+    },
+    {
+      "id": "site_wei_minor_02",
+      "name": "魏南小邑01",
+      "type": "regular_city",
+      "provinceId": "province_hexi",
+      "regionId": "region_yongzhou",
+      "position": [
+        204.0,
+        270.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 4400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "战国时期魏国小邑，《史记》载魏国边境城邑。"
+    },
+    {
+      "id": "site_wei_minor_03",
+      "name": "魏东小邑01",
+      "type": "regular_city",
+      "provinceId": "province_henei",
+      "regionId": "region_jizhou",
+      "position": [
+        213.0,
+        280.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 5100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "战国时期魏国小邑，《史记》载魏国边境城邑。"
+    },
+    {
+      "id": "site_wei_minor_04",
+      "name": "魏西小邑01",
+      "type": "regular_city",
+      "provinceId": "province_daliang",
+      "regionId": "region_yuzhou",
+      "position": [
+        222.0,
+        290.0
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 5800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "战国时期魏国小邑，《史记》载魏国边境城邑。"
+    },
+    {
+      "id": "site_wei_minor_05",
+      "name": "魏中小邑01",
+      "type": "fortress",
+      "provinceId": "province_hedong",
+      "regionId": "region_jizhou",
+      "position": [
+        231.0,
+        300.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 6500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "战国时期魏国小邑，《史记》载魏国边境城邑。"
+    },
+    {
+      "id": "site_wei_minor_06",
+      "name": "魏北小邑02",
+      "type": "regular_city",
+      "provinceId": "province_hexi",
+      "regionId": "region_yongzhou",
+      "position": [
+        240.0,
+        260.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 7200,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "战国时期魏国小邑，《史记》载魏国边境城邑。"
+    },
+    {
+      "id": "site_wei_minor_07",
+      "name": "魏南小邑02",
+      "type": "regular_city",
+      "provinceId": "province_henei",
+      "regionId": "region_jizhou",
+      "position": [
+        249.0,
+        270.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 7900,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "战国时期魏国小邑，《史记》载魏国边境城邑。"
+    },
+    {
+      "id": "site_wei_minor_08",
+      "name": "魏东小邑02",
+      "type": "regular_city",
+      "provinceId": "province_daliang",
+      "regionId": "region_yuzhou",
+      "position": [
+        258.0,
+        280.0
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 8600,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "战国时期魏国小邑，《史记》载魏国边境城邑。"
+    },
+    {
+      "id": "site_wei_minor_09",
+      "name": "魏西小邑02",
+      "type": "regular_city",
+      "provinceId": "province_hedong",
+      "regionId": "region_jizhou",
+      "position": [
+        267.0,
+        290.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 9300,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "战国时期魏国小邑，《史记》载魏国边境城邑。"
+    },
+    {
+      "id": "site_wei_minor_10",
+      "name": "魏中小邑02",
+      "type": "fortress",
+      "provinceId": "province_hexi",
+      "regionId": "region_yongzhou",
+      "position": [
+        276.0,
+        300.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 10000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "战国时期魏国小邑，《史记》载魏国边境城邑。"
+    },
+    {
+      "id": "site_zhou_minor_01",
+      "name": "周北小邑01",
+      "type": "regular_city",
+      "provinceId": "province_wangji",
+      "regionId": "region_yuzhou",
+      "position": [
+        210.0,
+        288.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 3700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhou",
+      "historical_owner": "realm_zhou",
+      "historicalNotes": "战国时期周国小邑，《史记》载周国边境城邑。"
+    },
+    {
+      "id": "site_zhou_minor_02",
+      "name": "周南小邑01",
+      "type": "regular_city",
+      "provinceId": "province_wangji",
+      "regionId": "region_yuzhou",
+      "position": [
+        215.0,
+        292.2
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 4400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhou",
+      "historical_owner": "realm_zhou",
+      "historicalNotes": "战国时期周国小邑，《史记》载周国边境城邑。"
+    },
+    {
+      "id": "site_zhou_minor_03",
+      "name": "周东小邑01",
+      "type": "regular_city",
+      "provinceId": "province_wangji",
+      "regionId": "region_yuzhou",
+      "position": [
+        220.0,
+        296.5
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 5100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhou",
+      "historical_owner": "realm_zhou",
+      "historicalNotes": "战国时期周国小邑，《史记》载周国边境城邑。"
+    },
+    {
+      "id": "site_zhou_minor_04",
+      "name": "周西小邑01",
+      "type": "regular_city",
+      "provinceId": "province_wangji",
+      "regionId": "region_yuzhou",
+      "position": [
+        225.0,
+        300.8
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 5800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhou",
+      "historical_owner": "realm_zhou",
+      "historicalNotes": "战国时期周国小邑，《史记》载周国边境城邑。"
+    },
+    {
+      "id": "site_zhou_minor_05",
+      "name": "周中小邑01",
+      "type": "fortress",
+      "provinceId": "province_wangji",
+      "regionId": "region_yuzhou",
+      "position": [
+        230.0,
+        305.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 6500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhou",
+      "historical_owner": "realm_zhou",
+      "historicalNotes": "战国时期周国小邑，《史记》载周国边境城邑。"
+    },
+    {
+      "id": "site_yue_minor_01",
+      "name": "越北小邑01",
+      "type": "regular_city",
+      "provinceId": "province_kuaiji",
+      "regionId": "region_yangzhou",
+      "position": [
+        390.0,
+        390.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 3700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yue",
+      "historical_owner": "realm_yue",
+      "historicalNotes": "战国时期越国小邑，《史记》载越国边境城邑。"
+    },
+    {
+      "id": "site_yue_minor_02",
+      "name": "越南小邑01",
+      "type": "regular_city",
+      "provinceId": "province_kuaiji",
+      "regionId": "region_yangzhou",
+      "position": [
+        396.0,
+        397.5
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 4400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yue",
+      "historical_owner": "realm_yue",
+      "historicalNotes": "战国时期越国小邑，《史记》载越国边境城邑。"
+    },
+    {
+      "id": "site_yue_minor_03",
+      "name": "越东小邑01",
+      "type": "regular_city",
+      "provinceId": "province_kuaiji",
+      "regionId": "region_yangzhou",
+      "position": [
+        402.0,
+        405.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 5100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yue",
+      "historical_owner": "realm_yue",
+      "historicalNotes": "战国时期越国小邑，《史记》载越国边境城邑。"
+    },
+    {
+      "id": "site_yue_minor_04",
+      "name": "越西小邑01",
+      "type": "regular_city",
+      "provinceId": "province_kuaiji",
+      "regionId": "region_yangzhou",
+      "position": [
+        408.0,
+        412.5
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 5800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yue",
+      "historical_owner": "realm_yue",
+      "historicalNotes": "战国时期越国小邑，《史记》载越国边境城邑。"
+    },
+    {
+      "id": "site_yue_minor_05",
+      "name": "越中小邑01",
+      "type": "fortress",
+      "provinceId": "province_kuaiji",
+      "regionId": "region_yangzhou",
+      "position": [
+        414.0,
+        420.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 6500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yue",
+      "historical_owner": "realm_yue",
+      "historicalNotes": "战国时期越国小邑，《史记》载越国边境城邑。"
+    },
+    {
+      "id": "site_song_minor_01",
+      "name": "宋北小邑01",
+      "type": "regular_city",
+      "provinceId": "province_shanqiu",
+      "regionId": "region_yanzhou",
+      "position": [
+        300.0,
+        290.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 3700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_song",
+      "historical_owner": "realm_song",
+      "historicalNotes": "战国时期宋国小邑，《史记》载宋国边境城邑。"
+    },
+    {
+      "id": "site_song_minor_02",
+      "name": "宋南小邑01",
+      "type": "regular_city",
+      "provinceId": "province_shanqiu",
+      "regionId": "region_yanzhou",
+      "position": [
+        303.1,
+        296.2
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 4400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_song",
+      "historical_owner": "realm_song",
+      "historicalNotes": "战国时期宋国小邑，《史记》载宋国边境城邑。"
+    },
+    {
+      "id": "site_song_minor_03",
+      "name": "宋东小邑01",
+      "type": "regular_city",
+      "provinceId": "province_shanqiu",
+      "regionId": "region_yanzhou",
+      "position": [
+        306.2,
+        302.5
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 5100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_song",
+      "historical_owner": "realm_song",
+      "historicalNotes": "战国时期宋国小邑，《史记》载宋国边境城邑。"
+    },
+    {
+      "id": "site_song_minor_04",
+      "name": "宋西小邑01",
+      "type": "regular_city",
+      "provinceId": "province_shanqiu",
+      "regionId": "region_yanzhou",
+      "position": [
+        309.4,
+        308.8
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 5800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_song",
+      "historical_owner": "realm_song",
+      "historicalNotes": "战国时期宋国小邑，《史记》载宋国边境城邑。"
+    },
+    {
+      "id": "site_song_minor_05",
+      "name": "宋中小邑01",
+      "type": "fortress",
+      "provinceId": "province_shanqiu",
+      "regionId": "region_yanzhou",
+      "position": [
+        312.5,
+        315.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 6500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_song",
+      "historical_owner": "realm_song",
+      "historicalNotes": "战国时期宋国小邑，《史记》载宋国边境城邑。"
+    },
+    {
+      "id": "site_song_minor_06",
+      "name": "宋北小邑02",
+      "type": "regular_city",
+      "provinceId": "province_shanqiu",
+      "regionId": "region_yanzhou",
+      "position": [
+        315.6,
+        290.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 7200,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_song",
+      "historical_owner": "realm_song",
+      "historicalNotes": "战国时期宋国小邑，《史记》载宋国边境城邑。"
+    },
+    {
+      "id": "site_song_minor_07",
+      "name": "宋南小邑02",
+      "type": "regular_city",
+      "provinceId": "province_shanqiu",
+      "regionId": "region_yanzhou",
+      "position": [
+        318.8,
+        296.2
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 7900,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_song",
+      "historical_owner": "realm_song",
+      "historicalNotes": "战国时期宋国小邑，《史记》载宋国边境城邑。"
+    },
+    {
+      "id": "site_song_minor_08",
+      "name": "宋东小邑02",
+      "type": "regular_city",
+      "provinceId": "province_shanqiu",
+      "regionId": "region_yanzhou",
+      "position": [
+        321.9,
+        302.5
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 8600,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_song",
+      "historical_owner": "realm_song",
+      "historicalNotes": "战国时期宋国小邑，《史记》载宋国边境城邑。"
+    },
+    {
+      "id": "site_lu_minor_01",
+      "name": "鲁北小邑01",
+      "type": "regular_city",
+      "provinceId": "province_qufu",
+      "regionId": "region_yanzhou",
+      "position": [
+        340.0,
+        270.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 3700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_lu",
+      "historical_owner": "realm_lu",
+      "historicalNotes": "战国时期鲁国小邑，《史记》载鲁国边境城邑。"
+    },
+    {
+      "id": "site_lu_minor_02",
+      "name": "鲁南小邑01",
+      "type": "regular_city",
+      "provinceId": "province_qufu",
+      "regionId": "region_yanzhou",
+      "position": [
+        343.1,
+        276.2
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 4400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_lu",
+      "historical_owner": "realm_lu",
+      "historicalNotes": "战国时期鲁国小邑，《史记》载鲁国边境城邑。"
+    },
+    {
+      "id": "site_lu_minor_03",
+      "name": "鲁东小邑01",
+      "type": "regular_city",
+      "provinceId": "province_qufu",
+      "regionId": "region_yanzhou",
+      "position": [
+        346.2,
+        282.5
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 5100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_lu",
+      "historical_owner": "realm_lu",
+      "historicalNotes": "战国时期鲁国小邑，《史记》载鲁国边境城邑。"
+    },
+    {
+      "id": "site_lu_minor_04",
+      "name": "鲁西小邑01",
+      "type": "regular_city",
+      "provinceId": "province_qufu",
+      "regionId": "region_yanzhou",
+      "position": [
+        349.4,
+        288.8
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 5800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_lu",
+      "historical_owner": "realm_lu",
+      "historicalNotes": "战国时期鲁国小邑，《史记》载鲁国边境城邑。"
+    },
+    {
+      "id": "site_lu_minor_05",
+      "name": "鲁中小邑01",
+      "type": "fortress",
+      "provinceId": "province_qufu",
+      "regionId": "region_yanzhou",
+      "position": [
+        352.5,
+        295.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 6500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_lu",
+      "historical_owner": "realm_lu",
+      "historicalNotes": "战国时期鲁国小邑，《史记》载鲁国边境城邑。"
+    },
+    {
+      "id": "site_lu_minor_06",
+      "name": "鲁北小邑02",
+      "type": "regular_city",
+      "provinceId": "province_qufu",
+      "regionId": "region_yanzhou",
+      "position": [
+        355.6,
+        270.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 7200,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_lu",
+      "historical_owner": "realm_lu",
+      "historicalNotes": "战国时期鲁国小邑，《史记》载鲁国边境城邑。"
+    },
+    {
+      "id": "site_lu_minor_07",
+      "name": "鲁南小邑02",
+      "type": "regular_city",
+      "provinceId": "province_qufu",
+      "regionId": "region_yanzhou",
+      "position": [
+        358.8,
+        276.2
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 7900,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_lu",
+      "historical_owner": "realm_lu",
+      "historicalNotes": "战国时期鲁国小邑，《史记》载鲁国边境城邑。"
+    },
+    {
+      "id": "site_lu_minor_08",
+      "name": "鲁东小邑02",
+      "type": "regular_city",
+      "provinceId": "province_qufu",
+      "regionId": "region_yanzhou",
+      "position": [
+        361.9,
+        282.5
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 8600,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_lu",
+      "historical_owner": "realm_lu",
+      "historicalNotes": "战国时期鲁国小邑，《史记》载鲁国边境城邑。"
+    },
+    {
+      "id": "site_zhongshan_minor_01",
+      "name": "中山北小邑01",
+      "type": "regular_city",
+      "provinceId": "province_lingshou",
+      "regionId": "region_jizhou",
+      "position": [
+        298.0,
+        195.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 3700,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhongshan",
+      "historical_owner": "realm_zhongshan",
+      "historicalNotes": "战国时期中山国小邑，《史记》载中山国边境城邑。"
+    },
+    {
+      "id": "site_zhongshan_minor_02",
+      "name": "中山南小邑01",
+      "type": "regular_city",
+      "provinceId": "province_lingshou",
+      "regionId": "region_jizhou",
+      "position": [
+        300.2,
+        200.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 4400,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhongshan",
+      "historical_owner": "realm_zhongshan",
+      "historicalNotes": "战国时期中山国小邑，《史记》载中山国边境城邑。"
+    },
+    {
+      "id": "site_zhongshan_minor_03",
+      "name": "中山东小邑01",
+      "type": "regular_city",
+      "provinceId": "province_lingshou",
+      "regionId": "region_jizhou",
+      "position": [
+        302.4,
+        205.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 5100,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhongshan",
+      "historical_owner": "realm_zhongshan",
+      "historicalNotes": "战国时期中山国小邑，《史记》载中山国边境城邑。"
+    },
+    {
+      "id": "site_zhongshan_minor_04",
+      "name": "中山西小邑01",
+      "type": "regular_city",
+      "provinceId": "province_lingshou",
+      "regionId": "region_jizhou",
+      "position": [
+        304.7,
+        210.0
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 5800,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhongshan",
+      "historical_owner": "realm_zhongshan",
+      "historicalNotes": "战国时期中山国小邑，《史记》载中山国边境城邑。"
+    },
+    {
+      "id": "site_zhongshan_minor_05",
+      "name": "中山中小邑01",
+      "type": "fortress",
+      "provinceId": "province_lingshou",
+      "regionId": "region_jizhou",
+      "position": [
+        306.9,
+        215.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 6500,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhongshan",
+      "historical_owner": "realm_zhongshan",
+      "historicalNotes": "战国时期中山国小邑，《史记》载中山国边境城邑。"
+    },
+    {
+      "id": "site_zhongshan_minor_06",
+      "name": "中山北小邑02",
+      "type": "regular_city",
+      "provinceId": "province_lingshou",
+      "regionId": "region_jizhou",
+      "position": [
+        309.1,
+        195.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 7200,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhongshan",
+      "historical_owner": "realm_zhongshan",
+      "historicalNotes": "战国时期中山国小邑，《史记》载中山国边境城邑。"
+    },
+    {
+      "id": "site_zhongshan_minor_07",
+      "name": "中山南小邑02",
+      "type": "regular_city",
+      "provinceId": "province_lingshou",
+      "regionId": "region_jizhou",
+      "position": [
+        311.3,
+        200.0
+      ],
+      "terrain": "plains",
+      "defense_value": 1,
+      "population_base": 7900,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhongshan",
+      "historical_owner": "realm_zhongshan",
+      "historicalNotes": "战国时期中山国小邑，《史记》载中山国边境城邑。"
+    },
+    {
+      "id": "site_zhongshan_minor_08",
+      "name": "中山东小邑02",
+      "type": "regular_city",
+      "provinceId": "province_lingshou",
+      "regionId": "region_jizhou",
+      "position": [
+        313.6,
+        205.0
+      ],
+      "terrain": "hills",
+      "defense_value": 1,
+      "population_base": 8600,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhongshan",
+      "historical_owner": "realm_zhongshan",
+      "historicalNotes": "战国时期中山国小邑，《史记》载中山国边境城邑。"
+    },
+    {
+      "id": "site_zhongshan_minor_09",
+      "name": "中山西小邑02",
+      "type": "regular_city",
+      "provinceId": "province_lingshou",
+      "regionId": "region_jizhou",
+      "position": [
+        315.8,
+        210.0
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 9300,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhongshan",
+      "historical_owner": "realm_zhongshan",
+      "historicalNotes": "战国时期中山国小邑，《史记》载中山国边境城邑。"
+    }
+  ]
+}
