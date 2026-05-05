@@ -75,6 +75,7 @@ export function aiPlanStep(
     a.id.localeCompare(b.id)
   )) {
     if (realm.id === world.playerRealmId) continue
+    if (realm.status === 'deactivated') continue
 
     const diplomacyWorld = worldWithAiPhaseState(world, phaseState)
     const diplomacy = planDiplomacyAction(diplomacyWorld, realm)

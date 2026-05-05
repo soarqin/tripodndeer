@@ -1,6 +1,7 @@
 import type { Academy, Effect, EventChain, EventChainId, EventChainStage, EventChainState, GameEvent, General, RNGState, World, ZhouInvestitureState } from '~/shared/types'
 import { evaluatePredicate } from '../reform/predicate'
 import { relationKey } from '~/engine/systems/diplomacy/diplomacy-core'
+import { deactivateRealm } from '~/engine/wars/realm-deactivation'
 import fanJuStrategy from '~/content/m5/events/fan-ju-strategy.json'
 import lianPoElder from '~/content/m5/events/lian-po-elder.json'
 import linXiangruBi from '~/content/m5/events/lin-xiangru-bi.json'
@@ -24,6 +25,7 @@ const EFFECT_TYPES = [
   'academy.create',
   'academy.dormant',
   'zhouInvestiture.grant',
+  'realm.deactivate',
 ] as const
 
 type EffectType = (typeof EFFECT_TYPES)[number]
@@ -185,6 +187,8 @@ function applyEffect(world: World, effect: Effect): World {
     }
     case 'zhouInvestiture.grant':
       return applyZhouInvestitureGrant(world, effect.realmId, effect.rank)
+    case 'realm.deactivate':
+      return deactivateRealm(world, effect.realmId, effect.reason).world
     default: {
       const unknownType = (effect as { type: string }).type
       throw new Error(`Unknown effect type: ${unknownType}`)

@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { PHASE_NAMES, PHASE_ORDER } from '../index'
 
 describe('phase chain constants', () => {
-  it('PHASE_ORDER has exactly 21 phases', () => {
-    expect(PHASE_ORDER.length).toBe(21)
+  it('PHASE_ORDER has exactly 23 phases', () => {
+    expect(PHASE_ORDER.length).toBe(23)
   })
 
   it('PHASE_ORDER is in correct order', () => {
@@ -17,17 +17,19 @@ describe('phase chain constants', () => {
     expect(PHASE_ORDER[7]).toBe(PHASE_NAMES.ESPIONAGE)
     expect(PHASE_ORDER[8]).toBe(PHASE_NAMES.RULER_LIFECYCLE)
     expect(PHASE_ORDER[9]).toBe(PHASE_NAMES.CHARACTER_LIFECYCLE)
-    expect(PHASE_ORDER[10]).toBe(PHASE_NAMES.RECRUITMENT)
-    expect(PHASE_ORDER[11]).toBe(PHASE_NAMES.IDEOLOGY_DRIFT)
-    expect(PHASE_ORDER[12]).toBe(PHASE_NAMES.REFORM)
-    expect(PHASE_ORDER[13]).toBe(PHASE_NAMES.VICTORY_CHECK)
-    expect(PHASE_ORDER[14]).toBe(PHASE_NAMES.DIPLOMACY_LIFECYCLE)
-    expect(PHASE_ORDER[15]).toBe(PHASE_NAMES.ECONOMY)
-    expect(PHASE_ORDER[16]).toBe(PHASE_NAMES.DISASTER)
-    expect(PHASE_ORDER[17]).toBe(PHASE_NAMES.TRADE)
-    expect(PHASE_ORDER[18]).toBe(PHASE_NAMES.FACTION)
-    expect(PHASE_ORDER[19]).toBe(PHASE_NAMES.HISTORICAL_EVENTS)
-    expect(PHASE_ORDER[20]).toBe(PHASE_NAMES.PRESTIGE_UPDATE)
+    expect(PHASE_ORDER[10]).toBe(PHASE_NAMES.CHARACTER_SPAWN)
+    expect(PHASE_ORDER[11]).toBe(PHASE_NAMES.RECRUITMENT)
+    expect(PHASE_ORDER[12]).toBe(PHASE_NAMES.IDEOLOGY_DRIFT)
+    expect(PHASE_ORDER[13]).toBe(PHASE_NAMES.REFORM)
+    expect(PHASE_ORDER[14]).toBe(PHASE_NAMES.VICTORY_CHECK)
+    expect(PHASE_ORDER[15]).toBe(PHASE_NAMES.DIPLOMACY_LIFECYCLE)
+    expect(PHASE_ORDER[16]).toBe(PHASE_NAMES.ECONOMY)
+    expect(PHASE_ORDER[17]).toBe(PHASE_NAMES.DISASTER)
+    expect(PHASE_ORDER[18]).toBe(PHASE_NAMES.TRADE)
+    expect(PHASE_ORDER[19]).toBe(PHASE_NAMES.FACTION)
+    expect(PHASE_ORDER[20]).toBe(PHASE_NAMES.HISTORICAL_EVENTS)
+    expect(PHASE_ORDER[21]).toBe(PHASE_NAMES.PRESTIGE_UPDATE)
+    expect(PHASE_ORDER[22]).toBe(PHASE_NAMES.REALM_DEACTIVATION)
   })
 
   it('CULTURAL_IDENTITY comes after COMBAT_V2 and before MANPOWER', () => {
@@ -78,10 +80,12 @@ describe('phase chain constants', () => {
     expect(historicalIdx).toBe(factionIdx + 1)
   })
 
-  it('PRESTIGE_UPDATE comes after HISTORICAL_EVENTS (last phase)', () => {
+  it('PRESTIGE_UPDATE comes after HISTORICAL_EVENTS and before REALM_DEACTIVATION', () => {
     const historicalIdx = PHASE_ORDER.indexOf(PHASE_NAMES.HISTORICAL_EVENTS)
     const prestigeIdx = PHASE_ORDER.indexOf(PHASE_NAMES.PRESTIGE_UPDATE)
+    const deactivationIdx = PHASE_ORDER.indexOf(PHASE_NAMES.REALM_DEACTIVATION)
     expect(prestigeIdx).toBe(historicalIdx + 1)
-    expect(prestigeIdx).toBe(PHASE_ORDER.length - 1)
+    expect(deactivationIdx).toBe(prestigeIdx + 1)
+    expect(deactivationIdx).toBe(PHASE_ORDER.length - 1)
   })
 })

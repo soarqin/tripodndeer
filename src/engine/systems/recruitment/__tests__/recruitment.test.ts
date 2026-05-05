@@ -176,7 +176,7 @@ describe('recruitmentPhase', () => {
     const victoryIdx = PHASE_ORDER.indexOf(PHASE_NAMES.VICTORY_CHECK)
 
     expect(recruitmentIdx).toBeGreaterThan(-1)
-    expect(recruitmentIdx).toBe(characterIdx + 1)
+    expect(recruitmentIdx).toBeGreaterThan(characterIdx)
     expect(recruitmentIdx).toBeLessThan(victoryIdx)
   })
 

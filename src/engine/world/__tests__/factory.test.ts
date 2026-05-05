@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { runTickPhases } from '@/engine/clock'
 import { PHASE_ORDER } from '@/engine/phases'
 import { aiPlanStep } from '@/engine/systems/ai'
-import { characterLifecyclePhase } from '@/engine/systems/character'
+import { characterLifecyclePhase, characterSpawnPhase } from '@/engine/systems/character'
 import { combatV2Step } from '@/engine/systems/combat-v2'
 import { culturalIdentityPhase } from '@/engine/systems/culture/cultural-identity-phase'
 import { ideologyDriftPhase } from '@/engine/systems/culture/ideology-drift-phase'
@@ -23,6 +23,7 @@ import { rulerLifecyclePhase } from '@/engine/systems/ruler'
 import { siegeStep } from '@/engine/systems/siege'
 import { tradePhase } from '@/engine/systems/trade/trade-phase'
 import { victoryCheckStep } from '@/engine/systems/victory'
+import { realmDeactivationPhase } from '@/engine/wars/realm-deactivation'
 import {
   M4_BASE_FOOD_PRODUCTION_PER_HOUSEHOLD,
   M4_DEFAULT_REALM_FOOD_STORES,
@@ -59,6 +60,7 @@ function phaseName(phase: TickPhase): string {
   if (phase === espionagePhase) return 'espionage'
   if (phase === rulerLifecyclePhase) return 'rulerLifecycle'
   if (phase === characterLifecyclePhase) return 'characterLifecycle'
+  if (phase === characterSpawnPhase) return 'characterSpawn'
   if (phase === recruitmentPhase) return 'recruitment'
   if (phase === ideologyDriftPhase) return 'ideologyDrift'
   if (phase === reformPhase) return 'reform'
@@ -70,6 +72,7 @@ function phaseName(phase: TickPhase): string {
   if (phase === factionPhase) return 'faction'
   if (phase === historicalEventsPhase) return 'historicalEvents'
   if (phase === prestigeUpdatePhase) return 'prestigeUpdate'
+  if (phase === realmDeactivationPhase) return 'realmDeactivation'
   return 'unknown'
 }
 
@@ -224,6 +227,7 @@ describe('createWorldFromM1Data — structure', () => {
       espionagePhase,
       rulerLifecyclePhase,
       characterLifecyclePhase,
+      characterSpawnPhase,
       recruitmentPhase,
       ideologyDriftPhase,
       reformPhase,
@@ -235,6 +239,7 @@ describe('createWorldFromM1Data — structure', () => {
       factionPhase,
       historicalEventsPhase,
       prestigeUpdatePhase,
+      realmDeactivationPhase,
     ])
     expect(world.phases.map(phaseName)).toEqual(PHASE_ORDER)
 

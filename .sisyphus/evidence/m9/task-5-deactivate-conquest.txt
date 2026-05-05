@@ -1,0 +1,14 @@
+
+> tripodndeer@ test /home/soar/src/tripodndeer
+> vitest run src/engine/wars/__tests__/realm-deactivation.test.ts
+
+
+ RUN  v1.6.1 /home/soar/src/tripodndeer
+
+ ✓ src/engine/wars/__tests__/realm-deactivation.test.ts  (6 tests) 11ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  16:26:21
+   Duration  793ms (transform 228ms, setup 0ms, collect 277ms, tests 11ms, environment 0ms, prepare 122ms)
+
