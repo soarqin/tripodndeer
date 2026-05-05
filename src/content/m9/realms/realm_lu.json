@@ -1,0 +1,13 @@
+{
+  "id": "realm_lu",
+  "name": "鲁",
+  "full_title": "鲁国",
+  "capital": "site_qufu",
+  "status": "active",
+  "aiPersonality": "learned",
+  "rulingHouse": "ji",
+  "ideology_lean": { "fa": 5, "ru": 70, "dao": 10, "mo": 10, "zonghen": 0, "bing": 5 },
+  "starting_treasury": 200,
+  "starting_manpower": 250,
+  "realm_traits": []
+}

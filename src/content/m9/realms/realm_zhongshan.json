@@ -1,0 +1,13 @@
+{
+  "id": "realm_zhongshan",
+  "name": "中山",
+  "full_title": "中山国",
+  "capital": "site_lingshou_zhongshan",
+  "status": "active",
+  "aiPersonality": "incompetent",
+  "rulingHouse": "diren",
+  "ideology_lean": { "fa": 20, "ru": 20, "dao": 20, "mo": 10, "zonghen": 10, "bing": 20 },
+  "starting_treasury": 200,
+  "starting_manpower": 300,
+  "realm_traits": []
+}

@@ -1,0 +1,13 @@
+{
+  "id": "realm_han",
+  "name": "韩",
+  "full_title": "韩国",
+  "capital": "site_yangzhai",
+  "status": "active",
+  "aiPersonality": "incompetent",
+  "rulingHouse": "han",
+  "ideology_lean": { "fa": 50, "ru": 20, "dao": 10, "mo": 10, "zonghen": 5, "bing": 5 },
+  "starting_treasury": 350,
+  "starting_manpower": 500,
+  "realm_traits": []
+}

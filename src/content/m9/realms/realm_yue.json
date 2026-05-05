@@ -1,0 +1,13 @@
+{
+  "id": "realm_yue",
+  "name": "越",
+  "full_title": "越国",
+  "capital": "site_kuaiji",
+  "status": "active",
+  "aiPersonality": "incompetent",
+  "rulingHouse": "siyue",
+  "ideology_lean": { "fa": 20, "ru": 10, "dao": 30, "mo": 10, "zonghen": 10, "bing": 20 },
+  "starting_treasury": 250,
+  "starting_manpower": 400,
+  "realm_traits": []
+}

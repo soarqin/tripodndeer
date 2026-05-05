@@ -1,0 +1,13 @@
+{
+  "id": "realm_wei",
+  "name": "魏",
+  "full_title": "魏国",
+  "capital": "site_anyi",
+  "status": "active",
+  "aiPersonality": "schemer",
+  "rulingHouse": "wei",
+  "ideology_lean": { "fa": 40, "ru": 20, "dao": 10, "mo": 10, "zonghen": 10, "bing": 10 },
+  "starting_treasury": 500,
+  "starting_manpower": 700,
+  "realm_traits": []
+}

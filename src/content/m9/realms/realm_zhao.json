@@ -1,0 +1,13 @@
+{
+  "id": "realm_zhao",
+  "name": "赵",
+  "full_title": "赵国",
+  "capital": "site_handan",
+  "status": "active",
+  "aiPersonality": "conqueror",
+  "rulingHouse": "zhao",
+  "ideology_lean": { "fa": 30, "ru": 20, "dao": 10, "mo": 10, "zonghen": 10, "bing": 20 },
+  "starting_treasury": 500,
+  "starting_manpower": 900,
+  "realm_traits": []
+}

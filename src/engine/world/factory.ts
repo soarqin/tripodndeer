@@ -283,6 +283,11 @@ export function loadM1Data(): M1DataV8 {
   return M1DataSchemaV8.parse(ensureV8(raw))
 }
 
+export async function loadM9Data(): Promise<unknown> {
+  const mod = await import('@/content/m9/scenario-453bc.json')
+  return (mod as { default: unknown }).default ?? mod
+}
+
 /** 构造初始 World（含 Zod 校验 + ownership 引用完整性 + polygon/adjacency 派发） */
 export function createInitialWorld(data: M0Data, seed: number): World {
   // Paranoid validation
