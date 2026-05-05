@@ -144,6 +144,11 @@ AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按
 | M8_PERSONALITY_DIMENSIONS_COUNT === 8                                               | `src/content/m2/__tests__/balance-m8.test.ts`                        |
 | getPersonality fallback uniform to 'incompetent'                                    | `src/engine/systems/ai/__tests__/utility-scorer.test.ts`             |
 | 8 archetype 字面值与 docs/design/07-ai.md §2.3 一一对应                             | `src/content/m2/__tests__/balance-m8.test.ts`                        |
+| M9_ENABLED=true (balance.ts)                                                        | `src/content/m2/__tests__/balance-m9.test.ts`                        |
+| M9 scenario 恰好 250 sites                                                          | `src/content/m9/__tests__/scenario-m9.test.ts`                       |
+| M9 12 realms registered (8 playable + 4 AI-only)                                   | `src/content/m2/__tests__/balance-m9.test.ts`                        |
+| Forbidden anachronism strings absent in event text                                  | `src/content/__tests__/m9-historical-fidelity.test.ts`               |
+| M9 character templates spawn within birthYear+20 window                             | `src/engine/systems/character/__tests__/character-spawn.test.ts`     |
 
 ---
 
@@ -175,6 +180,11 @@ world.generals: Map<GeneralId, General>
   → 人才池（含君主、将领、太守等）
   → Realm.rulerId 指向此 Map 的键
   → 君主死亡时从此 Map 移除
+
+world.characterTemplates: Map<CharId, CharacterTemplate>
+  → M9 新增：时间戳 roster，非运行时 instance
+  → 按 birthYearBC 动态 spawn 为 General
+  → 不要与 world.generals 混用
 
 heir candidate
   → 由 selectHeir(world, realmId) 动态计算
@@ -349,6 +359,18 @@ const world: World = {
 
 ---
 
+## M9 Subsystems Quick Reference
+
+| 子系统 | 主文件 | 关键函数 |
+| --- | --- | --- |
+| realmDeactivationPhase | `src/engine/wars/realm-deactivation.ts` | `realmDeactivationPhase(world, rng)` |
+| characterSpawnPhase | `src/engine/systems/character/character-spawn.ts` | `characterSpawnPhase(world, rng)` |
+| i18n core | `src/shared/i18n.ts` | `loadLocale`, `t` |
+| Character Templates | `world.characterTemplates` Map | `CharacterTemplate` interface |
+| Provinces / Regions | `world.provinces` / `world.regions` | `Province`, `Region` interfaces |
+
+---
+
 ## What NOT to Do
 
 ```
@@ -405,3 +427,24 @@ const world: World = {
 - UI 呈现 archetype（RulerOverviewPanel 加 archetype 标签）（M10）
 - 移除 realm.aiPersonality legacy 字段（M8.x）
 - Opportunist/Zealot 名册扩展（M9）
+
+## M9+ Deferred Items
+
+以下功能明确延后，**不要在对应里程碑之前实现**：
+
+- 兵种扩展（current 4 → design 6-9）（M9.x）
+- 政令扩展（current 2 → design 20-40）（M9.x）
+- 变法扩展（current 4 → design 5-8）（M9.x）
+- 危机/氛围事件 100-200 数量级（M9.x）
+- 会盟（春秋齐桓晋文式）机制（M9.x）
+- 军功爵制度（M9.x）
+- 变法窗口期限制（M9.x）
+- 异族 frontier pressure 系统（M9.x）
+- 春秋争霸前传 scenario（v1.x）
+- 第二剧本（v2）
+- 多语言（trad-CN / 英文）（v1.x）
+- 玩家自定义起始日期沙盒（v2）
+- 联姻 / 质子 / 朝聘（v1.x）
+- 越/宋/鲁/中山 任一改 playable（M9.1）
+- UI 面板（province/region/character browser）（M10）
+- Scenario picker UI（M10）
