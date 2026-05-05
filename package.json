@@ -17,6 +17,7 @@
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
     "test:all": "pnpm typecheck && pnpm lint && pnpm test && pnpm test:e2e",
+    "gen:locale-types": "tsx scripts/gen-locale-types.ts",
     "generate:m0-map": "tsx tools/generate-m0-map.ts",
     "generate:m1-map": "tsx tools/generate-m1-map.ts"
   },

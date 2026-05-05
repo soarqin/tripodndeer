@@ -1,0 +1,14 @@
+
+> tripodndeer@ test /home/soar/src/tripodndeer
+> vitest run src/shared/__tests__/i18n.test.ts
+
+
+ RUN  v1.6.1 /home/soar/src/tripodndeer
+
+ ✓ src/shared/__tests__/i18n.test.ts  (5 tests) 3ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  16:22:19
+   Duration  510ms (transform 35ms, setup 0ms, collect 30ms, tests 3ms, environment 0ms, prepare 127ms)
+
