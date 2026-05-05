@@ -1,0 +1,14 @@
+
+> tripodndeer@ test /home/soar/src/tripodndeer
+> vitest run src/content/__tests__/m9-historical-fidelity.test.ts
+
+
+ RUN  v1.6.1 /home/soar/src/tripodndeer
+
+ ✓ src/content/__tests__/m9-historical-fidelity.test.ts  (7 tests) 9ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  17:12:01
+   Duration  549ms (transform 63ms, setup 0ms, collect 63ms, tests 9ms, environment 0ms, prepare 107ms)
+
