@@ -1,0 +1,58 @@
+{
+  "regions": [
+    {
+      "id": "region_jizhou",
+      "name": "冀州",
+      "description": "黄河北岸广大地区，含赵北部、燕、魏河内。《禹贡》\"冀州\"为九州之首，《史记·夏本纪》载\"冀州既载\"。",
+      "provinceIds": []
+    },
+    {
+      "id": "region_yanzhou",
+      "name": "兖州",
+      "description": "黄河下游南岸，含齐西部、鲁、宋、魏一部。《禹贡》\"济河惟兖州\"，《史记·夏本纪》载\"兖州既修\"。",
+      "provinceIds": []
+    },
+    {
+      "id": "region_qingzhou",
+      "name": "青州",
+      "description": "山东半岛，含齐中部及东部沿海。《禹贡》\"海岱惟青州\"，《史记·夏本纪》载\"青州既营\"。",
+      "provinceIds": []
+    },
+    {
+      "id": "region_xuzhou",
+      "name": "徐州",
+      "description": "淮河下游，含楚北部、宋一部、鲁一部。《禹贡》\"海岱及淮惟徐州\"，《史记·夏本纪》载\"徐州既治\"。",
+      "provinceIds": []
+    },
+    {
+      "id": "region_yangzhou",
+      "name": "扬州",
+      "description": "长江中下游，含楚中部、越国。《禹贡》\"淮海惟扬州\"，《史记·夏本纪》载\"扬州既敷\"。",
+      "provinceIds": []
+    },
+    {
+      "id": "region_jingzhou",
+      "name": "荆州",
+      "description": "汉江流域，含楚西部核心。《禹贡》\"荆及衡阳惟荆州\"，《史记·夏本纪》载\"荆州既旅\"。",
+      "provinceIds": []
+    },
+    {
+      "id": "region_yuzhou",
+      "name": "豫州",
+      "description": "中原腹地，含韩、魏南部、周王畿。《禹贡》\"荆河惟豫州\"，《史记·夏本纪》载\"豫州既猪\"。",
+      "provinceIds": []
+    },
+    {
+      "id": "region_liangzhou",
+      "name": "梁州",
+      "description": "巴蜀汉中，含秦西南扩张地。《禹贡》\"华阳黑水惟梁州\"，《史记·夏本纪》载\"梁州既旅\"。",
+      "provinceIds": []
+    },
+    {
+      "id": "region_yongzhou",
+      "name": "雍州",
+      "description": "关中及西北，含秦国核心。《禹贡》\"黑水西河惟雍州\"，《史记·夏本纪》载\"雍州既截\"。",
+      "provinceIds": []
+    }
+  ]
+}
