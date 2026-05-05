@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest'
 import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
 import { migrateScenarioV6ToV7 } from '~/engine/world/migrations/v6-to-v7'
 import m6SaveV6 from '~/engine/world/migrations/__tests__/fixtures/m6-save-v6.json'
-import { M1DataSchemaV7 } from '~/shared/schemas'
+import { M1DataSchemaV7, M1DataSchemaV8 } from '~/shared/schemas'
 import { makeCoverageKey } from '~/shared/types'
 
 describe('M7 persistence: V6→V7 auto-migration on load', () => {
-  it('loadM1Data() returns V7 data with M7 fields populated', () => {
+  it('loadM1Data() returns V8 data with M7 fields populated', () => {
     const data = loadM1Data()
-    expect(data.schema_version).toBe(7)
+    expect(data.schema_version).toBe(8)
     expect(data.intelligenceCoverage).toBeDefined()
     expect(data.counterIntelStates).toBeDefined()
     expect(data.spyMissions).toBeDefined()
@@ -66,7 +66,7 @@ describe('M7 persistence: JSON round-trip preserves M7 fields', () => {
   it('preserves intelligenceCoverage through JSON.stringify + JSON.parse', () => {
     const data = loadM1Data()
     const json = JSON.stringify(data)
-    const parsed = M1DataSchemaV7.parse(JSON.parse(json))
+    const parsed = M1DataSchemaV8.parse(JSON.parse(json))
 
     expect(parsed.intelligenceCoverage).toEqual(data.intelligenceCoverage)
     expect(Object.keys(parsed.intelligenceCoverage)).toHaveLength(56)
@@ -74,7 +74,7 @@ describe('M7 persistence: JSON round-trip preserves M7 fields', () => {
 
   it('preserves counterIntelStates through JSON round-trip', () => {
     const data = loadM1Data()
-    const reparsed = M1DataSchemaV7.parse(JSON.parse(JSON.stringify(data)))
+    const reparsed = M1DataSchemaV8.parse(JSON.parse(JSON.stringify(data)))
 
     expect(reparsed.counterIntelStates).toHaveLength(8)
     expect(reparsed.counterIntelStates).toEqual(data.counterIntelStates)
@@ -82,7 +82,7 @@ describe('M7 persistence: JSON round-trip preserves M7 fields', () => {
 
   it('preserves spyMissions (empty by default) through JSON round-trip', () => {
     const data = loadM1Data()
-    const reparsed = M1DataSchemaV7.parse(JSON.parse(JSON.stringify(data)))
+    const reparsed = M1DataSchemaV8.parse(JSON.parse(JSON.stringify(data)))
 
     expect(reparsed.spyMissions).toEqual([])
     expect(reparsed.spyMissions).toEqual(data.spyMissions)

@@ -854,6 +854,16 @@ export const CharacterTemplateSchema = z.object({
   aliases: z.array(z.string()).readonly().optional(),
 })
 
+export const M1DataSchemaV8 = M1DataSchemaV7.extend({
+  schema_version: z.literal(8),
+  provinces: z.array(ProvinceSchema).optional().default([]),
+  regions: z.array(RegionSchema).optional().default([]),
+  characterTemplates: z.array(CharacterTemplateSchema).optional().default([]),
+  localization: z.record(z.string(), z.string()).optional().default({}),
+})
+
+export type M1DataV8 = z.infer<typeof M1DataSchemaV8>
+
 // World Schema (for runtime World validation)
 export const WorldSchema = z.object({
   date: z.object({

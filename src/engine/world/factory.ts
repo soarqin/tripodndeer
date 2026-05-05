@@ -1,7 +1,7 @@
 import m0Data from '@/content/m0/sites.json'
 import m1Data from '@/content/m1/scenario.json'
 import { INITIAL_DATE } from '@/shared/constants'
-import { M0DataSchema, M1DataSchemaV6, M1DataSchemaV7 } from '@/shared/schemas'
+import { M0DataSchema, M1DataSchemaV6, M1DataSchemaV7, M1DataSchemaV8 } from '@/shared/schemas'
 import { aiPlanStep } from '~/engine/systems/ai'
 import { characterLifecyclePhase } from '~/engine/systems/character'
 import { combatV2Step } from '~/engine/systems/combat-v2'
@@ -89,8 +89,8 @@ import type {
   World,
 } from '@/shared/types'
 import { makeCoverageKey } from '@/shared/types'
-import type { M1DataV6, M1DataV7 } from '@/shared/schemas'
-import { migrateScenarioV6ToV7 } from './migrations/v6-to-v7'
+import type { M1DataV6, M1DataV7, M1DataV8 } from '@/shared/schemas'
+import { ensureV8 } from './migrations/v7-to-v8'
 
 /** 将一个 site 的 boundary 引用展开为具体的 polygon 顶点列表 */
 function expandPolygon(
@@ -277,13 +277,9 @@ export function loadM0Data(): M0Data {
 }
 
 /** 加载并验证 M1 场景数据（静态 import + Zod 校验） */
-export function loadM1Data(): M1DataV7 {
+export function loadM1Data(): M1DataV8 {
   const raw = m1Data as unknown
-  const version = (raw as { schema_version?: number } | null)?.schema_version
-  if (version === undefined || version < 7) {
-    return migrateScenarioV6ToV7(raw)
-  }
-  return M1DataSchemaV7.parse(raw)
+  return M1DataSchemaV8.parse(ensureV8(raw))
 }
 
 /** 构造初始 World（含 Zod 校验 + ownership 引用完整性 + polygon/adjacency 派发） */
@@ -339,13 +335,15 @@ export function createInitialWorld(data: M0Data, seed: number): World {
 }
 
 export function createWorldFromM1Data(
-  data: M1DataV6 | M1DataV7,
+  data: M1DataV6 | M1DataV7 | M1DataV8,
   seed: number,
   playerRealmId: RealmId,
 ): World {
-  if (data.schema_version === 7) {
+  if (data.schema_version === 8) {
+    M1DataSchemaV8.parse(data)
+  } else if (data.schema_version === 7) {
     M1DataSchemaV7.parse(data)
-  } else {
+  } else if (data.schema_version === 6) {
     M1DataSchemaV6.parse(data)
   }
 
