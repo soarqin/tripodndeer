@@ -42,22 +42,26 @@ export function EventChainModal() {
       const stage = chain.stages.find((s) => s.id === targetStageId)
       if (!stage) return
 
+      const stageText = typeof stage.text === 'string' ? stage.text : stage.text.key
       openModal({
         title: '历史事件',
         content: (
           <div className={styles.content}>
-            <p>{stage.text}</p>
+            <p>{stageText}</p>
           </div>
         ),
         dismissable: false,
         priority: ModalPriority.EVENT_CHAIN,
         testId: `event-chain-modal-${targetChainId}`,
-        actions: stage.choices.map((choice) => ({
-          id: choice.id,
-          label: choice.label,
-          testId: `event-chain-choice-${choice.id}`,
-          onClick: () => applyEventChainChoice(targetChainId!, choice.id),
-        })),
+        actions: stage.choices.map((choice) => {
+          const choiceLabel = choice.label ?? (typeof choice.text === 'string' ? choice.text : choice.text?.key ?? choice.id)
+          return {
+            id: choice.id,
+            label: choiceLabel,
+            testId: `event-chain-choice-${choice.id}`,
+            onClick: () => applyEventChainChoice(targetChainId!, choice.id),
+          }
+        }),
       })
     }
   }, [eventChainStates, playerRealmId, openModal, applyEventChainChoice, modalQueue])

@@ -18,7 +18,7 @@ describe('historicalEventsPhase — real implementation', () => {
   })
 
   it('does not trigger any chain when date is outside all ranges', () => {
-    const date: GameDate = { yearBC: 400, season: 'spring', month: 1, xun: 'shang' }
+    const date: GameDate = { yearBC: 500, season: 'spring', month: 1, xun: 'shang' }
     const world = makeEmptyWorld({ date })
 
     const result = historicalEventsPhase(world, rng)

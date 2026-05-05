@@ -297,7 +297,7 @@ describe('checkTrigger — date triggers', () => {
 
 describe('historicalEventsPhase', () => {
   it('returns world unchanged when no chain triggers match the date', () => {
-    const date: GameDate = { yearBC: 400, season: 'spring', month: 1, xun: 'shang' }
+    const date: GameDate = { yearBC: 500, season: 'spring', month: 1, xun: 'shang' }
     const world = worldWith({ date })
 
     const result = historicalEventsPhase(world, rng)
@@ -307,7 +307,7 @@ describe('historicalEventsPhase', () => {
   })
 
   it('returns same RNG state by reference (no random consumed)', () => {
-    const date: GameDate = { yearBC: 400, season: 'spring', month: 1, xun: 'shang' }
+    const date: GameDate = { yearBC: 500, season: 'spring', month: 1, xun: 'shang' }
     const world = worldWith({ date })
 
     const result = historicalEventsPhase(world, rng)
@@ -316,7 +316,7 @@ describe('historicalEventsPhase', () => {
   })
 
   it('phase signature returns world/nextRng/events keys', () => {
-    const date: GameDate = { yearBC: 400, season: 'spring', month: 1, xun: 'shang' }
+    const date: GameDate = { yearBC: 500, season: 'spring', month: 1, xun: 'shang' }
     const world = worldWith({ date })
 
     const result = historicalEventsPhase(world, rng)
