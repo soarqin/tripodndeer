@@ -557,6 +557,12 @@ export const EventChainSchema = z.object({
   trigger: EventChainTriggerSchema,
   oneShot: z.boolean(),
   stages: z.array(EventChainStageSchema).min(1),
+  between: z
+    .object({
+      earliest_year_bc: z.number().int().nullable().optional(),
+      latest_year_bc: z.number().int().nullable().optional(),
+    })
+    .optional(),
   scope: EventChainScopeSchema.optional(),
 })
 

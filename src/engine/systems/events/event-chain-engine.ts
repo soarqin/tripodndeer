@@ -273,6 +273,16 @@ export function checkTrigger(world: World, trigger: EventChain['trigger']): bool
   return false
 }
 
+export function checkEventChainYearGate(world: World, chain: EventChain): boolean {
+  if (chain.between?.earliest_year_bc != null && world.date.yearBC > chain.between.earliest_year_bc) {
+    return false
+  }
+  if (chain.between?.latest_year_bc != null && world.date.yearBC < chain.between.latest_year_bc) {
+    return false
+  }
+  return true
+}
+
 const EVENT_CHAINS: readonly EventChain[] = [
   linXiangruBi as unknown as EventChain,
   fanJuStrategy as unknown as EventChain,
@@ -361,6 +371,7 @@ export function historicalEventsPhase(
 
   for (const chain of sortedChains) {
     if (chain.oneShot && currentWorld.eventChainStates.has(chain.id)) continue
+    if (!checkEventChainYearGate(currentWorld, chain)) continue
     if (!checkTrigger(currentWorld, chain.trigger)) continue
     if (chain.stages.length === 0) continue
 

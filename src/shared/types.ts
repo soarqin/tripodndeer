@@ -527,6 +527,10 @@ export interface EventChain {
   readonly trigger: EventChainTrigger
   readonly oneShot: boolean
   readonly stages: readonly EventChainStage[]
+  readonly between?: {
+    readonly earliest_year_bc?: number | null
+    readonly latest_year_bc?: number | null
+  }
   readonly scope?: EventChainScope
 }
 
