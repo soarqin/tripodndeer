@@ -1,0 +1,9 @@
+export const M9_FORBIDDEN_ANACHRONISM_STRINGS = [
+  '皇帝',
+  '火药',
+  '马镫',
+  '独尊儒术',
+  '宋词',
+  '造纸',
+  '马凯铁骑',
+] as const
