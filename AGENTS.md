@@ -8,9 +8,9 @@ AI agent behavioral guidelines for this codebase. Read before making any changes
 
 战国策略游戏引擎原型。Vite + React + TypeScript strict，纯函数引擎 + Zustand UI 层。
 
-**当前里程碑**: M0/M1/M2/M3/M3.1/M4(v1)/M5/M4.1/M4.2/M6/M7/M7.1 已交付。M8 为下一里程碑。
+**当前里程碑**: M0-M9 已交付。Wave 9: Refactor & Cleanup 已完成。
 
-**实施顺序**: M4(✅) → M5 人物(✅) → M4.1 变法(✅) → M4.2 灾害·贸易·派系(✅) → M6 文化(✅) → M7 谍报
+**实施顺序**: M4(✅) → M5(✅) → M4.1(✅) → M4.2(✅) → M6(✅) → M7(✅) → M8(✅) → M9(✅) → Wave 9(✅)
 
 ---
 
@@ -238,7 +238,7 @@ world.counterIntelStates: Map<RealmId, CounterIntelState>
 ```
 M0 path: loadM0Data() → createInitialWorld()   ← 不要碰
 M1 path: loadM1Data() → createWorldFromM1Data()
-  └─ 自动检测 schema_version，v1 自动 migrate 到 v2
+  └─ 自动检测 schema_version，v1 自动 migrate 到 v3
   └─ 加载 generals / passes / adjacencyEdges / realm.stats
 ```
 
@@ -249,7 +249,7 @@ M1 path: loadM1Data() → createWorldFromM1Data()
 ## Testing
 
 ```bash
-pnpm test          # 全部单元测试（390 个，~3s）
+pnpm test          # 全部单元测试（2200+ 个，~25s）
 pnpm typecheck     # TypeScript 严格检查
 pnpm lint          # ESLint，0 警告模式
 pnpm test:e2e      # Playwright e2e（需 dev server）
@@ -304,7 +304,7 @@ const world: World = {
 | 兵源      | `src/engine/systems/manpower/manpower.ts`        | `manpowerTick`                     |
 | 议和      | `src/engine/systems/peace/proposal-lifecycle.ts` | `acceptProposal`, `rejectProposal` |
 | 战争      | `src/engine/wars/wars.ts`                        | `declareWarWithCasus`, `endWar`    |
-| AI        | `src/engine/systems/ai/utility-scorer.ts`        | `pickAction`, `getPersonality`     |
+| AI        | `src/engine/systems/ai/ai.ts`                    | `aiPlanStep`, `planEspionageAction` |
 | AI 战术   | `src/engine/systems/ai/tactics/`                 | siege / cut-supply / retreat       |
 
 ---
@@ -332,6 +332,7 @@ const world: World = {
 | stage progression   | `src/engine/systems/reform/stage-progression.ts` | `applyReformChoice`, `completeReform`   |
 | TraitEffectRegistry | `src/content/m4_1/trait-effects.ts`              | `getTraitModifiers(realm)`              |
 | reform JSONs        | `src/content/m4_1/reforms/`                      | 4 reform definitions                    |
+| v1→v3 migration     | `src/engine/world/migrations/v1-to-v3.ts`        | `migrateScenarioV1ToV3`                 |
 | v3→v4 migration     | `src/engine/world/migrations/v3-to-v4.ts`        | `migrateScenarioV3ToV4`                 |
 
 ---
