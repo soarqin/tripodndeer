@@ -9,6 +9,7 @@ export const PHASE_NAMES = {
   ESPIONAGE: 'espionage',
   RULER_LIFECYCLE: 'rulerLifecycle',
   CHARACTER_LIFECYCLE: 'characterLifecycle',
+  CHARACTER_SPAWN: 'characterSpawn',
   RECRUITMENT: 'recruitment',
   IDEOLOGY_DRIFT: 'ideologyDrift',
   REFORM: 'reform',
@@ -20,6 +21,7 @@ export const PHASE_NAMES = {
   FACTION: 'faction',
   HISTORICAL_EVENTS: 'historicalEvents',
   PRESTIGE_UPDATE: 'prestigeUpdate',
+  REALM_DEACTIVATION: 'realmDeactivation',
 } as const
 
 export const PHASE_ORDER: readonly string[] = [
@@ -33,6 +35,7 @@ export const PHASE_ORDER: readonly string[] = [
   PHASE_NAMES.ESPIONAGE,
   PHASE_NAMES.RULER_LIFECYCLE,
   PHASE_NAMES.CHARACTER_LIFECYCLE,
+  PHASE_NAMES.CHARACTER_SPAWN,
   PHASE_NAMES.RECRUITMENT,
   PHASE_NAMES.IDEOLOGY_DRIFT,
   PHASE_NAMES.REFORM,
@@ -44,6 +47,7 @@ export const PHASE_ORDER: readonly string[] = [
   PHASE_NAMES.FACTION,
   PHASE_NAMES.HISTORICAL_EVENTS,
   PHASE_NAMES.PRESTIGE_UPDATE,
+  PHASE_NAMES.REALM_DEACTIVATION,
 ]
 
 // Legacy phase name (kept for reference/regression testing)

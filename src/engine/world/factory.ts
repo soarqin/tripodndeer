@@ -3,7 +3,7 @@ import m1Data from '@/content/m1/scenario.json'
 import { INITIAL_DATE } from '@/shared/constants'
 import { M0DataSchema, M1DataSchemaV6, M1DataSchemaV7, M1DataSchemaV8 } from '@/shared/schemas'
 import { aiPlanStep } from '~/engine/systems/ai'
-import { characterLifecyclePhase } from '~/engine/systems/character'
+import { characterLifecyclePhase, characterSpawnPhase } from '~/engine/systems/character'
 import { combatV2Step } from '~/engine/systems/combat-v2'
 import { culturalIdentityPhase } from '~/engine/systems/culture/cultural-identity-phase'
 import { ideologyDriftPhase } from '~/engine/systems/culture/ideology-drift-phase'
@@ -24,6 +24,7 @@ import { rulerLifecyclePhase } from '~/engine/systems/ruler'
 import { siegeStep } from '~/engine/systems/siege'
 import { tradePhase } from '~/engine/systems/trade/trade-phase'
 import { victoryCheckStep } from '~/engine/systems/victory'
+import { realmDeactivationPhase } from '~/engine/wars/realm-deactivation'
 import {
   M4_BASE_FOOD_PRODUCTION_PER_HOUSEHOLD,
   M4_DEFAULT_REALM_FOOD_STORES,
@@ -505,6 +506,7 @@ export function createWorldFromM1Data(
       espionagePhase,
       rulerLifecyclePhase,
       characterLifecyclePhase,
+      characterSpawnPhase,
       recruitmentPhase,
       ideologyDriftPhase,
       reformPhase,
@@ -516,6 +518,7 @@ export function createWorldFromM1Data(
       factionPhase,
       historicalEventsPhase,
       prestigeUpdatePhase,
+      realmDeactivationPhase,
     ],
     pendingOrders: [],
   }
