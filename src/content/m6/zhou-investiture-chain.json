@@ -2,6 +2,7 @@
   "id": "zhou_investiture_v1",
   "scope": "realm-scoped",
   "oneShot": true,
+  "between": { "earliest_year_bc": 403, "latest_year_bc": null },
   "trigger": {
     "type": "state",
     "realmId": "$currentRealm",

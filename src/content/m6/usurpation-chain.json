@@ -2,6 +2,7 @@
   "id": "usurpation_wang",
   "scope": "realm-scoped",
   "oneShot": true,
+  "between": { "earliest_year_bc": 344, "latest_year_bc": null },
   "trigger": {
     "type": "state",
     "realmId": "$currentRealm",
