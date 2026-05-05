@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { proposeNewTradeRoutes } from '../trade-decision'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { warKey } from '~/engine/wars/wars'
 import {
   M42_TRADE_ROUTE_BASE_INCOME_PER_XUN,
@@ -68,7 +68,7 @@ function setupTwoAIRealmsWithPlayerZhao(overrides: Partial<World> = {}): World {
   const qinSite = makeSite({ id: 'site_qin', ownerId: 'realm_qin' })
   const qiSite = makeSite({ id: 'site_qi', ownerId: 'realm_qi' })
 
-  return makeTestWorld({
+  return makeEmptyWorld({
     realms: new Map([
       ['realm_qin', qinRealm],
       ['realm_qi', qiRealm],
@@ -111,7 +111,7 @@ describe('proposeNewTradeRoutes: skip player', () => {
     const qinSite = makeSite({ id: 'site_qin', ownerId: 'realm_qin' })
     const qiSite = makeSite({ id: 'site_qi', ownerId: 'realm_qi' })
 
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([
         ['realm_qin', qinRealm],
         ['realm_qi', qiRealm],
@@ -171,7 +171,7 @@ describe('proposeNewTradeRoutes: cap enforcement', () => {
     realms.set(partnerId, makeRealm({ id: partnerId, capital: partnerSiteId }))
     sites.set(partnerSiteId, makeSite({ id: partnerSiteId, ownerId: partnerId }))
 
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms,
       sites,
       tradeRoutes,
@@ -229,7 +229,7 @@ describe('proposeNewTradeRoutes: determinism', () => {
 
 describe('proposeNewTradeRoutes: edge cases', () => {
   it('returns unchanged world when no AI realms exist', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([['realm_qin', makeRealm({ id: 'realm_qin' })]]),
       sites: new Map([['site_qin', makeSite({ id: 'site_qin', ownerId: 'realm_qin' })]]),
       playerRealmId: 'realm_qin',
@@ -243,7 +243,7 @@ describe('proposeNewTradeRoutes: edge cases', () => {
     const qiRealmWithoutSites = makeRealm({ id: 'realm_qi', capital: 'site_qi' })
     const qinSite = makeSite({ id: 'site_qin', ownerId: 'realm_qin' })
 
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([
         ['realm_qin', qinRealm],
         ['realm_qi', qiRealmWithoutSites],

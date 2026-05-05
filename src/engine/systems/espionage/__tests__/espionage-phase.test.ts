@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { espionagePhase } from '../espionage-phase'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { relationKey } from '~/engine/systems/diplomacy'
 import type {
   CounterIntelState,
@@ -102,7 +102,7 @@ function makeFactionInfluence(realmId: string, conservatives: number = 50): Fact
 const SUCCESS_RNG: RNGState = { seed: 1, counter: 0 }
 
 function makeBaseWorld(overrides: Partial<World> = {}): World {
-  return makeTestWorld({
+  return makeEmptyWorld({
     tick: 10,
     realms: new Map([
       ['realm_a', makeRealm('realm_a')],

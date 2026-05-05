@@ -1,13 +1,23 @@
 import type {
   Academy,
   AcademyId,
+  CharId,
+  CharacterTemplate,
+  CounterIntelState,
   General,
   GeneralId,
+  IntelligenceCoverage,
+  Province,
+  ProvinceId,
   Realm,
   RealmId,
+  Region,
+  RegionId,
   RNGState,
   Site,
   SiteId,
+  SpyMission,
+  SpyMissionId,
   World,
 } from '~/shared/types'
 
@@ -183,6 +193,50 @@ export function makeM6World(opts: MakeM6WorldOptions = {}): World {
     sites: opts.sites,
     generals: opts.generals,
     academies: opts.academies ?? new Map(),
+    playerRealmId: opts.playerRealmId,
+  })
+}
+
+export interface MakeM7WorldOptions {
+  readonly realms?: ReadonlyMap<RealmId, Realm>
+  readonly sites?: ReadonlyMap<SiteId, Site>
+  readonly generals?: ReadonlyMap<GeneralId, General>
+  readonly intelligenceCoverage?: IntelligenceCoverage
+  readonly spyMissions?: ReadonlyMap<SpyMissionId, SpyMission>
+  readonly counterIntelStates?: ReadonlyMap<RealmId, CounterIntelState>
+  readonly playerRealmId?: RealmId
+}
+
+export function makeM7World(opts: MakeM7WorldOptions = {}): World {
+  return makeEmptyWorld({
+    realms: opts.realms,
+    sites: opts.sites,
+    generals: opts.generals,
+    intelligenceCoverage: opts.intelligenceCoverage ?? new Map(),
+    spyMissions: opts.spyMissions ?? new Map(),
+    counterIntelStates: opts.counterIntelStates ?? new Map(),
+    playerRealmId: opts.playerRealmId,
+  })
+}
+
+export interface MakeM9WorldOptions {
+  readonly realms?: ReadonlyMap<RealmId, Realm>
+  readonly sites?: ReadonlyMap<SiteId, Site>
+  readonly generals?: ReadonlyMap<GeneralId, General>
+  readonly provinces?: ReadonlyMap<ProvinceId, Province>
+  readonly regions?: ReadonlyMap<RegionId, Region>
+  readonly characterTemplates?: ReadonlyMap<CharId, CharacterTemplate>
+  readonly playerRealmId?: RealmId
+}
+
+export function makeM9World(opts: MakeM9WorldOptions = {}): World {
+  return makeEmptyWorld({
+    realms: opts.realms,
+    sites: opts.sites,
+    generals: opts.generals,
+    provinces: opts.provinces ?? new Map(),
+    regions: opts.regions ?? new Map(),
+    characterTemplates: opts.characterTemplates ?? new Map(),
     playerRealmId: opts.playerRealmId,
   })
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import {
   M42_FACTION_EVENT_PRIORITY,
   M42_FACTION_INFLUENCE_INITIAL,
@@ -120,7 +120,7 @@ function makeWorld(opts: {
   for (const s of opts.sites ?? []) {
     sitesMap.set(s.id, s)
   }
-  return makeTestWorld({
+  return makeEmptyWorld({
     realms: new Map([[realm.id, realm]]),
     rulers,
     generals: generalsMap,

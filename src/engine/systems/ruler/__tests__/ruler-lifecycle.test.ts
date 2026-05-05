@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { rulerLifecyclePhase } from '../ruler-lifecycle'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { GameDate, RealmId, RulerState, World } from '~/shared/types'
 import { M5_HEALTH_DECREASE_PER_YEAR } from '~/content/m2/balance'
 
@@ -24,7 +24,7 @@ function makeRuler(realmId: RealmId, overrides: Partial<RulerState> = {}): Ruler
 }
 
 function worldWithRulers(rulers: readonly RulerState[], date: GameDate = yearStart): World {
-  return makeTestWorld({
+  return makeEmptyWorld({
     date,
     rulers: new Map(rulers.map((ruler) => [ruler.realmId, ruler])),
   })

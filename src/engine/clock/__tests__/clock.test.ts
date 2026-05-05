@@ -4,7 +4,7 @@ import { makeEmptyWorld } from '@/shared/__tests__/fixtures'
 import type { TickPhase, World } from '@/shared/types'
 import { advanceClock, runTickPhases, setSpeed } from '../index'
 
-function makeTestWorld(): World {
+function makeClockWorld(): World {
   return makeEmptyWorld({
     date: { ...INITIAL_DATE },
     playerRealmId: 'realm_red',
@@ -14,7 +14,7 @@ function makeTestWorld(): World {
 
 describe('advanceClock pause', () => {
   it('does not advance tick or accumulator while paused', () => {
-    const world = makeTestWorld()
+    const world = makeClockWorld()
     const result = advanceClock({ speed: 'pause', realTimeAccum: 0 }, 10000, world)
 
     expect(result.clockState.realTimeAccum).toBe(0)
@@ -25,14 +25,14 @@ describe('advanceClock pause', () => {
 
 describe('advanceClock intervals', () => {
   it('advances 1x by one tick for 5500ms', () => {
-    const result = advanceClock({ speed: '1x', realTimeAccum: 0 }, 5500, makeTestWorld())
+    const result = advanceClock({ speed: '1x', realTimeAccum: 0 }, 5500, makeClockWorld())
 
     expect(result.nextWorld.tick).toBe(1)
     expect(result.clockState.realTimeAccum).toBe(500)
   })
 
   it('trusts large deltaMs input without engine-side cap', () => {
-    const result = advanceClock({ speed: '5x', realTimeAccum: 0 }, 60000, makeTestWorld())
+    const result = advanceClock({ speed: '5x', realTimeAccum: 0 }, 60000, makeClockWorld())
 
     expect(result.nextWorld.tick).toBe(150)
     expect(result.clockState.realTimeAccum).toBe(0)
@@ -59,7 +59,7 @@ describe('runTickPhases', () => {
       calls.push(`second:${world.tick}:${rng.counter}`)
       return { world: { ...world, tick: 20 }, nextRng: { ...rng, counter: 2 }, events: [] }
     }
-    const world = { ...makeTestWorld(), phases: [firstPhase, secondPhase] }
+    const world = { ...makeClockWorld(), phases: [firstPhase, secondPhase] }
 
     const result = runTickPhases(world, world.rngState)
 

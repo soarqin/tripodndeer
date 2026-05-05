@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import { describe, expect, it } from 'vitest'
 
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   DisasterDefinition,
   FactionId,
@@ -109,7 +109,7 @@ describe('M4.2 cross-system couplings', () => {
       durationMonths: 1,
     }
 
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([['realm_chu', makeRealm('realm_chu')]]),
       rulers: new Map([['realm_chu', makeRuler('realm_chu', 'gen_chu_ruler', 'conqueror')]]),
       sites: new Map([['site_a', makeSite('site_a', 'realm_chu')]]),
@@ -156,7 +156,7 @@ describe('M4.2 cross-system couplings', () => {
       choiceHistory: [],
     }
 
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([['realm_qin', makeRealm('realm_qin')]]),
       reformStates: new Map([['realm_qin', reformState]]),
       factionInfluences: new Map([['realm_qin', makeFactionState('realm_qin')]]),
@@ -188,7 +188,7 @@ describe('M4.2 cross-system couplings', () => {
       failureTrait: 'reform_failed_scar',
     }
 
-    const blockedWorld = makeTestWorld({
+    const blockedWorld = makeEmptyWorld({
       realms: new Map([['realm_qin', makeRealm('realm_qin')]]),
       rulers: new Map([['realm_qin', makeRuler('realm_qin', 'gen_qin_ruler', 'builder')]]),
       factionInfluences: new Map([
@@ -201,7 +201,7 @@ describe('M4.2 cross-system couplings', () => {
     expect(blockedResult.world.reformStates.has('realm_qin')).toBe(false)
     expect(blockedResult.events).toEqual([])
 
-    const allowedWorld = makeTestWorld({
+    const allowedWorld = makeEmptyWorld({
       realms: new Map([['realm_qin', makeRealm('realm_qin')]]),
       rulers: new Map([['realm_qin', makeRuler('realm_qin', 'gen_qin_ruler', 'builder')]]),
       factionInfluences: new Map([
@@ -236,7 +236,7 @@ describe('M4.2 cross-system couplings', () => {
       attrs: { wu: 50, zheng: 50, jiao: 50, mou: 50, xue: 50, po: 50 },
     }
 
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([['realm_qin', makeRealm('realm_qin')]]),
       generals: new Map([
         ['gen_a', candidateA],
@@ -249,7 +249,7 @@ describe('M4.2 cross-system couplings', () => {
 
     expect(selectHeir(world, 'realm_qin')).toBe('gen_a')
 
-    const flipped = makeTestWorld({
+    const flipped = makeEmptyWorld({
       realms: new Map([['realm_qin', makeRealm('realm_qin')]]),
       generals: new Map([
         ['gen_a', candidateA],
@@ -275,7 +275,7 @@ describe('M4.2 cross-system couplings', () => {
       status: 'active',
     }
 
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([
         ['realm_qin', makeRealm('realm_qin')],
         ['realm_chu', makeRealm('realm_chu')],
@@ -320,7 +320,7 @@ describe('M4.2 cross-system couplings', () => {
       status: 'active',
     }
 
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([
         ['realm_qin', makeRealm('realm_qin')],
         ['realm_chu', makeRealm('realm_chu')],

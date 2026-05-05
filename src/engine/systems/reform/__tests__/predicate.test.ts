@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { evaluatePredicate } from '../predicate'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { warKey } from '~/engine/wars/wars'
 import type {
   General,
@@ -87,7 +87,7 @@ function makeWarState(): WarState {
 
 describe('evaluatePredicate: realm.id', () => {
   it('returns true when realm id matches value', () => {
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     const realm = makeRealm({ id: 'realm_qin' })
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.id', value: 'realm_qin' }),
@@ -95,7 +95,7 @@ describe('evaluatePredicate: realm.id', () => {
   })
 
   it('returns false when realm id does not match value', () => {
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     const realm = makeRealm({ id: 'realm_qin' })
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.id', value: 'realm_zhao' }),
@@ -111,7 +111,7 @@ describe('evaluatePredicate: realm.has-character-with-specialty', () => {
       realmId: 'realm_qin',
       specialty: 'reformer',
     })
-    const world = makeTestWorld({ generals: new Map([['gen_1', general]]) })
+    const world = makeEmptyWorld({ generals: new Map([['gen_1', general]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.has-character-with-specialty',
@@ -127,7 +127,7 @@ describe('evaluatePredicate: realm.has-character-with-specialty', () => {
       realmId: 'realm_qin',
       specialty: 'warrior',
     })
-    const world = makeTestWorld({ generals: new Map([['gen_1', general]]) })
+    const world = makeEmptyWorld({ generals: new Map([['gen_1', general]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.has-character-with-specialty',
@@ -143,7 +143,7 @@ describe('evaluatePredicate: realm.has-character-with-specialty', () => {
       realmId: 'realm_zhao',
       specialty: 'reformer',
     })
-    const world = makeTestWorld({ generals: new Map([['gen_1', general]]) })
+    const world = makeEmptyWorld({ generals: new Map([['gen_1', general]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.has-character-with-specialty',
@@ -157,7 +157,7 @@ describe('evaluatePredicate: realm.ruler-personality-in', () => {
   it('returns true when ruler personality is in values', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const ruler = makeRuler({ realmId: 'realm_qin', personality: 'conqueror' })
-    const world = makeTestWorld({ rulers: new Map([['realm_qin', ruler]]) })
+    const world = makeEmptyWorld({ rulers: new Map([['realm_qin', ruler]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.ruler-personality-in',
@@ -169,7 +169,7 @@ describe('evaluatePredicate: realm.ruler-personality-in', () => {
   it('returns false when ruler personality is not in values', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const ruler = makeRuler({ realmId: 'realm_qin', personality: 'benevolent' })
-    const world = makeTestWorld({ rulers: new Map([['realm_qin', ruler]]) })
+    const world = makeEmptyWorld({ rulers: new Map([['realm_qin', ruler]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.ruler-personality-in',
@@ -180,7 +180,7 @@ describe('evaluatePredicate: realm.ruler-personality-in', () => {
 
   it('returns false when realm has no ruler', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.ruler-personality-in',
@@ -193,7 +193,7 @@ describe('evaluatePredicate: realm.ruler-personality-in', () => {
 describe('evaluatePredicate: realm.has-trait', () => {
   it('returns true when realm has the trait', () => {
     const realm = makeRealm({ traits: ['shang_yang_reform_done'] })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.has-trait',
@@ -204,7 +204,7 @@ describe('evaluatePredicate: realm.has-trait', () => {
 
   it('returns false when realm does not have the trait', () => {
     const realm = makeRealm({ traits: [] })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.has-trait',
@@ -215,7 +215,7 @@ describe('evaluatePredicate: realm.has-trait', () => {
 
   it('with not:true returns false when realm has the trait', () => {
     const realm = makeRealm({ traits: ['shang_yang_reform_done'] })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.has-trait',
@@ -227,7 +227,7 @@ describe('evaluatePredicate: realm.has-trait', () => {
 
   it('with not:true returns true when realm does not have the trait', () => {
     const realm = makeRealm({ traits: [] })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.has-trait',
@@ -241,7 +241,7 @@ describe('evaluatePredicate: realm.has-trait', () => {
 describe('evaluatePredicate: realm.no-active-war', () => {
   it('returns true when realm has no active wars', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.no-active-war' }),
     ).toBe(true)
@@ -250,7 +250,7 @@ describe('evaluatePredicate: realm.no-active-war', () => {
   it('returns false when realm has an active war', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const wars = new Map([[warKey('realm_qin', 'realm_zhao'), makeWarState()]])
-    const world = makeTestWorld({ wars })
+    const world = makeEmptyWorld({ wars })
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.no-active-war' }),
     ).toBe(false)
@@ -259,7 +259,7 @@ describe('evaluatePredicate: realm.no-active-war', () => {
   it('returns true when wars exist but none involve this realm', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const wars = new Map([[warKey('realm_zhao', 'realm_chu'), makeWarState()]])
-    const world = makeTestWorld({ wars })
+    const world = makeEmptyWorld({ wars })
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.no-active-war' }),
     ).toBe(true)
@@ -271,7 +271,7 @@ describe('evaluatePredicate: realm.treasury-above', () => {
     const realm = makeRealm({
       economy: { treasury: 5000, foodStores: 0, taxRate: 10 },
     })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.treasury-above',
@@ -284,7 +284,7 @@ describe('evaluatePredicate: realm.treasury-above', () => {
     const realm = makeRealm({
       economy: { treasury: 1000, foodStores: 0, taxRate: 10 },
     })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.treasury-above',
@@ -301,7 +301,7 @@ describe('evaluatePredicate: realm.population-above', () => {
       ['site_a', makeSite('site_a', 'realm_qin', 5000)],
       ['site_b', makeSite('site_b', 'realm_qin', 3000)],
     ])
-    const world = makeTestWorld({ sites })
+    const world = makeEmptyWorld({ sites })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.population-above',
@@ -315,7 +315,7 @@ describe('evaluatePredicate: realm.population-above', () => {
     const sites = new Map<string, Site>([
       ['site_a', makeSite('site_a', 'realm_qin', 1000)],
     ])
-    const world = makeTestWorld({ sites })
+    const world = makeEmptyWorld({ sites })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.population-above',
@@ -330,7 +330,7 @@ describe('evaluatePredicate: realm.population-above', () => {
       ['site_a', makeSite('site_a', 'realm_qin', 1000)],
       ['site_b', makeSite('site_b', 'realm_zhao', 9999)],
     ])
-    const world = makeTestWorld({ sites })
+    const world = makeEmptyWorld({ sites })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.population-above',
@@ -344,7 +344,7 @@ describe('evaluatePredicate: realm.ruler-in-office-years', () => {
   it('returns true when ruler has been in office for exactly minYears (boundary)', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const ruler = makeRuler({ realmId: 'realm_qin', inOfficeSinceTick: 0 })
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       tick: 360,
       rulers: new Map([['realm_qin', ruler]]),
     })
@@ -359,7 +359,7 @@ describe('evaluatePredicate: realm.ruler-in-office-years', () => {
   it('returns false when ruler has been in office for less than minYears (9.9 years)', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const ruler = makeRuler({ realmId: 'realm_qin', inOfficeSinceTick: 0 })
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       tick: 356,
       rulers: new Map([['realm_qin', ruler]]),
     })
@@ -373,7 +373,7 @@ describe('evaluatePredicate: realm.ruler-in-office-years', () => {
 
   it('returns false when realm has no ruler', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld({ tick: 720 })
+    const world = makeEmptyWorld({ tick: 720 })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.ruler-in-office-years',
@@ -386,7 +386,7 @@ describe('evaluatePredicate: realm.ruler-in-office-years', () => {
 describe('evaluatePredicate: realm.has-political-system', () => {
   it('returns true when politicalSystem matches', () => {
     const realm = makeRealm({ politicalSystem: 'legalist_centralized' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.has-political-system',
@@ -397,7 +397,7 @@ describe('evaluatePredicate: realm.has-political-system', () => {
 
   it('returns false when politicalSystem does not match', () => {
     const realm = makeRealm({ politicalSystem: 'enfeoffment' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.has-political-system',
@@ -410,7 +410,7 @@ describe('evaluatePredicate: realm.has-political-system', () => {
 describe('evaluatePredicate: realm.year-after', () => {
   it('returns true when world yearBC equals predicate yearBC (boundary)', () => {
     const realm = makeRealm()
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
     })
     expect(
@@ -423,7 +423,7 @@ describe('evaluatePredicate: realm.year-after', () => {
 
   it('returns true when world yearBC is later (smaller) than predicate yearBC', () => {
     const realm = makeRealm()
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       date: { yearBC: 250, season: 'spring', month: 1, xun: 'shang' },
     })
     expect(
@@ -436,7 +436,7 @@ describe('evaluatePredicate: realm.year-after', () => {
 
   it('returns false when world yearBC is earlier (larger) than predicate yearBC', () => {
     const realm = makeRealm()
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
     })
     expect(
@@ -454,7 +454,7 @@ describe('evaluatePredicate: and', () => {
       id: 'realm_qin',
       traits: ['shang_yang_reform_done'],
     })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'and',
@@ -468,7 +468,7 @@ describe('evaluatePredicate: and', () => {
 
   it('returns false when any child is false', () => {
     const realm = makeRealm({ id: 'realm_qin', traits: [] })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'and',
@@ -483,7 +483,7 @@ describe('evaluatePredicate: and', () => {
   it('handles nested or inside and', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const ruler = makeRuler({ realmId: 'realm_qin', personality: 'conqueror' })
-    const world = makeTestWorld({ rulers: new Map([['realm_qin', ruler]]) })
+    const world = makeEmptyWorld({ rulers: new Map([['realm_qin', ruler]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'and',
@@ -511,7 +511,7 @@ describe('evaluatePredicate: and', () => {
 describe('evaluatePredicate: or', () => {
   it('returns true when any child is true', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'or',
@@ -525,7 +525,7 @@ describe('evaluatePredicate: or', () => {
 
   it('returns false when all children are false', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'or',
@@ -543,7 +543,7 @@ describe('evaluatePredicate: site.terrain', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const site = makeSite('site_01', 'realm_qin', 5000)
     site.terrainType = 'plains'
-    const world = makeTestWorld({ sites: new Map([['site_01', site]]) })
+    const world = makeEmptyWorld({ sites: new Map([['site_01', site]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'site.terrain',
@@ -557,7 +557,7 @@ describe('evaluatePredicate: site.terrain', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const site = makeSite('site_01', 'realm_qin', 5000)
     site.terrainType = 'plains'
-    const world = makeTestWorld({ sites: new Map([['site_01', site]]) })
+    const world = makeEmptyWorld({ sites: new Map([['site_01', site]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'site.terrain',
@@ -569,7 +569,7 @@ describe('evaluatePredicate: site.terrain', () => {
 
   it('returns false when site does not exist', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'site.terrain',
@@ -584,7 +584,7 @@ describe('evaluatePredicate: site.population-above', () => {
   it('returns true when site population exceeds value', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const site = makeSite('site_01', 'realm_qin', 10000)
-    const world = makeTestWorld({ sites: new Map([['site_01', site]]) })
+    const world = makeEmptyWorld({ sites: new Map([['site_01', site]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'site.population-above',
@@ -597,7 +597,7 @@ describe('evaluatePredicate: site.population-above', () => {
   it('returns false when site population is below or equal to value', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const site = makeSite('site_01', 'realm_qin', 10000)
-    const world = makeTestWorld({ sites: new Map([['site_01', site]]) })
+    const world = makeEmptyWorld({ sites: new Map([['site_01', site]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'site.population-above',
@@ -609,7 +609,7 @@ describe('evaluatePredicate: site.population-above', () => {
 
   it('returns false when site does not exist', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'site.population-above',
@@ -636,7 +636,7 @@ describe('evaluatePredicate: site.governor-zheng-above', () => {
       assignedAtTick: 0,
       modifierKind: 'tax_efficiency',
     }
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       sites: new Map([['site_01', site]]),
       generals: new Map([['gen_01', general]]),
       governorAssignments: new Map([['site_01', govAssignment]]),
@@ -665,7 +665,7 @@ describe('evaluatePredicate: site.governor-zheng-above', () => {
       assignedAtTick: 0,
       modifierKind: 'tax_efficiency',
     }
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       sites: new Map([['site_01', site]]),
       generals: new Map([['gen_01', general]]),
       governorAssignments: new Map([['site_01', govAssignment]]),
@@ -682,7 +682,7 @@ describe('evaluatePredicate: site.governor-zheng-above', () => {
   it('returns false when no governor is assigned to site', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const site = makeSite('site_01', 'realm_qin', 5000)
-    const world = makeTestWorld({ sites: new Map([['site_01', site]]) })
+    const world = makeEmptyWorld({ sites: new Map([['site_01', site]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'site.governor-zheng-above',
@@ -696,7 +696,7 @@ describe('evaluatePredicate: site.governor-zheng-above', () => {
 describe('evaluatePredicate: realm.faction-influence-above', () => {
   it('returns true when faction influence exceeds value', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       factionInfluences: new Map([
         [
           'realm_qin',
@@ -719,7 +719,7 @@ describe('evaluatePredicate: realm.faction-influence-above', () => {
 
   it('returns false when faction influence is below or equal to value', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       factionInfluences: new Map([
         [
           'realm_qin',
@@ -742,7 +742,7 @@ describe('evaluatePredicate: realm.faction-influence-above', () => {
 
   it('returns false when realm has no faction influences', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.faction-influence-above',
@@ -779,7 +779,7 @@ describe('evaluatePredicate: exhaustive coverage', () => {
       'commandery',
       'legalist_centralized',
     ]
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     for (const system of systems) {
       const realm = makeRealm({ politicalSystem: system })
       expect(
@@ -805,7 +805,7 @@ describe('evaluatePredicate: exhaustive coverage', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     for (const archetype of archetypes) {
       const ruler = makeRuler({ realmId: 'realm_qin', personality: archetype })
-      const world = makeTestWorld({ rulers: new Map([['realm_qin', ruler]]) })
+      const world = makeEmptyWorld({ rulers: new Map([['realm_qin', ruler]]) })
       expect(
         evaluatePredicate(world, realm, {
           kind: 'realm.ruler-personality-in',

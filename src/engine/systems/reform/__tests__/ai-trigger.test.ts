@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { M41_AI_PERSONALITY_REFORM_PROPENSITY } from '~/content/m2/balance'
 import { reformPhase } from '../reform-phase'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   PersonalityArchetype,
   Realm,
@@ -63,7 +63,7 @@ function makeReformDef(): ReformDefinition {
 }
 
 function buildWorld(personality: PersonalityArchetype): World {
-  return makeTestWorld({
+  return makeEmptyWorld({
     realms: new Map([['realm_qin', makeRealm()]]),
     rulers: new Map([['realm_qin', makeRuler(personality)]]),
     playerRealmId: 'realm_other',
@@ -143,7 +143,7 @@ describe('reformPhase AI trigger: determinism', () => {
 
 describe('reformPhase AI trigger: missing ruler personality', () => {
   it('realm without ruler → 0 triggers (defensive guard)', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([['realm_qin', makeRealm()]]),
       rulers: new Map(),
       playerRealmId: 'realm_other',

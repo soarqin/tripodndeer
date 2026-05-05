@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { reformPhase } from '../reform-phase'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { warKey } from '~/engine/wars/wars'
 import type {
   General,
@@ -106,7 +106,7 @@ function makeActiveReformWorld(opts: {
     status: 'in_progress',
     choiceHistory: [],
   }
-  return makeTestWorld({
+  return makeEmptyWorld({
     tick: opts.tick ?? 0,
     realms: opts.realms ?? new Map([['realm_qin', makeRealm()]]),
     rulers: opts.rulers ?? new Map([['realm_qin', makeRuler('builder')]]),
@@ -207,7 +207,7 @@ describe('EC4: realm conquered mid-reform', () => {
 
 describe('EC5: two reforms satisfy trigger simultaneously', () => {
   it('only the alphabetically first reform is started', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([['realm_qin', makeRealm()]]),
       rulers: new Map([['realm_qin', makeRuler('builder')]]),
       playerRealmId: 'realm_other',
@@ -224,7 +224,7 @@ describe('EC5: two reforms satisfy trigger simultaneously', () => {
 
 describe('EC6: reform_failed_scar blocks new reform', () => {
   it('realm with scar trait + reformer + builder ruler: AI trigger skipped', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([['realm_qin', makeRealm({ traits: ['reform_failed_scar'] })]]),
       rulers: new Map([['realm_qin', makeRuler('builder')]]),
       generals: new Map([['gen_reformer', makeReformer()]]),
@@ -236,7 +236,7 @@ describe('EC6: reform_failed_scar blocks new reform', () => {
   })
 
   it('removing scar trait restores AI trigger eligibility', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([['realm_qin', makeRealm({ traits: [] })]]),
       rulers: new Map([['realm_qin', makeRuler('builder')]]),
       generals: new Map([['gen_reformer', makeReformer()]]),

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { rulerLifecyclePhase } from '../ruler-lifecycle'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { RulerStateSchema } from '~/shared/schemas'
 import type {
   GameDate,
@@ -86,7 +86,7 @@ describe('RulerState.inOfficeSinceTick', () => {
     const oldRulerGen = makeGeneral(`general_${realmId}`, realmId)
     const heir = makeGeneral('g_heir_zhao', realmId, { loyalty: 90, specialty: 'commander' })
 
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       date: yearStart,
       tick: 42,
       playerRealmId: 'realm_qin',
@@ -111,7 +111,7 @@ describe('RulerState.inOfficeSinceTick', () => {
     const oldRulerGen = makeGeneral(`general_${realmId}`, realmId)
     const heir = makeGeneral('g_heir_qin', realmId, { loyalty: 90 })
 
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       date: yearStart,
       tick: 99,
       playerRealmId: 'realm_qin',
@@ -132,7 +132,7 @@ describe('RulerState.inOfficeSinceTick', () => {
 
   it('healthy ruler keeps original inOfficeSinceTick across years', () => {
     const realmId: RealmId = 'realm_zhao'
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       date: yearStart,
       tick: 200,
       rulers: new Map([

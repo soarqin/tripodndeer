@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { disasterPhase } from '../disaster-phase'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   DisasterDefinition,
   DisasterState,
@@ -84,7 +84,7 @@ function makeNeverDef(overrides: Partial<DisasterDefinition> = {}): DisasterDefi
 }
 
 function makeBaseWorld(overrides: Partial<World> = {}): World {
-  return makeTestWorld({
+  return makeEmptyWorld({
     realms: new Map([['realm_qin', makeRealm()]]),
     rulers: new Map([['realm_qin', makeRuler('builder')]]),
     sites: new Map([['site_a', makeSite('site_a', 'realm_qin')]]),
@@ -311,7 +311,7 @@ describe('disasterPhase: determinism & contract', () => {
       ['site_qin', makeSite('site_qin', 'realm_qin')],
       ['site_zhao', makeSite('site_zhao', 'realm_zhao')],
     ])
-    const world = makeTestWorld({ realms, rulers, sites, playerRealmId: 'realm_other' })
+    const world = makeEmptyWorld({ realms, rulers, sites, playerRealmId: 'realm_other' })
     const result = disasterPhase(world, { seed: 11, counter: 0 }, [makeGuaranteedDef()])
     expect(result.world.disasterStates.size).toBe(2)
     expect(result.events.length).toBeGreaterThanOrEqual(2)

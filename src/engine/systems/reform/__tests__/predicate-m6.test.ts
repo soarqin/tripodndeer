@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { attitudeToBucket, evaluatePredicate } from '../predicate'
 import { relationKey } from '~/engine/systems/diplomacy/diplomacy-core'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   DiplomaticRelation,
   Realm,
@@ -66,7 +66,7 @@ describe('attitudeToBucket', () => {
 describe('evaluatePredicate: realm.prestige.gte', () => {
   it('returns true when prestige equals threshold (boundary)', () => {
     const realm = makeRealm({ prestige: 50 })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.prestige.gte', threshold: 50 }),
     ).toBe(true)
@@ -74,7 +74,7 @@ describe('evaluatePredicate: realm.prestige.gte', () => {
 
   it('returns true when prestige exceeds threshold', () => {
     const realm = makeRealm({ prestige: 80 })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.prestige.gte', threshold: 50 }),
     ).toBe(true)
@@ -82,7 +82,7 @@ describe('evaluatePredicate: realm.prestige.gte', () => {
 
   it('returns false when prestige is below threshold', () => {
     const realm = makeRealm({ prestige: 30 })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.prestige.gte', threshold: 50 }),
     ).toBe(false)
@@ -90,7 +90,7 @@ describe('evaluatePredicate: realm.prestige.gte', () => {
 
   it('treats undefined prestige as 0', () => {
     const realm = makeRealm({ prestige: undefined })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.prestige.gte', threshold: 1 }),
     ).toBe(false)
@@ -100,7 +100,7 @@ describe('evaluatePredicate: realm.prestige.gte', () => {
 describe('evaluatePredicate: realm.prestige.lt', () => {
   it('returns true when prestige is below threshold', () => {
     const realm = makeRealm({ prestige: 20 })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.prestige.lt', threshold: 50 }),
     ).toBe(true)
@@ -108,7 +108,7 @@ describe('evaluatePredicate: realm.prestige.lt', () => {
 
   it('returns false when prestige equals threshold', () => {
     const realm = makeRealm({ prestige: 50 })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.prestige.lt', threshold: 50 }),
     ).toBe(false)
@@ -116,7 +116,7 @@ describe('evaluatePredicate: realm.prestige.lt', () => {
 
   it('returns false when prestige exceeds threshold', () => {
     const realm = makeRealm({ prestige: 70 })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.prestige.lt', threshold: 50 }),
     ).toBe(false)
@@ -127,7 +127,7 @@ describe('evaluatePredicate: realm.relation.attitude', () => {
   it('returns true when relation attitude bucket meets minAttitude (ally)', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const relation = makeRelation('realm_qin', 'realm_zhao', 80)
-    const world = makeTestWorld({ relations: new Map([[relation.key, relation]]) })
+    const world = makeEmptyWorld({ relations: new Map([[relation.key, relation]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.relation.attitude',
@@ -140,7 +140,7 @@ describe('evaluatePredicate: realm.relation.attitude', () => {
   it('returns false when relation attitude bucket is below minAttitude', () => {
     const realm = makeRealm({ id: 'realm_qin' })
     const relation = makeRelation('realm_qin', 'realm_zhao', -30)
-    const world = makeTestWorld({ relations: new Map([[relation.key, relation]]) })
+    const world = makeEmptyWorld({ relations: new Map([[relation.key, relation]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.relation.attitude',
@@ -152,7 +152,7 @@ describe('evaluatePredicate: realm.relation.attitude', () => {
 
   it('treats absent relation as neutral attitude', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.relation.attitude',
@@ -164,7 +164,7 @@ describe('evaluatePredicate: realm.relation.attitude', () => {
 
   it('returns false when target realm is the same as evaluating realm', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.relation.attitude',
@@ -177,7 +177,7 @@ describe('evaluatePredicate: realm.relation.attitude', () => {
   it('uses sorted relation key regardless of argument order', () => {
     const realm = makeRealm({ id: 'realm_zhao' })
     const relation = makeRelation('realm_qin', 'realm_zhao', 90)
-    const world = makeTestWorld({ relations: new Map([[relation.key, relation]]) })
+    const world = makeEmptyWorld({ relations: new Map([[relation.key, relation]]) })
     expect(
       evaluatePredicate(world, realm, {
         kind: 'realm.relation.attitude',
@@ -202,7 +202,7 @@ describe('evaluatePredicate: realm.zhouInvestiture.has', () => {
 
   it('returns true when realm has any investiture (no rank specified)', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       zhouInvestiture: new Map([['realm_qin', makeInvestiture('realm_qin', 'duke')]]),
     })
     expect(
@@ -212,7 +212,7 @@ describe('evaluatePredicate: realm.zhouInvestiture.has', () => {
 
   it('returns true when realm has investiture matching rank', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       zhouInvestiture: new Map([['realm_qin', makeInvestiture('realm_qin', 'marquis')]]),
     })
     expect(
@@ -222,7 +222,7 @@ describe('evaluatePredicate: realm.zhouInvestiture.has', () => {
 
   it('returns false when realm has investiture but rank does not match', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       zhouInvestiture: new Map([['realm_qin', makeInvestiture('realm_qin', 'count')]]),
     })
     expect(
@@ -232,7 +232,7 @@ describe('evaluatePredicate: realm.zhouInvestiture.has', () => {
 
   it('returns false when realm has no investiture', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.zhouInvestiture.has' }),
     ).toBe(false)
@@ -242,7 +242,7 @@ describe('evaluatePredicate: realm.zhouInvestiture.has', () => {
 describe('evaluatePredicate: realm.zhouInvestiture.absent', () => {
   it('returns true when realm has no investiture', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.zhouInvestiture.absent' }),
     ).toBe(true)
@@ -258,7 +258,7 @@ describe('evaluatePredicate: realm.zhouInvestiture.absent', () => {
       source: 'zhou',
       rank: 'duke',
     }
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       zhouInvestiture: new Map([['realm_qin', investiture]]),
     })
     expect(
@@ -270,7 +270,7 @@ describe('evaluatePredicate: realm.zhouInvestiture.absent', () => {
 describe('evaluatePredicate: realm.id.equals', () => {
   it('returns true when realm id matches value', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.id.equals', value: 'realm_qin' }),
     ).toBe(true)
@@ -278,7 +278,7 @@ describe('evaluatePredicate: realm.id.equals', () => {
 
   it('returns false when realm id does not match value', () => {
     const realm = makeRealm({ id: 'realm_qin' })
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     expect(
       evaluatePredicate(world, realm, { kind: 'realm.id.equals', value: 'realm_zhao' }),
     ).toBe(false)

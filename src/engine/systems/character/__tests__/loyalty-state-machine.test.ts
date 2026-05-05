@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { characterLifecyclePhase, computeLoyaltyState } from '../character-lifecycle'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   CharacterDefectedEvent,
   GameDate,
@@ -44,7 +44,7 @@ function worldWithGenerals(
   date: GameDate = midYear,
   governorAssignments: ReadonlyMap<SiteId, GovernorAssignment> = new Map(),
 ): World {
-  return makeTestWorld({
+  return makeEmptyWorld({
     date,
     generals: new Map(generals.map((g) => [g.id, g])),
     governorAssignments,

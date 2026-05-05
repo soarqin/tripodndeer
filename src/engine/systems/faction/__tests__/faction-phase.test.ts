@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { factionPhase } from '../faction-phase'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import {
   M42_FACTION_DRIFT_PER_GENERAL_BP,
   M42_FACTION_INFLUENCE_INITIAL,
@@ -92,7 +92,7 @@ function makeWorld(opts: {
   if (opts.ruler !== null) {
     rulers.set(realm.id, opts.ruler ?? makeRuler('benevolent'))
   }
-  return makeTestWorld({
+  return makeEmptyWorld({
     date,
     realms: new Map([[realm.id, realm]]),
     rulers,
@@ -178,7 +178,7 @@ describe('factionPhase: general drift', () => {
   it('generals from other realms are ignored', () => {
     const otherRealm = makeRealm({ id: 'realm_other', politicalSystem: 'enfeoffment' as PoliticalSystem })
     const realm = makeRealm({ politicalSystem: 'enfeoffment' as PoliticalSystem })
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([
         [realm.id, realm],
         [otherRealm.id, otherRealm],
@@ -293,12 +293,12 @@ describe('factionPhase: trait stability multiplier', () => {
       traits: ['qi_jixia_reform_done'],
     })
 
-    const baseWorld = makeTestWorld({
+    const baseWorld = makeEmptyWorld({
       realms: new Map([[realmWithoutTrait.id, realmWithoutTrait]]),
       generals: new Map([['gen1', makeGeneral('gen1', 'noble_clans')]]),
       playerRealmId: realmWithoutTrait.id,
     })
-    const traitWorld = makeTestWorld({
+    const traitWorld = makeEmptyWorld({
       realms: new Map([[realmWithTrait.id, realmWithTrait]]),
       generals: new Map([['gen1', makeGeneral('gen1', 'noble_clans')]]),
       playerRealmId: realmWithTrait.id,

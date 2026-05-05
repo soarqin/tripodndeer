@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { rulerLifecyclePhase } from '../ruler-lifecycle'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { M5_RULER_BASE_LIFESPAN } from '~/content/m2/balance'
 import type {
   GameDate,
@@ -77,7 +77,7 @@ function worldWith({
   realms?: readonly Realm[]
   playerRealmId?: RealmId
 }): World {
-  return makeTestWorld({
+  return makeEmptyWorld({
     date: yearStart,
     rulers: new Map(rulers.map((r) => [r.realmId, r])),
     generals: new Map((generals ?? []).map((g) => [g.id, g])),
@@ -251,7 +251,7 @@ describe('succession crisis & resolution (rulerLifecyclePhase)', () => {
   it('does not emit succession events outside year start', () => {
     const realmId: RealmId = 'realm_zhao'
     const midYear: GameDate = { yearBC: 260, season: 'summer', month: 2, xun: 'zhong' }
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       date: midYear,
       playerRealmId: 'realm_qin',
       rulers: new Map([[realmId, makeRuler(realmId, { age: 64, lifespan: 65 })]]),

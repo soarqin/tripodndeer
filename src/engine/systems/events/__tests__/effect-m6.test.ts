@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { applyEventEffect } from '../event-chain-engine'
 import { relationKey } from '~/engine/systems/diplomacy/diplomacy-core'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   Academy,
   DiplomaticRelation,
@@ -51,7 +51,7 @@ function makeSite(overrides: Partial<Site> = {}): Site {
 }
 
 function worldWithRealm(overrides: Partial<World> = {}): World {
-  return makeTestWorld({
+  return makeEmptyWorld({
     realms: new Map([['realm_qin', makeRealm()]]),
     ...overrides,
   })
@@ -104,7 +104,7 @@ describe('applyEventEffect: realm.relation.delta', () => {
       ['realm_qin', makeRealm({ id: 'realm_qin' })],
       ['realm_zhao', makeRealm({ id: 'realm_zhao' })],
     ])
-    const world = makeTestWorld({ realms })
+    const world = makeEmptyWorld({ realms })
     const next = applyEventEffect(world, {
       type: 'realm.relation.delta',
       realmId: 'realm_qin',
@@ -129,7 +129,7 @@ describe('applyEventEffect: realm.relation.delta', () => {
       trust: 10,
       updatedAt: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
     }
-    const world = makeTestWorld({ realms, relations: new Map([[key, existing]]) })
+    const world = makeEmptyWorld({ realms, relations: new Map([[key, existing]]) })
     const next = applyEventEffect(world, {
       type: 'realm.relation.delta',
       realmId: 'realm_qin',

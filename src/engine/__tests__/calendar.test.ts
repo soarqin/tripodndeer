@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { isYearStart } from '../calendar'
-import { makeTestWorld } from './world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { GameDate, World } from '~/shared/types'
 
 function worldWithDate(date: GameDate): World {
-  return makeTestWorld({ date })
+  return makeEmptyWorld({ date })
 }
 
 describe('isYearStart', () => {

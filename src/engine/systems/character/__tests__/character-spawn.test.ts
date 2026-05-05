@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { characterLifecyclePhase } from '../character-lifecycle'
 import { characterSpawnPhase } from '../character-spawn'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   CharacterTemplate,
   CharId,
@@ -64,7 +64,7 @@ function worldWithTemplate(
 ): World {
   const realms = new Map<RealmId, Realm>([[template.realmId, makeRealm(template.realmId, realmStatus)]])
   const characterTemplates = new Map<CharId, CharacterTemplate>([[template.id, template]])
-  return makeTestWorld({
+  return makeEmptyWorld({
     date: makeDate(yearBC),
     realms,
     characterTemplates,

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { computeMarchTicks, findTravelCost, marchStep } from '../march'
 import type { Army, RNGState, Site, World } from '~/shared/types'
 
 function makeWorld(armies: Army[]): World {
-  return makeTestWorld({ armies: new Map(armies.map((army) => [army.id, army])) })
+  return makeEmptyWorld({ armies: new Map(armies.map((army) => [army.id, army])) })
 }
 
 function makeArmy(overrides: Partial<Army> = {}): Army {
@@ -54,7 +54,7 @@ describe('computeMarchTicks', () => {
 
 describe('findTravelCost', () => {
   it('doubles mountain march cost', () => {
-    const world: World = makeTestWorld({
+    const world: World = makeEmptyWorld({
       sites: new Map([
         ['site_a', makeSite('site_a', 'plains')],
         ['site_b', makeSite('site_b', 'mountains')],
@@ -68,7 +68,7 @@ describe('findTravelCost', () => {
   })
 
   it('friendly-controlled pass reduces travel cost by 20%', () => {
-    const world: World = makeTestWorld({
+    const world: World = makeEmptyWorld({
       sites: new Map([
         ['site_a', makeSite('site_a', 'plains')],
         ['site_b', makeSite('site_b', 'plains')],

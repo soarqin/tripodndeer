@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { selectHeir } from '../succession'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { General, GeneralId, RealmId, RulerState, World } from '~/shared/types'
 
 function makeGeneral(id: GeneralId, realmId: RealmId, overrides: Partial<General> = {}): General {
@@ -31,7 +31,7 @@ function makeRuler(realmId: RealmId, generalId: GeneralId): RulerState {
 }
 
 function worldWith(generals: readonly General[], rulers: readonly RulerState[] = []): World {
-  return makeTestWorld({
+  return makeEmptyWorld({
     generals: new Map(generals.map((g) => [g.id, g])),
     rulers: new Map(rulers.map((r) => [r.realmId, r])),
   })

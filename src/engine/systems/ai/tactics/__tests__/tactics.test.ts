@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { makeTestWorld, TEST_WORLD_DATE } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld, TEST_WORLD_DATE } from '~/shared/__tests__/fixtures'
 import type { Army, Siege, Site, World } from '~/shared/types'
 import { evaluateCutSupplyOption, evaluateRetreatOption, evaluateSiegeOption } from '../index'
 
@@ -43,7 +43,7 @@ function makeSiege(overrides: Partial<Siege> & { id: string }): Siege {
 }
 
 function makeWorld(overrides: Partial<World> = {}): World {
-  return makeTestWorld({ playerRealmId: 'realm_red', ...overrides })
+  return makeEmptyWorld({ playerRealmId: 'realm_red', ...overrides })
 }
 
 describe('evaluateSiegeOption', () => {

@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { splitRealm } from '../realm-split'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   Army,
   CoalitionState,
@@ -190,7 +190,7 @@ function makeZhouInvestiture(realmId: RealmId): ZhouInvestitureState {
 
 describe('splitRealm', () => {
   it('reassigns sites to their new realms per splitConfig', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([[OLD_REALM, makeRealm(OLD_REALM)]]),
       sites: new Map([
         ['site_1', makeSite('site_1', OLD_REALM)],
@@ -213,7 +213,7 @@ describe('splitRealm', () => {
   })
 
   it('removes the old realm and creates each new realm', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([[OLD_REALM, makeRealm(OLD_REALM)]]),
       sites: new Map([
         ['site_1', makeSite('site_1', OLD_REALM)],
@@ -231,7 +231,7 @@ describe('splitRealm', () => {
   })
 
   it('reassigns armies to follow the new owner of their location site', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([[OLD_REALM, makeRealm(OLD_REALM)]]),
       sites: new Map([
         ['site_1', makeSite('site_1', OLD_REALM)],
@@ -252,7 +252,7 @@ describe('splitRealm', () => {
   })
 
   it('reassigns generals to follow their governor assignment site', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([[OLD_REALM, makeRealm(OLD_REALM)]]),
       sites: new Map([
         ['site_1', makeSite('site_1', OLD_REALM)],
@@ -277,7 +277,7 @@ describe('splitRealm', () => {
   })
 
   it('updates governor assignments to point at the site\'s new realm', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([[OLD_REALM, makeRealm(OLD_REALM)]]),
       sites: new Map([
         ['site_1', makeSite('site_1', OLD_REALM)],
@@ -303,7 +303,7 @@ describe('splitRealm', () => {
 
   it('lets the primary new realm inherit ongoing wars with other realms', () => {
     const oldVsOtherKey = warKey(OLD_REALM, OTHER_REALM)
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([
         [OLD_REALM, makeRealm(OLD_REALM)],
         [OTHER_REALM, makeRealm(OTHER_REALM)],
@@ -325,7 +325,7 @@ describe('splitRealm', () => {
   })
 
   it('lets the primary new realm inherit diplomatic relations with other realms', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([
         [OLD_REALM, makeRealm(OLD_REALM)],
         [OTHER_REALM, makeRealm(OTHER_REALM)],
@@ -350,7 +350,7 @@ describe('splitRealm', () => {
   })
 
   it('lets the primary new realm inherit the ruler state', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([[OLD_REALM, makeRealm(OLD_REALM, { rulerId: 'gen_ruler' })]]),
       sites: new Map([
         ['site_1', makeSite('site_1', OLD_REALM)],
@@ -373,7 +373,7 @@ describe('splitRealm', () => {
   })
 
   it('removes peace proposals involving the old realm', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([
         [OLD_REALM, makeRealm(OLD_REALM)],
         [OTHER_REALM, makeRealm(OTHER_REALM)],
@@ -396,7 +396,7 @@ describe('splitRealm', () => {
   })
 
   it('reassigns passes controlled by the old realm to the primary new realm', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([[OLD_REALM, makeRealm(OLD_REALM)]]),
       sites: new Map([
         ['site_1', makeSite('site_1', OLD_REALM)],
@@ -413,7 +413,7 @@ describe('splitRealm', () => {
   })
 
   it('removes the old realm from any coalition memberships', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([
         [OLD_REALM, makeRealm(OLD_REALM)],
         [OTHER_REALM, makeRealm(OTHER_REALM)],
@@ -437,7 +437,7 @@ describe('splitRealm', () => {
   })
 
   it('lets the primary new realm inherit any zhou investiture', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([[OLD_REALM, makeRealm(OLD_REALM)]]),
       sites: new Map([
         ['site_1', makeSite('site_1', OLD_REALM)],
@@ -456,7 +456,7 @@ describe('splitRealm', () => {
   })
 
   it('splits treasury and food stores proportionally by site count', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([
         [
           OLD_REALM,
@@ -487,7 +487,7 @@ describe('splitRealm', () => {
   })
 
   it('handles a degenerate single-site split into a single new realm', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([
         [OLD_REALM, makeRealm(OLD_REALM, { economy: { treasury: 500, foodStores: 400, taxRate: 10 } })],
       ]),
@@ -506,7 +506,7 @@ describe('splitRealm', () => {
   })
 
   it('emits a realmSplit event with the old and new realm ids', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([[OLD_REALM, makeRealm(OLD_REALM)]]),
       sites: new Map([
         ['site_1', makeSite('site_1', OLD_REALM)],

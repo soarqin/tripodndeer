@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { General, GeneralId, Realm, RealmId, World } from '~/shared/types'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { candidateScore } from '../succession'
 import {
   M6_LEGITIMACY_BONUS_MULTIPLIER,
@@ -41,7 +41,7 @@ function makeRealm(id: RealmId, overrides: Partial<Realm> = {}): Realm {
 }
 
 function worldWith(realm: Realm): World {
-  return makeTestWorld({
+  return makeEmptyWorld({
     realms: new Map([[realm.id, realm]]),
   })
 }

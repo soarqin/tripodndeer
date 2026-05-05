@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { checkTrigger } from '../event-chain-engine'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { GameDate, Realm } from '~/shared/types'
 
 function makeRealm(id: string, treasury = 1000): Realm {
@@ -23,7 +23,7 @@ function makeRealm(id: string, treasury = 1000): Realm {
 describe('checkTrigger — state triggers', () => {
   it('returns true when predicate matches the specified realm', () => {
     const realms = new Map([['realm_qin', makeRealm('realm_qin', 5000)]])
-    const world = makeTestWorld({ realms })
+    const world = makeEmptyWorld({ realms })
 
     const result = checkTrigger(world, {
       type: 'state',
@@ -36,7 +36,7 @@ describe('checkTrigger — state triggers', () => {
 
   it('returns false when predicate does not match the specified realm', () => {
     const realms = new Map([['realm_qin', makeRealm('realm_qin', 500)]])
-    const world = makeTestWorld({ realms })
+    const world = makeEmptyWorld({ realms })
 
     const result = checkTrigger(world, {
       type: 'state',
@@ -49,7 +49,7 @@ describe('checkTrigger — state triggers', () => {
 
   it('returns false when realmId is missing', () => {
     const realms = new Map([['realm_qin', makeRealm('realm_qin', 5000)]])
-    const world = makeTestWorld({ realms })
+    const world = makeEmptyWorld({ realms })
 
     const result = checkTrigger(world, {
       type: 'state',
@@ -61,7 +61,7 @@ describe('checkTrigger — state triggers', () => {
 
   it('returns false when realmId points to a non-existent realm', () => {
     const realms = new Map([['realm_qin', makeRealm('realm_qin', 5000)]])
-    const world = makeTestWorld({ realms })
+    const world = makeEmptyWorld({ realms })
 
     const result = checkTrigger(world, {
       type: 'state',
@@ -74,7 +74,7 @@ describe('checkTrigger — state triggers', () => {
 
   it('returns false when state trigger has realmId but no predicate', () => {
     const realms = new Map([['realm_qin', makeRealm('realm_qin', 5000)]])
-    const world = makeTestWorld({ realms })
+    const world = makeEmptyWorld({ realms })
 
     const result = checkTrigger(world, {
       type: 'state',
@@ -87,7 +87,7 @@ describe('checkTrigger — state triggers', () => {
   it('evaluates compound and-predicate scoped to specified realm', () => {
     const qin: Realm = { ...makeRealm('realm_qin', 5000), traits: ['legalist'] }
     const realms = new Map([['realm_qin', qin]])
-    const world = makeTestWorld({ realms })
+    const world = makeEmptyWorld({ realms })
 
     const result = checkTrigger(world, {
       type: 'state',
@@ -106,7 +106,7 @@ describe('checkTrigger — state triggers', () => {
 
   it('date trigger still works (regression)', () => {
     const date: GameDate = { yearBC: 350, season: 'spring', month: 1, xun: 'shang' }
-    const world = makeTestWorld({ date })
+    const world = makeEmptyWorld({ date })
 
     const result = checkTrigger(world, {
       type: 'date',

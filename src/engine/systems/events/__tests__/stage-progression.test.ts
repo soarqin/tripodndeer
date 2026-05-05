@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import linXiangruEvent from '~/content/m5/events/lin-xiangru-bi.json'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { General, Realm, World } from '~/shared/types'
 import { applyEventChainChoice, getCurrentStage } from '../event-chain-engine'
 
@@ -35,7 +35,7 @@ function makeGeneral(id: string, realmId: string, loyalty = 70): General {
 }
 
 function worldAtStage(stageId: string): World {
-  return makeTestWorld({
+  return makeEmptyWorld({
     tick: 12,
     realms: new Map([['realm_zhao', makeRealm('realm_zhao')]]),
     generals: new Map([['gen_lin_xiangru', makeGeneral('gen_lin_xiangru', 'realm_zhao')]]),

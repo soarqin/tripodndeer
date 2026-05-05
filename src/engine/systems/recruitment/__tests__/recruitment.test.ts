@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { pickSpecialty, recruitmentPhase } from '../recruitment'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { PHASE_NAMES, PHASE_ORDER } from '~/engine/phases'
 import type {
   CharacterRecruitedEvent,
@@ -41,7 +41,7 @@ function makeRealm(id: RealmId): Realm {
 
 function worldWithRealms(realmIds: readonly RealmId[], date: GameDate = yearStart): World {
   const realms = new Map(realmIds.map((id) => [id, makeRealm(id)]))
-  return makeTestWorld({ date, realms })
+  return makeEmptyWorld({ date, realms })
 }
 
 function specialtyCounts(personality: PersonalityArchetype): Map<Specialty, number> {
@@ -140,7 +140,7 @@ describe('recruitmentPhase', () => {
         loyalty: 80,
       })
     }
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       date: yearStart,
       realms: new Map([['realm_qin', makeRealm('realm_qin')]]),
       generals,
@@ -160,7 +160,7 @@ describe('recruitmentPhase', () => {
     const seenSpecialties = new Set<Specialty>()
 
     for (let seed = 1; seed <= 200 && seenSpecialties.size < 9; seed++) {
-      const world = makeTestWorld({ date: yearStart, realms })
+      const world = makeEmptyWorld({ date: yearStart, realms })
       const result = recruitmentPhase(world, { seed, counter: 0 })
       for (const general of result.world.generals.values()) {
         if (general.specialty !== undefined) seenSpecialties.add(general.specialty)
@@ -186,7 +186,7 @@ describe('recruitmentPhase', () => {
       ['realm_chu', makeRealm('realm_chu')],
       ['realm_qin', makeRealm('realm_qin')],
     ])
-    const world = makeTestWorld({ date: yearStart, realms })
+    const world = makeEmptyWorld({ date: yearStart, realms })
 
     const result = recruitmentPhase(world, rng)
 
@@ -242,7 +242,7 @@ describe('recruitmentPhase', () => {
       ],
     ])
     const realms = new Map([['realm_qin', makeRealm('realm_qin')]])
-    const world = makeTestWorld({ date: yearStart, realms, generals: existingGenerals })
+    const world = makeEmptyWorld({ date: yearStart, realms, generals: existingGenerals })
 
     const result = recruitmentPhase(world, rng)
 

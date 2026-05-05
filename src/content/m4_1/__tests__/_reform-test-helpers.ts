@@ -7,7 +7,7 @@ import type {
   Site,
   World,
 } from '~/shared/types'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 
 export function makeRealm(overrides: Partial<Realm> & { id: RealmId }): Realm {
   const { id } = overrides
@@ -90,7 +90,7 @@ export function makeReformWorld(opts: ReformWorldOpts): World {
   if (opts.ruler) rulers.set(opts.realm.id, opts.ruler)
   const sites = new Map<string, Site>()
   for (const site of opts.sites ?? []) sites.set(site.id, site)
-  return makeTestWorld({
+  return makeEmptyWorld({
     date: { yearBC: opts.yearBC, season: 'spring', month: 1, xun: 'shang' },
     tick: opts.tick ?? 100,
     realms: new Map([[opts.realm.id, opts.realm]]),

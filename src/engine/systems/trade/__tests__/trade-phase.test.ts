@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { tradePhase } from '../trade-phase'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { warKey } from '~/engine/wars/wars'
 import {
   M42_TRADE_FACTION_INFLUENCE_PER_ROUTE_PER_YEAR,
@@ -86,7 +86,7 @@ function setupTwoRealmWorld(overrides: Partial<World> = {}): World {
   const qinSite = makeSite({ id: 'site_qin', ownerId: 'realm_qin', adjacency: ['site_qi'] })
   const qiSite = makeSite({ id: 'site_qi', ownerId: 'realm_qi', adjacency: ['site_qin'] })
 
-  return makeTestWorld({
+  return makeEmptyWorld({
     realms: new Map([
       ['realm_qin', qinRealm],
       ['realm_qi', qiRealm],
@@ -246,7 +246,7 @@ describe('tradePhase: ordering and multiplicity', () => {
       ['site_qi', makeSite({ id: 'site_qi', ownerId: 'realm_qi', adjacency: ['site_qin', 'site_wei'] })],
       ['site_wei', makeSite({ id: 'site_wei', ownerId: 'realm_wei', adjacency: ['site_qi'] })],
     ])
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms,
       sites,
       adjacencyEdges: new Map([

@@ -5,7 +5,7 @@ import {
   applyReformChoice,
   completeReform,
 } from '../stage-progression'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   General,
   Realm,
@@ -111,7 +111,7 @@ function makeInitialState(overrides: Partial<ReformState> = {}): ReformState {
 }
 
 function makeWorldWithReform(overrides: Partial<World> = {}): World {
-  return makeTestWorld({
+  return makeEmptyWorld({
     tick: 5,
     realms: new Map([['realm_qin', makeRealm()]]),
     generals: new Map([['gen_reformer', makeReformer()]]),
@@ -280,7 +280,7 @@ describe('applyReformChoice: choice history accumulation', () => {
 
 describe('applyReformChoice: guard clauses', () => {
   it('returns world unchanged when no reform state exists for realm', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([['realm_qin', makeRealm()]]),
     })
     const reformDef = makeReformDef()
@@ -343,7 +343,7 @@ describe('advanceReformStage', () => {
   })
 
   it('returns world unchanged when realm has no reform state', () => {
-    const world = makeTestWorld()
+    const world = makeEmptyWorld()
     const result = advanceReformStage(world, 'realm_qin', 'stage2')
     expect(result).toBe(world)
   })

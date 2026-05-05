@@ -6,7 +6,7 @@ import {
   historicalEventsPhase,
   isValidEffectType,
 } from '../event-chain-engine'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { Effect } from '~/shared/schemas'
 import type { GameDate, General, Realm, World } from '~/shared/types'
 
@@ -42,7 +42,7 @@ function makeGeneral(id: string, realmId: string, loyalty = 80): General {
 }
 
 function worldWith(overrides: Partial<World> = {}): World {
-  return makeTestWorld(overrides)
+  return makeEmptyWorld(overrides)
 }
 
 describe('isValidEffectType', () => {

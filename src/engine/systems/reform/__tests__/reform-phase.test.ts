@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { reformPhase } from '../reform-phase'
-import { makeTestWorld } from '~/engine/__tests__/world-test-fixtures'
+import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
   General,
   PersonalityArchetype,
@@ -79,7 +79,7 @@ function makeSimpleReformDef(): ReformDefinition {
 }
 
 function makeWorldWithBuilder(overrides: Partial<World> = {}): World {
-  return makeTestWorld({
+  return makeEmptyWorld({
     realms: new Map([['realm_qin', makeRealm()]]),
     rulers: new Map([['realm_qin', makeRuler('builder')]]),
     playerRealmId: 'realm_other',
@@ -89,7 +89,7 @@ function makeWorldWithBuilder(overrides: Partial<World> = {}): World {
 
 describe('reformPhase: early return', () => {
   it('returns unchanged world when not year-start', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       date: { yearBC: 260, season: 'summer', month: 1, xun: 'shang' },
       realms: new Map([['realm_qin', makeRealm()]]),
       rulers: new Map([['realm_qin', makeRuler('builder')]]),
@@ -101,7 +101,7 @@ describe('reformPhase: early return', () => {
   })
 
   it('does not consume RNG when not year-start', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       date: { yearBC: 260, season: 'autumn', month: 2, xun: 'zhong' },
     })
     const rng = { seed: 42, counter: 5 }
@@ -191,7 +191,7 @@ describe('reformPhase: active reform handling', () => {
       choiceHistory: [],
       ...stateOverrides,
     }
-    return makeTestWorld({
+    return makeEmptyWorld({
       tick: 0,
       realms: new Map([['realm_qin', makeRealm()]]),
       rulers: new Map([['realm_qin', makeRuler('builder')]]),
@@ -229,7 +229,7 @@ describe('reformPhase: active reform handling', () => {
       status: 'in_progress',
       choiceHistory: [],
     }
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       tick: 73,
       realms: new Map([['realm_qin', makeRealm()]]),
       rulers: new Map([['realm_qin', makeRuler('builder')]]),
@@ -280,7 +280,7 @@ describe('reformPhase: active reform handling', () => {
       status: 'in_progress',
       choiceHistory: [],
     }
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       tick: 36,
       realms: new Map([['realm_qin', makeRealm()]]),
       rulers: new Map([['realm_qin', makeRuler('builder')]]),
@@ -331,7 +331,7 @@ describe('reformPhase: active reform handling', () => {
       status: 'in_progress',
       choiceHistory: [],
     }
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       tick: 36,
       realms: new Map([['realm_qin', makeRealm()]]),
       rulers: new Map([['realm_qin', makeRuler('builder')]]),
@@ -359,7 +359,7 @@ describe('reformPhase: determinism', () => {
   })
 
   it('returns same world reference and unchanged RNG when no realms eligible', () => {
-    const world = makeTestWorld({
+    const world = makeEmptyWorld({
       realms: new Map([['realm_qin', makeRealm()]]),
       rulers: new Map([['realm_qin', makeRuler('steward')]]),
       playerRealmId: 'realm_other',
