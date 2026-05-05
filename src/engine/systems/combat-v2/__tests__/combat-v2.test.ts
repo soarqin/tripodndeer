@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { setCombatVarianceEnabled } from '~/engine/random'
 import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { Army, General, RNGState, Site, World } from '~/shared/types'
-import { resolveCombat as resolveLegacyCombat } from '../../combat/combat'
 import { resolveCombat } from '../combat-v2'
 import { combatV2Step } from '../combat-v2-step'
 import type { BattleContext, Composition } from '../combat-v2'
@@ -90,14 +89,13 @@ describe('resolveCombat v2', () => {
   beforeEach(() => setCombatVarianceEnabled(false))
   afterEach(() => setCombatVarianceEnabled(true))
 
-  it('matches legacy winner for neutral infantry on plains', () => {
+  it('attacker wins for neutral infantry 1000 vs 500 on plains', () => {
     const attacker = makeArmy({ manpower: 1000 })
     const defenders = [makeArmy({ id: 'army_defender', realmId: 'realm_han', manpower: 500 })]
-    const legacy = resolveLegacyCombat(attacker, defenders)
 
     const result = resolveCombat(makeContext({ attackerArmy: attacker, defenderArmies: defenders }))
 
-    expect(result.winner).toBe(legacy.winner)
+    expect(result.winner).toBe('attacker')
   })
 
   it('mountain terrain gives the defender a significant advantage', () => {
@@ -339,5 +337,87 @@ describe('combatV2Step', () => {
         battleSiteId: 'site_2',
       },
     })
+  })
+
+  it('marching army with ticksRemaining 0 triggers siteConquered event', () => {
+    const attacker = makeArmy({
+      state: 'marching',
+      destination: 'site_2',
+      source: 'site_1',
+      ticksRemaining: 0,
+    })
+    const defender = makeArmy({
+      id: 'army_defender',
+      realmId: 'realm_han',
+      manpower: 500,
+      location: 'site_2',
+    })
+    const world = makeWorld(
+      [attacker, defender],
+      [makeSite('site_1', 'realm_qin'), makeSite('site_2', 'realm_han')],
+    )
+
+    const result = combatV2Step(world, rng)
+
+    expect(result.events.some((e) => e.type === 'siteConquered')).toBe(true)
+    expect(result.events.find((e) => e.type === 'siteConquered')?.payload).toMatchObject({
+      siteId: 'site_2',
+      byRealm: 'realm_qin',
+      fromRealm: 'realm_han',
+    })
+  })
+
+  it('idle army is not affected by combatV2Step', () => {
+    const attacker = makeArmy({ state: 'idle', destination: 'site_2', ticksRemaining: 0 })
+    const defender = makeArmy({ id: 'army_defender', realmId: 'realm_han', location: 'site_2' })
+    const world = makeWorld([attacker, defender], [makeSite('site_2', 'realm_han')])
+
+    const result = combatV2Step(world, rng)
+
+    expect(result.events.filter((e) => e.type === 'siteConquered')).toHaveLength(0)
+    expect(result.world.armies.get(attacker.id)).toEqual(attacker)
+    expect(result.world.armies.get(defender.id)).toEqual(defender)
+  })
+
+  it('marching army with ticksRemaining > 0 is not affected', () => {
+    const attacker = makeArmy({ state: 'marching', destination: 'site_2', ticksRemaining: 1 })
+    const world = makeWorld([attacker], [makeSite('site_2', 'realm_han')])
+
+    const result = combatV2Step(world, rng)
+
+    expect(result.events.filter((e) => e.type === 'siteConquered')).toHaveLength(0)
+    expect(result.world.armies.get(attacker.id)).toEqual(attacker)
+  })
+
+  it('attacker victory: site ownership changes, defender removed, siteConquered emitted', () => {
+    const attacker = makeArmy({
+      manpower: 1000,
+      state: 'marching',
+      destination: 'site_2',
+      source: 'site_1',
+      ticksRemaining: 0,
+    })
+    const defender = makeArmy({
+      id: 'army_defender',
+      realmId: 'realm_han',
+      manpower: 500,
+      location: 'site_2',
+    })
+    const world = makeWorld(
+      [attacker, defender],
+      [makeSite('site_1', 'realm_qin'), makeSite('site_2', 'realm_han')],
+    )
+
+    const result = combatV2Step(world, rng)
+
+    expect(result.world.sites.get('site_2')?.ownerId).toBe('realm_qin')
+    expect(result.world.armies.get(attacker.id)).toMatchObject({
+      location: 'site_2',
+      state: 'idle',
+      destination: null,
+      source: null,
+    })
+    expect(result.world.armies.has(defender.id)).toBe(false)
+    expect(result.events.some((e) => e.type === 'siteConquered')).toBe(true)
   })
 })

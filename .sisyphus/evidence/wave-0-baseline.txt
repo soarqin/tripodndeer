@@ -1,14 +1,36 @@
-BASELINE_SHA=168adbeffde1c9d65cb4f940bef15c455c47dcda
+=== Wave 0 Baseline Capture Evidence ===
+Date: 2026-05-05
+
+BASELINE_SHA=8b2ec2e10fb867f19cb8f346eaab0da7548ac1e4
 LOC: 55316
 Files: 396
-Tests: 2266
+Tests: 227
 ASSERTIONS: 4026
-build_size_bytes: 526487
-typecheck_time_seconds: 18.553
-god_file_types_ts_loc: 963
-god_file_schemas_ts_loc: 920
-god_file_balance_ts_loc: 778
-god_file_ai_ts_loc: 701
-god_file_game_store_ts_loc: 743
-makeEmptyWorld_usage: 209
-LEGACY_WINNER: attacker
+makeEmptyWorld_usage: 56 files (target: ≥90 post-W8)
+
+God files:
+- types.ts: 963 lines
+- schemas.ts: 920 lines
+- balance.ts: 778 lines
+- ai.ts: 701 lines
+- game-store.ts: 743 lines
+
+LEGACY_WINNER: attacker (attacker=1000 vs defender=500)
+
+Test results:
+- pnpm typecheck: PASS
+- pnpm lint: PASS
+- pnpm test: PASS (2266 tests)
+- pnpm test:perf: PASS (8 tests)
+- pnpm test:behavior: FAIL - 2 pre-existing failures (m8-behavior.test.ts)
+- pnpm test:e2e: FAIL - 1 pre-existing failure (control.spec.ts pause test)
+
+Pre-existing failures:
+1. m8-behavior: schemer.aggressiveEspionage=89, steward=90 (off by 1)
+2. m8-behavior: tyrant.attack=65, steward=72, ratio=0.9027 (needs 0.95)
+3. e2e control: pause test 30s timeout
+
+These failures pre-date this refactor. Barrel re-exports cannot change behavior.
+Refactor proceeds with documented pre-existing failures.
+
+boulder.json archived to: .sisyphus/run-continuation/m9-final-20260505.json

@@ -1,23 +1,25 @@
-aiPlanStep
-orderApplyStep
-marchStep
-siegeStep
-combatV2Step
-culturalIdentityPhase
-manpowerTick
-espionagePhase
-rulerLifecyclePhase
-characterLifecyclePhase
-characterSpawnPhase
-recruitmentPhase
-ideologyDriftPhase
-reformPhase
-victoryCheckStep
-diplomacyLifecycleStep
-economyPhase
-disasterPhase
-tradePhase
-factionPhase
-historicalEventsPhase
-prestigeUpdatePhase
-realmDeactivationPhase
+phases: [
+  aiPlanStep,
+  orderApplyStep,
+  marchStep,
+  siegeStep,
+  combatV2Step,
+  culturalIdentityPhase,
+  manpowerTick,
+  espionagePhase,
+  rulerLifecyclePhase,
+  characterLifecyclePhase,
+  characterSpawnPhase,
+  recruitmentPhase,
+  ideologyDriftPhase,
+  reformPhase,
+  victoryCheckStep,
+  diplomacyLifecycleStep,
+  economyPhase,
+  disasterPhase,
+  tradePhase,
+  factionPhase,
+  historicalEventsPhase,
+  prestigeUpdatePhase,
+  realmDeactivationPhase,
+]
