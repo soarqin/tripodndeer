@@ -1,0 +1,8 @@
+{
+  "id": "tribal_pressure_yi_qu",
+  "between": { "earliest_year_bc": 350, "latest_year_bc": 330 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range", "realmId": "realm_qin" },
+  "stages": [{ "id": "stage_pressure", "text": { "key": "event.tribal_pressure_yi_qu.stage_pressure.text" }, "choices": [{ "id": "fight", "text": { "key": "event.tribal_pressure_yi_qu.choice_fight.text" }, "effects": [] }, { "id": "negotiate", "text": { "key": "event.tribal_pressure_yi_qu.choice_negotiate.text" }, "effects": [] }] }]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "flood_yellow_river",
+  "between": { "earliest_year_bc": 390, "latest_year_bc": 370 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "stages": [{ "id": "stage_flood", "text": { "key": "event.flood_yellow_river.stage_flood.text" }, "choices": [{ "id": "respond", "text": { "key": "event.flood_yellow_river.choice_respond.text" }, "effects": [] }] }]
+}

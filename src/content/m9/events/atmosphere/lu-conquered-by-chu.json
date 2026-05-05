@@ -1,0 +1,8 @@
+{
+  "id": "lu_conquered_by_chu",
+  "between": { "earliest_year_bc": 256, "latest_year_bc": 252 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "stages": [{ "id": "stage_conquest", "text": { "key": "event.lu_conquered_by_chu.stage_conquest.text" }, "choices": [{ "id": "surrender", "text": { "key": "event.lu_conquered_by_chu.choice_surrender.text" }, "effects": [{ "type": "realm.deactivate", "realmId": "realm_lu", "reason": "conquered", "absorbingRealmId": "realm_chu" }] }, { "id": "resist", "text": { "key": "event.lu_conquered_by_chu.choice_resist.text" }, "effects": [] }] }]
+}

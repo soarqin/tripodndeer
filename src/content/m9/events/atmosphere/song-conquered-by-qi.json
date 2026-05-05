@@ -1,0 +1,8 @@
+{
+  "id": "song_conquered_by_qi",
+  "between": { "earliest_year_bc": 286, "latest_year_bc": 282 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "stages": [{ "id": "stage_conquest", "text": { "key": "event.song_conquered_by_qi.stage_conquest.text" }, "choices": [{ "id": "surrender", "text": { "key": "event.song_conquered_by_qi.choice_surrender.text" }, "effects": [{ "type": "realm.deactivate", "realmId": "realm_song", "reason": "conquered", "absorbingRealmId": "realm_qi" }] }, { "id": "resist", "text": { "key": "event.song_conquered_by_qi.choice_resist.text" }, "effects": [] }] }]
+}

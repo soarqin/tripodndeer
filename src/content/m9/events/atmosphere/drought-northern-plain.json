@@ -1,0 +1,8 @@
+{
+  "id": "drought_northern_plain",
+  "between": { "earliest_year_bc": 340, "latest_year_bc": 320 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "stages": [{ "id": "stage_drought", "text": { "key": "event.drought_northern_plain.stage_drought.text" }, "choices": [{ "id": "respond", "text": { "key": "event.drought_northern_plain.choice_respond.text" }, "effects": [] }] }]
+}

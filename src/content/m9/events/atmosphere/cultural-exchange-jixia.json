@@ -1,0 +1,8 @@
+{
+  "id": "cultural_exchange_jixia",
+  "between": { "earliest_year_bc": 310, "latest_year_bc": 290 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "stages": [{ "id": "stage_jixia", "text": { "key": "event.cultural_exchange_jixia.stage_jixia.text" }, "choices": [{ "id": "participate", "text": { "key": "event.cultural_exchange_jixia.choice_participate.text" }, "effects": [] }, { "id": "ignore", "text": { "key": "event.cultural_exchange_jixia.choice_ignore.text" }, "effects": [] }] }]
+}

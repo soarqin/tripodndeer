@@ -1,0 +1,8 @@
+{
+  "id": "qi_recovery_from_ye_yi",
+  "between": { "earliest_year_bc": 279, "latest_year_bc": 275 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range", "realmId": "realm_qi" },
+  "stages": [{ "id": "stage_recovery", "text": { "key": "event.qi_recovery_from_ye_yi.stage_recovery.text" }, "choices": [{ "id": "counterattack", "text": { "key": "event.qi_recovery_from_ye_yi.choice_counterattack.text" }, "effects": [] }, { "id": "rebuild", "text": { "key": "event.qi_recovery_from_ye_yi.choice_rebuild.text" }, "effects": [] }] }]
+}

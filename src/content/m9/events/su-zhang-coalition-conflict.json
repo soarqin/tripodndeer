@@ -1,0 +1,18 @@
+{
+  "id": "su_zhang_coalition_conflict",
+  "between": { "earliest_year_bc": 334, "latest_year_bc": 310 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "stages": [
+    {
+      "id": "stage_coalition",
+      "text": { "key": "event.su_zhang_coalition_conflict.stage_coalition.text" },
+      "choices": [
+        { "id": "join_vertical", "text": { "key": "event.su_zhang_coalition_conflict.choice_join_vertical.text" }, "effects": [] },
+        { "id": "join_horizontal", "text": { "key": "event.su_zhang_coalition_conflict.choice_join_horizontal.text" }, "effects": [] },
+        { "id": "neutral", "text": { "key": "event.su_zhang_coalition_conflict.choice_neutral.text" }, "effects": [] }
+      ]
+    }
+  ]
+}

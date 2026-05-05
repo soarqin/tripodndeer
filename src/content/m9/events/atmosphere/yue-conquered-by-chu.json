@@ -1,0 +1,8 @@
+{
+  "id": "yue_conquered_by_chu",
+  "between": { "earliest_year_bc": 334, "latest_year_bc": 330 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "stages": [{ "id": "stage_conquest", "text": { "key": "event.yue_conquered_by_chu.stage_conquest.text" }, "choices": [{ "id": "surrender", "text": { "key": "event.yue_conquered_by_chu.choice_surrender.text" }, "effects": [{ "type": "realm.deactivate", "realmId": "realm_yue", "reason": "conquered", "absorbingRealmId": "realm_chu" }] }, { "id": "resist", "text": { "key": "event.yue_conquered_by_chu.choice_resist.text" }, "effects": [] }] }]
+}

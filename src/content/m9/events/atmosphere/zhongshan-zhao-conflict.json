@@ -1,0 +1,8 @@
+{
+  "id": "zhongshan_zhao_conflict",
+  "between": { "earliest_year_bc": 296, "latest_year_bc": 292 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "stages": [{ "id": "stage_conquest", "text": { "key": "event.zhongshan_zhao_conflict.stage_conquest.text" }, "choices": [{ "id": "surrender", "text": { "key": "event.zhongshan_zhao_conflict.choice_surrender.text" }, "effects": [{ "type": "realm.deactivate", "realmId": "realm_zhongshan", "reason": "conquered", "absorbingRealmId": "realm_zhao" }] }, { "id": "resist", "text": { "key": "event.zhongshan_zhao_conflict.choice_resist.text" }, "effects": [] }] }]
+}

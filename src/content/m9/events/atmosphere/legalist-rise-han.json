@@ -1,0 +1,8 @@
+{
+  "id": "legalist_rise_han",
+  "between": { "earliest_year_bc": 351, "latest_year_bc": 337 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range", "realmId": "realm_han" },
+  "stages": [{ "id": "stage_reform", "text": { "key": "event.legalist_rise_han.stage_reform.text" }, "choices": [{ "id": "support", "text": { "key": "event.legalist_rise_han.choice_support.text" }, "effects": [] }, { "id": "oppose", "text": { "key": "event.legalist_rise_han.choice_oppose.text" }, "effects": [] }] }]
+}

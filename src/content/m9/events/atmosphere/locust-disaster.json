@@ -1,0 +1,8 @@
+{
+  "id": "locust_disaster",
+  "between": { "earliest_year_bc": 360, "latest_year_bc": 340 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "stages": [{ "id": "stage_locust", "text": { "key": "event.locust_disaster.stage_locust.text" }, "choices": [{ "id": "respond", "text": { "key": "event.locust_disaster.choice_respond.text" }, "effects": [] }] }]
+}

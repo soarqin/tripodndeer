@@ -1,0 +1,8 @@
+{
+  "id": "merchant_network_bashu",
+  "between": { "earliest_year_bc": 320, "latest_year_bc": 300 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "stages": [{ "id": "stage_trade", "text": { "key": "event.merchant_network_bashu.stage_trade.text" }, "choices": [{ "id": "invest", "text": { "key": "event.merchant_network_bashu.choice_invest.text" }, "effects": [] }, { "id": "ignore", "text": { "key": "event.merchant_network_bashu.choice_ignore.text" }, "effects": [] }] }]
+}
