@@ -4,7 +4,6 @@ import { join } from 'path'
 import { M9_FORBIDDEN_ANACHRONISM_STRINGS } from '../m2/balance'
 
 const M9_EVENTS_DIR = join(process.cwd(), 'src/content/m9/events')
-const M9_LOCALES_DIR = join(process.cwd(), 'src/content/locales')
 const M9_TEMPLATES_FILE = join(process.cwd(), 'src/content/m9/character-templates.json')
 const M9_SITES_DIR = join(process.cwd(), 'src/content/m9/sites')
 const M9_PASSES_FILE = join(process.cwd(), 'src/content/m9/passes.json')
