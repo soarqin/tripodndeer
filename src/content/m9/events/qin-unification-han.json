@@ -1,0 +1,18 @@
+{
+  "id": "qin_unification_han",
+  "between": { "earliest_year_bc": 230, "latest_year_bc": 226 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage_conquest",
+      "text": { "key": "event.qin_unification_han.stage_conquest.text" },
+      "choices": [
+        { "id": "surrender", "text": { "key": "event.qin_unification_han.choice_surrender.text" }, "effects": [{ "type": "realm.deactivate", "realmId": "realm_han", "reason": "conquered", "absorbingRealmId": "realm_qin" }] },
+        { "id": "resist", "text": { "key": "event.qin_unification_han.choice_resist.text" }, "effects": [] }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "tian_replaces_jiang",
+  "between": { "earliest_year_bc": 386, "latest_year_bc": 380 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range", "realmId": "realm_qi" },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage_transition",
+      "text": { "key": "event.tian_replaces_jiang.stage_transition.text" },
+      "choices": [
+        { "id": "support", "text": { "key": "event.tian_replaces_jiang.choice_support.text" }, "effects": [{ "type": "realm.rulingHouseTransition", "realmId": "realm_qi", "newHouse": "tian" }] },
+        { "id": "oppose", "text": { "key": "event.tian_replaces_jiang.choice_oppose.text" }, "effects": [] }
+      ]
+    }
+  ]
+}

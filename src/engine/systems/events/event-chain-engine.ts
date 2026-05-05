@@ -5,6 +5,19 @@ import { deactivateRealm } from '~/engine/wars/realm-deactivation'
 import fanJuStrategy from '~/content/m5/events/fan-ju-strategy.json'
 import lianPoElder from '~/content/m5/events/lian-po-elder.json'
 import linXiangruBi from '~/content/m5/events/lin-xiangru-bi.json'
+import zhouRecognizesThreeJin from '~/content/m9/events/zhou-recognizes-three-jin.json'
+import tianReplacesJiang from '~/content/m9/events/tian-replaces-jiang.json'
+import qinXiaoSeeksTalent from '~/content/m9/events/qin-xiao-seeks-talent.json'
+import shangYangReform from '~/content/m9/events/shang-yang-reform.json'
+import malingBattle from '~/content/m9/events/maling-battle.json'
+import suQinVerticalAlliance from '~/content/m9/events/su-qin-vertical-alliance.json'
+import zhangYiHorizontal from '~/content/m9/events/zhang-yi-horizontal.json'
+import zhaoHuFu from '~/content/m9/events/zhao-hu-fu.json'
+import yueYiAttackQi from '~/content/m9/events/yue-yi-attack-qi.json'
+import changpingBattle from '~/content/m9/events/changping-battle.json'
+import qinDestroysEastZhou from '~/content/m9/events/qin-destroys-east-zhou.json'
+import qinUnificationHan from '~/content/m9/events/qin-unification-han.json'
+import qinUnificationFinal from '~/content/m9/events/qin-unification-final.json'
 
 const EFFECT_TYPES = [
   'realm.treasury',
@@ -26,6 +39,7 @@ const EFFECT_TYPES = [
   'academy.dormant',
   'zhouInvestiture.grant',
   'realm.deactivate',
+  'realm.rulingHouseTransition',
 ] as const
 
 type EffectType = (typeof EFFECT_TYPES)[number]
@@ -189,6 +203,13 @@ function applyEffect(world: World, effect: Effect): World {
       return applyZhouInvestitureGrant(world, effect.realmId, effect.rank)
     case 'realm.deactivate':
       return deactivateRealm(world, effect.realmId, effect.reason).world
+    case 'realm.rulingHouseTransition': {
+      const realm = world.realms.get(effect.realmId)
+      if (!realm) return world
+      const realms = new Map(world.realms)
+      realms.set(realm.id, { ...realm, rulingHouse: effect.newHouse })
+      return { ...world, realms }
+    }
     default: {
       const unknownType = (effect as { type: string }).type
       throw new Error(`Unknown effect type: ${unknownType}`)
@@ -274,6 +295,12 @@ export function checkTrigger(world: World, trigger: EventChain['trigger']): bool
     if (!realm) return false
     return evaluatePredicate(world, realm, trigger.predicate)
   }
+  if (trigger.type === 'year_range') {
+    if (trigger.realmId) {
+      return world.realms.has(trigger.realmId)
+    }
+    return true
+  }
   return false
 }
 
@@ -291,6 +318,19 @@ const EVENT_CHAINS: readonly EventChain[] = [
   linXiangruBi as unknown as EventChain,
   fanJuStrategy as unknown as EventChain,
   lianPoElder as unknown as EventChain,
+  zhouRecognizesThreeJin as unknown as EventChain,
+  tianReplacesJiang as unknown as EventChain,
+  qinXiaoSeeksTalent as unknown as EventChain,
+  shangYangReform as unknown as EventChain,
+  malingBattle as unknown as EventChain,
+  suQinVerticalAlliance as unknown as EventChain,
+  zhangYiHorizontal as unknown as EventChain,
+  zhaoHuFu as unknown as EventChain,
+  yueYiAttackQi as unknown as EventChain,
+  changpingBattle as unknown as EventChain,
+  qinDestroysEastZhou as unknown as EventChain,
+  qinUnificationHan as unknown as EventChain,
+  qinUnificationFinal as unknown as EventChain,
 ]
 
 export function getEventChain(chainId: EventChainId): EventChain | null {

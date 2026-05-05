@@ -1,0 +1,19 @@
+{
+  "id": "zhao_hu_fu",
+  "between": { "earliest_year_bc": 307, "latest_year_bc": 301 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range", "realmId": "realm_zhao" },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage_reform",
+      "text": { "key": "event.zhao_hu_fu.stage_reform.text" },
+      "choices": [
+        { "id": "implement", "text": { "key": "event.zhao_hu_fu.choice_implement.text" }, "effects": [] },
+        { "id": "delay", "text": { "key": "event.zhao_hu_fu.choice_delay.text" }, "effects": [] },
+        { "id": "refuse", "text": { "key": "event.zhao_hu_fu.choice_refuse.text" }, "effects": [] }
+      ]
+    }
+  ]
+}

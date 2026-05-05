@@ -1,0 +1,19 @@
+{
+  "id": "changping_battle",
+  "between": { "earliest_year_bc": 260, "latest_year_bc": 256 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage_battle",
+      "text": { "key": "event.changping_battle.stage_battle.text" },
+      "choices": [
+        { "id": "lian_po", "text": { "key": "event.changping_battle.choice_lian_po.text" }, "effects": [] },
+        { "id": "zhao_kuo", "text": { "key": "event.changping_battle.choice_zhao_kuo.text" }, "effects": [] },
+        { "id": "negotiate", "text": { "key": "event.changping_battle.choice_negotiate.text" }, "effects": [] }
+      ]
+    }
+  ]
+}

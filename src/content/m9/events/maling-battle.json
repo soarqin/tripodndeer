@@ -1,0 +1,19 @@
+{
+  "id": "maling_battle",
+  "between": { "earliest_year_bc": 341, "latest_year_bc": 338 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage_battle",
+      "text": { "key": "event.maling_battle.stage_battle.text" },
+      "choices": [
+        { "id": "attack", "text": { "key": "event.maling_battle.choice_attack.text" }, "effects": [] },
+        { "id": "defend", "text": { "key": "event.maling_battle.choice_defend.text" }, "effects": [] },
+        { "id": "negotiate", "text": { "key": "event.maling_battle.choice_negotiate.text" }, "effects": [] }
+      ]
+    }
+  ]
+}

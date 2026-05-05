@@ -1,0 +1,18 @@
+{
+  "id": "zhou_recognizes_three_jin",
+  "between": { "earliest_year_bc": 403, "latest_year_bc": 395 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage_recognition",
+      "text": { "key": "event.zhou_recognizes_three_jin.stage_recognition.text" },
+      "choices": [
+        { "id": "accept", "text": { "key": "event.zhou_recognizes_three_jin.choice_accept.text" }, "effects": [] },
+        { "id": "resist", "text": { "key": "event.zhou_recognizes_three_jin.choice_resist.text" }, "effects": [] }
+      ]
+    }
+  ]
+}

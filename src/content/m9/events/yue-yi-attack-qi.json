@@ -1,0 +1,19 @@
+{
+  "id": "yue_yi_attack_qi",
+  "between": { "earliest_year_bc": 284, "latest_year_bc": 278 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage_invasion",
+      "text": { "key": "event.yue_yi_attack_qi.stage_invasion.text" },
+      "choices": [
+        { "id": "defend", "text": { "key": "event.yue_yi_attack_qi.choice_defend.text" }, "effects": [] },
+        { "id": "flee", "text": { "key": "event.yue_yi_attack_qi.choice_flee.text" }, "effects": [] },
+        { "id": "counterattack", "text": { "key": "event.yue_yi_attack_qi.choice_counterattack.text" }, "effects": [] }
+      ]
+    }
+  ]
+}

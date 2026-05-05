@@ -1,0 +1,18 @@
+{
+  "id": "su_qin_vertical_alliance",
+  "between": { "earliest_year_bc": 334, "latest_year_bc": 328 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage_alliance",
+      "text": { "key": "event.su_qin_vertical_alliance.stage_alliance.text" },
+      "choices": [
+        { "id": "join", "text": { "key": "event.su_qin_vertical_alliance.choice_join.text" }, "effects": [] },
+        { "id": "refuse", "text": { "key": "event.su_qin_vertical_alliance.choice_refuse.text" }, "effects": [] }
+      ]
+    }
+  ]
+}

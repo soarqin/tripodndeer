@@ -494,17 +494,19 @@ export type Effect =
   | { readonly type: 'academy.dormant'; readonly academyId: AcademyId }
   | { readonly type: 'zhouInvestiture.grant'; readonly realmId: RealmId; readonly rank: ZhouInvestitureRank }
   | { readonly type: 'realm.deactivate'; readonly realmId: RealmId; readonly reason: 'conquered' | 'extinguished' | 'merged'; readonly absorbingRealmId?: RealmId }
+  | { readonly type: 'realm.rulingHouseTransition'; readonly realmId: RealmId; readonly newHouse: string }
 
 export interface EventChainChoice {
   readonly id: string
-  readonly label: string
+  readonly label?: string
+  readonly text?: string | { readonly key: string }
   readonly effects: readonly Effect[]
   readonly nextStageId?: string
 }
 
 export interface EventChainStage {
   readonly id: string
-  readonly text: string
+  readonly text: string | { readonly key: string }
   readonly choices: readonly EventChainChoice[]
 }
 
@@ -517,6 +519,10 @@ export type EventChainTrigger =
   | {
       readonly type: 'state'
       readonly predicate?: PredicateNode
+      readonly realmId?: RealmId
+    }
+  | {
+      readonly type: 'year_range'
       readonly realmId?: RealmId
     }
 
@@ -532,6 +538,8 @@ export interface EventChain {
     readonly latest_year_bc?: number | null
   }
   readonly scope?: EventChainScope
+  readonly author?: string
+  readonly reviewedBy?: string
 }
 
 export interface EventChainState {

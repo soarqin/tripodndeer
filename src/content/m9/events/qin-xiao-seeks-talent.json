@@ -1,0 +1,18 @@
+{
+  "id": "qin_xiao_seeks_talent",
+  "between": { "earliest_year_bc": 361, "latest_year_bc": 355 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range", "realmId": "realm_qin" },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage_edict",
+      "text": { "key": "event.qin_xiao_seeks_talent.stage_edict.text" },
+      "choices": [
+        { "id": "seek", "text": { "key": "event.qin_xiao_seeks_talent.choice_seek.text" }, "effects": [] },
+        { "id": "ignore", "text": { "key": "event.qin_xiao_seeks_talent.choice_ignore.text" }, "effects": [] }
+      ]
+    }
+  ]
+}

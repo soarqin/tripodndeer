@@ -1,0 +1,18 @@
+{
+  "id": "qin_destroys_east_zhou",
+  "between": { "earliest_year_bc": 256, "latest_year_bc": 252 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range" },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage_conquest",
+      "text": { "key": "event.qin_destroys_east_zhou.stage_conquest.text" },
+      "choices": [
+        { "id": "accept", "text": { "key": "event.qin_destroys_east_zhou.choice_accept.text" }, "effects": [{ "type": "realm.deactivate", "realmId": "realm_zhou", "reason": "conquered", "absorbingRealmId": "realm_qin" }] },
+        { "id": "resist", "text": { "key": "event.qin_destroys_east_zhou.choice_resist.text" }, "effects": [] }
+      ]
+    }
+  ]
+}

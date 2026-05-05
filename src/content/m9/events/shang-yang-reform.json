@@ -1,0 +1,19 @@
+{
+  "id": "shang_yang_reform",
+  "between": { "earliest_year_bc": 356, "latest_year_bc": 350 },
+  "author": "atlas-m9",
+  "reviewedBy": "atlas-m9",
+  "trigger": { "type": "year_range", "realmId": "realm_qin" },
+  "oneShot": true,
+  "stages": [
+    {
+      "id": "stage_reform",
+      "text": { "key": "event.shang_yang_reform.stage_reform.text" },
+      "choices": [
+        { "id": "implement", "text": { "key": "event.shang_yang_reform.choice_implement.text" }, "effects": [] },
+        { "id": "delay", "text": { "key": "event.shang_yang_reform.choice_delay.text" }, "effects": [] },
+        { "id": "compromise", "text": { "key": "event.shang_yang_reform.choice_compromise.text" }, "effects": [] }
+      ]
+    }
+  ]
+}
