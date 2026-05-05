@@ -380,16 +380,22 @@ export const EffectSchema = z.discriminatedUnion('type', [
 
 export type Effect = z.infer<typeof EffectSchema>
 
+const I18nTextSchema = z.union([
+  z.string().min(1),
+  z.object({ key: z.string().min(1) }),
+])
+
 export const EventChainChoiceSchema = z.object({
   id: z.string().min(1),
-  label: z.string().min(1),
+  label: z.string().min(1).optional(),
+  text: I18nTextSchema.optional(),
   effects: z.array(EffectSchema),
   nextStageId: z.string().min(1).optional(),
 })
 
 export const EventChainStageSchema = z.object({
   id: z.string().min(1),
-  text: z.string().min(1),
+  text: I18nTextSchema,
   choices: z.array(EventChainChoiceSchema),
 })
 

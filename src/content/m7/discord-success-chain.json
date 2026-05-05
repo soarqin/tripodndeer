@@ -13,7 +13,7 @@
   "stages": [
     {
       "id": "discord_success_narrative",
-      "text": "离间计成 — 我国细作于敌国朝堂之间挑拨君臣，致使敌将忠心动摇。",
+      "text": { "key": "event.discord_success_v1.discord_success_narrative.text" },
       "choices": [
         {
           "id": "acknowledge",

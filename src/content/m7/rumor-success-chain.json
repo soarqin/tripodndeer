@@ -13,7 +13,7 @@
   "stages": [
     {
       "id": "rumor_success_narrative",
-      "text": "流言计成 — 我国细作于敌国市井间散播流言，扰动人心，敌方派系倾轧加剧。",
+      "text": { "key": "event.rumor_success_v1.rumor_success_narrative.text" },
       "choices": [
         {
           "id": "acknowledge",

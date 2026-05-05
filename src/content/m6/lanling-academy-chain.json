@@ -10,7 +10,7 @@
   "stages": [
     {
       "id": "xunzi_arrives",
-      "text": "荀子至兰陵 — 荀子来到楚国兰陵，欲建学宫传授儒学。",
+      "text": { "key": "event.lanling_academy_founding.xunzi_arrives.text" },
       "choices": [
         {
           "id": "accept",

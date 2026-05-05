@@ -18,7 +18,7 @@
   "stages": [
     {
       "id": "request_investiture",
-      "text": "请求册封 — 周王可赐予爵位，以正名分。",
+      "text": { "key": "event.zhou_investiture_v1.request_investiture.text" },
       "choices": [
         {
           "id": "accept_duke",

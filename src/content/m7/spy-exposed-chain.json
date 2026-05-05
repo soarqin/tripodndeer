@@ -13,7 +13,7 @@
   "stages": [
     {
       "id": "spy_exposed_response",
-      "text": "高风险间谍行动暴露 — 我国间者于敌国行事不慎，被对方擒获。当如何应对？",
+      "text": { "key": "event.spy_exposed_high_risk_v1.spy_exposed_response.text" },
       "choices": [
         {
           "id": "deny",

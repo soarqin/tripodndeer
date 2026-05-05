@@ -1,0 +1,30 @@
+T22 i18n key extraction from M6/M7 chains — evidence
+
+M5 chains byte-equal unchanged (git diff HEAD -- src/content/m5/events/):
+0 lines changed
+
+M6/M7 chain stage.text fields converted from hardcoded zh-CN to {key} format:
+  src/content/m6/zhou-investiture-chain.json   → event.zhou_investiture_v1.request_investiture.text
+  src/content/m6/usurpation-chain.json         → event.usurpation_wang.usurpation_choice.text
+  src/content/m6/lanling-academy-chain.json    → event.lanling_academy_founding.xunzi_arrives.text
+  src/content/m7/spy-exposed-chain.json        → event.spy_exposed_high_risk_v1.spy_exposed_response.text
+  src/content/m7/counter-success-chain.json    → event.counter_success_v1.counter_success_response.text
+  src/content/m7/discord-success-chain.json    → event.discord_success_v1.discord_success_narrative.text
+  src/content/m7/rumor-success-chain.json      → event.rumor_success_v1.rumor_success_narrative.text
+
+Total: 7 stage.text fields extracted, all keys follow event.${chain_id}.${stage_id}.text format.
+Choice labels (all <30 chars, e.g. "请封公爵", "拒绝") preserved as direct strings.
+
+Schema updates (src/shared/schemas.ts):
+  - I18nTextSchema = z.union([z.string().min(1), z.object({ key: z.string().min(1) })])
+  - EventChainStageSchema.text accepts dual-mode (string | {key})
+  - EventChainChoiceSchema.label now optional + new optional text field for parity with M9
+
+i18n.ts: added resolveText() helper for dual-mode rendering (returns string as-is OR looks up key).
+
+scripts/extract-i18n-keys.ts: scans M6/M7 dirs, reports extractable strings + missing key refs.
+Dry-run output: 7 key refs found (already extracted), 0 remaining hardcoded strings.
+
+Tests: 2248 passed (full suite); 75 passed in M5/M6/M7/i18n subset (8 new i18n cases for resolveText).
+Typecheck: clean.
+M5 chains: byte-equal (per AGENTS.md guardrail).

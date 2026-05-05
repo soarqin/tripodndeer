@@ -18,7 +18,7 @@
   "stages": [
     {
       "id": "usurpation_choice",
-      "text": "僭号称王 — 威望日盛，可效魏惠王故事，自称王号。",
+      "text": { "key": "event.usurpation_wang.usurpation_choice.text" },
       "choices": [
         {
           "id": "usurp",

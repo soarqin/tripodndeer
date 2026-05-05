@@ -33,3 +33,14 @@ export function t(
     return val !== undefined ? String(val) : `{{${name}}}`
   })
 }
+
+export function resolveText(
+  localization: ReadonlyMap<string, string>,
+  textOrKey: string | { readonly key: string },
+  params?: Record<string, string | number>,
+): string {
+  if (typeof textOrKey === 'string') {
+    return textOrKey
+  }
+  return t(localization, textOrKey.key, params)
+}
