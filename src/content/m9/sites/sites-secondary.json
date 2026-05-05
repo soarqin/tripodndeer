@@ -1,0 +1,1764 @@
+{
+  "sites": [
+    {
+      "id": "site_wuguan",
+      "name": "武关",
+      "type": "fortress",
+      "provinceId": "province_hanzhong",
+      "regionId": "region_liangzhou",
+      "position": [
+        160,
+        310
+      ],
+      "terrain": "mountains",
+      "defense_value": 5,
+      "population_base": 8000,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 2
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "秦楚边界要隘"
+    },
+    {
+      "id": "site_shangjun_north",
+      "name": "上郡北城",
+      "type": "fortress",
+      "provinceId": "province_shangjun",
+      "regionId": "region_yongzhou",
+      "position": [
+        115,
+        230
+      ],
+      "terrain": "hills",
+      "defense_value": 5,
+      "population_base": 7000,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "秦北部边防要塞"
+    },
+    {
+      "id": "site_beidi_city",
+      "name": "北地城",
+      "type": "regular_city",
+      "provinceId": "province_beidi",
+      "regionId": "region_yongzhou",
+      "position": [
+        90,
+        260
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 12000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 2
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "北地郡治所"
+    },
+    {
+      "id": "site_wugong",
+      "name": "武功",
+      "type": "regular_city",
+      "provinceId": "province_neishi",
+      "regionId": "region_yongzhou",
+      "position": [
+        125,
+        285
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 18000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "关中重镇"
+    },
+    {
+      "id": "site_mianchi",
+      "name": "渑池",
+      "type": "strategic_city",
+      "provinceId": "province_neishi",
+      "regionId": "region_yongzhou",
+      "position": [
+        200,
+        290
+      ],
+      "terrain": "hills",
+      "defense_value": 4,
+      "population_base": 25000,
+      "economy": {
+        "agri": 2,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "秦魏交界要冲，秦赵渑池之会所在地"
+    },
+    {
+      "id": "site_yiqu",
+      "name": "义渠",
+      "type": "fortress",
+      "provinceId": "province_beidi",
+      "regionId": "region_yongzhou",
+      "position": [
+        85,
+        255
+      ],
+      "terrain": "hills",
+      "defense_value": 5,
+      "population_base": 6000,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "原义渠戎都城，后为秦郡"
+    },
+    {
+      "id": "site_shangyong",
+      "name": "上庸",
+      "type": "strategic_city",
+      "provinceId": "province_hanzhong",
+      "regionId": "region_liangzhou",
+      "position": [
+        200,
+        340
+      ],
+      "terrain": "mountains",
+      "defense_value": 4,
+      "population_base": 20000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 2
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "汉水上游重镇"
+    },
+    {
+      "id": "site_bajun_north",
+      "name": "巴郡北城",
+      "type": "regular_city",
+      "provinceId": "province_bajun",
+      "regionId": "region_liangzhou",
+      "position": [
+        130,
+        350
+      ],
+      "terrain": "hills",
+      "defense_value": 2,
+      "population_base": 15000,
+      "economy": {
+        "agri": 3,
+        "craft": 1,
+        "trade": 2
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "巴郡北部据点"
+    },
+    {
+      "id": "site_shujun_north",
+      "name": "蜀郡北城",
+      "type": "regular_city",
+      "provinceId": "province_shujun",
+      "regionId": "region_liangzhou",
+      "position": [
+        105,
+        370
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 16000,
+      "economy": {
+        "agri": 4,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "蜀郡北部据点"
+    },
+    {
+      "id": "site_longxi_south",
+      "name": "陇西南城",
+      "type": "regular_city",
+      "provinceId": "province_longxi",
+      "regionId": "region_yongzhou",
+      "position": [
+        82,
+        295
+      ],
+      "terrain": "mountains",
+      "defense_value": 2,
+      "population_base": 10000,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 2
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "陇西南部据点"
+    },
+    {
+      "id": "site_qin_east",
+      "name": "秦东城",
+      "type": "regular_city",
+      "provinceId": "province_neishi",
+      "regionId": "region_yongzhou",
+      "position": [
+        145,
+        275
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 20000,
+      "economy": {
+        "agri": 4,
+        "craft": 3,
+        "trade": 3
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "关中东部重镇"
+    },
+    {
+      "id": "site_hangu_east",
+      "name": "函谷东城",
+      "type": "fortress",
+      "provinceId": "province_neishi",
+      "regionId": "region_yongzhou",
+      "position": [
+        195,
+        285
+      ],
+      "terrain": "hills",
+      "defense_value": 5,
+      "population_base": 9000,
+      "economy": {
+        "agri": 1,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_qin",
+      "historical_owner": "realm_qin",
+      "historicalNotes": "函谷关东部防御设施"
+    },
+    {
+      "id": "site_xiangyang",
+      "name": "襄阳",
+      "type": "strategic_city",
+      "provinceId": "province_handong",
+      "regionId": "region_jingzhou",
+      "position": [
+        270,
+        360
+      ],
+      "terrain": "plains",
+      "defense_value": 4,
+      "population_base": 35000,
+      "economy": {
+        "agri": 4,
+        "craft": 3,
+        "trade": 4
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "汉水重镇，战略要冲"
+    },
+    {
+      "id": "site_shangcai",
+      "name": "上蔡",
+      "type": "strategic_city",
+      "provinceId": "province_huainan",
+      "regionId": "region_yangzhou",
+      "position": [
+        295,
+        330
+      ],
+      "terrain": "plains",
+      "defense_value": 3,
+      "population_base": 30000,
+      "economy": {
+        "agri": 4,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "楚国北部门户"
+    },
+    {
+      "id": "site_fangcheng",
+      "name": "方城",
+      "type": "fortress",
+      "provinceId": "province_jiangjun",
+      "regionId": "region_jingzhou",
+      "position": [
+        265,
+        355
+      ],
+      "terrain": "hills",
+      "defense_value": 5,
+      "population_base": 12000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "楚国北部长城要塞"
+    },
+    {
+      "id": "site_yunmeng",
+      "name": "云梦",
+      "type": "regular_city",
+      "provinceId": "province_jiangjun",
+      "regionId": "region_jingzhou",
+      "position": [
+        275,
+        385
+      ],
+      "terrain": "swamp",
+      "defense_value": 2,
+      "population_base": 18000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "云梦泽畔重镇"
+    },
+    {
+      "id": "site_jiangxia",
+      "name": "江夏",
+      "type": "regular_city",
+      "provinceId": "province_jiangjun",
+      "regionId": "region_jingzhou",
+      "position": [
+        285,
+        390
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 20000,
+      "economy": {
+        "agri": 4,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "长江汉水交汇处"
+    },
+    {
+      "id": "site_huaiyin",
+      "name": "淮阴",
+      "type": "strategic_city",
+      "provinceId": "province_jiujiang",
+      "regionId": "region_yangzhou",
+      "position": [
+        340,
+        350
+      ],
+      "terrain": "plains",
+      "defense_value": 3,
+      "population_base": 28000,
+      "economy": {
+        "agri": 4,
+        "craft": 2,
+        "trade": 4
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "淮河下游重镇"
+    },
+    {
+      "id": "site_pei",
+      "name": "沛",
+      "type": "regular_city",
+      "provinceId": "province_jiujiang",
+      "regionId": "region_yangzhou",
+      "position": [
+        330,
+        330
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 22000,
+      "economy": {
+        "agri": 4,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "楚国东部重镇"
+    },
+    {
+      "id": "site_chu_north",
+      "name": "楚北城",
+      "type": "regular_city",
+      "provinceId": "province_handong",
+      "regionId": "region_jingzhou",
+      "position": [
+        280,
+        345
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 15000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "楚国北部据点"
+    },
+    {
+      "id": "site_chu_west",
+      "name": "楚西城",
+      "type": "regular_city",
+      "provinceId": "province_yiling",
+      "regionId": "region_jingzhou",
+      "position": [
+        245,
+        395
+      ],
+      "terrain": "hills",
+      "defense_value": 2,
+      "population_base": 14000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 2
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "楚国西部据点"
+    },
+    {
+      "id": "site_chu_south",
+      "name": "楚南城",
+      "type": "regular_city",
+      "provinceId": "province_jiujiang",
+      "regionId": "region_yangzhou",
+      "position": [
+        310,
+        400
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 16000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_chu",
+      "historical_owner": "realm_chu",
+      "historicalNotes": "楚国南部据点"
+    },
+    {
+      "id": "site_gaotang",
+      "name": "高唐",
+      "type": "strategic_city",
+      "provinceId": "province_jibei",
+      "regionId": "region_yanzhou",
+      "position": [
+        365,
+        255
+      ],
+      "terrain": "plains",
+      "defense_value": 4,
+      "population_base": 32000,
+      "economy": {
+        "agri": 4,
+        "craft": 3,
+        "trade": 4
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "齐国西部重镇"
+    },
+    {
+      "id": "site_pinglu",
+      "name": "平陆",
+      "type": "regular_city",
+      "provinceId": "province_jibei",
+      "regionId": "region_yanzhou",
+      "position": [
+        358,
+        262
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 20000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "齐国西部据点"
+    },
+    {
+      "id": "site_bo",
+      "name": "博",
+      "type": "regular_city",
+      "provinceId": "province_linzijun",
+      "regionId": "region_qingzhou",
+      "position": [
+        375,
+        248
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 25000,
+      "economy": {
+        "agri": 4,
+        "craft": 3,
+        "trade": 3
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "齐国核心区重镇"
+    },
+    {
+      "id": "site_qi_south",
+      "name": "齐南城",
+      "type": "regular_city",
+      "provinceId": "province_langya",
+      "regionId": "region_qingzhou",
+      "position": [
+        385,
+        270
+      ],
+      "terrain": "hills",
+      "defense_value": 2,
+      "population_base": 18000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "齐国南部据点"
+    },
+    {
+      "id": "site_qi_north",
+      "name": "齐北城",
+      "type": "regular_city",
+      "provinceId": "province_beihai",
+      "regionId": "region_qingzhou",
+      "position": [
+        372,
+        215
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 17000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "齐国北部据点"
+    },
+    {
+      "id": "site_qi_east",
+      "name": "齐东城",
+      "type": "regular_city",
+      "provinceId": "province_jimo",
+      "regionId": "region_qingzhou",
+      "position": [
+        405,
+        225
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 19000,
+      "economy": {
+        "agri": 3,
+        "craft": 3,
+        "trade": 4
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "齐国东部据点"
+    },
+    {
+      "id": "site_qi_west",
+      "name": "齐西城",
+      "type": "regular_city",
+      "provinceId": "province_jibei",
+      "regionId": "region_yanzhou",
+      "position": [
+        352,
+        258
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 21000,
+      "economy": {
+        "agri": 4,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "齐国西部据点"
+    },
+    {
+      "id": "site_qi_central",
+      "name": "齐中城",
+      "type": "regular_city",
+      "provinceId": "province_linzijun",
+      "regionId": "region_qingzhou",
+      "position": [
+        378,
+        245
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 28000,
+      "economy": {
+        "agri": 4,
+        "craft": 4,
+        "trade": 4
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "齐国核心区据点"
+    },
+    {
+      "id": "site_qi_port",
+      "name": "齐港城",
+      "type": "regular_city",
+      "provinceId": "province_beihai",
+      "regionId": "region_qingzhou",
+      "position": [
+        395,
+        210
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 15000,
+      "economy": {
+        "agri": 1,
+        "craft": 2,
+        "trade": 5
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "齐国北部港口"
+    },
+    {
+      "id": "site_qi_border",
+      "name": "齐边城",
+      "type": "fortress",
+      "provinceId": "province_langya",
+      "regionId": "region_qingzhou",
+      "position": [
+        392,
+        265
+      ],
+      "terrain": "hills",
+      "defense_value": 5,
+      "population_base": 10000,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 2
+      },
+      "cultural": "chinese_qi",
+      "historical_owner": "realm_qi",
+      "historicalNotes": "齐国南部边防要塞"
+    },
+    {
+      "id": "site_yan_south",
+      "name": "燕南城",
+      "type": "regular_city",
+      "provinceId": "province_yanjun",
+      "regionId": "region_jizhou",
+      "position": [
+        335,
+        170
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 25000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "燕国南部据点"
+    },
+    {
+      "id": "site_yan_east",
+      "name": "燕东城",
+      "type": "regular_city",
+      "provinceId": "province_liaodong",
+      "regionId": "region_jizhou",
+      "position": [
+        375,
+        145
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 18000,
+      "economy": {
+        "agri": 2,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "燕国东部据点"
+    },
+    {
+      "id": "site_yan_north",
+      "name": "燕北城",
+      "type": "fortress",
+      "provinceId": "province_liaodong",
+      "regionId": "region_jizhou",
+      "position": [
+        380,
+        135
+      ],
+      "terrain": "hills",
+      "defense_value": 5,
+      "population_base": 12000,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "燕国北部边防要塞"
+    },
+    {
+      "id": "site_yan_west",
+      "name": "燕西城",
+      "type": "regular_city",
+      "provinceId": "province_shanggu",
+      "regionId": "region_jizhou",
+      "position": [
+        315,
+        168
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 20000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "燕国西部据点"
+    },
+    {
+      "id": "site_yan_border",
+      "name": "燕边城",
+      "type": "fortress",
+      "provinceId": "province_yuyang",
+      "regionId": "region_jizhou",
+      "position": [
+        355,
+        148
+      ],
+      "terrain": "hills",
+      "defense_value": 5,
+      "population_base": 11000,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "燕国边境要塞"
+    },
+    {
+      "id": "site_yan_port",
+      "name": "燕港城",
+      "type": "regular_city",
+      "provinceId": "province_liaodong",
+      "regionId": "region_jizhou",
+      "position": [
+        385,
+        150
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 14000,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 4
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "燕国东部港口"
+    },
+    {
+      "id": "site_yan_central",
+      "name": "燕中城",
+      "type": "regular_city",
+      "provinceId": "province_yanjun",
+      "regionId": "region_jizhou",
+      "position": [
+        338,
+        163
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 28000,
+      "economy": {
+        "agri": 3,
+        "craft": 3,
+        "trade": 3
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "燕国核心区据点"
+    },
+    {
+      "id": "site_yan_fortress",
+      "name": "燕要塞",
+      "type": "fortress",
+      "provinceId": "province_shanggu",
+      "regionId": "region_jizhou",
+      "position": [
+        318,
+        162
+      ],
+      "terrain": "mountains",
+      "defense_value": 5,
+      "population_base": 9000,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_yan",
+      "historical_owner": "realm_yan",
+      "historicalNotes": "燕国西部要塞"
+    },
+    {
+      "id": "site_han_north",
+      "name": "韩北城",
+      "type": "regular_city",
+      "provinceId": "province_shangdang_han",
+      "regionId": "region_jizhou",
+      "position": [
+        258,
+        250
+      ],
+      "terrain": "mountains",
+      "defense_value": 2,
+      "population_base": 15000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 2
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "韩国北部据点"
+    },
+    {
+      "id": "site_han_south",
+      "name": "韩南城",
+      "type": "regular_city",
+      "provinceId": "province_yingchuan",
+      "regionId": "region_yuzhou",
+      "position": [
+        245,
+        292
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 22000,
+      "economy": {
+        "agri": 4,
+        "craft": 3,
+        "trade": 3
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "韩国南部据点"
+    },
+    {
+      "id": "site_han_east",
+      "name": "韩东城",
+      "type": "regular_city",
+      "provinceId": "province_henan",
+      "regionId": "region_yuzhou",
+      "position": [
+        235,
+        298
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 20000,
+      "economy": {
+        "agri": 3,
+        "craft": 3,
+        "trade": 4
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "韩国东部据点"
+    },
+    {
+      "id": "site_han_west",
+      "name": "韩西城",
+      "type": "fortress",
+      "provinceId": "province_yingchuan",
+      "regionId": "region_yuzhou",
+      "position": [
+        238,
+        288
+      ],
+      "terrain": "hills",
+      "defense_value": 5,
+      "population_base": 12000,
+      "economy": {
+        "agri": 2,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "韩国西部要塞"
+    },
+    {
+      "id": "site_han_border",
+      "name": "韩边城",
+      "type": "fortress",
+      "provinceId": "province_shangdang_han",
+      "regionId": "region_jizhou",
+      "position": [
+        262,
+        248
+      ],
+      "terrain": "mountains",
+      "defense_value": 5,
+      "population_base": 10000,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "韩国边境要塞"
+    },
+    {
+      "id": "site_han_central",
+      "name": "韩中城",
+      "type": "regular_city",
+      "provinceId": "province_yingchuan",
+      "regionId": "region_yuzhou",
+      "position": [
+        248,
+        290
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 25000,
+      "economy": {
+        "agri": 4,
+        "craft": 4,
+        "trade": 4
+      },
+      "cultural": "chinese_han",
+      "historical_owner": "realm_han",
+      "historicalNotes": "韩国核心区据点"
+    },
+    {
+      "id": "site_zhao_north",
+      "name": "赵北城",
+      "type": "regular_city",
+      "provinceId": "province_daijun",
+      "regionId": "region_jizhou",
+      "position": [
+        298,
+        180
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 18000,
+      "economy": {
+        "agri": 2,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "赵国北部据点"
+    },
+    {
+      "id": "site_zhao_south",
+      "name": "赵南城",
+      "type": "regular_city",
+      "provinceId": "province_handanjun",
+      "regionId": "region_jizhou",
+      "position": [
+        292,
+        245
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 25000,
+      "economy": {
+        "agri": 4,
+        "craft": 3,
+        "trade": 4
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "赵国南部据点"
+    },
+    {
+      "id": "site_zhao_east",
+      "name": "赵东城",
+      "type": "regular_city",
+      "provinceId": "province_handanjun",
+      "regionId": "region_jizhou",
+      "position": [
+        298,
+        242
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 22000,
+      "economy": {
+        "agri": 4,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "赵国东部据点"
+    },
+    {
+      "id": "site_zhao_west",
+      "name": "赵西城",
+      "type": "regular_city",
+      "provinceId": "province_taiyuan",
+      "regionId": "region_jizhou",
+      "position": [
+        235,
+        225
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 20000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "赵国西部据点"
+    },
+    {
+      "id": "site_zhao_border",
+      "name": "赵边城",
+      "type": "fortress",
+      "provinceId": "province_yanmen",
+      "regionId": "region_jizhou",
+      "position": [
+        263,
+        188
+      ],
+      "terrain": "mountains",
+      "defense_value": 5,
+      "population_base": 12000,
+      "economy": {
+        "agri": 1,
+        "craft": 1,
+        "trade": 2
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "赵国边境要塞"
+    },
+    {
+      "id": "site_zhao_fortress",
+      "name": "赵要塞",
+      "type": "fortress",
+      "provinceId": "province_yunzhong",
+      "regionId": "region_jizhou",
+      "position": [
+        228,
+        188
+      ],
+      "terrain": "plains",
+      "defense_value": 5,
+      "population_base": 11000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 2
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "赵国西北要塞"
+    },
+    {
+      "id": "site_zhao_central",
+      "name": "赵中城",
+      "type": "regular_city",
+      "provinceId": "province_taiyuan",
+      "regionId": "region_jizhou",
+      "position": [
+        242,
+        222
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 28000,
+      "economy": {
+        "agri": 4,
+        "craft": 3,
+        "trade": 3
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "赵国核心区据点"
+    },
+    {
+      "id": "site_zhao_port",
+      "name": "赵港城",
+      "type": "regular_city",
+      "provinceId": "province_handanjun",
+      "regionId": "region_jizhou",
+      "position": [
+        294,
+        238
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 15000,
+      "economy": {
+        "agri": 1,
+        "craft": 2,
+        "trade": 5
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "赵国东部港口"
+    },
+    {
+      "id": "site_zhao_trade",
+      "name": "赵商城",
+      "type": "regular_city",
+      "provinceId": "province_handanjun",
+      "regionId": "region_jizhou",
+      "position": [
+        288,
+        243
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 30000,
+      "economy": {
+        "agri": 3,
+        "craft": 3,
+        "trade": 6
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "赵国商业重镇"
+    },
+    {
+      "id": "site_zhao_culture",
+      "name": "赵文城",
+      "type": "regular_city",
+      "provinceId": "province_taiyuan",
+      "regionId": "region_jizhou",
+      "position": [
+        238,
+        218
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 20000,
+      "economy": {
+        "agri": 3,
+        "craft": 4,
+        "trade": 3
+      },
+      "cultural": "chinese_zhao",
+      "historical_owner": "realm_zhao",
+      "historicalNotes": "赵国文化重镇"
+    },
+    {
+      "id": "site_wei_north",
+      "name": "魏北城",
+      "type": "regular_city",
+      "provinceId": "province_henei",
+      "regionId": "region_jizhou",
+      "position": [
+        268,
+        262
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 22000,
+      "economy": {
+        "agri": 4,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "魏国北部据点"
+    },
+    {
+      "id": "site_wei_south",
+      "name": "魏南城",
+      "type": "regular_city",
+      "provinceId": "province_daliang",
+      "regionId": "region_yuzhou",
+      "position": [
+        272,
+        295
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 28000,
+      "economy": {
+        "agri": 4,
+        "craft": 4,
+        "trade": 5
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "魏国南部据点"
+    },
+    {
+      "id": "site_wei_east",
+      "name": "魏东城",
+      "type": "regular_city",
+      "provinceId": "province_daliang",
+      "regionId": "region_yuzhou",
+      "position": [
+        278,
+        292
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 25000,
+      "economy": {
+        "agri": 4,
+        "craft": 3,
+        "trade": 4
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "魏国东部据点"
+    },
+    {
+      "id": "site_wei_west",
+      "name": "魏西城",
+      "type": "regular_city",
+      "provinceId": "province_hedong",
+      "regionId": "region_jizhou",
+      "position": [
+        215,
+        272
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 20000,
+      "economy": {
+        "agri": 4,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "魏国西部据点"
+    },
+    {
+      "id": "site_wei_border",
+      "name": "魏边城",
+      "type": "fortress",
+      "provinceId": "province_hexi",
+      "regionId": "region_yongzhou",
+      "position": [
+        195,
+        278
+      ],
+      "terrain": "plains",
+      "defense_value": 5,
+      "population_base": 12000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 2
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "魏国边境要塞"
+    },
+    {
+      "id": "site_wei_trade",
+      "name": "魏商城",
+      "type": "regular_city",
+      "provinceId": "province_daliang",
+      "regionId": "region_yuzhou",
+      "position": [
+        274,
+        288
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 35000,
+      "economy": {
+        "agri": 3,
+        "craft": 4,
+        "trade": 6
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "魏国商业重镇"
+    },
+    {
+      "id": "site_wei_fortress",
+      "name": "魏要塞",
+      "type": "fortress",
+      "provinceId": "province_henei",
+      "regionId": "region_jizhou",
+      "position": [
+        262,
+        268
+      ],
+      "terrain": "plains",
+      "defense_value": 5,
+      "population_base": 15000,
+      "economy": {
+        "agri": 2,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "魏国北部要塞"
+    },
+    {
+      "id": "site_wei_culture",
+      "name": "魏文城",
+      "type": "regular_city",
+      "provinceId": "province_hedong",
+      "regionId": "region_jizhou",
+      "position": [
+        218,
+        268
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 22000,
+      "economy": {
+        "agri": 3,
+        "craft": 4,
+        "trade": 3
+      },
+      "cultural": "chinese_wei",
+      "historical_owner": "realm_wei",
+      "historicalNotes": "魏国文化重镇"
+    },
+    {
+      "id": "site_zhou_east",
+      "name": "周东城",
+      "type": "regular_city",
+      "provinceId": "province_wangji",
+      "regionId": "region_yuzhou",
+      "position": [
+        228,
+        296
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 12000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_zhou_central",
+      "historical_owner": "realm_zhou",
+      "historicalNotes": "周王畿东部据点"
+    },
+    {
+      "id": "site_zhou_west",
+      "name": "周西城",
+      "type": "regular_city",
+      "provinceId": "province_wangji",
+      "regionId": "region_yuzhou",
+      "position": [
+        215,
+        296
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 11000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_zhou_central",
+      "historical_owner": "realm_zhou",
+      "historicalNotes": "周王畿西部据点"
+    },
+    {
+      "id": "site_zhou_border",
+      "name": "周边城",
+      "type": "fortress",
+      "provinceId": "province_wangji",
+      "regionId": "region_yuzhou",
+      "position": [
+        222,
+        300
+      ],
+      "terrain": "plains",
+      "defense_value": 5,
+      "population_base": 8000,
+      "economy": {
+        "agri": 2,
+        "craft": 1,
+        "trade": 1
+      },
+      "cultural": "chinese_zhou_central",
+      "historical_owner": "realm_zhou",
+      "historicalNotes": "周王畿边境要塞"
+    },
+    {
+      "id": "site_yue_north",
+      "name": "越北城",
+      "type": "regular_city",
+      "provinceId": "province_kuaiji",
+      "regionId": "region_yangzhou",
+      "position": [
+        395,
+        395
+      ],
+      "terrain": "hills",
+      "defense_value": 2,
+      "population_base": 15000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_yue",
+      "historical_owner": "realm_yue",
+      "historicalNotes": "越国北部据点"
+    },
+    {
+      "id": "site_yue_south",
+      "name": "越南城",
+      "type": "regular_city",
+      "provinceId": "province_kuaiji",
+      "regionId": "region_yangzhou",
+      "position": [
+        405,
+        405
+      ],
+      "terrain": "hills",
+      "defense_value": 2,
+      "population_base": 14000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_yue",
+      "historical_owner": "realm_yue",
+      "historicalNotes": "越国南部据点"
+    },
+    {
+      "id": "site_yue_port",
+      "name": "越港城",
+      "type": "regular_city",
+      "provinceId": "province_kuaiji",
+      "regionId": "region_yangzhou",
+      "position": [
+        410,
+        400
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 12000,
+      "economy": {
+        "agri": 1,
+        "craft": 2,
+        "trade": 5
+      },
+      "cultural": "chinese_yue",
+      "historical_owner": "realm_yue",
+      "historicalNotes": "越国港口"
+    },
+    {
+      "id": "site_song_north",
+      "name": "宋北城",
+      "type": "regular_city",
+      "provinceId": "province_shanqiu",
+      "regionId": "region_yanzhou",
+      "position": [
+        315,
+        295
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 20000,
+      "economy": {
+        "agri": 4,
+        "craft": 2,
+        "trade": 4
+      },
+      "cultural": "chinese_song",
+      "historical_owner": "realm_song",
+      "historicalNotes": "宋国北部据点"
+    },
+    {
+      "id": "site_song_south",
+      "name": "宋南城",
+      "type": "regular_city",
+      "provinceId": "province_shanqiu",
+      "regionId": "region_yanzhou",
+      "position": [
+        308,
+        305
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 18000,
+      "economy": {
+        "agri": 4,
+        "craft": 2,
+        "trade": 3
+      },
+      "cultural": "chinese_song",
+      "historical_owner": "realm_song",
+      "historicalNotes": "宋国南部据点"
+    },
+    {
+      "id": "site_song_east",
+      "name": "宋东城",
+      "type": "regular_city",
+      "provinceId": "province_shanqiu",
+      "regionId": "region_yanzhou",
+      "position": [
+        318,
+        302
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 19000,
+      "economy": {
+        "agri": 4,
+        "craft": 2,
+        "trade": 4
+      },
+      "cultural": "chinese_song",
+      "historical_owner": "realm_song",
+      "historicalNotes": "宋国东部据点"
+    },
+    {
+      "id": "site_lu_north",
+      "name": "鲁北城",
+      "type": "regular_city",
+      "provinceId": "province_qufu",
+      "regionId": "region_yanzhou",
+      "position": [
+        355,
+        275
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 18000,
+      "economy": {
+        "agri": 3,
+        "craft": 3,
+        "trade": 2
+      },
+      "cultural": "chinese_lu",
+      "historical_owner": "realm_lu",
+      "historicalNotes": "鲁国北部据点"
+    },
+    {
+      "id": "site_lu_south",
+      "name": "鲁南城",
+      "type": "regular_city",
+      "provinceId": "province_qufu",
+      "regionId": "region_yanzhou",
+      "position": [
+        348,
+        285
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 17000,
+      "economy": {
+        "agri": 3,
+        "craft": 3,
+        "trade": 2
+      },
+      "cultural": "chinese_lu",
+      "historical_owner": "realm_lu",
+      "historicalNotes": "鲁国南部据点"
+    },
+    {
+      "id": "site_lu_east",
+      "name": "鲁东城",
+      "type": "regular_city",
+      "provinceId": "province_qufu",
+      "regionId": "region_yanzhou",
+      "position": [
+        358,
+        282
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 16000,
+      "economy": {
+        "agri": 3,
+        "craft": 3,
+        "trade": 2
+      },
+      "cultural": "chinese_lu",
+      "historical_owner": "realm_lu",
+      "historicalNotes": "鲁国东部据点"
+    },
+    {
+      "id": "site_lu_west",
+      "name": "鲁西城",
+      "type": "regular_city",
+      "provinceId": "province_qufu",
+      "regionId": "region_yanzhou",
+      "position": [
+        345,
+        278
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 15000,
+      "economy": {
+        "agri": 3,
+        "craft": 3,
+        "trade": 2
+      },
+      "cultural": "chinese_lu",
+      "historical_owner": "realm_lu",
+      "historicalNotes": "鲁国西部据点"
+    },
+    {
+      "id": "site_zhongshan_north",
+      "name": "中山北城",
+      "type": "regular_city",
+      "provinceId": "province_lingshou",
+      "regionId": "region_jizhou",
+      "position": [
+        308,
+        200
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 14000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_zhongshan",
+      "historical_owner": "realm_zhongshan",
+      "historicalNotes": "中山国北部据点"
+    },
+    {
+      "id": "site_zhongshan_south",
+      "name": "中山南城",
+      "type": "regular_city",
+      "provinceId": "province_lingshou",
+      "regionId": "region_jizhou",
+      "position": [
+        302,
+        208
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 13000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_zhongshan",
+      "historical_owner": "realm_zhongshan",
+      "historicalNotes": "中山国南部据点"
+    },
+    {
+      "id": "site_zhongshan_east",
+      "name": "中山东城",
+      "type": "regular_city",
+      "provinceId": "province_lingshou",
+      "regionId": "region_jizhou",
+      "position": [
+        312,
+        205
+      ],
+      "terrain": "plains",
+      "defense_value": 2,
+      "population_base": 12000,
+      "economy": {
+        "agri": 3,
+        "craft": 2,
+        "trade": 2
+      },
+      "cultural": "chinese_zhongshan",
+      "historical_owner": "realm_zhongshan",
+      "historicalNotes": "中山国东部据点"
+    }
+  ]
+}
