@@ -1,0 +1,169 @@
+{
+  "passes": [
+    {
+      "id": "pass_sanguan",
+      "name": "散关",
+      "controls_edges": [],
+      "default_owner": "realm_qin",
+      "fortification_base": 3,
+      "terrain_bonus": 0.4,
+      "flank_difficulty": 0.7,
+      "historical_significance": "tier1",
+      "historicalNotes": "秦岭南麓要隘，控扼汉中入关中通道。《史记·秦本纪》载秦楚争夺散关。"
+    },
+    {
+      "id": "pass_jingxing",
+      "name": "井陉关",
+      "controls_edges": [],
+      "default_owner": "realm_zhao",
+      "fortification_base": 3,
+      "terrain_bonus": 0.5,
+      "flank_difficulty": 0.8,
+      "historical_significance": "tier1",
+      "historicalNotes": "太行山东麓要隘，控扼赵国与燕齐往来。《史记·赵世家》载井陉之险。"
+    },
+    {
+      "id": "pass_yanmen",
+      "name": "雁门关",
+      "controls_edges": [],
+      "default_owner": "realm_zhao",
+      "fortification_base": 3,
+      "terrain_bonus": 0.5,
+      "flank_difficulty": 0.8,
+      "historical_significance": "tier1",
+      "historicalNotes": "赵国北部边关，防御匈奴南下。《史记·赵世家》载赵武灵王胡服骑射后加强雁门防御。"
+    },
+    {
+      "id": "pass_juyong",
+      "name": "居庸关",
+      "controls_edges": [],
+      "default_owner": "realm_yan",
+      "fortification_base": 3,
+      "terrain_bonus": 0.5,
+      "flank_difficulty": 0.8,
+      "historical_significance": "tier1",
+      "historicalNotes": "燕国北部要隘，控扼燕山通道。《史记·燕世家》载燕国北部防线。"
+    },
+    {
+      "id": "pass_tianjing",
+      "name": "天井关",
+      "controls_edges": [],
+      "default_owner": "realm_wei",
+      "fortification_base": 2,
+      "terrain_bonus": 0.4,
+      "flank_difficulty": 0.7,
+      "historical_significance": "tier1",
+      "historicalNotes": "太行八陉之一，控扼晋豫往来。《读史方舆纪要》载天井关为太行要隘。"
+    },
+    {
+      "id": "pass_mengmen",
+      "name": "孟门",
+      "controls_edges": [],
+      "default_owner": "realm_wei",
+      "fortification_base": 2,
+      "terrain_bonus": 0.3,
+      "flank_difficulty": 0.6,
+      "historical_significance": "tier2",
+      "historicalNotes": "黄河渡口要地，控扼晋陕往来。《战国策·魏策》载孟门之险。"
+    },
+    {
+      "id": "pass_zhiguan",
+      "name": "轵关",
+      "controls_edges": [],
+      "default_owner": "realm_wei",
+      "fortification_base": 2,
+      "terrain_bonus": 0.3,
+      "flank_difficulty": 0.6,
+      "historical_significance": "tier2",
+      "historicalNotes": "太行八陉之一，控扼魏国西部。《史记·魏世家》载轵关陉。"
+    },
+    {
+      "id": "pass_taihang",
+      "name": "太行陉",
+      "controls_edges": [],
+      "default_owner": "realm_zhao",
+      "fortification_base": 2,
+      "terrain_bonus": 0.4,
+      "flank_difficulty": 0.7,
+      "historical_significance": "tier2",
+      "historicalNotes": "太行山主要通道，控扼赵魏往来。《读史方舆纪要》载太行八陉。"
+    },
+    {
+      "id": "pass_baima",
+      "name": "白马津",
+      "controls_edges": [],
+      "default_owner": "realm_wei",
+      "fortification_base": 2,
+      "terrain_bonus": 0.2,
+      "flank_difficulty": 0.5,
+      "historical_significance": "tier2",
+      "historicalNotes": "黄河重要渡口，控扼魏国东部。《史记·魏世家》载白马津渡。"
+    },
+    {
+      "id": "pass_ji",
+      "name": "棘门",
+      "controls_edges": [],
+      "default_owner": "realm_qin",
+      "fortification_base": 2,
+      "terrain_bonus": 0.3,
+      "flank_difficulty": 0.6,
+      "historical_significance": "tier2",
+      "historicalNotes": "秦国东部关隘，控扼关中东出。《史记·秦本纪》载棘门防线。"
+    },
+    {
+      "id": "pass_fen",
+      "name": "汾水津",
+      "controls_edges": [],
+      "default_owner": "realm_wei",
+      "fortification_base": 1,
+      "terrain_bonus": 0.2,
+      "flank_difficulty": 0.4,
+      "historical_significance": "tier2",
+      "historicalNotes": "汾水渡口，控扼晋中往来。《史记·魏世家》载汾水渡口。"
+    },
+    {
+      "id": "pass_yiling",
+      "name": "夷陵",
+      "controls_edges": [],
+      "default_owner": "realm_chu",
+      "fortification_base": 2,
+      "terrain_bonus": 0.4,
+      "flank_difficulty": 0.7,
+      "historical_significance": "tier1",
+      "historicalNotes": "楚国西部要隘，控扼巴楚往来。《史记·楚世家》载夷陵之险。"
+    },
+    {
+      "id": "pass_wusheng",
+      "name": "武胜关",
+      "controls_edges": [],
+      "default_owner": "realm_chu",
+      "fortification_base": 3,
+      "terrain_bonus": 0.5,
+      "flank_difficulty": 0.8,
+      "historical_significance": "tier1",
+      "historicalNotes": "大别山要隘，控扼楚国北部。《读史方舆纪要》载武胜关为南北要冲。"
+    },
+    {
+      "id": "pass_tongque",
+      "name": "潼关",
+      "controls_edges": [],
+      "default_owner": "realm_qin",
+      "fortification_base": 4,
+      "terrain_bonus": 0.6,
+      "flank_difficulty": 0.9,
+      "historical_significance": "tier1",
+      "historicalNotes": "关中东部门户，与函谷关并称秦国东部防线。《读史方舆纪要》载潼关之险。"
+    },
+    {
+      "id": "pass_maling",
+      "name": "马陵关",
+      "controls_edges": [],
+      "default_owner": "realm_wei",
+      "fortification_base": 2,
+      "terrain_bonus": 0.3,
+      "flank_difficulty": 0.6,
+      "historical_significance": "tier2",
+      "historicalNotes": "魏齐交战要地，孙膑在此设伏大败庞涓。《史记·孙子吴起列传》载马陵之战。"
+    }
+  ]
+}
