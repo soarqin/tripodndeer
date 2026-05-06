@@ -25,7 +25,7 @@
 - **语言**: [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
 - **状态管理**: [Zustand](https://github.com/pmndrs/zustand)
 - **数据校验**: [Zod](https://zod.dev/)
-- **测试**: [Vitest](https://vitest.dev/) (Unit/Integration), [Playwright](https://playwright.dev/) (E2E)
+- **测试**: [Vitest](https://vitest.dev/) (Unit/Integration), [agent-browser](https://github.com/vercel-labs/agent-browser) (Agent-driven E2E 验证)
 - **渲染**: HTML5 Canvas (高性能地图渲染)
 
 ## 架构概览 (Architecture Overview)
@@ -55,8 +55,7 @@ pnpm lint         # 执行 ESLint 检查
 pnpm test         # 运行所有单元测试 (Vitest)
 pnpm test:behavior # 运行行为驱动测试
 pnpm test:perf    # 运行性能预算测试 (100 tick 压力测试)
-pnpm test:e2e     # 运行端到端测试 (Playwright)
-pnpm test:all     # 一键执行所有检查与测试
+pnpm test:all     # 一键执行所有检查与测试 (typecheck + lint + test)
 ```
 
 ### 核心规范

@@ -252,10 +252,11 @@ M1 path: loadM1Data() → createWorldFromM1Data()
 pnpm test          # 全部单元测试（2200+ 个，~25s）
 pnpm typecheck     # TypeScript 严格检查
 pnpm lint          # ESLint，0 警告模式
-pnpm test:e2e      # Playwright e2e（需 dev server）
 pnpm test:perf     # 性能预算（100 tick，p95 < 200ms）
-pnpm test:all      # typecheck + lint + test + e2e
+pnpm test:all      # typecheck + lint + test
 ```
+
+E2E 验证已迁移到 agent-browser CLI（agent 驱动的手动验证），不再有 Playwright 自动化套件。
 
 ### TDD 节奏
 

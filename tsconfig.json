@@ -12,5 +12,5 @@
     "skipLibCheck": true,
     "paths": { "@/*": ["src/*"], "~/*": ["src/*"] }
   },
-  "include": ["src", "tools", "e2e", "scripts", "vitest.config.ts", "vitest.perf.config.ts", "vitest.behavior.config.ts", "vite.config.ts", "playwright.config.ts"]
+  "include": ["src", "tools", "scripts", "vitest.config.ts", "vitest.perf.config.ts", "vitest.behavior.config.ts", "vite.config.ts"]
 }

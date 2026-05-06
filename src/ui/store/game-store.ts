@@ -52,7 +52,7 @@ export const useGameStore = create<GameStore>()(
   })),
 )
 
-// DEV-only 调试钩子（Playwright E2E 通过 window.__game.world() 读取）
+// DEV-only 调试钩子（agent-browser 通过 `agent-browser eval "window.__game.world()"` 读取）
 // 仅在浏览器 + Vite DEV 时挂载；jsdom 测试环境一般不会触发
 if (typeof window !== 'undefined' && import.meta.env.DEV) {
   ;(window as Window & { __game?: unknown }).__game = {
