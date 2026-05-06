@@ -1,7 +1,11 @@
 // @vitest-environment jsdom
 import { render, screen, fireEvent, act } from '@testing-library/react'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { App } from '../App'
+
+vi.mock('../rendering/map/MapCanvas', () => ({
+  MapCanvas: () => <canvas data-testid="map-canvas" />,
+}))
 import { useGameStore } from '../ui/store/game-store'
 import type { BattleResolution } from '~/engine/systems/combat-v2'
 
