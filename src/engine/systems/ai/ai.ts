@@ -53,6 +53,39 @@ function runEspionageForRealm(
   return { ctx, events: [], nextRng: rng }
 }
 
+function runTacticalForRealm(
+  world: World,
+  realm: Realm,
+  ctx: AiTickContext,
+  rng: RNGState
+): { ctx: AiTickContext; events: readonly GameEvent[]; nextRng: RNGState } {
+  // 20% gate — PRESERVE THIS EXACT LOCATION (T3.5/T4.1 will relocate it; T1.5 freezes it here)
+  const roll = nextRng(rng)
+  const currentRng = roll.nextState
+  if (roll.value >= 0.2) {
+    return { ctx, events: [], nextRng: currentRng }
+  }
+
+  const options = collectTacticalOptions(world, ctx, realm.id)
+  if (options.length === 1) {
+    return { ctx, events: [], nextRng: currentRng }
+  }
+
+  const personality = getPersonality(world, realm.id)
+  const { action, nextRng: pickRng } = pickAction(options, personality, currentRng)
+  let postPickRng = pickRng
+
+  if (action.kind === 'idle') return { ctx, events: [], nextRng: postPickRng }
+  if (!action.targetSiteId || !action.armyId) return { ctx, events: [], nextRng: postPickRng }
+
+  const result = applyTacticalAction(world, ctx, realm.id, action)
+  return {
+    ctx: result.tickContext,
+    events: result.events,
+    nextRng: postPickRng,
+  }
+}
+
 // IMPORTANT: realm and army iteration order is locked to lexicographic ID sort.
 // This is a contract — changing iteration order breaks RNG reproducibility.
 
@@ -95,31 +128,10 @@ export function aiPlanStep(
     events.push(...espionage.events)
     currentRng = espionage.nextRng
 
-    const roll = nextRng(currentRng)
-    currentRng = roll.nextState
-
-    if (roll.value >= 0.2) continue
-
-    const options = collectTacticalOptions(world, tickContext, realm.id)
-
-    // If there are no concrete options (only idle) skip the action entirely so
-    // we keep the historical "no candidate → no events / no extra rng draws" contract.
-    if (options.length === 1) continue
-
-    const personality = getPersonality(world, realm.id)
-    const { action, nextRng: pickRng } = pickAction(
-      options,
-      personality,
-      currentRng
-    )
-    currentRng = pickRng
-
-    if (action.kind === 'idle') continue
-    if (!action.targetSiteId || !action.armyId) continue
-
-    const result = applyTacticalAction(world, tickContext, realm.id, action)
-    tickContext = result.tickContext
-    events.push(...result.events)
+    const tactical = runTacticalForRealm(world, realm, tickContext, currentRng)
+    tickContext = tactical.ctx
+    events.push(...tactical.events)
+    currentRng = tactical.nextRng
 
   }
 
