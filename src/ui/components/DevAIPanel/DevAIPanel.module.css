@@ -1,0 +1,60 @@
+.panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 250px;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 12px;
+  font-family: monospace;
+  font-size: 12px;
+  z-index: 500;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.header {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #666;
+  padding-bottom: 4px;
+  color: #ffeb3b;
+}
+
+.section {
+  margin-bottom: 12px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  font-weight: bold;
+  color: #aaa;
+  margin-bottom: 4px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.listItem {
+  display: flex;
+  justify-content: space-between;
+}
+
+.realmName {
+  color: #ddd;
+}
+
+.personality {
+  color: #4caf50;
+}

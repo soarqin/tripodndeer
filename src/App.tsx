@@ -19,6 +19,9 @@ import { SuccessionModal } from '@/ui/components/SuccessionModal'
 import { DisasterReliefModal } from '@/ui/components/DisasterReliefModal'
 import { EventChainModal } from '@/ui/components/EventChainModal'
 import { ReformPromptModal } from '@/ui/components/ReformPromptModal'
+import { DevAIPanel } from '@/ui/components/DevAIPanel'
+import { ToastQueue } from '@/ui/components/ToastQueue'
+import { EventLogPanel } from '@/ui/components/EventLogPanel'
 import { useRafDriver } from '@/ui/store/raf-driver'
 import { useGameStore, ModalPriority } from '@/ui/store/game-store'
 import { isVictorious } from '@/engine/systems/victory'
@@ -178,6 +181,9 @@ export function App(): React.JSX.Element {
         onDiebao={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'espionage' ? null : 'espionage')}
       />
       <TimeControlBar />
+      <DevAIPanel />
+      <ToastQueue />
+      <EventLogPanel />
       {import.meta.env.DEV && (
         <button
           data-testid="trigger-test-modal"
