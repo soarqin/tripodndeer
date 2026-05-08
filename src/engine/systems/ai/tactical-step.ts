@@ -1,12 +1,16 @@
 import type { GameEvent, RealmId, RNGState, World } from '~/shared/types'
 import type { OperationalDirective } from '~/shared/types/ai-state'
+import { isAtWar } from '~/engine/wars'
 import type { AIOption } from './utility-scorer'
 import { getPersonality, pickAction } from './utility-scorer'
 import {
+  type AiTickContext,
   createAiTickContext,
   worldWithAiTickContext,
 } from './internal/tick-context'
 import { applyTacticalAction, collectTacticalOptions } from './internal/tactical'
+
+type DroppedDirective = { id: string; reason: string }
 
 function directiveAllowsTacticalOption(
   directive: OperationalDirective,
@@ -26,7 +30,7 @@ function directiveAllowsTacticalOption(
 
 function boundedTacticalOptions(
   world: World,
-  tickContext: ReturnType<typeof createAiTickContext>,
+  tickContext: AiTickContext,
   realmId: RealmId,
   directives: readonly OperationalDirective[]
 ): AIOption[] {
@@ -36,6 +40,59 @@ function boundedTacticalOptions(
   )
 }
 
+function dropReason(
+  world: World,
+  realmId: RealmId,
+  directive: OperationalDirective
+): string | null {
+  if (directive.expiresAtTick < world.tick) return 'expired'
+  if (directive.armyId && !world.armies.has(directive.armyId)) return 'army_gone'
+
+  if (directive.targetSiteId) {
+    const ownerId = world.sites.get(directive.targetSiteId)?.ownerId
+    if (ownerId === realmId || ownerId === world.playerRealmId) {
+      return 'objective_achieved'
+    }
+  }
+
+  if (
+    directive.kind === 'declare_war' &&
+    directive.targetRealmId &&
+    isAtWar(world.wars, realmId, directive.targetRealmId)
+  ) {
+    return 'war_active'
+  }
+
+  if (
+    directive.targetRealmId &&
+    world.realms.get(directive.targetRealmId)?.status === 'deactivated'
+  ) {
+    return 'target_deactivated'
+  }
+
+  return null
+}
+
+export function cleanseDirectives(
+  world: World,
+  realmId: RealmId,
+  directives: readonly OperationalDirective[]
+): { active: readonly OperationalDirective[]; dropped: DroppedDirective[] } {
+  const active: OperationalDirective[] = []
+  const dropped: DroppedDirective[] = []
+
+  for (const directive of directives) {
+    const reason = dropReason(world, realmId, directive)
+    if (reason) {
+      dropped.push({ id: directive.id, reason })
+    } else {
+      active.push(directive)
+    }
+  }
+
+  return { active, dropped }
+}
+
 export function aiTacticalStep(
   world: World,
   rng: RNGState
@@ -43,6 +100,8 @@ export function aiTacticalStep(
   const events: GameEvent[] = []
   let currentRng = rng
   let tickContext = createAiTickContext(world)
+  const newAiState = new Map(world.aiState)
+  let currentWorld: World = world
 
   for (const realm of [...world.realms.values()].sort((a, b) =>
     a.id.localeCompare(b.id)
@@ -50,11 +109,38 @@ export function aiTacticalStep(
     if (realm.id === world.playerRealmId) continue
     if (realm.status === 'deactivated') continue
 
-    const directives = world.aiState.get(realm.id)?.operational ?? []
+    const existingAiState = newAiState.get(realm.id) ?? {
+      strategic: null,
+      operational: [],
+    }
+    const lifecycle = cleanseDirectives(
+      currentWorld,
+      realm.id,
+      existingAiState.operational
+    )
+    if (lifecycle.dropped.length > 0) {
+      newAiState.set(realm.id, {
+        ...existingAiState,
+        operational: lifecycle.active,
+      })
+      currentWorld = { ...currentWorld, aiState: newAiState }
+      for (const dropped of lifecycle.dropped) {
+        events.push({
+          type: 'ai_directive_dropped',
+          payload: {
+            realmId: realm.id,
+            directiveId: dropped.id,
+            reason: dropped.reason,
+          },
+        })
+      }
+    }
+
+    const directives = lifecycle.active
     if (directives.length === 0) continue
 
     const options = boundedTacticalOptions(
-      world,
+      currentWorld,
       tickContext,
       realm.id,
       directives
@@ -68,13 +154,13 @@ export function aiTacticalStep(
     if (action.kind === 'idle') continue
     if (!action.targetSiteId || !action.armyId) continue
 
-    const result = applyTacticalAction(world, tickContext, realm.id, action)
+    const result = applyTacticalAction(currentWorld, tickContext, realm.id, action)
     tickContext = result.tickContext
     events.push(...result.events)
   }
 
   return {
-    world: worldWithAiTickContext(world, tickContext),
+    world: { ...worldWithAiTickContext(currentWorld, tickContext), aiState: newAiState },
     nextRng: currentRng,
     events,
   }
