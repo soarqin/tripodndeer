@@ -1,9 +1,10 @@
-import type { GameEvent, RNGState, World } from '~/shared/types'
+import type { GameEvent, Realm, RNGState, World } from '~/shared/types'
 import { nextRng } from '~/engine/random'
 import { M7_ENABLED } from '~/content/m2/balance'
 import { getPersonality, pickAction } from './utility-scorer'
 import {
   createAiTickContext,
+  type AiTickContext,
   tickContextWithDiplomacyResult,
   tickContextWithEspionageResult,
   worldWithAiTickContext,
@@ -12,6 +13,24 @@ import { applyTacticalAction, collectTacticalOptions } from './internal/tactical
 import { planDiplomacyAction } from './internal/diplomacy'
 export { planEspionageAction } from './internal/espionage'
 import { planEspionageAction } from './internal/espionage'
+
+function runDiplomacyForRealm(
+  world: World,
+  realm: Realm,
+  ctx: AiTickContext,
+  _rng: RNGState
+): { ctx: AiTickContext; events: readonly GameEvent[]; nextRng: RNGState } {
+  const diplomacyWorld = worldWithAiTickContext(world, ctx)
+  const diplomacy = planDiplomacyAction(diplomacyWorld, realm)
+  if (diplomacy.ok) {
+    return {
+      ctx: tickContextWithDiplomacyResult(ctx, diplomacy.world),
+      events: diplomacy.events,
+      nextRng: _rng,
+    }
+  }
+  return { ctx, events: [], nextRng: _rng }
+}
 
 // IMPORTANT: realm and army iteration order is locked to lexicographic ID sort.
 // This is a contract — changing iteration order breaks RNG reproducibility.
@@ -46,12 +65,9 @@ export function aiPlanStep(
     if (realm.id === world.playerRealmId) continue
     if (realm.status === 'deactivated') continue
 
-    const diplomacyWorld = worldWithAiTickContext(world, tickContext)
-    const diplomacy = planDiplomacyAction(diplomacyWorld, realm)
-    if (diplomacy.ok) {
-      tickContext = tickContextWithDiplomacyResult(tickContext, diplomacy.world)
-      events.push(...diplomacy.events)
-    }
+    const diplomacy = runDiplomacyForRealm(world, realm, tickContext, currentRng)
+    tickContext = diplomacy.ctx
+    events.push(...diplomacy.events)
 
     if (M7_ENABLED) {
       const espionageWorld = worldWithAiTickContext(world, tickContext)
@@ -88,6 +104,7 @@ export function aiPlanStep(
     const result = applyTacticalAction(world, tickContext, realm.id, action)
     tickContext = result.tickContext
     events.push(...result.events)
+
   }
 
   return {
