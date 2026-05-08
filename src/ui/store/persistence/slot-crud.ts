@@ -1,4 +1,5 @@
 import { getDb, type SaveMetadata } from './db'
+import { SUPPORTED_SAVE_DTO_VERSIONS } from '~/engine/world/save-dto'
 import { SaveDTOSchema } from '~/shared/schemas/save-dto'
 import { SAVE_DTO_VERSION, type Result, type SaveDTO, type SaveLoadError } from '~/shared/types/save-dto'
 
@@ -31,7 +32,7 @@ export async function loadSlot(slotId: SlotId): Promise<Result<SaveSlot, SaveLoa
   }
 
   const schemaVersion = readSchemaVersion(record.dto)
-  if (schemaVersion !== null && schemaVersion !== SAVE_DTO_VERSION) {
+  if (schemaVersion !== null && !SUPPORTED_SAVE_DTO_VERSIONS.includes(schemaVersion)) {
     return {
       ok: false,
       error: {

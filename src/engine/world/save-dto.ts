@@ -58,7 +58,7 @@ export function worldToSaveDTO(world: World, scenarioId: 'm1' | 'm9' = 'm1'): Sa
   }
 }
 
-const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [1, SAVE_DTO_VERSION]
+export const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [1, SAVE_DTO_VERSION]
 
 export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
   if (!SUPPORTED_SAVE_DTO_VERSIONS.includes(dto.schemaVersion)) {
