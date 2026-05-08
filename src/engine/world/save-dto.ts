@@ -80,6 +80,7 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
       },
     ]),
   )
+  const intelligenceCoverage: IntelligenceCoverage = new Map(sw.intelligenceCoverage)
 
   return {
     ok: true,
@@ -111,7 +112,7 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
       sieges: new Map(sw.sieges),
       edicts: new Map(sw.edicts),
       governorAssignments: new Map(sw.governorAssignments),
-      intelligenceCoverage: new Map(sw.intelligenceCoverage) as IntelligenceCoverage,
+      intelligenceCoverage,
       spyMissions: new Map(sw.spyMissions),
       counterIntelStates: new Map(sw.counterIntelStates),
       provinces: new Map(sw.provinces),
