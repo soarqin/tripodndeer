@@ -42,7 +42,7 @@ describe('ProvinceBrowserPanel', () => {
           ['reg_1', { id: 'reg_1', name: 'Guanzhong', provinceIds: ['prov_1'] }],
         ]),
         realms: new Map([
-          ['realm_qin', { id: 'realm_qin', name: 'Qin' }],
+          ['realm_qin', { id: 'realm_qin', displayName: 'Qin' }],
         ]),
         sites: new Map([
           ['site_1', { id: 'site_1', name: 'Nanzheng' }],
