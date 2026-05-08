@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { M8_1_STRATEGIC_WEIGHTS } from '../balance/m8_1'
+import { M8_1_OPERATIONAL_WEIGHTS, M8_1_STRATEGIC_WEIGHTS } from '../balance/m8_1'
 
 describe('M8_1_STRATEGIC_WEIGHTS', () => {
   it('all 8 archetypes have a row', () => {
-    const archetypes = ['conqueror','steward','schemer','learned','tyrant','incompetent','benevolent','builder']
+    const archetypes = ['conqueror','steward','schemer','learned','tyrant','incompetent','benevolent','builder'] as const
     for (const archetype of archetypes) {
       expect(M8_1_STRATEGIC_WEIGHTS[archetype]).toBeDefined()
     }
@@ -22,5 +22,26 @@ describe('M8_1_STRATEGIC_WEIGHTS', () => {
   })
   it('no opportunist or zealot strings exist', () => {
     expect(JSON.stringify(M8_1_STRATEGIC_WEIGHTS)).not.toMatch(/opportunist|zealot/)
+  })
+})
+
+describe('M8_1_OPERATIONAL_WEIGHTS', () => {
+  it('all 8 archetypes have a row', () => {
+    const archetypes = ['conqueror','steward','schemer','learned','tyrant','incompetent','benevolent','builder'] as const
+    for (const archetype of archetypes) {
+      expect(M8_1_OPERATIONAL_WEIGHTS[archetype]).toBeDefined()
+    }
+  })
+  it('conqueror warDeclarationBias > steward warDeclarationBias', () => {
+    expect(M8_1_OPERATIONAL_WEIGHTS.conqueror.warDeclarationBias).toBeGreaterThan(M8_1_OPERATIONAL_WEIGHTS.steward.warDeclarationBias)
+  })
+  it('schemer espionageInitiative > tyrant espionageInitiative', () => {
+    expect(M8_1_OPERATIONAL_WEIGHTS.schemer.espionageInitiative).toBeGreaterThan(M8_1_OPERATIONAL_WEIGHTS.tyrant.espionageInitiative)
+  })
+  it('learned diplomacyInitiative > tyrant diplomacyInitiative', () => {
+    expect(M8_1_OPERATIONAL_WEIGHTS.learned.diplomacyInitiative).toBeGreaterThan(M8_1_OPERATIONAL_WEIGHTS.tyrant.diplomacyInitiative)
+  })
+  it('no opportunist or zealot strings exist', () => {
+    expect(JSON.stringify(M8_1_OPERATIONAL_WEIGHTS)).not.toMatch(/opportunist|zealot/)
   })
 })
