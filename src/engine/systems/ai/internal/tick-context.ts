@@ -1,6 +1,6 @@
 import type { Army, ArmyId, World } from '~/shared/types'
 
-export interface AiPhaseState {
+export interface AiTickContext {
   readonly armies: Map<ArmyId, Army>
   readonly sieges: World['sieges']
   readonly sites: World['sites']
@@ -13,7 +13,7 @@ export interface AiPhaseState {
   readonly spyMissions: World['spyMissions']
 }
 
-export function createAiPhaseState(world: World): AiPhaseState {
+export function createAiTickContext(world: World): AiTickContext {
   return {
     armies: new Map(world.armies),
     sieges: new Map(world.sieges),
@@ -28,31 +28,31 @@ export function createAiPhaseState(world: World): AiPhaseState {
   }
 }
 
-export function worldWithAiPhaseState(
+export function worldWithAiTickContext(
   world: World,
-  phaseState: AiPhaseState
+  tickContext: AiTickContext
 ): World {
   return {
     ...world,
-    armies: phaseState.armies,
-    sieges: phaseState.sieges,
-    sites: phaseState.sites,
-    wars: phaseState.wars,
-    relations: phaseState.relations,
-    diplomaticProposals: phaseState.diplomaticProposals,
-    treaties: phaseState.treaties,
-    diplomacyHistory: phaseState.diplomacyHistory,
-    coalitions: phaseState.coalitions,
-    spyMissions: phaseState.spyMissions,
+    armies: tickContext.armies,
+    sieges: tickContext.sieges,
+    sites: tickContext.sites,
+    wars: tickContext.wars,
+    relations: tickContext.relations,
+    diplomaticProposals: tickContext.diplomaticProposals,
+    treaties: tickContext.treaties,
+    diplomacyHistory: tickContext.diplomacyHistory,
+    coalitions: tickContext.coalitions,
+    spyMissions: tickContext.spyMissions,
   }
 }
 
-export function phaseStateWithDiplomacyResult(
-  phaseState: AiPhaseState,
+export function tickContextWithDiplomacyResult(
+  tickContext: AiTickContext,
   world: World
-): AiPhaseState {
+): AiTickContext {
   return {
-    ...phaseState,
+    ...tickContext,
     wars: world.wars,
     relations: world.relations,
     diplomaticProposals: world.diplomaticProposals,
@@ -62,22 +62,22 @@ export function phaseStateWithDiplomacyResult(
   }
 }
 
-export function phaseStateWithEspionageResult(
-  phaseState: AiPhaseState,
+export function tickContextWithEspionageResult(
+  tickContext: AiTickContext,
   world: World
-): AiPhaseState {
+): AiTickContext {
   return {
-    ...phaseState,
+    ...tickContext,
     spyMissions: world.spyMissions,
   }
 }
 
-export function phaseStateWithBattlefieldResult(
-  phaseState: AiPhaseState,
+export function tickContextWithBattlefieldResult(
+  tickContext: AiTickContext,
   world: World
-): AiPhaseState {
+): AiTickContext {
   return {
-    ...phaseState,
+    ...tickContext,
     armies: new Map(world.armies),
     sieges: new Map(world.sieges),
     sites: new Map(world.sites),

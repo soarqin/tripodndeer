@@ -3,11 +3,11 @@ import { nextRng } from '~/engine/random'
 import { M7_ENABLED } from '~/content/m2/balance'
 import { getPersonality, pickAction } from './utility-scorer'
 import {
-  createAiPhaseState,
-  phaseStateWithDiplomacyResult,
-  phaseStateWithEspionageResult,
-  worldWithAiPhaseState,
-} from './internal/phase-state'
+  createAiTickContext,
+  tickContextWithDiplomacyResult,
+  tickContextWithEspionageResult,
+  worldWithAiTickContext,
+} from './internal/tick-context'
 import { applyTacticalAction, collectTacticalOptions } from './internal/tactical'
 import { planDiplomacyAction } from './internal/diplomacy'
 export { planEspionageAction } from './internal/espionage'
@@ -38,7 +38,7 @@ export function aiPlanStep(
 
   const events: GameEvent[] = []
   let currentRng = rng
-  let phaseState = createAiPhaseState(world)
+  let tickContext = createAiTickContext(world)
 
   for (const realm of [...world.realms.values()].sort((a, b) =>
     a.id.localeCompare(b.id)
@@ -46,18 +46,18 @@ export function aiPlanStep(
     if (realm.id === world.playerRealmId) continue
     if (realm.status === 'deactivated') continue
 
-    const diplomacyWorld = worldWithAiPhaseState(world, phaseState)
+    const diplomacyWorld = worldWithAiTickContext(world, tickContext)
     const diplomacy = planDiplomacyAction(diplomacyWorld, realm)
     if (diplomacy.ok) {
-      phaseState = phaseStateWithDiplomacyResult(phaseState, diplomacy.world)
+      tickContext = tickContextWithDiplomacyResult(tickContext, diplomacy.world)
       events.push(...diplomacy.events)
     }
 
     if (M7_ENABLED) {
-      const espionageWorld = worldWithAiPhaseState(world, phaseState)
+      const espionageWorld = worldWithAiTickContext(world, tickContext)
       const espionage = planEspionageAction(espionageWorld, realm, currentRng)
       if (espionage.ok) {
-        phaseState = phaseStateWithEspionageResult(phaseState, espionage.world)
+        tickContext = tickContextWithEspionageResult(tickContext, espionage.world)
         events.push(...espionage.events)
         currentRng = espionage.nextRng
       }
@@ -68,7 +68,7 @@ export function aiPlanStep(
 
     if (roll.value >= 0.2) continue
 
-    const options = collectTacticalOptions(world, phaseState, realm.id)
+    const options = collectTacticalOptions(world, tickContext, realm.id)
 
     // If there are no concrete options (only idle) skip the action entirely so
     // we keep the historical "no candidate → no events / no extra rng draws" contract.
@@ -85,13 +85,13 @@ export function aiPlanStep(
     if (action.kind === 'idle') continue
     if (!action.targetSiteId || !action.armyId) continue
 
-    const result = applyTacticalAction(world, phaseState, realm.id, action)
-    phaseState = result.phaseState
+    const result = applyTacticalAction(world, tickContext, realm.id, action)
+    tickContext = result.tickContext
     events.push(...result.events)
   }
 
   return {
-    world: worldWithAiPhaseState(world, phaseState),
+    world: worldWithAiTickContext(world, tickContext),
     nextRng: currentRng,
     events,
   }

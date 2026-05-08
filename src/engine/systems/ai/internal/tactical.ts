@@ -8,21 +8,21 @@ import {
 } from '../tactics'
 import type { AIOption } from '../utility-scorer'
 import {
-  phaseStateWithBattlefieldResult,
-  phaseStateWithDiplomacyResult,
-  worldWithAiPhaseState,
-  type AiPhaseState,
-} from './phase-state'
+  tickContextWithBattlefieldResult,
+  tickContextWithDiplomacyResult,
+  worldWithAiTickContext,
+  type AiTickContext,
+} from './tick-context'
 import { dispatchCandidate, findCandidateTargets } from './diplomacy'
 
 export function collectTacticalOptions(
   world: World,
-  phaseState: AiPhaseState,
+  tickContext: AiTickContext,
   realmId: RealmId
 ): AIOption[] {
   const candidateTargets = findCandidateTargets(
     world,
-    phaseState.armies,
+    tickContext.armies,
     realmId
   )
 
@@ -34,8 +34,8 @@ export function collectTacticalOptions(
   }))
   options.push({ kind: 'idle', score: 10 })
 
-  const worldSnapshot = worldWithAiPhaseState(world, phaseState)
-  for (const army of [...phaseState.armies.values()]
+  const worldSnapshot = worldWithAiTickContext(world, tickContext)
+  for (const army of [...tickContext.armies.values()]
     .filter((a) => a.realmId === realmId)
     .sort((a, b) => a.id.localeCompare(b.id))) {
     const siegeOpt = evaluateSiegeOption(army, worldSnapshot)
@@ -51,19 +51,19 @@ export function collectTacticalOptions(
 
 export function applyTacticalAction(
   world: World,
-  phaseState: AiPhaseState,
+  tickContext: AiTickContext,
   realmId: RealmId,
   action: AIOption
 ): {
-  readonly phaseState: AiPhaseState
+  readonly tickContext: AiTickContext
   readonly events: readonly GameEvent[]
 } {
-  if (!action.targetSiteId || !action.armyId) return { phaseState, events: [] }
+  if (!action.targetSiteId || !action.armyId) return { tickContext, events: [] }
 
   if (action.kind === 'attack' || action.kind === 'cut-supply') {
     const dispatch = dispatchCandidate(
-      worldWithAiPhaseState(world, phaseState),
-      phaseState.armies,
+      worldWithAiTickContext(world, tickContext),
+      tickContext.armies,
       realmId,
       {
         targetSiteId: action.targetSiteId,
@@ -71,19 +71,19 @@ export function applyTacticalAction(
       }
     )
     return {
-      phaseState: phaseStateWithDiplomacyResult(phaseState, dispatch.world),
+      tickContext: tickContextWithDiplomacyResult(tickContext, dispatch.world),
       events: dispatch.events,
     }
   }
 
   if (action.kind === 'siege-continue') {
     const newWorld = startSiege(
-      worldWithAiPhaseState(world, phaseState),
+      worldWithAiTickContext(world, tickContext),
       action.armyId,
       action.targetSiteId
     )
     return {
-      phaseState: phaseStateWithBattlefieldResult(phaseState, newWorld),
+      tickContext: tickContextWithBattlefieldResult(tickContext, newWorld),
       events: [
         {
           type: 'aiStartedSiege',
@@ -98,9 +98,9 @@ export function applyTacticalAction(
   }
 
   if (action.kind === 'retreat') {
-    const army = phaseState.armies.get(action.armyId)
-    if (!army) return { phaseState, events: [] }
-    phaseState.armies.set(action.armyId, {
+    const army = tickContext.armies.get(action.armyId)
+    if (!army) return { tickContext, events: [] }
+    tickContext.armies.set(action.armyId, {
       ...army,
       state: 'retreating',
       destination: action.targetSiteId,
@@ -113,7 +113,7 @@ export function applyTacticalAction(
       source: army.location,
     })
     return {
-      phaseState,
+      tickContext,
       events: [
         {
           type: 'aiRetreatedArmy',
@@ -127,5 +127,5 @@ export function applyTacticalAction(
     }
   }
 
-  return { phaseState, events: [] }
+  return { tickContext, events: [] }
 }

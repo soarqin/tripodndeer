@@ -33,3 +33,10 @@ historicalEventsPhase → prestigeUpdatePhase → realmDeactivationPhase
 - All cross-sub-module type references use `import type`
 - Sub-module files stay in same directory as the god-file (e.g., balance/ subdirectory next to balance.ts)
 - Do NOT rename any exports
+
+## [Wave 0 - 2026-05-08] Task: T1.2 AiPhaseState rename
+
+### Learnings
+- Mechanical type renames in AI internals should update the backing file path and all helper names together to avoid stale import paths.
+- `grep -rE "AiPhaseState|phase-state" src/` was clean after renaming to `AiTickContext` / `tick-context`.
+- `pnpm typecheck` and `pnpm test src/engine/systems/ai/` both passed without behavior changes.
