@@ -1,5 +1,4 @@
 import type { GameEvent, Realm, RNGState, World } from '~/shared/types'
-import { nextRng } from '~/engine/random'
 import { M7_ENABLED } from '~/content/m2/balance'
 import { getPersonality, pickAction } from './utility-scorer'
 import {
@@ -14,7 +13,7 @@ import { planDiplomacyAction } from './internal/diplomacy'
 export { planEspionageAction } from './internal/espionage'
 import { planEspionageAction } from './internal/espionage'
 
-function runDiplomacyForRealm(
+export function runDiplomacyForRealm(
   world: World,
   realm: Realm,
   ctx: AiTickContext,
@@ -32,7 +31,7 @@ function runDiplomacyForRealm(
   return { ctx, events: [], nextRng: _rng }
 }
 
-function runEspionageForRealm(
+export function runEspionageForRealm(
   world: World,
   realm: Realm,
   ctx: AiTickContext,
@@ -59,21 +58,14 @@ function runTacticalForRealm(
   ctx: AiTickContext,
   rng: RNGState
 ): { ctx: AiTickContext; events: readonly GameEvent[]; nextRng: RNGState } {
-  // 20% gate — PRESERVE THIS EXACT LOCATION (T3.5/T4.1 will relocate it; T1.5 freezes it here)
-  const roll = nextRng(rng)
-  const currentRng = roll.nextState
-  if (roll.value >= 0.2) {
-    return { ctx, events: [], nextRng: currentRng }
-  }
-
   const options = collectTacticalOptions(world, ctx, realm.id)
   if (options.length === 1) {
-    return { ctx, events: [], nextRng: currentRng }
+    return { ctx, events: [], nextRng: rng }
   }
 
   const personality = getPersonality(world, realm.id)
-  const { action, nextRng: pickRng } = pickAction(options, personality, currentRng)
-  let postPickRng = pickRng
+  const { action, nextRng: pickRng } = pickAction(options, personality, rng)
+  const postPickRng = pickRng
 
   if (action.kind === 'idle') return { ctx, events: [], nextRng: postPickRng }
   if (!action.targetSiteId || !action.armyId) return { ctx, events: [], nextRng: postPickRng }
@@ -92,7 +84,7 @@ function runTacticalForRealm(
 /**
  * AI planning phase step.
  * Only executes every 3 ticks (monthly).
- * Each non-player realm has 20% chance to pick one tactical action.
+ * Each non-player realm picks from tactical options when the monthly phase runs.
  *
  * Options considered per realm:
  *  - attack: march an idle army into an adjacent enemy site
