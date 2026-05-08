@@ -3,17 +3,17 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { BottomBar } from '../BottomBar'
 
 describe('BottomBar', () => {
-  it('renders 10 buttons', () => {
+  it('renders 12 buttons', () => {
     render(<BottomBar />)
     const buttons = screen.getAllByRole('button')
-    expect(buttons).toHaveLength(10)
+    expect(buttons).toHaveLength(12)
   })
 
-  it('9 buttons are enabled (not disabled)', () => {
+  it('11 buttons are enabled (not disabled)', () => {
     render(<BottomBar />)
     const buttons = screen.getAllByRole('button')
     const enabledButtons = buttons.filter(btn => !(btn as HTMLButtonElement).disabled)
-    expect(enabledButtons).toHaveLength(9)
+    expect(enabledButtons).toHaveLength(11)
     expect(enabledButtons[0]?.textContent).toBe('王宫')
     expect(enabledButtons[1]?.textContent).toBe('军事')
     expect(enabledButtons[2]?.textContent).toBe('外交')
@@ -23,6 +23,8 @@ describe('BottomBar', () => {
     expect(enabledButtons[6]?.textContent).toBe('人才')
     expect(enabledButtons[7]?.textContent).toBe('州郡')
     expect(enabledButtons[8]?.textContent).toBe('地区')
+    expect(enabledButtons[9]?.textContent).toBe('名册')
+    expect(enabledButtons[10]?.textContent).toBe('返回主菜单')
   })
 
   it('disabled buttons have aria-disabled="true"', () => {
@@ -48,5 +50,13 @@ describe('BottomBar', () => {
     const junshiBtn = screen.getByTestId('bottom-bar-junshi')
     fireEvent.click(junshiBtn)
     expect(onJunshi).toHaveBeenCalledTimes(1)
+  })
+
+  it('clicking 返回主菜单 calls the onBackToMenu callback', () => {
+    const onBackToMenu = vi.fn()
+    render(<BottomBar onBackToMenu={onBackToMenu} />)
+    const backBtn = screen.getByTestId('back-to-menu-btn')
+    fireEvent.click(backBtn)
+    expect(onBackToMenu).toHaveBeenCalledTimes(1)
   })
 })

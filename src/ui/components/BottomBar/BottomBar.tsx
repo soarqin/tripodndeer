@@ -10,6 +10,8 @@ interface BottomBarProps {
   onDiebao?: () => void
   onProvinceBrowser?: () => void
   onRegionBrowser?: () => void
+  onCharacterBrowser?: () => void
+  onBackToMenu?: () => void
 }
 
 const BUTTONS = [
@@ -23,9 +25,10 @@ const BUTTONS = [
   { id: 'rencai',   label: '人才', enabled: true },
   { id: 'province-browser', label: '州郡', enabled: true },
   { id: 'region-browser', label: '地区', enabled: true },
+  { id: 'character-browser', label: '名册', enabled: true },
 ]
 
-export function BottomBar({ onWanggong, onJunshi, onNeizheng, onRencai, onWaijiao, onWenhua, onDiebao, onProvinceBrowser, onRegionBrowser }: BottomBarProps) {
+export function BottomBar({ onWanggong, onJunshi, onNeizheng, onRencai, onWaijiao, onWenhua, onDiebao, onProvinceBrowser, onRegionBrowser, onCharacterBrowser, onBackToMenu }: BottomBarProps) {
   return (
     <nav className={styles.bar} data-testid="bottom-bar">
       {BUTTONS.map(({ id, label, enabled }) => (
@@ -35,11 +38,18 @@ export function BottomBar({ onWanggong, onJunshi, onNeizheng, onRencai, onWaijia
           className={enabled ? styles.btnEnabled : styles.btnDisabled}
           disabled={!enabled}
           aria-disabled={!enabled}
-          onClick={enabled ? (id === 'wanggong' ? onWanggong : id === 'junshi' ? onJunshi : id === 'neizheng' ? onNeizheng : id === 'rencai' ? onRencai : id === 'waijiao' ? onWaijiao : id === 'wenhua' ? onWenhua : id === 'diebao' ? onDiebao : id === 'province-browser' ? onProvinceBrowser : id === 'region-browser' ? onRegionBrowser : undefined) : undefined}
+          onClick={enabled ? (id === 'wanggong' ? onWanggong : id === 'junshi' ? onJunshi : id === 'neizheng' ? onNeizheng : id === 'rencai' ? onRencai : id === 'waijiao' ? onWaijiao : id === 'wenhua' ? onWenhua : id === 'diebao' ? onDiebao : id === 'province-browser' ? onProvinceBrowser : id === 'region-browser' ? onRegionBrowser : id === 'character-browser' ? onCharacterBrowser : undefined) : undefined}
         >
           {label}
         </button>
       ))}
+      <button
+        data-testid="back-to-menu-btn"
+        className={styles.btnEnabled}
+        onClick={onBackToMenu}
+      >
+        返回主菜单
+      </button>
     </nav>
   )
 }

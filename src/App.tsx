@@ -17,6 +17,7 @@ import { CulturePanel } from '@/ui/components/CulturePanel'
 import { EspionagePanel } from '@/ui/components/EspionagePanel'
 import { ProvinceBrowserPanel } from '@/ui/components/ProvinceBrowserPanel'
 import { RegionBrowserPanel } from '@/ui/components/RegionBrowserPanel'
+import { CharacterBrowserPanel } from '@/ui/components/CharacterBrowserPanel'
 import { Modal } from '@/ui/components/Modal'
 import { SuccessionModal } from '@/ui/components/SuccessionModal'
 import { DisasterReliefModal } from '@/ui/components/DisasterReliefModal'
@@ -154,6 +155,7 @@ export function App(): React.JSX.Element {
         {activePanel === 'espionage' && <EspionagePanel />}
         {activePanel === 'province-browser' && <ProvinceBrowserPanel />}
         {activePanel === 'region-browser' && <RegionBrowserPanel />}
+        {activePanel === 'character-browser' && <CharacterBrowserPanel />}
         {isPeacePanelOpen && diplomacyTargetRealmId && (
           <PeacePanel
             targetRealmId={diplomacyTargetRealmId}
@@ -182,6 +184,29 @@ export function App(): React.JSX.Element {
         onDiebao={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'espionage' ? null : 'espionage')}
         onProvinceBrowser={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'province-browser' ? null : 'province-browser')}
         onRegionBrowser={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'region-browser' ? null : 'region-browser')}
+        onCharacterBrowser={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'character-browser' ? null : 'character-browser')}
+        onBackToMenu={() => {
+          useGameStore.getState().openModal({
+            title: '返回主菜单',
+            content: '未保存的进度将丢失，确认返回？',
+            actions: [
+              {
+                id: 'cancel',
+                label: '取消',
+                onClick: () => useGameStore.getState().closeModal(),
+              },
+              {
+                id: 'confirm',
+                label: '确认',
+                primary: true,
+                onClick: () => {
+                  useGameStore.getState().closeModal()
+                  useGameStore.getState().resetToBootPending()
+                },
+              },
+            ],
+          })
+        }}
       />
       <TimeControlBar />
       <DevAIPanel />
