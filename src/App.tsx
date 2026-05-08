@@ -1,4 +1,5 @@
 import React from 'react'
+import { ScenarioPicker } from '@/ui/components/ScenarioPicker'
 import { TopBar } from '@/ui/components/TopBar'
 import { MapCanvas } from '@/rendering/map'
 import { TimeControlBar } from '@/ui/components/TimeControlBar'
@@ -117,11 +118,7 @@ export function App(): React.JSX.Element {
   }, [openModal, closeModal])
 
   if (bootStatus === 'pending') {
-    return (
-      <div className={styles.app} data-testid="scenario-picker-placeholder">
-        Loading...
-      </div>
-    )
+    return <ScenarioPicker />
   }
 
   return (

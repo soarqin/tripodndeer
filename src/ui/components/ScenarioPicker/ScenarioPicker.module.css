@@ -1,0 +1,36 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: #0d0d1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.container { text-align: center; max-width: 800px; padding: 2rem; }
+.title { color: #e8d5a3; font-size: 2rem; margin-bottom: 2rem; }
+.loading { color: #aaa; margin-bottom: 1rem; }
+.grid { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
+.card {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  cursor: pointer;
+  width: 280px;
+  text-align: left;
+  color: #e8d5a3;
+  transition: border-color 0.2s;
+}
+.card:hover:not(:disabled) { border-color: #4a9eff; }
+.card:disabled { opacity: 0.6; cursor: not-allowed; }
+.thumbnail { margin-bottom: 1rem; }
+.name { font-size: 1.2rem; margin: 0 0 0.5rem; }
+.description { font-size: 0.85rem; color: #aaa; margin: 0 0 0.75rem; }
+.difficulty {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: white;
+}
