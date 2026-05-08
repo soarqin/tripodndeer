@@ -1,7 +1,22 @@
 import m0Data from '@/content/m0/sites.json'
 import m1Data from '@/content/m1/scenario.json'
 import { INITIAL_DATE } from '@/shared/constants'
-import { M0DataSchema, M1DataSchemaV6, M1DataSchemaV7, M1DataSchemaV8 } from '@/shared/schemas'
+import {
+  M0DataSchema,
+  M1DataSchemaV6,
+  M1DataSchemaV7,
+  M1DataSchemaV8,
+  M9DataSchema,
+  M9RawDataSchema,
+} from '@/shared/schemas'
+import type {
+  M9Data,
+  M9DataProvince,
+  M9DataRealm,
+  M9DataRegion,
+  M9DataSite,
+} from '@/shared/schemas'
+import { mapM9RawToM9Data } from './m9-mapper'
 import { aiPlanStep } from '~/engine/systems/ai'
 import { characterLifecyclePhase, characterSpawnPhase } from '~/engine/systems/character'
 import { combatV2Step } from '~/engine/systems/combat-v2'
@@ -42,6 +57,8 @@ import type {
   BoundaryRef,
   Army,
   ArmyId,
+  CharId,
+  CharacterTemplate,
   CoalitionId,
   CoalitionState,
   CounterIntelState,
@@ -60,10 +77,15 @@ import type {
   ReformState,
   GovernorAssignment,
   ZhouInvestitureState,
+  Province,
+  ProvinceId,
+  Region,
+  RegionId,
   RelationKey,
   RulerState,
   SpyMission,
   SpyMissionId,
+  TickPhase,
   TradeRoute,
   TradeRouteId,
   Treaty,
@@ -272,6 +294,34 @@ function buildInitialCounterIntelStates(
   return states
 }
 
+function getDefaultPhases(): readonly TickPhase[] {
+  return [
+    aiPlanStep,
+    orderApplyStep,
+    marchStep,
+    siegeStep,
+    combatV2Step,
+    culturalIdentityPhase,
+    manpowerTick,
+    espionagePhase,
+    rulerLifecyclePhase,
+    characterLifecyclePhase,
+    characterSpawnPhase,
+    recruitmentPhase,
+    ideologyDriftPhase,
+    reformPhase,
+    victoryCheckStep,
+    diplomacyLifecycleStep,
+    economyPhase,
+    disasterPhase,
+    tradePhase,
+    factionPhase,
+    historicalEventsPhase,
+    prestigeUpdatePhase,
+    realmDeactivationPhase,
+  ]
+}
+
 /** 加载并验证 M0 地图数据（静态 import + Zod 校验） */
 export function loadM0Data(): M0Data {
   return M0DataSchema.parse(m0Data)
@@ -283,9 +333,13 @@ export function loadM1Data(): M1DataV8 {
   return M1DataSchemaV8.parse(ensureV8(raw))
 }
 
-export async function loadM9Data(): Promise<unknown> {
+/** 加载并验证 M9 战国剧本数据（动态 import + 双层 Zod 校验：raw → M9Data） */
+export async function loadM9Data(): Promise<M9Data> {
   const mod = await import('@/content/m9/scenario-453bc.json')
-  return (mod as { default: unknown }).default ?? mod
+  const raw = (mod as { default: unknown }).default ?? mod
+  const parsedRaw = M9RawDataSchema.parse(raw)
+  const data = mapM9RawToM9Data(parsedRaw)
+  return M9DataSchema.parse(data)
 }
 
 /** 构造初始 World（含 Zod 校验 + ownership 引用完整性 + polygon/adjacency 派发） */
@@ -500,31 +554,216 @@ export function createWorldFromM1Data(
     localization: new Map(),
     playerRealmId,
     rngState: { seed, counter: 0 },
-    phases: [
-      aiPlanStep,
-      orderApplyStep,
-      marchStep,
-      siegeStep,
-      combatV2Step,
-      culturalIdentityPhase,
-      manpowerTick,
-      espionagePhase,
-      rulerLifecyclePhase,
-      characterLifecyclePhase,
-      characterSpawnPhase,
-      recruitmentPhase,
-      ideologyDriftPhase,
-      reformPhase,
-      victoryCheckStep,
-      diplomacyLifecycleStep,
-      economyPhase,
-      disasterPhase,
-      tradePhase,
-      factionPhase,
-      historicalEventsPhase,
-      prestigeUpdatePhase,
-      realmDeactivationPhase,
-    ],
+    phases: getDefaultPhases(),
+    pendingOrders: [],
+  }
+}
+
+const M9_REALM_COLORS: Record<RealmId, string> = {
+  realm_qin: '#1A1A1A',
+  realm_chu: '#8B1A1A',
+  realm_qi: '#2E5A6E',
+  realm_yan: '#B0B0B0',
+  realm_han: '#D8741A',
+  realm_zhao: '#5B3A6F',
+  realm_wei: '#4A8B5C',
+  realm_zhou: '#C8362F',
+  realm_yue: '#3F8A4A',
+  realm_song: '#A89A4A',
+  realm_lu: '#6B7A8C',
+  realm_zhongshan: '#7A4A6A',
+}
+
+function colorForM9Realm(realmId: RealmId): string {
+  return M9_REALM_COLORS[realmId] ?? '#888888'
+}
+
+function buildM9RealmMap(
+  realms: readonly M9DataRealm[],
+  initialSitesByRealm: ReadonlyMap<RealmId, readonly SiteId[]>,
+): Map<RealmId, Realm> {
+  const realmMap = new Map<RealmId, Realm>()
+  for (const r of realms) {
+    realmMap.set(r.id, {
+      id: r.id,
+      displayName: r.displayName,
+      fullTitle: r.fullTitle,
+      color: colorForM9Realm(r.id),
+      capital: r.capital,
+      initialSites: initialSitesByRealm.get(r.id) ?? [],
+      initialArmies: [],
+      aiPersonality: 'aggressive_random',
+      economy: {
+        treasury: r.startingTreasury,
+        foodStores: r.startingManpower,
+        taxRate: M4_DEFAULT_TAX_RATE,
+      },
+      traits: r.traits,
+      politicalSystem: 'enfeoffment',
+      prestige: prestigeForRealm(r.id),
+      ideologyLean: r.ideologyLean,
+      warVictoriesThisYear: 0,
+      status: r.status,
+      rulingHouse: r.rulingHouse,
+    })
+  }
+  return realmMap
+}
+
+function buildM9Sites(
+  rawSites: readonly M9DataSite[],
+  realms: ReadonlyMap<RealmId, Realm>,
+): Map<SiteId, Site> {
+  const sites = new Map<SiteId, Site>()
+  for (const s of rawSites) {
+    const ownerId = realms.has(s.historicalOwner) ? s.historicalOwner : null
+    const households = Math.floor(M4_DEFAULT_SITE_POPULATION / M4_HOUSEHOLD_DIVISOR)
+    sites.set(s.id, {
+      id: s.id,
+      name: s.name,
+      position: s.position as Vec2,
+      boundary: [],
+      terrainType: s.terrain,
+      ownerId,
+      polygon: [],
+      adjacency: [],
+      cultural: culturalTagForOwner(ownerId),
+      culturalIdentityStrength: 100,
+      lastConquestTick: null,
+      lowIdentitySinceTick: null,
+      economy: {
+        population: M4_DEFAULT_SITE_POPULATION,
+        households,
+        taxBase: households,
+        foodProduction: households * M4_BASE_FOOD_PRODUCTION_PER_HOUSEHOLD,
+      },
+      occupation: ownerId !== null ? { occupierId: ownerId, controlLevel: 100 } : undefined,
+    })
+  }
+  return sites
+}
+
+function deriveInitialSitesByRealm(
+  sites: readonly M9DataSite[],
+): Map<RealmId, SiteId[]> {
+  const map = new Map<RealmId, SiteId[]>()
+  for (const s of sites) {
+    const list = map.get(s.historicalOwner) ?? []
+    list.push(s.id)
+    map.set(s.historicalOwner, list)
+  }
+  return map
+}
+
+function deriveProvinceSiteIds(
+  provinces: readonly M9DataProvince[],
+  sites: readonly M9DataSite[],
+): Map<ProvinceId, SiteId[]> {
+  const map = new Map<ProvinceId, SiteId[]>()
+  for (const p of provinces) map.set(p.id, [])
+  for (const s of sites) {
+    const list = map.get(s.provinceId)
+    if (list) list.push(s.id)
+  }
+  return map
+}
+
+function deriveRegionProvinceIds(
+  regions: readonly M9DataRegion[],
+  provinces: readonly M9DataProvince[],
+): Map<RegionId, ProvinceId[]> {
+  const map = new Map<RegionId, ProvinceId[]>()
+  for (const r of regions) map.set(r.id, [])
+  for (const p of provinces) {
+    const list = map.get(p.regionId)
+    if (list) list.push(p.id)
+  }
+  return map
+}
+
+export function createWorldFromM9Data(data: M9Data, seed: number, playerRealmId: RealmId): World {
+  M9DataSchema.parse(data)
+
+  const initialSitesByRealm = deriveInitialSitesByRealm(data.sites)
+  const realms = buildM9RealmMap(data.realms, initialSitesByRealm)
+  const sites = buildM9Sites(data.sites, realms)
+
+  const provinceSiteIds = deriveProvinceSiteIds(data.provinces, data.sites)
+  const provinces = new Map<ProvinceId, Province>()
+  for (const p of data.provinces) {
+    provinces.set(p.id, {
+      id: p.id,
+      name: p.name,
+      regionId: p.regionId,
+      realmId: p.realmId,
+      siteIds: provinceSiteIds.get(p.id) ?? [],
+      historicalCapital: p.historicalCapital,
+      historicalNotes: p.historicalNotes,
+    })
+  }
+
+  const regionProvinceIds = deriveRegionProvinceIds(data.regions, data.provinces)
+  const regions = new Map<RegionId, Region>()
+  for (const r of data.regions) {
+    regions.set(r.id, {
+      id: r.id,
+      name: r.name,
+      description: r.description,
+      provinceIds: regionProvinceIds.get(r.id) ?? [],
+    })
+  }
+
+  const characterTemplates = new Map<CharId, CharacterTemplate>()
+  for (const t of data.characterTemplates) {
+    characterTemplates.set(t.id, t)
+  }
+
+  const passes = new Map<PassId, Pass>()
+  for (const p of data.passes) {
+    passes.set(p.id, p)
+  }
+
+  const realmIds = data.realms.map(r => r.id)
+  const adjacency = new Map<RealmId, ReadonlySet<RealmId>>()
+
+  return {
+    date: { yearBC: data.meta.startYearBC, season: 'spring', month: 1, xun: 'shang' },
+    tick: 0,
+    sites,
+    realms,
+    armies: new Map<ArmyId, Army>(),
+    edges: new Map<EdgeId, MapEdge>(),
+    wars: new Map<WarKey, WarState>(),
+    peaceProposals: new Map<PeaceProposalId, PeaceProposal>(),
+    relations: new Map<RelationKey, DiplomaticRelation>(),
+    diplomaticProposals: new Map<DiplomaticProposalId, DiplomaticProposal>(),
+    treaties: new Map<TreatyId, Treaty>(),
+    diplomacyHistory: [],
+    coalitions: new Map<CoalitionId, CoalitionState>(),
+    zhouInvestiture: new Map<RealmId, ZhouInvestitureState>(),
+    generals: new Map<GeneralId, General>(),
+    rulers: new Map<RealmId, RulerState>(),
+    academies: new Map<AcademyId, Academy>(),
+    eventChainStates: new Map<EventChainId, EventChainState>(),
+    reformStates: new Map<RealmId, ReformState>(),
+    disasterStates: new Map<RealmId, DisasterState>(),
+    tradeRoutes: new Map<TradeRouteId, TradeRoute>(),
+    factionInfluences: new Map<RealmId, FactionInfluenceState>(),
+    passes,
+    adjacencyEdges: new Map<AdjacencyEdgeId, AdjacencyEdge>(),
+    sieges: new Map<SiegeId, Siege>(),
+    edicts: new Map<EdictId, EdictState>(),
+    governorAssignments: new Map<SiteId, GovernorAssignment>(),
+    intelligenceCoverage: buildInitialIntelligenceCoverage(realmIds, adjacency),
+    spyMissions: new Map<SpyMissionId, SpyMission>(),
+    counterIntelStates: buildInitialCounterIntelStates(realmIds),
+    provinces,
+    regions,
+    characterTemplates,
+    localization: new Map<string, string>(),
+    playerRealmId,
+    rngState: { seed, counter: 0 },
+    phases: getDefaultPhases(),
     pendingOrders: [],
   }
 }
