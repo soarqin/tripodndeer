@@ -72,9 +72,12 @@ function findTargetSiteId(
   }
 
   const candidates = [...candidateIds]
-    .map((siteId) => world.sites.get(siteId))
-    .filter((site) => site?.ownerId && site.ownerId !== realm.id)
-    .filter((site) => isEnemy(world, realm.id, site.ownerId!))
+    .flatMap((siteId) => {
+      const site = world.sites.get(siteId)
+      if (!site?.ownerId || site.ownerId === realm.id) return []
+      if (!isEnemy(world, realm.id, site.ownerId)) return []
+      return [site]
+    })
     .sort((a, b) => a.id.localeCompare(b.id))
 
   if (candidates.length === 0) return { targetSiteId: null, nextRng: rng }
@@ -85,7 +88,8 @@ function findTargetSiteId(
   let bestScore = Number.NEGATIVE_INFINITY
 
   for (const site of candidates) {
-    const ownerId = site.ownerId!
+    const ownerId = site.ownerId
+    if (!ownerId) continue
     const sizeFactor = countOwnedSites(world, ownerId)
     const roll = nextRng(currentRng)
     currentRng = roll.nextState
@@ -189,14 +193,56 @@ function planStrategicForRealm(
   }
 }
 
+function isAdjacentToOwnedTerritory(
+  world: World,
+  realmId: RealmId,
+  siteId: SiteId
+): boolean {
+  for (const site of world.sites.values()) {
+    if (site.ownerId === realmId && site.adjacency.includes(siteId)) return true
+  }
+  return false
+}
+
+export function isStrategicPlanStale(
+  world: World,
+  realmId: RealmId,
+  plan: StrategicPlan
+): boolean {
+  if (
+    plan.mainEnemyRealmId &&
+    world.realms.get(plan.mainEnemyRealmId)?.status === 'deactivated'
+  ) {
+    return true
+  }
+
+  if (plan.mainAllyRealmId && isAtWar(world.wars, realmId, plan.mainAllyRealmId)) {
+    return true
+  }
+
+  if (plan.targetSiteId) {
+    const targetSite = world.sites.get(plan.targetSiteId)
+    if (targetSite?.ownerId === realmId) return true
+    if (!isAdjacentToOwnedTerritory(world, realmId, plan.targetSiteId)) return true
+  }
+
+  if (plan.reformIntentId && world.reformStates.has(realmId)) {
+    return true
+  }
+
+  const ruler = world.rulers.get(realmId)
+  if (ruler && ruler.inOfficeSinceTick > plan.decidedAtTick) {
+    return true
+  }
+
+  return false
+}
+
 export function aiStrategicStep(
   world: World,
   rng: RNGState
 ): { world: World; nextRng: RNGState; events: readonly GameEvent[] } {
-  if (!isYearlyTrigger(world)) {
-    return { world, nextRng: rng, events: [] }
-  }
-
+  const yearlyTrigger = isYearlyTrigger(world)
   const events: GameEvent[] = []
   let currentRng = rng
   const newAiState = new Map(world.aiState)
@@ -208,6 +254,11 @@ export function aiStrategicStep(
     if (realm.status === 'deactivated') continue
 
     const existingAiState = newAiState.get(realm.id)
+    const existingPlan = existingAiState?.strategic ?? null
+    if (!yearlyTrigger && (!existingPlan || !isStrategicPlanStale(world, realm.id, existingPlan))) {
+      continue
+    }
+
     const planResult = planStrategicForRealm(world, realm, currentRng)
     currentRng = planResult.nextRng
 
@@ -221,6 +272,10 @@ export function aiStrategicStep(
       type: 'aiStrategicDecided',
       payload: { realmId: realm.id, plan: planResult.plan },
     })
+  }
+
+  if (events.length === 0) {
+    return { world, nextRng: rng, events: [] }
   }
 
   return {
