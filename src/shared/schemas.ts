@@ -1,5 +1,6 @@
 export * from './schemas/core'
 export * from './schemas/character'
+export * from './schemas/ai-state'
 export * from './schemas/espionage'
 export * from './schemas/events'
 export * from './schemas/diplomacy'
