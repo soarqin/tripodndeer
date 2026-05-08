@@ -82,16 +82,9 @@ function runTacticalForRealm(
 // This is a contract — changing iteration order breaks RNG reproducibility.
 
 /**
- * AI planning phase step.
- * Only executes every 3 ticks (monthly).
- * Each non-player realm picks from tactical options when the monthly phase runs.
- *
- * Options considered per realm:
- *  - attack: march an idle army into an adjacent enemy site
- *  - siege-continue: start a siege on the enemy site the army is parked at
- *  - cut-supply: march to an adjacent enemy site to tighten an existing siege
- *  - retreat: fall back to a friendly adjacent site when outmatched or starving
- *  - idle: do nothing (always available, low score)
+ * @deprecated Use aiStrategicStep + aiOperationalStep + aiTacticalStep instead.
+ * Kept for backward compatibility. Preserves M8 monolithic monthly behavior:
+ * runs every 3 ticks and dispatches diplomacy/espionage/tactical for each realm.
  */
 export function aiPlanStep(
   world: World,

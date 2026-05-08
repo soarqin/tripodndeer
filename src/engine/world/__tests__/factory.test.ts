@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import { runTickPhases } from '@/engine/clock'
 import { PHASE_ORDER } from '@/engine/phases'
-import { aiPlanStep } from '@/engine/systems/ai'
+import { aiStrategicStep } from '@/engine/systems/ai/strategic'
+import { aiOperationalStep } from '@/engine/systems/ai/operational'
+import { aiTacticalStep } from '@/engine/systems/ai/tactical-step'
 import { characterLifecyclePhase, characterSpawnPhase } from '@/engine/systems/character'
 import { combatV2Step } from '@/engine/systems/combat-v2'
 import { culturalIdentityPhase } from '@/engine/systems/culture/cultural-identity-phase'
@@ -50,7 +52,9 @@ const expectedRealmEconomy = {
 }
 
 function phaseName(phase: TickPhase): string {
-  if (phase === aiPlanStep) return 'aiPlan'
+  if (phase === aiStrategicStep) return 'aiStrategic'
+  if (phase === aiOperationalStep) return 'aiOperational'
+  if (phase === aiTacticalStep) return 'aiTactical'
   if (phase === orderApplyStep) return 'orderApply'
   if (phase === marchStep) return 'march'
   if (phase === siegeStep) return 'siege'
@@ -217,7 +221,9 @@ describe('createWorldFromM1Data — structure', () => {
     const world = createWorldFromM1Data(data, 42, 'realm_qin')
 
     expect(world.phases).toEqual([
-      aiPlanStep,
+      aiStrategicStep,
+      aiOperationalStep,
+      aiTacticalStep,
       orderApplyStep,
       marchStep,
       siegeStep,

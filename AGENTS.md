@@ -55,7 +55,7 @@ interface World {
 ### Phase Pipeline (M2)
 
 ```
-aiPlan → orderApply → march → siege → combat-v2 → culturalIdentity → manpower → espionagePhase → rulerLifecycle → characterLifecycle → recruitment → ideologyDrift → reform → victoryCheck → diplomacyLifecycle → economy → disaster → trade → faction → historicalEvents → prestigeUpdate
+aiStrategic (yearly) → aiOperational (monthly) → aiTactical (per-tick) → orderApply → march → siege → combat-v2 → culturalIdentity → manpower → espionagePhase → rulerLifecycle → characterLifecycle → recruitment → ideologyDrift → reform → victoryCheck → diplomacyLifecycle → economy → disaster → trade → faction → historicalEvents → prestigeUpdate
 ```
 
 每个 phase 是纯函数：`(World, RNGState) → { world, nextRng, events }`

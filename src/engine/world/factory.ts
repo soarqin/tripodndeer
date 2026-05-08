@@ -17,7 +17,9 @@ import type {
   M9DataSite,
 } from '@/shared/schemas'
 import { mapM9RawToM9Data } from './m9-mapper'
-import { aiPlanStep } from '~/engine/systems/ai'
+import { aiStrategicStep } from '~/engine/systems/ai/strategic'
+import { aiOperationalStep } from '~/engine/systems/ai/operational'
+import { aiTacticalStep } from '~/engine/systems/ai/tactical-step'
 import { characterLifecyclePhase, characterSpawnPhase } from '~/engine/systems/character'
 import { combatV2Step } from '~/engine/systems/combat-v2'
 import { culturalIdentityPhase } from '~/engine/systems/culture/cultural-identity-phase'
@@ -296,7 +298,10 @@ function buildInitialCounterIntelStates(
 
 export function getDefaultPhases(): readonly TickPhase[] {
   return [
-    aiPlanStep,
+    aiStrategicStep,
+    aiOperationalStep,
+    aiTacticalStep,
+    // aiPlanStep removed — replaced by 3-layer AI pipeline above
     orderApplyStep,
     marchStep,
     siegeStep,

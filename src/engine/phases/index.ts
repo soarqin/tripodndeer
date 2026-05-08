@@ -1,5 +1,7 @@
 export const PHASE_NAMES = {
-  AI_PLAN: 'aiPlan',
+  AI_STRATEGIC: 'aiStrategic',
+  AI_OPERATIONAL: 'aiOperational',
+  AI_TACTICAL: 'aiTactical',
   ORDER_APPLY: 'orderApply',
   MARCH: 'march',
   SIEGE: 'siege',
@@ -25,7 +27,9 @@ export const PHASE_NAMES = {
 } as const
 
 export const PHASE_ORDER: readonly string[] = [
-  PHASE_NAMES.AI_PLAN,
+  PHASE_NAMES.AI_STRATEGIC,
+  PHASE_NAMES.AI_OPERATIONAL,
+  PHASE_NAMES.AI_TACTICAL,
   PHASE_NAMES.ORDER_APPLY,
   PHASE_NAMES.MARCH,
   PHASE_NAMES.SIEGE,
