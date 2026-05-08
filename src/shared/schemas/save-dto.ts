@@ -48,6 +48,7 @@ export const SerializedWorldSchema = z.object({
   playerRealmId: z.string().min(1),
   rngState: z.object({ seed: z.number(), counter: z.number().int().nonnegative() }),
   pendingOrders: z.array(z.unknown()),
+  aiState: z.array(keyValueTuple).optional(),
 })
 
 export const SaveDTOSchema = z.object({

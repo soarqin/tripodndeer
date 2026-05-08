@@ -1,0 +1,10 @@
+
+ RUN  v1.6.1 /home/soar/src/tripodndeer
+
+ ✓ src/engine/world/__tests__/save-dto-m8_1.test.ts  (6 tests) 77ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  23:51:04
+   Duration  876ms (transform 386ms, setup 0ms, collect 562ms, tests 77ms, environment 0ms, prepare 62ms)
+

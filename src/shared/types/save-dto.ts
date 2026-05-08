@@ -1,3 +1,4 @@
+import type { AIState } from './ai-state'
 import type { General, GeneralId, FactionId, RulerState } from './character'
 import type { AdjacencyEdge, AdjacencyEdgeId, Army, ArmyId, EdgeId, MapEdge, RealmId, Site, SiteId } from './core'
 import type {
@@ -38,7 +39,7 @@ import type {
   RNGState,
 } from './world'
 
-export const SAVE_DTO_VERSION = 1 as const
+export const SAVE_DTO_VERSION = 2 as const
 
 export type SaveLoadErrorKind = 'incompatible_version' | 'parse_error' | 'missing_data'
 
@@ -96,6 +97,7 @@ export interface SerializedWorld {
   readonly playerRealmId: RealmId
   readonly rngState: RNGState
   readonly pendingOrders: readonly Order[]
+  readonly aiState?: readonly [RealmId, AIState][]
 }
 
 export interface SaveDTO {

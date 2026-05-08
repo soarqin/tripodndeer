@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
 import { worldToSaveDTO } from '~/engine/world/save-dto'
+import { SAVE_DTO_VERSION } from '~/shared/types/save-dto'
 import { getDb, resetDbForTesting, type SaveMetadata } from '../db'
 import { deleteSlot, listSlots, loadSlot, saveSlot } from '../slot-crud'
 
@@ -80,7 +81,7 @@ describe('slot-crud', () => {
         kind: 'incompatible_version',
         message: 'Incompatible save version',
         got: 0,
-        expected: 1,
+        expected: SAVE_DTO_VERSION,
       },
     })
   })

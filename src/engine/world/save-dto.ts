@@ -53,12 +53,15 @@ export function worldToSaveDTO(world: World, scenarioId: 'm1' | 'm9' = 'm1'): Sa
       playerRealmId: world.playerRealmId,
       rngState: world.rngState,
       pendingOrders: [...world.pendingOrders],
+      aiState: [],
     },
   }
 }
 
+const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [1, SAVE_DTO_VERSION]
+
 export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
-  if (dto.schemaVersion !== SAVE_DTO_VERSION) {
+  if (!SUPPORTED_SAVE_DTO_VERSIONS.includes(dto.schemaVersion)) {
     return {
       ok: false,
       error: {
