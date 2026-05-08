@@ -1,6 +1,7 @@
 import { useGameStore } from '~/ui/store'
 import { selectHeir } from '~/engine/systems/ruler/succession'
 import { M10_ARCHETYPE_TOOLTIPS } from '~/content/m2/balance'
+import { Portrait } from '~/ui/components/Portrait'
 import styles from './RulerPanel.module.css'
 
 const PERSONALITY_LABELS: Record<string, string> = {
@@ -63,7 +64,10 @@ export function RulerPanel() {
   return (
     <div className={styles.panel} data-testid="ruler-panel">
       <div className={styles.header}>
-        <span className={styles.name}>{general.name}</span>
+        <div className={styles.headerLeft}>
+          <Portrait name={general.name} realmId={playerRealmId} size={48} />
+          <span className={styles.name}>{general.name}</span>
+        </div>
         <span
           className={styles.personality}
           title={personalityTooltip}

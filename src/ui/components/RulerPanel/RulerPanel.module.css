@@ -12,6 +12,12 @@
   align-items: center;
 }
 
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .name {
   font-size: 1.1rem;
   font-weight: bold;
