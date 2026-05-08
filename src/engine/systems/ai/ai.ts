@@ -32,6 +32,27 @@ function runDiplomacyForRealm(
   return { ctx, events: [], nextRng: _rng }
 }
 
+function runEspionageForRealm(
+  world: World,
+  realm: Realm,
+  ctx: AiTickContext,
+  rng: RNGState
+): { ctx: AiTickContext; events: readonly GameEvent[]; nextRng: RNGState } {
+  if (!M7_ENABLED) {
+    return { ctx, events: [], nextRng: rng }
+  }
+  const espionageWorld = worldWithAiTickContext(world, ctx)
+  const espionage = planEspionageAction(espionageWorld, realm, rng)
+  if (espionage.ok) {
+    return {
+      ctx: tickContextWithEspionageResult(ctx, espionage.world),
+      events: espionage.events,
+      nextRng: espionage.nextRng,
+    }
+  }
+  return { ctx, events: [], nextRng: rng }
+}
+
 // IMPORTANT: realm and army iteration order is locked to lexicographic ID sort.
 // This is a contract — changing iteration order breaks RNG reproducibility.
 
@@ -69,15 +90,10 @@ export function aiPlanStep(
     tickContext = diplomacy.ctx
     events.push(...diplomacy.events)
 
-    if (M7_ENABLED) {
-      const espionageWorld = worldWithAiTickContext(world, tickContext)
-      const espionage = planEspionageAction(espionageWorld, realm, currentRng)
-      if (espionage.ok) {
-        tickContext = tickContextWithEspionageResult(tickContext, espionage.world)
-        events.push(...espionage.events)
-        currentRng = espionage.nextRng
-      }
-    }
+    const espionage = runEspionageForRealm(world, realm, tickContext, currentRng)
+    tickContext = espionage.ctx
+    events.push(...espionage.events)
+    currentRng = espionage.nextRng
 
     const roll = nextRng(currentRng)
     currentRng = roll.nextState
