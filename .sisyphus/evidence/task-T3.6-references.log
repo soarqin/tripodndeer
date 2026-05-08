@@ -1,0 +1,16 @@
+ * plan.mainEnemyRealmId → consumed by 'declare_war' and 'dispatch_army' directives
+ * plan.mainAllyRealmId  → consumed by 'diplomacy' (alliance) directive
+ * plan.targetSiteId     → consumed by 'dispatch_army' directive (primary target)
+ * plan.reformIntentId   → consumed by 'diplomacy' (reform-intent) directive (future)
+  if (plan.mainEnemyRealmId && !isAtWar(world.wars, realm.id, plan.mainEnemyRealmId)) {
+      id: `${realm.id}:${world.tick}:declare_war:${plan.mainEnemyRealmId}`,
+      targetRealmId: plan.mainEnemyRealmId,
+  if (plan.targetSiteId && plan.mainEnemyRealmId && isAtWar(world.wars, realm.id, plan.mainEnemyRealmId)) {
+      id: `${realm.id}:${world.tick}:dispatch_army:${plan.targetSiteId}`,
+      targetRealmId: plan.mainEnemyRealmId,
+      targetSiteId: plan.targetSiteId,
+  if (plan.mainAllyRealmId && !isAtWar(world.wars, realm.id, plan.mainAllyRealmId)) {
+      id: `${realm.id}:${world.tick}:diplomacy:${plan.mainAllyRealmId}`,
+      targetRealmId: plan.mainAllyRealmId,
+
+--- ai.ts gate check ---

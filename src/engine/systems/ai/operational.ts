@@ -13,6 +13,16 @@ import { getPersonality } from './utility-scorer'
 const MAX_NEW_DIRECTIVES = 3
 const OPERATIONAL_GATE = 0.2
 
+/**
+ * StrategicPlan → OperationalDirective field consumption:
+ *
+ * plan.mainEnemyRealmId → consumed by 'declare_war' and 'dispatch_army' directives
+ * plan.mainAllyRealmId  → consumed by 'diplomacy' (alliance) directive
+ * plan.targetSiteId     → consumed by 'dispatch_army' directive (primary target)
+ * plan.reformIntentId   → consumed by 'diplomacy' (reform-intent) directive (future)
+ * plan.decidedForYearBC → used for staleness cross-reference with isStrategicPlanStale
+ */
+
 function retainedDirectives(
   directives: readonly OperationalDirective[],
   tick: number
