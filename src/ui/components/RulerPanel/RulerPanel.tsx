@@ -1,5 +1,6 @@
 import { useGameStore } from '~/ui/store'
 import { selectHeir } from '~/engine/systems/ruler/succession'
+import { M10_ARCHETYPE_TOOLTIPS } from '~/content/m2/balance'
 import styles from './RulerPanel.module.css'
 
 const PERSONALITY_LABELS: Record<string, string> = {
@@ -13,15 +14,14 @@ const PERSONALITY_LABELS: Record<string, string> = {
   builder: '建设者',
 }
 
-const PERSONALITY_DESCS: Record<string, string> = {
-  conqueror: '热衷扩张',
-  steward: '善于治国',
-  schemer: '工于心计',
-  learned: '博学多才',
-  tyrant: '残暴专制',
-  incompetent: '昏庸无能',
-  benevolent: '仁慈宽厚',
-  builder: '励精图治',
+const DIMENSION_LABELS: Record<string, string> = {
+  attack: '进攻',
+  retreat: '撤退',
+  'siege-continue': '攻城坚持',
+  'cut-supply': '断粮',
+  recruit: '招募',
+  diplomacy: '外交',
+  economy: '内政',
 }
 
 export function RulerPanel() {
@@ -54,7 +54,11 @@ export function RulerPanel() {
   }
 
   const personalityLabel = PERSONALITY_LABELS[ruler.personality] ?? ruler.personality
-  const personalityDesc = PERSONALITY_DESCS[ruler.personality] ?? ''
+  const tooltipEntry = M10_ARCHETYPE_TOOLTIPS[ruler.personality]
+  const multiplierLines = Object.entries(tooltipEntry.multipliers)
+    .map(([dim, val]) => `${DIMENSION_LABELS[dim] ?? dim} ×${val.toFixed(1)}`)
+    .join(' / ')
+  const personalityTooltip = `${tooltipEntry.name}\n${tooltipEntry.tagline}\n\n决策权重：\n${multiplierLines}`
 
   return (
     <div className={styles.panel} data-testid="ruler-panel">
@@ -62,7 +66,7 @@ export function RulerPanel() {
         <span className={styles.name}>{general.name}</span>
         <span
           className={styles.personality}
-          title={personalityDesc}
+          title={personalityTooltip}
           data-testid="ruler-personality"
         >
           {personalityLabel}
