@@ -1,0 +1,6 @@
+.portrait {
+  display: inline-block;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
