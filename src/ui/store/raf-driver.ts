@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { MAX_DELTA_MS } from '@/shared/constants'
 import { detectCriticalEvent } from './critical-events'
+import { getSeverity } from './notification-severity-map'
 import { useGameStore } from './game-store'
 import { M10_AUTOSAVE_INTERVAL } from '@/content/m2/balance'
 import { worldToSaveDTO } from '@/engine/world/save-dto'
@@ -27,7 +28,7 @@ export function useRafDriver(): void {
         store.tick(cappedDelta)
         const newWorld = useGameStore.getState().world
         
-        if (newWorld.tick > oldTick && newWorld.tick % M10_AUTOSAVE_INTERVAL === 0 && newWorld.tick > 0) {
+        if (newWorld.tick > oldTick && newWorld.tick % M10_AUTOSAVE_INTERVAL === 0 && newWorld.tick > 0 && useGameStore.getState().bootStatus === 'ready') {
           const scenarioId: 'm1' | 'm9' = newWorld.sites.size === 250 ? 'm9' : 'm1'
           const dto = worldToSaveDTO(newWorld, scenarioId)
           const playerRealm = newWorld.realms.get(newWorld.playerRealmId)
@@ -52,12 +53,33 @@ export function useRafDriver(): void {
       if (state.events === prevState.events) return
       if (state.events.length === 0) return
 
+      let criticalHandled = false
       for (const event of state.events) {
-        const critical = detectCriticalEvent(event, state.playerRealmId)
-        if (critical !== null) {
-          state.pauseOnCriticalEvent(critical.type, critical.payload)
-          break
+        if (!criticalHandled) {
+          const critical = detectCriticalEvent(event, state.playerRealmId)
+          if (critical !== null) {
+            state.pauseOnCriticalEvent(critical.type, critical.payload)
+            criticalHandled = true
+          }
         }
+
+        const severity = getSeverity(event, state.playerRealmId)
+        if (severity === 'hidden') continue
+        const text = `[${event.type}]`
+
+        if (severity === 'L2') {
+          state.enqueueToast(text)
+        } else if (severity === 'L3') {
+          state.showBanner(text)
+        }
+
+        state.appendEventLog({
+          id: `${event.type}-${state.world.tick}-${Math.random()}`,
+          tick: state.world.tick,
+          type: event.type,
+          text,
+          createdAt: Date.now(),
+        })
       }
     })
 

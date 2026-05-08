@@ -49,13 +49,22 @@ export function ProvinceBrowserPanel() {
 
                   {isExpanded && (
                     <div className={styles.detail} data-testid="province-detail">
+                      {province.historicalNotes && (
+                        <div className={styles.notes} data-testid="province-historical-notes">
+                          {province.historicalNotes}
+                        </div>
+                      )}
                       <div>下辖邑：</div>
                       <div className={styles.siteList}>
                         {province.siteIds.map((siteId) => {
                           const site = sites.get(siteId)
+                          const isCapital = province.historicalCapital === siteId
                           return (
                             <span key={siteId} className={styles.siteItem}>
                               {site ? site.name : siteId}
+                              {isCapital && (
+                                <span className={styles.capitalMark} data-testid="province-historical-capital"> ★ 历史首府</span>
+                              )}
                             </span>
                           )
                         })}

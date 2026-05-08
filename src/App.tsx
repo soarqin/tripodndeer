@@ -186,6 +186,13 @@ export function App(): React.JSX.Element {
         onRegionBrowser={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'region-browser' ? null : 'region-browser')}
         onCharacterBrowser={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'character-browser' ? null : 'character-browser')}
         onBackToMenu={() => {
+          if (typeof window !== 'undefined' && import.meta.env.DEV) {
+            const params = new URLSearchParams(window.location.search)
+            if (params.get('skipConfirm') === '1') {
+              useGameStore.getState().resetToBootPending()
+              return
+            }
+          }
           useGameStore.getState().openModal({
             title: '返回主菜单',
             content: '未保存的进度将丢失，确认返回？',

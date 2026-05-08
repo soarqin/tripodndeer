@@ -109,3 +109,17 @@
   border-radius: 3px;
   font-size: 0.85rem;
 }
+
+.notes {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #aaa;
+  font-style: italic;
+  margin-bottom: 6px;
+}
+
+.capitalMark {
+  color: #d4af37;
+  font-weight: bold;
+  margin-left: 4px;
+}

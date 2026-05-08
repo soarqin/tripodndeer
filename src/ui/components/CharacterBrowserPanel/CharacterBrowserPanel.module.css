@@ -114,6 +114,11 @@
   font-style: italic;
 }
 
+.birthplace {
+  font-size: 12px;
+  color: var(--text-secondary, #aaa);
+}
+
 .notes {
   font-size: 12px;
   line-height: 1.4;

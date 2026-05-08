@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useGameStore } from '~/ui/store/game-store'
 import { Portrait } from '~/ui/components/Portrait'
-import type { General, CharacterTemplate } from '~/shared/types'
+import type { General, CharacterTemplate, Site, SiteId } from '~/shared/types'
 import styles from './CharacterBrowserPanel.module.css'
 
 type Tab = 'alive' | 'history'
@@ -65,6 +65,7 @@ export function CharacterBrowserPanel() {
                   key={t.id}
                   template={t}
                   realmName={world.realms.get(t.realmId)?.displayName ?? '在野'}
+                  sites={world.sites}
                   isExpanded={selectedId === t.id}
                   onClick={() => handleCardClick(t.id)}
                 />
@@ -104,8 +105,10 @@ function CharacterCard({ character, realmName, isExpanded, onClick }: { characte
   )
 }
 
-function TemplateCard({ template, realmName, isExpanded, onClick }: { template: CharacterTemplate, realmName: string, isExpanded: boolean, onClick: () => void }) {
+function TemplateCard({ template, realmName, sites, isExpanded, onClick }: { template: CharacterTemplate, realmName: string, sites: ReadonlyMap<SiteId, Site>, isExpanded: boolean, onClick: () => void }) {
   const name = template.familyName + template.givenName
+  const birthplaceSite = sites.get(template.birthplace)
+  const birthplaceLabel = birthplaceSite ? birthplaceSite.name : template.birthplace
   return (
     <div data-testid={`character-card-${template.id}`} className={styles.card} onClick={onClick}>
       <div className={styles.cardHeader}>
@@ -127,8 +130,11 @@ function TemplateCard({ template, realmName, isExpanded, onClick }: { template: 
             <span>学: {template.attributes.xue}</span>
             <span>魄: {template.attributes.po}</span>
           </div>
+          <div className={styles.birthplace} data-testid="character-birthplace">
+            出生地: {birthplaceLabel}
+          </div>
           {template.aliases && template.aliases.length > 0 && (
-            <div className={styles.aliases}>别名: {template.aliases.join(', ')}</div>
+            <div className={styles.aliases} data-testid="character-aliases">别名: {template.aliases.join(', ')}</div>
           )}
           <div className={styles.notes}>{template.historicalNotes}</div>
         </div>

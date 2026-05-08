@@ -12,6 +12,7 @@ describe('CharacterBrowserPanel', () => {
         generals: new Map(),
         characterTemplates: new Map(),
         realms: new Map(),
+        sites: new Map(),
       } as unknown as World,
     })
   })
@@ -50,6 +51,7 @@ describe('CharacterBrowserPanel', () => {
               realmId: 'realm_qin',
               birthYearBC: 332,
               deathYearBC: 257,
+              birthplace: 'site_xianyang',
               specialty: 'military',
               attributes: { wu: 95, zheng: 50, jiao: 40, mou: 80, xue: 60, po: 90 },
               historicalNotes: 'Famous general of Qin.',
@@ -59,6 +61,9 @@ describe('CharacterBrowserPanel', () => {
         ]),
         realms: new Map([
           ['realm_qin', { id: 'realm_qin', displayName: 'Qin' }],
+        ]),
+        sites: new Map([
+          ['site_xianyang', { id: 'site_xianyang', name: '咸阳' }],
         ]),
       } as unknown as World,
     })
@@ -97,5 +102,7 @@ describe('CharacterBrowserPanel', () => {
     expect(detail.textContent).toContain('武: 95')
     expect(detail.textContent).toContain('Wu An Jun')
     expect(detail.textContent).toContain('Famous general of Qin.')
+    expect(detail.textContent).toContain('出生地')
+    expect(detail.textContent).toContain('咸阳')
   })
 })

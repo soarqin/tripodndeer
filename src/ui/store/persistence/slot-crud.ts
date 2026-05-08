@@ -62,3 +62,9 @@ export async function deleteSlot(slotId: SlotId): Promise<void> {
   const db = await getDb()
   await db.delete('saves', slotId)
 }
+
+export async function getMetadata(slotId: SlotId): Promise<SaveMetadata | null> {
+  const db = await getDb()
+  const record = await db.get('saves', slotId)
+  return record?.metadata ?? null
+}
