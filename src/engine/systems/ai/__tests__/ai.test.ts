@@ -1,3 +1,8 @@
+// M8.1 three-layer AI model: Strategic (yearly) / Operational (monthly) / Tactical (per-tick)
+// aiPlanStep is @deprecated; tests below preserve its monolithic-monthly behavior for
+// backward compatibility. New per-layer cadence assertions live in the
+// 'three-layer cadence (M8.1)' describe block and target aiStrategicStep,
+// aiOperationalStep, and aiTacticalStep directly.
 import { describe, expect, it } from 'vitest'
 import type { Army, GameEvent, MapEdge, Realm, RNGState, Site, WarState, World } from '~/shared/types'
 import { createInitialRng } from '~/engine/random'
@@ -5,6 +10,9 @@ import { warKey } from '~/engine/wars'
 import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
 import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import { aiPlanStep } from '../index'
+import { aiStrategicStep } from '../strategic'
+import { aiOperationalStep } from '../operational'
+import { aiTacticalStep } from '../tactical-step'
 
 function makeWarState(): WarState {
   return {
@@ -113,7 +121,58 @@ function baseWorld(overrides: Partial<World> = {}): World {
   })
 }
 
-describe('aiPlanStep cadence and realm eligibility', () => {
+describe('three-layer cadence (M8.1)', () => {
+  it('aiStrategicStep fires only on yearly trigger (spring/month=1/xun=shang)', () => {
+    const yearlyWorld = baseWorld({
+      date: { yearBC: 300, season: 'spring', month: 1, xun: 'shang' },
+    })
+    const offYearWorld = baseWorld({
+      date: { yearBC: 300, season: 'summer', month: 1, xun: 'shang' },
+    })
+
+    const yearlyResult = aiStrategicStep(yearlyWorld, createInitialRng(1))
+    const offYearResult = aiStrategicStep(offYearWorld, createInitialRng(1))
+
+    expect(yearlyResult.events.length).toBeGreaterThan(0)
+    expect(offYearResult.events).toEqual([])
+    expect(offYearResult.world).toBe(offYearWorld)
+  })
+
+  it('aiOperationalStep fires monthly (xun=shang) and is no-op otherwise', () => {
+    const monthStartWorld = baseWorld({
+      date: { yearBC: 300, season: 'spring', month: 2, xun: 'shang' },
+    })
+    const midMonthWorld = baseWorld({
+      date: { yearBC: 300, season: 'spring', month: 2, xun: 'zhong' },
+    })
+
+    const monthStart = aiOperationalStep(monthStartWorld, createInitialRng(1))
+    const midMonth = aiOperationalStep(midMonthWorld, createInitialRng(1))
+
+    expect(monthStart.world).not.toBe(monthStartWorld)
+    expect(midMonth.events).toEqual([])
+    expect(midMonth.world).toBe(midMonthWorld)
+  })
+
+  it('aiTacticalStep runs every tick regardless of date', () => {
+    const tickA = baseWorld({
+      date: { yearBC: 300, season: 'spring', month: 1, xun: 'zhong' },
+      tick: 1,
+    })
+    const tickB = baseWorld({
+      date: { yearBC: 300, season: 'autumn', month: 2, xun: 'xia' },
+      tick: 17,
+    })
+
+    const resultA = aiTacticalStep(tickA, createInitialRng(1))
+    const resultB = aiTacticalStep(tickB, createInitialRng(1))
+
+    expect(resultA.events).toBeDefined()
+    expect(resultB.events).toBeDefined()
+  })
+})
+
+describe('aiPlanStep cadence and realm eligibility (deprecated, M8 monolith)', () => {
   it('does nothing off monthly ticks', () => {
     const world = baseWorld({ tick: 1 })
     const rng = createInitialRng(1)
