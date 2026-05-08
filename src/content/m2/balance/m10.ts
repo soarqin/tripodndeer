@@ -7,6 +7,8 @@ const M10_PERSONALITY_WEIGHTS = M5_PERSONALITY_WEIGHTS as Record<
   Record<string, number>
 >
 
+export const M10_AUTOSAVE_INTERVAL = 100
+
 export interface ArchetypeTooltipEntry {
   name: string
   tagline: string

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { M10_ARCHETYPE_TOOLTIPS, M5_PERSONALITY_WEIGHTS } from '~/content/m2/balance'
+import { M10_ARCHETYPE_TOOLTIPS, M10_AUTOSAVE_INTERVAL, M5_PERSONALITY_WEIGHTS } from '~/content/m2/balance'
 import type { PersonalityArchetype } from '~/shared/types'
 
 const ARCHETYPES: PersonalityArchetype[] = [
@@ -37,5 +37,11 @@ describe('M10 archetype tooltips', () => {
       expect(M10_ARCHETYPE_TOOLTIPS[archetype].tagline).toBe(EXPECTED_LABELS[archetype].tagline)
       expect(M10_ARCHETYPE_TOOLTIPS[archetype].multipliers).toEqual(M5_PERSONALITY_WEIGHTS[archetype])
     }
+  })
+})
+
+describe('M10 autosave', () => {
+  it('has M10_AUTOSAVE_INTERVAL = 100', () => {
+    expect(M10_AUTOSAVE_INTERVAL).toBe(100)
   })
 })

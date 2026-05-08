@@ -37,6 +37,7 @@ export const TopBar = React.memo(function TopBar() {
   const date = useWorldDate()
   const tick = useWorldTick()
   const speed = useSpeed()
+  const openSaveLoadModal = useGameStore(state => state.openSaveLoadModal)
   const totalManpower = armies.reduce((sum, army) => sum + army.manpower, 0)
   const realmLabel = realm ? `${realm.displayName} ${realm.fullTitle}` : '未知势力'
   
@@ -57,6 +58,20 @@ export const TopBar = React.memo(function TopBar() {
         <span data-testid="top-bar-tick-count">时步：{tick}</span>
       </div>
       <div className={styles.resourceGroup}>
+        <button 
+          className={styles.systemBtn} 
+          onClick={() => openSaveLoadModal('save')}
+          data-testid="topbar-save-btn"
+        >
+          存档
+        </button>
+        <button 
+          className={styles.systemBtn} 
+          onClick={() => openSaveLoadModal('load')}
+          data-testid="topbar-load-btn"
+        >
+          读档
+        </button>
         <span className={styles.resourceChip} data-testid="top-bar-treasury" title="国库">
           💰 {formatResource(realm?.economy?.treasury)}
         </span>

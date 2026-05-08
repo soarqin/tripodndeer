@@ -63,6 +63,7 @@ export interface UiActions {
   dismissToast: (id: string) => void
   appendEventLog: (entry: EventLogEntry) => void
   clearEventLog: () => void
+  openSaveLoadModal: (mode: 'save' | 'load') => void
 }
 
 export function enqueueModal(state: GameStore, modal: OpenModalPayload): void {
@@ -185,6 +186,17 @@ export function createUiSlice(set: StoreSet): UiActions {
     clearEventLog: () =>
       set((state) => {
         state.eventLog = []
+      }),
+    openSaveLoadModal: (mode) =>
+      set((state) => {
+        enqueueModal(state, {
+          title: mode === 'save' ? '存档' : '读档',
+          content: React.createElement(React.lazy(() => import('@/ui/components/SaveLoadModal/SaveLoadModal').then(m => ({ default: m.SaveLoadModal }))), { mode }),
+          actions: [],
+          dismissable: true,
+          priority: ModalPriority.GENERIC,
+          testId: 'save-load-modal',
+        })
       }),
   }
 }
