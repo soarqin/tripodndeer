@@ -31,6 +31,21 @@ export interface OpenModalPayload {
   readonly testId?: string
 }
 
+export interface Toast {
+  readonly id: string
+  readonly text: string
+  readonly createdAt: number
+  readonly durationMs: number
+}
+
+export interface EventLogEntry {
+  readonly id: string
+  readonly tick: number
+  readonly type: string
+  readonly text: string
+  readonly createdAt: number
+}
+
 export interface UiActions {
   openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) => void
   closeContextMenu: () => void
@@ -44,6 +59,10 @@ export interface UiActions {
   openModal: (modal: OpenModalPayload) => void
   closeModal: () => void
   clearModalQueue: () => void
+  enqueueToast: (text: string, durationMs?: number) => void
+  dismissToast: (id: string) => void
+  appendEventLog: (entry: EventLogEntry) => void
+  clearEventLog: () => void
 }
 
 export function enqueueModal(state: GameStore, modal: OpenModalPayload): void {
@@ -138,6 +157,34 @@ export function createUiSlice(set: StoreSet): UiActions {
     clearModalQueue: () =>
       set((state) => {
         clearQueuedModals(state)
+      }),
+    enqueueToast: (text, durationMs = 10000) =>
+      set((state) => {
+        const toast: Toast = {
+          id: Math.random().toString(36).substring(2, 9),
+          text,
+          createdAt: Date.now(),
+          durationMs,
+        }
+        state.toastQueue.push(toast)
+        if (state.toastQueue.length > 5) {
+          state.toastQueue.shift()
+        }
+      }),
+    dismissToast: (id) =>
+      set((state) => {
+        state.toastQueue = castDraft(state.toastQueue.filter((t) => t.id !== id))
+      }),
+    appendEventLog: (entry) =>
+      set((state) => {
+        state.eventLog.unshift(entry)
+        if (state.eventLog.length > 200) {
+          state.eventLog.pop()
+        }
+      }),
+    clearEventLog: () =>
+      set((state) => {
+        state.eventLog = []
       }),
   }
 }

@@ -11,7 +11,7 @@ import type {
   SpeedTier,
   World,
 } from '~/shared/types'
-import type { Modal } from './slices/ui-slice'
+import type { Modal, Toast, EventLogEntry } from './slices/ui-slice'
 import type { DiplomacyActionFeedback } from './slices/world-slice'
 
 export type BootStatus = 'pending' | 'ready'
@@ -30,6 +30,8 @@ export interface GameState {
   isPeacePanelOpen: boolean
   transientBanner: { text: string; createdAt: number } | null
   modalQueue: ReadonlyArray<Modal>
+  toastQueue: Toast[]
+  eventLog: EventLogEntry[]
   previousClockSpeed: SpeedTier
   bootStatus: BootStatus
 }
@@ -105,6 +107,8 @@ export function makeInitialState(): GameState {
     isPeacePanelOpen: false,
     transientBanner: null,
     modalQueue: [],
+    toastQueue: [],
+    eventLog: [],
     previousClockSpeed: '1x',
     bootStatus: 'pending',
   }
