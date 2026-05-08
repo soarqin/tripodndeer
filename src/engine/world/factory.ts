@@ -294,7 +294,7 @@ function buildInitialCounterIntelStates(
   return states
 }
 
-function getDefaultPhases(): readonly TickPhase[] {
+export function getDefaultPhases(): readonly TickPhase[] {
   return [
     aiPlanStep,
     orderApplyStep,

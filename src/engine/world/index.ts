@@ -6,3 +6,4 @@ export {
   loadM1Data,
   loadM9Data,
 } from './factory'
+export { saveDtoToWorld, worldToSaveDTO } from './save-dto'
