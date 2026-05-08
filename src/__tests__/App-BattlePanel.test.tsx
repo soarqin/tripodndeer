@@ -20,6 +20,7 @@ const fakeResolution: BattleResolution = {
 describe('App - BattlePanel Integration', () => {
   beforeEach(() => {
     useGameStore.getState().reset()
+    useGameStore.setState({ bootStatus: 'ready' })
   })
 
   it('renders BattlePanel when lastBattleResolution is set, and closes it on click', () => {

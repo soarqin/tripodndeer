@@ -1,6 +1,12 @@
 import { castDraft } from 'immer'
 import { setSpeed as engineSetSpeed } from '@/engine/clock'
 import {
+  createWorldFromM1Data,
+  createWorldFromM9Data,
+  loadM1Data,
+  loadM9Data,
+} from '@/engine/world'
+import {
   applyDiplomacyAction,
   relationKey,
   validateDiplomacyAction,
@@ -35,8 +41,10 @@ import type {
   World,
 } from '~/shared/types'
 import { bannerTextForCriticalEvent, type CriticalEventType } from '../critical-events'
-import type { StoreSet } from '../game-store'
+import type { GameStore, StoreSet } from '../game-store'
 import { closeQueuedModal } from './ui-slice'
+
+export type ScenarioId = 'm1' | 'm9'
 
 export interface DiplomacyActionFeedback {
   readonly id: string
@@ -89,6 +97,9 @@ export interface WorldActions {
   applyReformChoice: (realmId: RealmId, reformId: ReformId, choiceId: string) => void
   applyEventChainChoice: (chainId: EventChainId, choiceId: string) => void
   pauseOnCriticalEvent: (eventType: CriticalEventType, payload?: Record<string, unknown>) => void
+  loadWorld: (scenarioId: ScenarioId) => Promise<void>
+  replaceWorldFromSave: (world: World) => void
+  resetToBootPending: () => void
 }
 
 function createDiplomacyActionFeedback(
@@ -222,6 +233,63 @@ function createDiplomacyAction(set: StoreSet): Pick<WorldActions, 'submitPlayerD
   }
 }
 
+function applyReadyWorld(state: GameStore, world: World, playerRealmId: RealmId): void {
+  state.world = castDraft(world)
+  state.playerRealmId = playerRealmId
+  state.bootStatus = 'ready'
+  state.selectedArmyId = null
+  state.lastBattleResolution = null
+  state.contextMenu = null
+  state.activePanel = null
+  state.diplomacyTargetRealmId = null
+  state.isPeacePanelOpen = false
+  state.transientBanner = null
+  state.events = castDraft([])
+  state.diplomacyFeedback = castDraft([])
+  state.modalQueue = castDraft([])
+}
+
+function createBootActions(set: StoreSet): Pick<WorldActions, 'loadWorld' | 'replaceWorldFromSave' | 'resetToBootPending'> {
+  return {
+    loadWorld: async (scenarioId) => {
+      if (scenarioId === 'm1') {
+        const data = loadM1Data()
+        const playerRealmId: RealmId = 'realm_qin'
+        const world = createWorldFromM1Data(data, 42, playerRealmId)
+        set((state) => {
+          applyReadyWorld(state, world, playerRealmId)
+        })
+        return
+      }
+
+      const data = await loadM9Data()
+      const playerRealmId: RealmId = 'realm_qin'
+      const world = createWorldFromM9Data(data, 42, playerRealmId)
+      set((state) => {
+        applyReadyWorld(state, world, playerRealmId)
+      })
+    },
+    replaceWorldFromSave: (world) =>
+      set((state) => {
+        applyReadyWorld(state, world, world.playerRealmId)
+      }),
+    resetToBootPending: () =>
+      set((state) => {
+        state.bootStatus = 'pending'
+        state.selectedArmyId = null
+        state.lastBattleResolution = null
+        state.contextMenu = null
+        state.activePanel = null
+        state.diplomacyTargetRealmId = null
+        state.isPeacePanelOpen = false
+        state.transientBanner = null
+        state.events = castDraft([])
+        state.diplomacyFeedback = castDraft([])
+        state.modalQueue = castDraft([])
+      }),
+  }
+}
+
 function createDecisionActions(set: StoreSet): Pick<WorldActions, 'applyDisasterChoice' | 'applyReformChoice' | 'applyEventChainChoice' | 'pauseOnCriticalEvent'> {
   return {
     applyDisasterChoice: (disasterId, choiceId) =>
@@ -287,5 +355,6 @@ export function createWorldSlice(set: StoreSet): WorldActions {
     ...createOrderActions(set),
     ...createDiplomacyAction(set),
     ...createDecisionActions(set),
+    ...createBootActions(set),
   }
 }

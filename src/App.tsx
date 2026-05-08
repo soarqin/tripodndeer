@@ -39,6 +39,7 @@ const ACTION_NAMES: Record<string, string> = {
 export function App(): React.JSX.Element {
   useRafDriver()
   const victorious = useVictory()
+  const bootStatus = useGameStore((state) => state.bootStatus)
   const modalQueue = useGameStore((state) => state.modalQueue)
   const modal = modalQueue[0]
   const queuedModalCount = Math.max(0, modalQueue.length - 1)
@@ -111,6 +112,14 @@ export function App(): React.JSX.Element {
       }
     }
   }, [openModal, closeModal])
+
+  if (bootStatus === 'pending') {
+    return (
+      <div className={styles.app} data-testid="scenario-picker-placeholder">
+        Loading...
+      </div>
+    )
+  }
 
   return (
     <div className={styles.app}>

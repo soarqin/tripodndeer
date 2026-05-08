@@ -14,6 +14,8 @@ import type {
 import type { Modal } from './slices/ui-slice'
 import type { DiplomacyActionFeedback } from './slices/world-slice'
 
+export type BootStatus = 'pending' | 'ready'
+
 export interface GameState {
   world: World
   clockState: ClockState
@@ -29,6 +31,7 @@ export interface GameState {
   transientBanner: { text: string; createdAt: number } | null
   modalQueue: ReadonlyArray<Modal>
   previousClockSpeed: SpeedTier
+  bootStatus: BootStatus
 }
 
 export function makeInitialState(): GameState {
@@ -103,5 +106,6 @@ export function makeInitialState(): GameState {
     transientBanner: null,
     modalQueue: [],
     previousClockSpeed: '1x',
+    bootStatus: 'pending',
   }
 }

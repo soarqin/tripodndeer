@@ -14,6 +14,7 @@ export { ModalPriority } from './slices/ui-slice'
 export type { Modal, OpenModalPayload } from './slices/ui-slice'
 export type {
   DiplomacyActionFeedback,
+  ScenarioId,
   SubmitPlayerDiplomacyActionPayload,
   SubmitPlayerDiplomacyActionResult,
   ActivatePlayerEdictPayload,
@@ -58,5 +59,12 @@ if (typeof window !== 'undefined' && import.meta.env.DEV) {
   ;(window as Window & { __game?: unknown }).__game = {
     store: useGameStore,
     world: () => useGameStore.getState().world,
+  }
+
+  // DEV-only `?forceScenario=m1|m9` skips the ScenarioPicker and immediately loads the named scenario.
+  const params = new URLSearchParams(window.location.search)
+  const forceScenario = params.get('forceScenario')
+  if (forceScenario === 'm1' || forceScenario === 'm9') {
+    void useGameStore.getState().loadWorld(forceScenario)
   }
 }

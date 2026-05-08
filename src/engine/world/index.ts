@@ -1,1 +1,8 @@
-export { createInitialWorld, createWorldFromM1Data, loadM0Data, loadM1Data } from './factory'
+export {
+  createInitialWorld,
+  createWorldFromM1Data,
+  createWorldFromM9Data,
+  loadM0Data,
+  loadM1Data,
+  loadM9Data,
+} from './factory'
