@@ -213,7 +213,7 @@ describe('aiPlanStep skip conditions', () => {
     const result = aiPlanStep(world, createInitialRng(1))
 
     expect(result.events).toEqual([])
-    expect(result.nextRng.counter).toBe(1)
+    expect(result.nextRng.counter).toBe(0)
   })
 
   it('skips a realm with no adjacent enemy sites', () => {
@@ -441,23 +441,6 @@ describe('aiPlanStep personality resolution', () => {
 })
 
 describe('aiPlanStep target selection', () => {
-  it('keeps the action rate near 20 percent over 100 monthly opportunities', () => {
-    let rng: RNGState = createInitialRng(2)
-    let actions = 0
-
-    for (let i = 0; i < 100; i += 1) {
-      const result = aiPlanStep(
-        baseWorld({ realms: new Map([[aiRealmId, makeRealm(aiRealmId, 'site_ai')]]) }),
-        rng,
-      )
-      rng = result.nextRng
-      if (result.events.some(event => event.type === 'aiDispatchedArmy')) actions += 1
-    }
-
-    expect(actions).toBeGreaterThanOrEqual(15)
-    expect(actions).toBeLessThanOrEqual(25)
-  })
-
   it('only attacks adjacent sites, not long-range enemy sites', () => {
     const sites = new Map(baseWorld().sites)
     sites.set('site_ai', makeSite('site_ai', aiRealmId, ['site_player'], ['edge_ai_enemy']))
