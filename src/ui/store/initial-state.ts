@@ -25,7 +25,7 @@ export interface GameState {
   selectedArmyId: ArmyId | null
   lastBattleResolution: BattleResolution | null
   contextMenu: { siteId: SiteId; x: number; y: number } | null
-  activePanel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | 'espionage' | null
+  activePanel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | 'espionage' | 'province-browser' | 'region-browser' | null
   diplomacyTargetRealmId: RealmId | null
   isPeacePanelOpen: boolean
   transientBanner: { text: string; createdAt: number } | null

@@ -49,7 +49,7 @@ export interface EventLogEntry {
 export interface UiActions {
   openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) => void
   closeContextMenu: () => void
-  setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | 'espionage' | null) => void
+  setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | 'espionage' | 'province-browser' | 'region-browser' | null) => void
   openDiplomacyPanel: (realmId: RealmId) => void
   closeDiplomacyPanel: () => void
   openPeacePanel: () => void

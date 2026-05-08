@@ -1,0 +1,111 @@
+.panel {
+  position: absolute;
+  top: 60px;
+  left: 20px;
+  width: 350px;
+  max-height: calc(100vh - 150px);
+  background-color: rgba(20, 20, 20, 0.95);
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #eee;
+  font-family: sans-serif;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  padding: 10px 15px;
+  border-bottom: 1px solid #444;
+  background-color: #2a2a2a;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.content {
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.emptyState {
+  color: #aaa;
+  text-align: center;
+  padding: 20px 0;
+  font-style: italic;
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.card:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+.name {
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.tags {
+  display: flex;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+
+.tag {
+  background-color: #333;
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: #ccc;
+}
+
+.detail {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #444;
+  font-size: 0.9rem;
+  color: #bbb;
+}
+
+.siteList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.siteItem {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.85rem;
+}

@@ -15,6 +15,8 @@ import { CharacterPanel } from '@/ui/components/CharacterPanel'
 import { BattlePanel } from '@/ui/components/BattlePanel'
 import { CulturePanel } from '@/ui/components/CulturePanel'
 import { EspionagePanel } from '@/ui/components/EspionagePanel'
+import { ProvinceBrowserPanel } from '@/ui/components/ProvinceBrowserPanel'
+import { RegionBrowserPanel } from '@/ui/components/RegionBrowserPanel'
 import { Modal } from '@/ui/components/Modal'
 import { SuccessionModal } from '@/ui/components/SuccessionModal'
 import { DisasterReliefModal } from '@/ui/components/DisasterReliefModal'
@@ -150,6 +152,8 @@ export function App(): React.JSX.Element {
         <DiplomacyPanel />
         {activePanel === 'culture' && <CulturePanel />}
         {activePanel === 'espionage' && <EspionagePanel />}
+        {activePanel === 'province-browser' && <ProvinceBrowserPanel />}
+        {activePanel === 'region-browser' && <RegionBrowserPanel />}
         {isPeacePanelOpen && diplomacyTargetRealmId && (
           <PeacePanel
             targetRealmId={diplomacyTargetRealmId}
@@ -176,6 +180,8 @@ export function App(): React.JSX.Element {
         onWaijiao={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'waijiao' ? null : 'waijiao')}
         onWenhua={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'culture' ? null : 'culture')}
         onDiebao={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'espionage' ? null : 'espionage')}
+        onProvinceBrowser={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'province-browser' ? null : 'province-browser')}
+        onRegionBrowser={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'region-browser' ? null : 'region-browser')}
       />
       <TimeControlBar />
       <DevAIPanel />

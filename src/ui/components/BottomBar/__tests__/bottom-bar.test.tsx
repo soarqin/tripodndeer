@@ -3,17 +3,17 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { BottomBar } from '../BottomBar'
 
 describe('BottomBar', () => {
-  it('renders 8 buttons', () => {
+  it('renders 10 buttons', () => {
     render(<BottomBar />)
     const buttons = screen.getAllByRole('button')
-    expect(buttons).toHaveLength(8)
+    expect(buttons).toHaveLength(10)
   })
 
-  it('7 buttons are enabled (not disabled)', () => {
+  it('9 buttons are enabled (not disabled)', () => {
     render(<BottomBar />)
     const buttons = screen.getAllByRole('button')
     const enabledButtons = buttons.filter(btn => !(btn as HTMLButtonElement).disabled)
-    expect(enabledButtons).toHaveLength(7)
+    expect(enabledButtons).toHaveLength(9)
     expect(enabledButtons[0]?.textContent).toBe('王宫')
     expect(enabledButtons[1]?.textContent).toBe('军事')
     expect(enabledButtons[2]?.textContent).toBe('外交')
@@ -21,6 +21,8 @@ describe('BottomBar', () => {
     expect(enabledButtons[4]?.textContent).toBe('文化')
     expect(enabledButtons[5]?.textContent).toBe('谍报')
     expect(enabledButtons[6]?.textContent).toBe('人才')
+    expect(enabledButtons[7]?.textContent).toBe('州郡')
+    expect(enabledButtons[8]?.textContent).toBe('地区')
   })
 
   it('disabled buttons have aria-disabled="true"', () => {
