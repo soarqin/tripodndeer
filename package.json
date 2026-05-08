@@ -20,6 +20,7 @@
     "generate:m1-map": "tsx tools/generate-m1-map.ts"
   },
   "dependencies": {
+    "idb": "^8.0.3",
     "immer": "^10",
     "react": "^18.3",
     "react-dom": "^18.3",
@@ -41,6 +42,7 @@
     "eslint-config-prettier": "^9",
     "eslint-plugin-react": "^7",
     "eslint-plugin-react-hooks": "^4",
+    "fake-indexeddb": "^6.2.5",
     "jsdom": "^24",
     "prettier": "^3",
     "tsx": "^4",
