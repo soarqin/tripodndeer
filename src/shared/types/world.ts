@@ -1,3 +1,4 @@
+import type { AIState } from './ai-state'
 import type {
   RealmId,
   SiteId,
@@ -231,6 +232,7 @@ export interface World {
   regions: ReadonlyMap<RegionId, Region>
   characterTemplates: ReadonlyMap<CharId, CharacterTemplate>
   localization: ReadonlyMap<string, string>
+  aiState: ReadonlyMap<RealmId, AIState>
   playerRealmId: RealmId
   rngState: RNGState // PRNG 状态在 World，不在 module 闭包
   phases: readonly TickPhase[] // Tick 阶段数组（M0 仅 1 个，但形状必须是数组）

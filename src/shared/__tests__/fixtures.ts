@@ -108,6 +108,7 @@ export function makeEmptyWorld(overrides: MakeEmptyWorldOverrides = {}): World {
     regions: new Map(),
     characterTemplates: new Map(),
     localization: new Map(),
+    aiState: new Map(),
     playerRealmId: 'realm_qin',
     rngState: { ...DEFAULT_RNG },
     phases: [],

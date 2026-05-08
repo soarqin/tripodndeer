@@ -53,7 +53,7 @@ export function worldToSaveDTO(world: World, scenarioId: 'm1' | 'm9' = 'm1'): Sa
       playerRealmId: world.playerRealmId,
       rngState: world.rngState,
       pendingOrders: [...world.pendingOrders],
-      aiState: [],
+      aiState: [...world.aiState.entries()],
     },
   }
 }
@@ -122,6 +122,7 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
       regions: new Map(sw.regions),
       characterTemplates: new Map(sw.characterTemplates),
       localization: new Map(sw.localization),
+      aiState: new Map(sw.aiState ?? []),
       playerRealmId: sw.playerRealmId,
       rngState: sw.rngState,
       phases: getDefaultPhases(),

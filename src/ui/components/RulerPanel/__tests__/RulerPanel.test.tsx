@@ -38,6 +38,7 @@ const mockState = {
     regions: new Map(),
     characterTemplates: new Map(),
     localization: new Map(),
+    aiState: new Map(),
     playerRealmId: 'realm_qin',
     rngState: { seed: 42, counter: 0 },
     phases: [],
