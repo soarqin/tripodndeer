@@ -3,6 +3,7 @@ import styles from './BottomBar.module.css'
 interface BottomBarProps {
   onWanggong?: () => void
   onJunshi?: () => void
+  onShi?: () => void
   onNeizheng?: () => void
   onRencai?: () => void
   onWaijiao?: () => void
@@ -19,6 +20,7 @@ const BUTTONS = [
   { id: 'junshi',   label: '军事', enabled: true },
   { id: 'waijiao',  label: '外交', enabled: true },
   { id: 'neizheng', label: '内政', enabled: true },
+  { id: 'codex-toggle', label: '史', enabled: true },
   { id: 'jingji',   label: '经济', enabled: false },
   { id: 'wenhua',   label: '文化', enabled: true },
   { id: 'diebao',   label: '谍报', enabled: true },
@@ -28,7 +30,7 @@ const BUTTONS = [
   { id: 'character-browser', label: '名册', enabled: true },
 ]
 
-export function BottomBar({ onWanggong, onJunshi, onNeizheng, onRencai, onWaijiao, onWenhua, onDiebao, onProvinceBrowser, onRegionBrowser, onCharacterBrowser, onBackToMenu }: BottomBarProps) {
+export function BottomBar({ onWanggong, onJunshi, onShi, onNeizheng, onRencai, onWaijiao, onWenhua, onDiebao, onProvinceBrowser, onRegionBrowser, onCharacterBrowser, onBackToMenu }: BottomBarProps) {
   return (
     <nav className={styles.bar} data-testid="bottom-bar">
       {BUTTONS.map(({ id, label, enabled }) => (
@@ -38,7 +40,7 @@ export function BottomBar({ onWanggong, onJunshi, onNeizheng, onRencai, onWaijia
           className={enabled ? styles.btnEnabled : styles.btnDisabled}
           disabled={!enabled}
           aria-disabled={!enabled}
-          onClick={enabled ? (id === 'wanggong' ? onWanggong : id === 'junshi' ? onJunshi : id === 'neizheng' ? onNeizheng : id === 'rencai' ? onRencai : id === 'waijiao' ? onWaijiao : id === 'wenhua' ? onWenhua : id === 'diebao' ? onDiebao : id === 'province-browser' ? onProvinceBrowser : id === 'region-browser' ? onRegionBrowser : id === 'character-browser' ? onCharacterBrowser : undefined) : undefined}
+          onClick={enabled ? (id === 'wanggong' ? onWanggong : id === 'junshi' ? onJunshi : id === 'codex-toggle' ? onShi : id === 'neizheng' ? onNeizheng : id === 'rencai' ? onRencai : id === 'waijiao' ? onWaijiao : id === 'wenhua' ? onWenhua : id === 'diebao' ? onDiebao : id === 'province-browser' ? onProvinceBrowser : id === 'region-browser' ? onRegionBrowser : id === 'character-browser' ? onCharacterBrowser : undefined) : undefined}
         >
           {label}
         </button>

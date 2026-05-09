@@ -3,28 +3,29 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { BottomBar } from '../BottomBar'
 
 describe('BottomBar', () => {
-  it('renders 12 buttons', () => {
+  it('renders 13 buttons', () => {
     render(<BottomBar />)
     const buttons = screen.getAllByRole('button')
-    expect(buttons).toHaveLength(12)
+    expect(buttons).toHaveLength(13)
   })
 
-  it('11 buttons are enabled (not disabled)', () => {
+  it('12 buttons are enabled (not disabled)', () => {
     render(<BottomBar />)
     const buttons = screen.getAllByRole('button')
     const enabledButtons = buttons.filter(btn => !(btn as HTMLButtonElement).disabled)
-    expect(enabledButtons).toHaveLength(11)
+    expect(enabledButtons).toHaveLength(12)
     expect(enabledButtons[0]?.textContent).toBe('王宫')
     expect(enabledButtons[1]?.textContent).toBe('军事')
     expect(enabledButtons[2]?.textContent).toBe('外交')
     expect(enabledButtons[3]?.textContent).toBe('内政')
-    expect(enabledButtons[4]?.textContent).toBe('文化')
-    expect(enabledButtons[5]?.textContent).toBe('谍报')
-    expect(enabledButtons[6]?.textContent).toBe('人才')
-    expect(enabledButtons[7]?.textContent).toBe('州郡')
-    expect(enabledButtons[8]?.textContent).toBe('地区')
-    expect(enabledButtons[9]?.textContent).toBe('名册')
-    expect(enabledButtons[10]?.textContent).toBe('返回主菜单')
+    expect(enabledButtons[4]?.textContent).toBe('史')
+    expect(enabledButtons[5]?.textContent).toBe('文化')
+    expect(enabledButtons[6]?.textContent).toBe('谍报')
+    expect(enabledButtons[7]?.textContent).toBe('人才')
+    expect(enabledButtons[8]?.textContent).toBe('州郡')
+    expect(enabledButtons[9]?.textContent).toBe('地区')
+    expect(enabledButtons[10]?.textContent).toBe('名册')
+    expect(enabledButtons[11]?.textContent).toBe('返回主菜单')
   })
 
   it('disabled buttons have aria-disabled="true"', () => {
@@ -50,6 +51,14 @@ describe('BottomBar', () => {
     const junshiBtn = screen.getByTestId('bottom-bar-junshi')
     fireEvent.click(junshiBtn)
     expect(onJunshi).toHaveBeenCalledTimes(1)
+  })
+
+  it('clicking 史 calls the onShi callback', () => {
+    const onShi = vi.fn()
+    render(<BottomBar onShi={onShi} />)
+    const shiBtn = screen.getByTestId('bottom-bar-codex-toggle')
+    fireEvent.click(shiBtn)
+    expect(onShi).toHaveBeenCalledTimes(1)
   })
 
   it('clicking 返回主菜单 calls the onBackToMenu callback', () => {
