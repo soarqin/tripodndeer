@@ -1,10 +1,13 @@
 import React from 'react'
-import { render } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { fireEvent, render } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 import { renderMarkdown } from '../markdown-renderer'
 
-function renderMarkdownInFragment(source: string) {
-  return render(React.createElement(React.Fragment, null, renderMarkdown(source)))
+function renderMarkdownInFragment(
+  source: string,
+  props?: Parameters<typeof renderMarkdown>[1],
+) {
+  return render(React.createElement(React.Fragment, null, renderMarkdown(source, props)))
 }
 
 describe('renderMarkdown', () => {
@@ -100,5 +103,80 @@ describe('renderMarkdown', () => {
 
   it('returns an empty array for whitespace-only input', () => {
     expect(renderMarkdown('  \n\t')).toEqual([])
+  })
+
+  it('renders codex links as clickable anchors when entry exists', () => {
+    const onLinkClick = vi.fn()
+    const { container } = renderMarkdownInFragment('[条目](codex://entry-1)', {
+      entryIds: new Set(['entry-1']),
+      onLinkClick,
+    })
+
+    const link = container.querySelector('[data-codex-link="entry-1"]')
+    expect(link?.textContent).toBe('条目')
+    expect(link?.tagName).toBe('A')
+
+    if (link) fireEvent.click(link)
+    expect(onLinkClick).toHaveBeenCalledWith('entry-1')
+  })
+
+  it('renders unknown codex links as broken spans', () => {
+    const { container } = renderMarkdownInFragment('[条目](codex://missing)')
+    const broken = container.querySelector('[data-codex-broken="true"]')
+    expect(broken?.tagName).toBe('SPAN')
+    expect(broken?.getAttribute('title')).toBe('该条目不存在')
+    expect(broken?.textContent).toBe('条目')
+  })
+
+  it('renders external links literally', () => {
+    const { container } = renderMarkdownInFragment('[外链](https://example.com)')
+    expect(container.querySelector('a')).toBeNull()
+    expect(container.querySelector('p')?.textContent).toBe('[外链](https://example.com)')
+  })
+
+  it('renders empty link urls literally', () => {
+    const { container } = renderMarkdownInFragment('[空]()')
+    expect(container.querySelector('a')).toBeNull()
+    expect(container.querySelector('p')?.textContent).toBe('[空]()')
+  })
+
+  it('renders malformed bracket text literally', () => {
+    const { container } = renderMarkdownInFragment('[bracket(no-paren)')
+    expect(container.querySelector('p')?.textContent).toBe('[bracket(no-paren)')
+    expect(container.querySelector('a')).toBeNull()
+  })
+
+  it('renders incomplete h3 markers as paragraph text', () => {
+    const { container } = renderMarkdownInFragment('###incomplete')
+    expect(container.querySelector('h3')).toBeNull()
+    expect(container.querySelector('p')?.textContent).toBe('###incomplete')
+  })
+
+  it('renders single asterisks literally', () => {
+    const { container } = renderMarkdownInFragment('*single')
+    expect(container.querySelector('ul')).toBeNull()
+    expect(container.querySelector('p')?.textContent).toBe('*single')
+  })
+
+  it('treats leading newline content as a paragraph', () => {
+    const { container } = renderMarkdownInFragment('\nleading-newline')
+    expect(container.querySelector('p')?.textContent).toBe('leading-newline')
+  })
+
+  it('renders img payloads as literal escaped text', () => {
+    const { container } = renderMarkdownInFragment('<img src=x onerror=alert(1)>')
+    expect(container.querySelector('img')).toBeNull()
+    expect(container.querySelector('p')?.textContent).toBe('<img src=x onerror=alert(1)>')
+  })
+
+  it('renders angle-bracket script payloads as literal text', () => {
+    const { container } = renderMarkdownInFragment('<script>alert(1)</script>')
+    expect(container.querySelector('script')).toBeNull()
+    expect(container.querySelector('p')?.textContent).toBe('<script>alert(1)</script>')
+  })
+
+  it('preserves entity text literally', () => {
+    const { container } = renderMarkdownInFragment('&lt;')
+    expect(container.querySelector('p')?.textContent).toBe('&lt;')
   })
 })
