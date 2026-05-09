@@ -49,6 +49,7 @@ import {
   M4_DEFAULT_SITE_POPULATION,
   M4_DEFAULT_TAX_RATE,
   M4_HOUSEHOLD_DIVISOR,
+  M5_PERSONALITY_DIMS_BASELINE,
   M7_COVERAGE_TIER_1,
 } from '~/content/m2/balance'
 import type {
@@ -66,6 +67,8 @@ import type {
   CounterIntelState,
   CoverageKey,
   CulturalTag,
+  DifficultyTier,
+  DiplomaticMemory,
   DisasterState,
   DiplomaticProposal,
   DiplomaticProposalId,
@@ -79,6 +82,7 @@ import type {
   ReformState,
   GovernorAssignment,
   ZhouInvestitureState,
+  MemoryKey,
   Province,
   ProvinceId,
   Region,
@@ -348,7 +352,7 @@ export async function loadM9Data(): Promise<M9Data> {
 }
 
 /** 构造初始 World（含 Zod 校验 + ownership 引用完整性 + polygon/adjacency 派发） */
-export function createInitialWorld(data: M0Data, seed: number): World {
+export function createInitialWorld(data: M0Data, seed: number, difficulty?: DifficultyTier): World {
   // Paranoid validation
   M0DataSchema.parse(data)
 
@@ -393,6 +397,8 @@ export function createInitialWorld(data: M0Data, seed: number): World {
     characterTemplates: new Map(),
     localization: new Map(),
     aiState: new Map(),
+    difficulty: difficulty ?? 'hero',
+    diplomaticMemory: new Map<MemoryKey, DiplomaticMemory>(),
     playerRealmId: data.realms[0]?.id ?? '',
     rngState: { seed, counter: 0 },
     phases: [],
@@ -404,6 +410,7 @@ export function createWorldFromM1Data(
   data: M1DataV6 | M1DataV7 | M1DataV8,
   seed: number,
   playerRealmId: RealmId,
+  difficulty?: DifficultyTier,
 ): World {
   if (data.schema_version === 8) {
     M1DataSchemaV8.parse(data)
@@ -487,7 +494,10 @@ export function createWorldFromM1Data(
 
   const rulers = new Map<RealmId, RulerState>()
   for (const ruler of data.rulers) {
-    rulers.set(ruler.realmId, ruler)
+    rulers.set(ruler.realmId, {
+      ...ruler,
+      personalityDims: { ...M5_PERSONALITY_DIMS_BASELINE[ruler.personality] },
+    })
   }
 
   const eventChainStates = new Map<EventChainId, EventChainState>()
@@ -559,6 +569,8 @@ export function createWorldFromM1Data(
     characterTemplates: new Map(),
     localization: new Map(),
     aiState: new Map(),
+    difficulty: difficulty ?? 'hero',
+    diplomaticMemory: new Map<MemoryKey, DiplomaticMemory>(),
     playerRealmId,
     rngState: { seed, counter: 0 },
     phases: getDefaultPhases(),
@@ -688,7 +700,12 @@ function deriveRegionProvinceIds(
   return map
 }
 
-export function createWorldFromM9Data(data: M9Data, seed: number, playerRealmId: RealmId): World {
+export function createWorldFromM9Data(
+  data: M9Data,
+  seed: number,
+  playerRealmId: RealmId,
+  difficulty?: DifficultyTier,
+): World {
   M9DataSchema.parse(data)
 
   const initialSitesByRealm = deriveInitialSitesByRealm(data.sites)
@@ -769,6 +786,8 @@ export function createWorldFromM9Data(data: M9Data, seed: number, playerRealmId:
     characterTemplates,
     localization: new Map<string, string>(),
     aiState: new Map(),
+    difficulty: difficulty ?? 'hero',
+    diplomaticMemory: new Map<MemoryKey, DiplomaticMemory>(),
     playerRealmId,
     rngState: { seed, counter: 0 },
     phases: getDefaultPhases(),
