@@ -331,13 +331,13 @@ describe('migrateScenarioV1ToV3 — realms', () => {
 })
 
 describe('migrateScenarioV1ToV3 — rulers', () => {
-  it('maps aiPersonality=aggressive to ruler.personality=conqueror', () => {
+  it('maps archetype=conqueror to ruler.personality=conqueror', () => {
     const data = makeV2({
       realms: [
         {
           ...scenarioV2.realms[0]!,
           rulerId: 'gen_a',
-          aiPersonality: 'aggressive',
+          archetype: 'conqueror',
         },
       ],
       generals: [
@@ -359,13 +359,13 @@ describe('migrateScenarioV1ToV3 — rulers', () => {
     expect(ruler.personality).toBe('conqueror')
   })
 
-  it('maps aiPersonality=cautious to ruler.personality=steward', () => {
+  it('maps archetype=steward to ruler.personality=steward', () => {
     const data = makeV2({
       realms: [
         {
           ...scenarioV2.realms[0]!,
           rulerId: 'gen_b',
-          aiPersonality: 'cautious',
+          archetype: 'steward',
         },
       ],
       generals: [
@@ -387,13 +387,13 @@ describe('migrateScenarioV1ToV3 — rulers', () => {
     expect(ruler.personality).toBe('steward')
   })
 
-  it('maps aiPersonality=aggressive_random to ruler.personality=schemer', () => {
+  it('maps archetype=schemer to ruler.personality=schemer', () => {
     const data = makeV2({
       realms: [
         {
           ...scenarioV2.realms[0]!,
           rulerId: 'gen_c',
-          aiPersonality: 'aggressive_random',
+          archetype: 'schemer',
         },
       ],
       generals: [

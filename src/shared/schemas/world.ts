@@ -14,6 +14,7 @@ import {
   AcademyIdSchema,
   CharacterAttributesSchema,
   GeneralSchema,
+  PersonalityArchetypeSchema,
   RulerStateSchema,
   SpecialtySchema,
 } from './character'
@@ -116,6 +117,7 @@ export type M1Data = z.infer<typeof M1DataSchema>
 
 export const RealmSchemaV2 = RealmSchema.extend({
   stats: RealmStatsSchema.optional(),
+  archetype: PersonalityArchetypeSchema.optional(),
 })
 
 export const M1DataSchemaV2 = M1DataSchema.extend({

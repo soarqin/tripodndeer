@@ -5,9 +5,21 @@ import {
   type M1DataV2,
   type M1DataV3,
 } from '~/shared/schemas'
+import { M5_PERSONALITY_DIMS_BASELINE } from '~/content/m2/balance/m5'
 import type { AIPersonality, PersonalityArchetype } from '~/shared/types'
 
-function mapAiPersonality(ai: AIPersonality): PersonalityArchetype {
+const PERSONALITY_ARCHETYPES: readonly PersonalityArchetype[] = [
+  'conqueror',
+  'steward',
+  'schemer',
+  'learned',
+  'tyrant',
+  'incompetent',
+  'benevolent',
+  'builder',
+]
+
+function mapLegacyAiPersonality(ai: AIPersonality): PersonalityArchetype {
   switch (ai) {
     case 'aggressive':
       return 'conqueror'
@@ -18,8 +30,60 @@ function mapAiPersonality(ai: AIPersonality): PersonalityArchetype {
   }
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isLegacyAiPersonality(value: unknown): value is AIPersonality {
+  return value === 'aggressive' || value === 'cautious' || value === 'aggressive_random'
+}
+
+function isPersonalityArchetype(value: unknown): value is PersonalityArchetype {
+  return typeof value === 'string' && PERSONALITY_ARCHETYPES.includes(value as PersonalityArchetype)
+}
+
+function normalizeRealmFields(realm: unknown): unknown {
+  if (!isRecord(realm)) return realm
+  const { aiPersonality: legacyAiPersonality, ...withoutLegacyAi } = realm
+  if (withoutLegacyAi.archetype !== undefined) return withoutLegacyAi
+  if (!isLegacyAiPersonality(legacyAiPersonality)) return withoutLegacyAi
+  return { ...withoutLegacyAi, archetype: mapLegacyAiPersonality(legacyAiPersonality) }
+}
+
+function normalizeRawRealmFields(rawData: unknown): unknown {
+  if (!isRecord(rawData) || !Array.isArray(rawData.realms)) return rawData
+  return { ...rawData, realms: rawData.realms.map(normalizeRealmFields) }
+}
+
+function stripRealmV2Fields(realm: unknown): unknown {
+  if (!isRecord(realm)) return realm
+  const v1Realm = { ...realm }
+  delete v1Realm.archetype
+  delete v1Realm.stats
+  return v1Realm
+}
+
+function stripV1OnlyRealmFields(rawData: unknown): unknown {
+  if (!isRecord(rawData) || !Array.isArray(rawData.realms)) return rawData
+  return { ...rawData, realms: rawData.realms.map(stripRealmV2Fields) }
+}
+
+function getNormalizedRealmArchetypes(rawData: unknown): ReadonlyMap<string, PersonalityArchetype> {
+  const normalized = normalizeRawRealmFields(rawData)
+  if (!isRecord(normalized) || !Array.isArray(normalized.realms)) return new Map()
+
+  const archetypes = new Map<string, PersonalityArchetype>()
+  for (const realm of normalized.realms) {
+    if (!isRecord(realm) || typeof realm.id !== 'string') continue
+    if (isPersonalityArchetype(realm.archetype)) archetypes.set(realm.id, realm.archetype)
+  }
+  return archetypes
+}
+
 function v1ToV2(rawData: unknown): M1DataV2 {
-  const v1 = M1DataSchema.parse(rawData)
+  const normalized = normalizeRawRealmFields(rawData)
+  const v1 = M1DataSchema.parse(stripV1OnlyRealmFields(normalized))
+  const realmArchetypes = getNormalizedRealmArchetypes(normalized)
   const migrated = {
     ...v1,
     schema_version: 2 as const,
@@ -30,6 +94,7 @@ function v1ToV2(rawData: unknown): M1DataV2 {
     realms: v1.realms.map(realm => ({
       ...realm,
       stats: { manpowerPool: 50000, manpowerCap: 80000, warWeariness: 0 },
+      ...(realmArchetypes.has(realm.id) ? { archetype: realmArchetypes.get(realm.id) } : {}),
     })),
     generals: [] as unknown[],
     passes: [] as unknown[],
@@ -50,7 +115,7 @@ function ensureV2(rawData: unknown): M1DataV2 {
   if (version === undefined || version < 2) {
     return v1ToV2(rawData)
   }
-  return M1DataSchemaV2.parse(rawData)
+  return M1DataSchemaV2.parse(normalizeRawRealmFields(rawData))
 }
 
 function v2ToV3(v2: M1DataV2): M1DataV3 {
@@ -103,7 +168,8 @@ function v2ToV3(v2: M1DataV2): M1DataV3 {
       age: 45,
       lifespan: 65,
       health: 80,
-      personality: mapAiPersonality(realm.aiPersonality),
+      personality: realm.archetype ?? 'incompetent',
+      personalityDims: { ...M5_PERSONALITY_DIMS_BASELINE[realm.archetype ?? 'incompetent'] },
       successionLawId: 'primogeniture' as const,
       inOfficeSinceTick: 0,
     }))
