@@ -22,7 +22,7 @@ export const M9RawRealmSchema = z.object({
   full_title: z.string().min(1),
   capital: SiteIdSchema,
   status: z.enum(['active', 'deactivated']),
-  aiPersonality: PersonalityArchetypeSchema,
+  archetype: PersonalityArchetypeSchema,
   rulingHouse: z.string(),
   ideology_lean: IdeologyLeanSchema,
   starting_treasury: z.number().nonnegative(),

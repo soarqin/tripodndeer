@@ -4,7 +4,7 @@
   "full_title": "燕国",
   "capital": "site_ji",
   "status": "active",
-  "aiPersonality": "incompetent",
+  "archetype": "incompetent",
   "rulingHouse": "ji",
   "ideology_lean": { "fa": 10, "ru": 30, "dao": 20, "mo": 10, "zonghen": 20, "bing": 10 },
   "starting_treasury": 300,

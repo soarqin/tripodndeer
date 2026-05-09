@@ -4,7 +4,7 @@
   "full_title": "齐国",
   "capital": "site_linzi",
   "status": "active",
-  "aiPersonality": "schemer",
+  "archetype": "schemer",
   "rulingHouse": "jiang",
   "ideology_lean": { "fa": 20, "ru": 30, "dao": 10, "mo": 10, "zonghen": 20, "bing": 10 },
   "starting_treasury": 700,

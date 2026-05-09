@@ -4,7 +4,7 @@
   "full_title": "宋国",
   "capital": "site_shangqiu",
   "status": "active",
-  "aiPersonality": "incompetent",
+  "archetype": "incompetent",
   "rulingHouse": "zi",
   "ideology_lean": { "fa": 10, "ru": 40, "dao": 20, "mo": 20, "zonghen": 5, "bing": 5 },
   "starting_treasury": 250,

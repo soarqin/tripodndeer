@@ -4,7 +4,7 @@
   "full_title": "鲁国",
   "capital": "site_qufu",
   "status": "active",
-  "aiPersonality": "learned",
+  "archetype": "learned",
   "rulingHouse": "ji",
   "ideology_lean": { "fa": 5, "ru": 70, "dao": 10, "mo": 10, "zonghen": 0, "bing": 5 },
   "starting_treasury": 200,

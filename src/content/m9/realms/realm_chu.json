@@ -4,7 +4,7 @@
   "full_title": "楚国",
   "capital": "site_ying",
   "status": "active",
-  "aiPersonality": "builder",
+  "archetype": "builder",
   "rulingHouse": "mi",
   "ideology_lean": { "fa": 20, "ru": 20, "dao": 30, "mo": 10, "zonghen": 10, "bing": 10 },
   "starting_treasury": 600,

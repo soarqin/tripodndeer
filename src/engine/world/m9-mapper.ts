@@ -22,7 +22,7 @@ function mapRealm(raw: M9RawRealm): M9DataRealm {
     fullTitle: raw.full_title,
     capital: raw.capital,
     status: raw.status,
-    archetypePersonality: raw.aiPersonality,
+    archetypePersonality: raw.archetype,
     rulingHouse: raw.rulingHouse,
     ideologyLean: raw.ideology_lean,
     startingTreasury: raw.starting_treasury,

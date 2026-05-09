@@ -4,7 +4,7 @@
   "full_title": "秦国",
   "capital": "site_xianyang",
   "status": "active",
-  "aiPersonality": "conqueror",
+  "archetype": "conqueror",
   "rulingHouse": "ying",
   "ideology_lean": { "fa": 80, "ru": 10, "dao": 5, "mo": 5, "zonghen": 0, "bing": 0 },
   "starting_treasury": 500,

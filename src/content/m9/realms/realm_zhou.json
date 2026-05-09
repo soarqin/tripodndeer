@@ -4,7 +4,7 @@
   "full_title": "东周",
   "capital": "site_luoyi",
   "status": "active",
-  "aiPersonality": "incompetent",
+  "archetype": "incompetent",
   "rulingHouse": "ji",
   "ideology_lean": { "fa": 10, "ru": 60, "dao": 10, "mo": 10, "zonghen": 5, "bing": 5 },
   "starting_treasury": 200,

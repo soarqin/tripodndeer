@@ -11,7 +11,7 @@ import {
 } from '~/content/m2/balance'
 
 interface SiteShape { id: string }
-interface RealmShape { id: string; capital?: string; aiPersonality?: string }
+interface RealmShape { id: string; capital?: string; archetype?: string }
 interface PassShape { id: string }
 interface ProvinceShape { id: string }
 interface RegionShape { id: string }
@@ -89,14 +89,14 @@ describe('M9 scenario-453bc invariants', () => {
     expect(scenario.schema_version).toBe(8)
   })
 
-  it('Test 12: all realms have valid aiPersonality', () => {
+  it('Test 12: all realms have valid archetype', () => {
     const realms = (scenario.realms ?? []) as readonly RealmShape[]
     const validArchetypes = new Set<string>(M8_PERSONALITY_ARCHETYPE_LIST)
     for (const realm of realms) {
-      if (realm.aiPersonality !== undefined && realm.aiPersonality !== null) {
+      if (realm.archetype !== undefined && realm.archetype !== null) {
         expect(
-          validArchetypes.has(realm.aiPersonality),
-          `Realm ${realm.id} has invalid aiPersonality: ${realm.aiPersonality}`,
+          validArchetypes.has(realm.archetype),
+          `Realm ${realm.id} has invalid archetype: ${realm.archetype}`,
         ).toBe(true)
       }
     }
