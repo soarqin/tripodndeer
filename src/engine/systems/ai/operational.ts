@@ -1,6 +1,8 @@
 import type { GameEvent, Realm, RNGState, World } from '~/shared/types'
 import type { AIState, OperationalDirective } from '~/shared/types/ai-state'
+import type { OperationalWeights } from '~/content/m2/balance/m8_1'
 import { M8_1_OPERATIONAL_WEIGHTS } from '~/content/m2/balance/m8_1'
+import { M8_2_DIFFICULTY_PROFILES } from '~/content/m2/balance/m8_2'
 import { nextRng } from '~/engine/random'
 import { isAtWar } from '~/engine/wars'
 import { runDiplomacyForRealm, runEspionageForRealm } from './ai'
@@ -12,6 +14,25 @@ import { getPersonality } from './utility-scorer'
 
 const MAX_NEW_DIRECTIVES = 3
 const OPERATIONAL_GATE = 0.2
+
+function blendWeights(
+  archetypeWeights: OperationalWeights,
+  incompetentWeights: OperationalWeights,
+  mix: number
+): OperationalWeights {
+  return {
+    warDeclarationBias:
+      archetypeWeights.warDeclarationBias * (1 - mix) + incompetentWeights.warDeclarationBias * mix,
+    dispatchPriorityBias:
+      archetypeWeights.dispatchPriorityBias * (1 - mix) + incompetentWeights.dispatchPriorityBias * mix,
+    diplomacyInitiative:
+      archetypeWeights.diplomacyInitiative * (1 - mix) + incompetentWeights.diplomacyInitiative * mix,
+    espionageInitiative:
+      archetypeWeights.espionageInitiative * (1 - mix) + incompetentWeights.espionageInitiative * mix,
+    directiveExpiryBias:
+      archetypeWeights.directiveExpiryBias * (1 - mix) + incompetentWeights.directiveExpiryBias * mix,
+  }
+}
 
 /**
  * StrategicPlan → OperationalDirective field consumption:
@@ -52,7 +73,11 @@ function buildDirectivesForRealm(
   const plan = aiState.strategic
   if (!plan) return []
 
-  const weights = M8_1_OPERATIONAL_WEIGHTS[getPersonality(world, realm.id)]
+  const archetype = getPersonality(world, realm.id)
+  const archetypeWeights = M8_1_OPERATIONAL_WEIGHTS[archetype]
+  const incompetentWeights = M8_1_OPERATIONAL_WEIGHTS.incompetent
+  const mix = M8_2_DIFFICULTY_PROFILES[world.difficulty].incompetentMix
+  const weights = blendWeights(archetypeWeights, incompetentWeights, mix)
   const expiresAtTick = world.tick + Math.floor(3 * weights.directiveExpiryBias)
   const candidates: OperationalDirective[] = []
 
