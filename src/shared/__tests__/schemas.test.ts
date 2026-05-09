@@ -51,17 +51,16 @@ const validSite = {
     { edge: 'e_003', reverse: false },
   ],
 }
-const validRealm = {
-  id: 'realm_red',
-  displayName: '红',
-  fullTitle: '红方',
-  color: '#dc2626',
-  capital: 'site_1',
-  initialSites: ['site_1'],
-  initialArmies: [],
-  aiPersonality: 'aggressive_random' as const,
-  economy: { treasury: 1000, foodStores: 2000, taxRate: 10 },
-}
+  const validRealm = {
+    id: 'realm_red',
+    displayName: '红',
+    fullTitle: '红方',
+    color: '#dc2626',
+    capital: 'site_1',
+    initialSites: ['site_1'],
+    initialArmies: [],
+    economy: { treasury: 1000, foodStores: 2000, taxRate: 10 },
+  }
 const validData = {
   edges: { e_001: validPolylineEdge, e_002: validBezierEdge, e_003: validPolylineEdge },
   sites: [validSite],
@@ -542,7 +541,10 @@ describe('M2 contract schemas', () => {
 
   it.each(['aggressive_random', 'aggressive', 'cautious'] as const)('accepts AI personality %s', personality => {
     expect(() => AIPersonalitySchema.parse(personality)).not.toThrow()
-    expect(() => RealmSchema.parse({ ...validRealm, aiPersonality: personality })).not.toThrow()
+  })
+
+  it('rejects Realm with aiPersonality', () => {
+    expect(() => RealmSchema.parse({ ...validRealm, aiPersonality: 'aggressive' })).toThrow()
   })
 
   it('rejects RealmStats with negative manpowerPool', () => {

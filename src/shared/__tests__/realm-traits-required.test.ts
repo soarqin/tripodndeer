@@ -10,7 +10,6 @@ const baseRealm = {
   capital: 'site_xianyang',
   initialSites: ['site_xianyang'],
   initialArmies: [],
-  aiPersonality: 'aggressive' as const,
   economy: { treasury: 1000, foodStores: 500, taxRate: 10 },
 }
 

@@ -15,7 +15,6 @@ import type {
 } from './core'
 import type {
   GeneralId,
-  AIPersonality,
   General,
   RulerState,
 } from './character'
@@ -128,7 +127,6 @@ export interface Realm {
   readonly capital: SiteId
   readonly initialSites: readonly SiteId[]
   readonly initialArmies: readonly ArmyTemplate[]
-  readonly aiPersonality: AIPersonality
   readonly economy: RealmEconomy
   readonly stats?: RealmStats
   readonly rulerId?: GeneralId | null

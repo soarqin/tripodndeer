@@ -12,7 +12,6 @@ import {
 } from './core'
 import {
   AcademyIdSchema,
-  AIPersonalitySchema,
   CharacterAttributesSchema,
   GeneralSchema,
   RulerStateSchema,
@@ -85,7 +84,6 @@ export const RealmSchema = z.object({
   capital: SiteIdSchema,
   initialSites: z.array(SiteIdSchema),
   initialArmies: z.array(ArmyTemplateSchema),
-  aiPersonality: AIPersonalitySchema,
   economy: RealmEconomySchema.default({ treasury: 0, foodStores: 0, taxRate: 10 }),
   rulerId: z.string().nullable().optional(),
   traits: z.array(z.string()).default([]),
@@ -95,7 +93,7 @@ export const RealmSchema = z.object({
   warVictoriesThisYear: z.number().int().nonnegative().default(0),
   status: RealmStatusSchema.optional(),
   rulingHouse: z.string().optional(),
-})
+}).strict()
 
 export const M0DataSchema = z.object({
   edges: z.record(z.string(), MapEdgeSchema),

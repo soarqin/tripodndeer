@@ -160,20 +160,19 @@ export function makeM5World(opts: MakeM5WorldOptions = {}): World {
 }
 
 function makeMinimalRealm(id: RealmId): Realm {
-  return {
-    id,
-    displayName: id,
-    fullTitle: id,
-    color: '#dc2626',
-    capital: `site_${id}_capital`,
-    initialSites: [],
-    initialArmies: [],
-    aiPersonality: 'cautious',
-    economy: {
-      treasury: 1000,
-      foodStores: 1000,
-      taxRate: 0.1,
-    },
+    return {
+      id,
+      displayName: id,
+      fullTitle: id,
+      color: '#dc2626',
+      capital: `site_${id}_capital`,
+      initialSites: [],
+      initialArmies: [],
+      economy: {
+        treasury: 1000,
+        foodStores: 1000,
+        taxRate: 0.1,
+      },
     traits: [],
     politicalSystem: 'enfeoffment',
     prestige: 40,
