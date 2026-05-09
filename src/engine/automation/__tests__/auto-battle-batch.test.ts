@@ -252,3 +252,35 @@ describe('runAutoBattleBatch', () => {
     expect(JSON.stringify(stable1)).toEqual(JSON.stringify(stable2))
   }, 60000)
 })
+
+describe('T4.4 determinism guard (5 games, maxTicks=500)', () => {
+  it('same seed range produces byte-equal stable aggregate', async () => {
+    const config = {
+      scenarioId: 'm9' as const,
+      difficulty: 'hero' as const,
+      seedStart: 1,
+      limit: 5,
+      maxTicks: 500,
+      stopCondition: 'unification' as const,
+    }
+
+    const r1 = await runAutoBattleBatch(config)
+    const r2 = await runAutoBattleBatch(config)
+
+    // Exclude runtime block — wall-clock derived, not byte-equal by design (see plan §Reporter JSON Schema)
+    const stable1 = {
+      meta: r1.meta,
+      outcomes: r1.outcomes,
+      distribution: r1.distribution,
+      behaviorMetrics: r1.behaviorMetrics,
+    }
+    const stable2 = {
+      meta: r2.meta,
+      outcomes: r2.outcomes,
+      distribution: r2.distribution,
+      behaviorMetrics: r2.behaviorMetrics,
+    }
+
+    expect(JSON.stringify(stable1)).toEqual(JSON.stringify(stable2))
+  }, 120000)
+})
