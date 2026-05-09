@@ -62,6 +62,16 @@ function makeRuler(realmId: RealmId): RulerState {
     lifespan: 70,
     health: 100,
     personality: 'conqueror',
+    personalityDims: {
+      expansionDrive: 0.5,
+      diplomaticTrust: 0.5,
+      caution: 0.5,
+      honor: 0.5,
+      vindictiveness: 0.5,
+      reformInclination: 0.5,
+      patience: 0.5,
+      preferredStrategy: 'diplomatic',
+    },
     successionLawId: 'primogeniture',
     inOfficeSinceTick: 0,
   }

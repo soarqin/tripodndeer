@@ -36,6 +36,17 @@ export const PersonalityArchetypeSchema = z.enum([
   'builder',
 ])
 
+export const RulerPersonalityProfileSchema = z.object({
+  expansionDrive: z.number().min(0).max(1),
+  diplomaticTrust: z.number().min(0).max(1),
+  caution: z.number().min(0).max(1),
+  honor: z.number().min(0).max(1),
+  vindictiveness: z.number().min(0).max(1),
+  reformInclination: z.number().min(0).max(1),
+  patience: z.number().min(0).max(1),
+  preferredStrategy: z.enum(['blitz', 'siege', 'attrition', 'diplomatic']),
+})
+
 export const FactionIdSchema = z.enum([
   'royal_kin',
   'noble_clans',
@@ -85,6 +96,7 @@ export const RulerStateSchema = z.object({
   lifespan: z.number().int().positive(),
   health: z.number().int().min(0).max(100),
   personality: PersonalityArchetypeSchema,
+  personalityDims: RulerPersonalityProfileSchema,
   successionLawId: z.literal('primogeniture'),
   inOfficeSinceTick: z.number().int().nonnegative().default(0),
 })

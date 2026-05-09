@@ -12,6 +12,16 @@ const validRuler = {
   lifespan: 70,
   health: 80,
   personality: 'conqueror' as const,
+  personalityDims: {
+    expansionDrive: 0.9,
+    diplomaticTrust: 0.2,
+    caution: 0.4,
+    honor: 0.7,
+    vindictiveness: 0.6,
+    reformInclination: 0.3,
+    patience: 0.5,
+    preferredStrategy: 'blitz' as const,
+  },
   successionLawId: 'primogeniture' as const,
 }
 
@@ -35,6 +45,14 @@ describe('RulerStateSchema (M5)', () => {
 
   it('rejects RulerState with invalid personality', () => {
     const result = RulerStateSchema.safeParse({ ...validRuler, personality: 'wizard' })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects RulerState with invalid personalityDims', () => {
+    const result = RulerStateSchema.safeParse({
+      ...validRuler,
+      personalityDims: { ...validRuler.personalityDims, preferredStrategy: 'ambush' },
+    })
     expect(result.success).toBe(false)
   })
 
