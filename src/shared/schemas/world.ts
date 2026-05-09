@@ -18,6 +18,8 @@ import {
   RulerStateSchema,
   SpecialtySchema,
 } from './character'
+import { DifficultyTierSchema } from './difficulty'
+import { DiplomaticMemorySchema } from './diplomatic-memory'
 import { RealmEconomySchema } from './economy'
 import {
   CoalitionStateSchema,
@@ -243,6 +245,8 @@ export const WorldSchema = z.object({
   zhouInvestiture: z.instanceof(Map),
   generals: z.instanceof(Map),
   rulers: z.map(RealmIdSchema, RulerStateSchema),
+  difficulty: DifficultyTierSchema,
+  diplomaticMemory: z.map(z.string(), DiplomaticMemorySchema),
   academies: z.map(AcademyIdSchema, AcademySchema),
   eventChainStates: z.map(z.string().min(1), EventChainStateSchema),
   disasterStates: z.map(RealmIdSchema, DisasterStateSchema),
