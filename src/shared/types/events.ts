@@ -117,6 +117,27 @@ export interface GameEvent {
   payload: unknown
 }
 
+export interface BattleResolvedEvent {
+  readonly type: 'battleResolved'
+  readonly payload: {
+    readonly battleResolution: unknown
+    readonly attackerRealmId: RealmId
+    readonly defenderRealmId: RealmId
+    readonly siteId: SiteId
+    readonly armySizeTotal: number
+    readonly borderSite: boolean
+  }
+}
+
+export interface SpyCaughtEvent {
+  readonly type: 'spy_caught'
+  readonly payload: {
+    readonly observerRealmId: RealmId
+    readonly subjectRealmId: RealmId
+    readonly missionId: string
+  }
+}
+
 export interface EconomySettlementEvent {
   readonly type: 'economySettlement'
   readonly payload: {

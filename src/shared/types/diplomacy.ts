@@ -16,7 +16,18 @@ export type DiplomaticActionKind = 'alliance' | 'non_aggression' | 'tribute' | '
 export type DiplomaticProposalStatus = 'pending' | 'accepted' | 'rejected' | 'expired' | 'cancelled'
 export type DiplomaticTreatyKind = 'alliance' | 'non_aggression' | 'tribute' | 'marriage' | 'truce'
 export type DiplomaticTreatyStatus = 'active' | 'expired' | 'cancelled' | 'broken'
-export type DiplomacyEventKind = 'proposal_created' | 'proposal_resolved' | 'treaty_created' | 'treaty_ended' | 'war_declared' | 'betrayal' | 'relation_changed' | 'coalition_changed' | 'zhou_investiture_changed'
+export type DiplomacyEventKind =
+  | 'proposal_created'
+  | 'proposal_resolved'
+  | 'treaty_created'
+  | 'treaty_ended'
+  | 'war_declared'
+  | 'betrayal'
+  | 'relation_changed'
+  | 'coalition_changed'
+  | 'zhou_investiture_changed'
+  | 'combat_observed'
+  | 'spy_caught'
 export type DiplomacyEventReason = 'war_declaration_against_treaty'
 export type CoalitionStatus = 'forming' | 'active' | 'dissolved'
 
@@ -67,9 +78,16 @@ export interface DiplomacyEvent {
   readonly targetRealmId: RealmId | null
   readonly proposalId?: DiplomaticProposalId
   readonly treatyId?: TreatyId
+  readonly treatyKind?: DiplomaticTreatyKind
   readonly relationKey?: RelationKey
   readonly coalitionId?: CoalitionId
   readonly reason?: DiplomacyEventReason
+  readonly combatPayload?: {
+    readonly armySizeTotal: number
+    readonly borderSite: boolean
+    readonly victorRealmId: RealmId
+  }
+  readonly spyMissionId?: string
 }
 
 export interface CoalitionState {
