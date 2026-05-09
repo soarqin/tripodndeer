@@ -64,12 +64,14 @@ export function applyDiplomacyAction(world: World, request: DiplomacyActionReque
   )
   const events: GameEvent[] = []
   let history = [...world.diplomacyHistory]
+  const unprovoked = isUnprovokedWar(world, request.proposingRealmId, request.targetRealmId)
 
   const declared = appendDiplomacyHistory(nextWorld, history, events, {
     kind: 'war_declared',
     actorRealmId: request.proposingRealmId,
     targetRealmId: request.targetRealmId,
     relationKey: validation.proposalOrOrder.relationKey,
+    unprovoked,
   })
   history = declared.history
 
@@ -149,4 +151,29 @@ function cancelBelligerentTreaties(
   }
 
   return { world: { ...world, treaties, relations, diplomacyHistory: history }, events }
+}
+
+function isUnprovokedWar(world: World, attackerRealmId: string, defenderRealmId: string): boolean {
+  for (const treaty of world.treaties.values()) {
+    if (treaty.status !== 'active') continue
+    if (relationKey(treaty.realmAId, treaty.realmBId) !== relationKey(attackerRealmId, defenderRealmId)) continue
+    return false
+  }
+
+  for (const event of world.diplomacyHistory) {
+    if (relationKeyForEvent(event.actorRealmId, event.targetRealmId) !== relationKey(attackerRealmId, defenderRealmId)) continue
+    if (event.kind === 'betrayal') return false
+    if (isPeaceBreakEvent(event.kind)) return false
+  }
+
+  return true
+}
+
+function relationKeyForEvent(actorRealmId: string | null, targetRealmId: string | null): string {
+  if (actorRealmId === null || targetRealmId === null) return ''
+  return relationKey(actorRealmId, targetRealmId)
+}
+
+function isPeaceBreakEvent(kind: string): boolean {
+  return kind === 'peace_break'
 }

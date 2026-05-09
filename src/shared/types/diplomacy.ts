@@ -76,6 +76,7 @@ export interface DiplomacyEvent {
   readonly occurredAt: GameDate
   readonly actorRealmId: RealmId | null
   readonly targetRealmId: RealmId | null
+  readonly unprovoked?: boolean
   readonly proposalId?: DiplomaticProposalId
   readonly treatyId?: TreatyId
   readonly treatyKind?: DiplomaticTreatyKind

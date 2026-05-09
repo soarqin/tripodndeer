@@ -110,6 +110,7 @@ export const DiplomacyEventSchema = z.object({
   occurredAt: GameDateSchema,
   actorRealmId: RealmIdSchema.nullable(),
   targetRealmId: RealmIdSchema.nullable(),
+  unprovoked: z.boolean().optional(),
   proposalId: DiplomaticProposalIdSchema.optional(),
   treatyId: TreatyIdSchema.optional(),
   treatyKind: DiplomaticTreatyKindSchema.optional(),
