@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
 import { SAVE_DTO_VERSION } from '~/shared/types/save-dto'
+import { RulerPersonalityProfileSchema, PersonalityArchetypeSchema } from './character'
+import { DifficultyTierSchema } from './difficulty'
 
 const keyValueTuple = z.tuple([z.string().min(1), z.unknown()])
 const numericKeyValueTuple = z.tuple([z.string().min(1), z.number()])
@@ -10,9 +12,24 @@ export const SerializedFactionInfluenceSchema = z.object({
   influences: z.array(numericKeyValueTuple),
 })
 
+export const SerializedRulerStateSchema = z
+  .object({
+    realmId: z.string().min(1),
+    generalId: z.string().min(1),
+    age: z.number().int().nonnegative(),
+    lifespan: z.number().int().positive(),
+    health: z.number().int().min(0).max(100),
+    personality: PersonalityArchetypeSchema,
+    personalityDims: RulerPersonalityProfileSchema.optional(),
+    successionLawId: z.literal('primogeniture'),
+    inOfficeSinceTick: z.number().int().nonnegative(),
+  })
+  .passthrough()
+
 export const SerializedWorldSchema = z.object({
   date: z.unknown(),
   tick: z.number().int().nonnegative(),
+  difficulty: DifficultyTierSchema.optional(),
   sites: z.array(keyValueTuple),
   realms: z.array(keyValueTuple),
   armies: z.array(keyValueTuple),
@@ -23,10 +40,11 @@ export const SerializedWorldSchema = z.object({
   diplomaticProposals: z.array(keyValueTuple),
   treaties: z.array(keyValueTuple),
   diplomacyHistory: z.array(z.unknown()),
+  diplomaticMemory: z.array(keyValueTuple).optional(),
   coalitions: z.array(keyValueTuple),
   zhouInvestiture: z.array(keyValueTuple),
   generals: z.array(keyValueTuple),
-  rulers: z.array(keyValueTuple),
+  rulers: z.array(z.tuple([z.string().min(1), SerializedRulerStateSchema])),
   academies: z.array(keyValueTuple),
   eventChainStates: z.array(keyValueTuple),
   reformStates: z.array(keyValueTuple),

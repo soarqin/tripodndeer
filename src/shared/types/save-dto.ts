@@ -1,6 +1,7 @@
 import type { AIState } from './ai-state'
-import type { General, GeneralId, FactionId, RulerState } from './character'
+import type { General, GeneralId, FactionId, RulerPersonalityProfile, RulerState } from './character'
 import type { AdjacencyEdge, AdjacencyEdgeId, Army, ArmyId, EdgeId, MapEdge, RealmId, Site, SiteId } from './core'
+import type { DifficultyTier } from './difficulty'
 import type {
   CoalitionId,
   CoalitionState,
@@ -23,6 +24,7 @@ import type { EdictId, EdictState, GovernorAssignment, Order } from './economy'
 import type { CounterIntelState, CoverageKey, SpyMission, SpyMissionId } from './espionage'
 import type { EventChainId, EventChainState } from './events'
 import type { DisasterState, ReformState, TradeRoute, TradeRouteId } from './reform-disaster-trade'
+import type { DiplomaticMemory, MemoryKey } from './diplomatic-memory'
 import type {
   Academy,
   AcademyId,
@@ -39,7 +41,7 @@ import type {
   RNGState,
 } from './world'
 
-export const SAVE_DTO_VERSION = 2 as const
+export const SAVE_DTO_VERSION = 3 as const
 
 export type SaveLoadErrorKind = 'incompatible_version' | 'parse_error' | 'missing_data'
 
@@ -59,9 +61,14 @@ export interface SerializedFactionInfluence {
   readonly influences: [FactionId, number][]
 }
 
+export interface SerializedRulerState extends Omit<RulerState, 'personalityDims'> {
+  readonly personalityDims?: RulerPersonalityProfile
+}
+
 export interface SerializedWorld {
   readonly date: GameDate
   readonly tick: number
+  readonly difficulty?: DifficultyTier
   readonly sites: [SiteId, Site][]
   readonly realms: [RealmId, Realm][]
   readonly armies: [ArmyId, Army][]
@@ -72,10 +79,11 @@ export interface SerializedWorld {
   readonly diplomaticProposals: [DiplomaticProposalId, DiplomaticProposal][]
   readonly treaties: [TreatyId, Treaty][]
   readonly diplomacyHistory: readonly DiplomacyEvent[]
+  readonly diplomaticMemory?: [MemoryKey, DiplomaticMemory][]
   readonly coalitions: [CoalitionId, CoalitionState][]
   readonly zhouInvestiture: [RealmId, ZhouInvestitureState][]
   readonly generals: [GeneralId, General][]
-  readonly rulers: [RealmId, RulerState][]
+  readonly rulers: [RealmId, SerializedRulerState][]
   readonly academies: [AcademyId, Academy][]
   readonly eventChainStates: [EventChainId, EventChainState][]
   readonly reformStates: [RealmId, ReformState][]

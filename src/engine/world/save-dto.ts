@@ -1,4 +1,5 @@
-import type { FactionId, FactionInfluenceState, IntelligenceCoverage, World } from '~/shared/types'
+import { M5_PERSONALITY_DIMS_BASELINE } from '~/content/m2/balance'
+import type { FactionId, FactionInfluenceState, IntelligenceCoverage, RulerState, World } from '~/shared/types'
 import {
   SAVE_DTO_VERSION,
   type Result,
@@ -15,6 +16,7 @@ export function worldToSaveDTO(world: World, scenarioId: 'm1' | 'm9' = 'm1'): Sa
     world: {
       date: world.date,
       tick: world.tick,
+      difficulty: world.difficulty,
       sites: [...world.sites.entries()],
       realms: [...world.realms.entries()],
       armies: [...world.armies.entries()],
@@ -25,10 +27,14 @@ export function worldToSaveDTO(world: World, scenarioId: 'm1' | 'm9' = 'm1'): Sa
       diplomaticProposals: [...world.diplomaticProposals.entries()],
       treaties: [...world.treaties.entries()],
       diplomacyHistory: [...world.diplomacyHistory],
+      diplomaticMemory: [...world.diplomaticMemory.entries()],
       coalitions: [...world.coalitions.entries()],
       zhouInvestiture: [...world.zhouInvestiture.entries()],
       generals: [...world.generals.entries()],
-      rulers: [...world.rulers.entries()],
+      rulers: [...world.rulers.entries()].map(([realmId, ruler]) => [
+        realmId,
+        { ...ruler, personalityDims: ruler.personalityDims },
+      ]),
       academies: [...world.academies.entries()],
       eventChainStates: [...world.eventChainStates.entries()],
       reformStates: [...world.reformStates.entries()],
@@ -58,7 +64,7 @@ export function worldToSaveDTO(world: World, scenarioId: 'm1' | 'm9' = 'm1'): Sa
   }
 }
 
-export const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [1, SAVE_DTO_VERSION]
+export const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [1, 2, SAVE_DTO_VERSION]
 
 export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
   if (!SUPPORTED_SAVE_DTO_VERSIONS.includes(dto.schemaVersion)) {
@@ -84,12 +90,22 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
     ]),
   )
   const intelligenceCoverage: IntelligenceCoverage = new Map(sw.intelligenceCoverage)
+  const rulers = new Map(
+    sw.rulers.map(([realmId, ruler]): [string, RulerState] => [
+      realmId,
+      {
+        ...ruler,
+        personalityDims: ruler.personalityDims ?? M5_PERSONALITY_DIMS_BASELINE[ruler.personality],
+      },
+    ]),
+  )
 
   return {
     ok: true,
     value: {
       date: sw.date,
       tick: sw.tick,
+      difficulty: sw.difficulty ?? 'hero',
       sites: new Map(sw.sites),
       realms: new Map(sw.realms),
       armies: new Map(sw.armies),
@@ -103,7 +119,7 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
       coalitions: new Map(sw.coalitions),
       zhouInvestiture: new Map(sw.zhouInvestiture),
       generals: new Map(sw.generals),
-      rulers: new Map(sw.rulers),
+      rulers,
       academies: new Map(sw.academies),
       eventChainStates: new Map(sw.eventChainStates),
       reformStates: new Map(sw.reformStates),
@@ -123,6 +139,7 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
       characterTemplates: new Map(sw.characterTemplates),
       localization: new Map(sw.localization),
       aiState: new Map(sw.aiState ?? []),
+      diplomaticMemory: new Map(sw.diplomaticMemory ?? []),
       playerRealmId: sw.playerRealmId,
       rngState: sw.rngState,
       phases: getDefaultPhases(),
