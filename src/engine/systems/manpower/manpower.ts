@@ -1,11 +1,13 @@
 import type { GameEvent, RNGState, World } from '~/shared/types'
 import {
   M4_BASIS_POINTS_DIVISOR,
+  M8_2_DIFFICULTY_PROFILES,
   MANPOWER_RECOVERY_PER_MONTH,
   WAR_WEARINESS_PER_MONTH_AT_WAR,
   WAR_WEARINESS_RECOVERY_THRESHOLD,
 } from '~/content/m2/balance'
 import { getTraitModifiers } from '~/content/m4_1/trait-effects'
+import { isAIRealm } from '~/engine/automation/sentinels'
 
 export function manpowerTick(
   world: World,
@@ -16,6 +18,7 @@ export function manpowerTick(
   }
 
   const realms = new Map(world.realms)
+  const profile = M8_2_DIFFICULTY_PROFILES[world.difficulty]
 
   for (const realm of world.realms.values()) {
     if (!realm.stats) continue
@@ -34,8 +37,12 @@ export function manpowerTick(
       : MANPOWER_RECOVERY_PER_MONTH
 
     const traitMod = getTraitModifiers(realm)
+    const manpowerMul = isAIRealm(world, realm.id) ? profile.aiManpowerMul : profile.playerManpowerMul
     const recovery = Math.floor(
-      baseRecovery * (M4_BASIS_POINTS_DIVISOR + traitMod.recruitmentSpeedMultiplierBp) / M4_BASIS_POINTS_DIVISOR,
+      baseRecovery
+      * (M4_BASIS_POINTS_DIVISOR + traitMod.recruitmentSpeedMultiplierBp)
+      / M4_BASIS_POINTS_DIVISOR
+      * manpowerMul,
     )
     const effectiveCap = Math.floor(
       realm.stats.manpowerCap * (M4_BASIS_POINTS_DIVISOR + traitMod.manpowerCapMultiplierBp) / M4_BASIS_POINTS_DIVISOR,
