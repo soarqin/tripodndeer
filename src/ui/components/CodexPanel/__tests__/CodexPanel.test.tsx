@@ -1,7 +1,8 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { act, render, screen, fireEvent } from '@testing-library/react'
 import { CodexPanel } from '../CodexPanel'
+import { Modal } from '~/ui/components/Modal/Modal'
 import { useGameStore } from '~/ui/store/game-store'
 import { CODEX_EMPTY_STATE_M1_CHARACTERS, CODEX_EMPTY_SEARCH_RESULTS } from '~/content/codex/empty-state-messages'
 import * as dataLoader from '../codex-data-loader'
@@ -21,7 +22,9 @@ describe('CodexPanel', () => {
     useGameStore.setState({
       activePanel: null,
       selectedCodexEntryId: null,
-      world: dummyWorld
+      world: dummyWorld,
+      modalQueue: [],
+      codexPreviousClockSpeed: null,
     })
     
     vi.mocked(dataLoader.loadStaticEntries).mockReturnValue([
@@ -127,7 +130,59 @@ describe('CodexPanel', () => {
     
     const link = screen.getByText('History')
     fireEvent.click(link)
-    
+
     expect(useGameStore.getState().selectedCodexEntryId).toBe('hist-1')
+  })
+
+  it('keeps Codex visible while a queued modal opens and closes', () => {
+    useGameStore.setState({
+      clockState: { speed: '4x', realTimeAccum: 0 },
+      previousClockSpeed: '1x',
+      codexPreviousClockSpeed: null,
+      activePanel: null,
+      selectedCodexEntryId: null,
+      modalQueue: [],
+    })
+
+    act(() => {
+      useGameStore.getState().openCodex('mech-1')
+    })
+    expect(useGameStore.getState().clockState.speed).toBe('pause')
+    expect(useGameStore.getState().codexPreviousClockSpeed).toBe('4x')
+
+    act(() => {
+      useGameStore.getState().openModal({
+        title: '测试弹窗',
+        content: React.createElement('div', null, 'modal'),
+        actions: [],
+      })
+    })
+
+    expect(useGameStore.getState().modalQueue).toHaveLength(1)
+
+    render(
+      <>
+        <CodexPanel />
+        <Modal title="测试弹窗" content={React.createElement('div', null, 'modal')} actions={[]} onClose={() => {}} />
+      </>,
+    )
+
+    const codexPanel = screen.getByTestId('codex-panel')
+    const modalBackdrop = screen.getByTestId('modal-backdrop')
+    expect(codexPanel.compareDocumentPosition(modalBackdrop) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+
+    act(() => {
+      useGameStore.getState().closeModal()
+    })
+    expect(useGameStore.getState().modalQueue).toHaveLength(0)
+    expect(screen.getByTestId('codex-panel')).toBeTruthy()
+    expect(useGameStore.getState().clockState.speed).toBe('pause')
+
+    act(() => {
+      useGameStore.getState().closeCodex()
+    })
+    expect(useGameStore.getState().activePanel).toBeNull()
+    expect(useGameStore.getState().selectedCodexEntryId).toBeNull()
+    expect(useGameStore.getState().clockState.speed).toBe('4x')
   })
 })
