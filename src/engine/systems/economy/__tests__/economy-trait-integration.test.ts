@@ -26,7 +26,6 @@ function makeRealm(id: string, traits: readonly string[] = [], treasury = 0, foo
     capital: `${id}_capital`,
     initialSites: [],
     initialArmies: [],
-    aiPersonality: 'cautious',
     economy: { treasury, foodStores, taxRate: 10 },
     traits,
     politicalSystem: 'enfeoffment',

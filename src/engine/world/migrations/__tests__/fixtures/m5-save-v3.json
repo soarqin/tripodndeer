@@ -40,8 +40,7 @@
       "color": "#ff0000",
       "capital": "site_a",
       "initialSites": ["site_a"],
-      "initialArmies": [],
-      "aiPersonality": "aggressive",
+       "initialArmies": [],
       "rulerId": null,
       "traits": ["legalist", "qin_legacy"]
     },
@@ -52,8 +51,7 @@
       "color": "#00ff00",
       "capital": "site_a",
       "initialSites": [],
-      "initialArmies": [],
-      "aiPersonality": "cautious",
+       "initialArmies": [],
       "rulerId": "gen_ruler"
     }
   ],

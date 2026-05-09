@@ -23,7 +23,6 @@ function makeRealm(id: string): Realm {
     capital: `${id}_capital`,
     initialSites: [],
     initialArmies: [],
-    aiPersonality: 'cautious',
     stats: { manpowerPool: 1000, manpowerCap: 5000, warWeariness: 0 },
     economy: { treasury: 0, foodStores: 0, taxRate: 10 },
     traits: [],

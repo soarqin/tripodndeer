@@ -773,8 +773,7 @@
       "initialSites": [
         "site_1"
       ],
-      "initialArmies": [],
-      "aiPersonality": "aggressive_random"
+      "initialArmies": []
     },
     {
       "id": "realm_blue",
@@ -788,8 +787,7 @@
         "site_4",
         "site_5"
       ],
-      "initialArmies": [],
-      "aiPersonality": "aggressive_random"
+      "initialArmies": []
     }
   ],
   "initialOwnership": {

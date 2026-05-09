@@ -39,7 +39,6 @@ function makeRealm(id: string, treasury: number, foodStores: number, taxRate: nu
     capital: `${id}_capital`,
     initialSites: [],
     initialArmies: [],
-    aiPersonality: 'cautious',
     economy: { treasury, foodStores, taxRate },
     traits: [],
     politicalSystem: 'enfeoffment',

@@ -136,3 +136,16 @@ After M8.2 (difficulty + diplomatic memory + personality dims), 18 tests failed 
 8. **Faction-balance edict bias** — `M8_EDICT_ENACTMENT_BIAS` now per-personality. `incompetent` (default fallback) has `issuanceMultiplier: 0.5` → effective threshold 140 (vs 70 raw). Tests must pass a ruler with personality having multiplier >= 1.0 (steward/schemer/conqueror) AND `preferredEdict` matching expected edict kind.
 9. **Operational priorities** — Specific priority values (30, 5) shifted to floats (~26, ~6) due to scoring formula changes. Use `expect.objectContaining` without priority match.
 10. **Legacy aiPersonality migration removed** — `v1-to-v3.ts` no longer maps `aiPersonality: 'aggressive_random' → personality: 'schemer'`. EC9 test updated to use `archetype: 'schemer'` directly.
+
+## F3 Manual QA Session (2026-05-09 13:51-13:54)
+
+**8 scenarios executed, all PASS.**
+
+### Useful invocations
+- Determinism check needs `pnpm --silent ...` to suppress pnpm header noise (otherwise diff includes "> tripodndeer@..." lines, which still match between runs but pollute the JSON).
+- The aiPersonality grep invariant has TWO test files: `no-aipersonality.test.ts` (find-based) and `no-aipersonality-grep.test.ts` (grep-based). Both passed.
+- Full suite size: 2601 tests / 299 files / 45.22s.
+
+### Evidence layout
+- `.sisyphus/evidence/final-qa/01-...08-...` per-scenario logs
+- `.sisyphus/evidence/final-qa/VERDICT.md` summary table

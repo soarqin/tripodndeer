@@ -17,7 +17,6 @@
           "capital": "site_xianyang",
           "initialSites": [],
           "initialArmies": [],
-          "aiPersonality": "aggressive",
           "economy": { "treasury": 1000, "food": 1000, "taxRate": 0.1 },
           "stats": { "manpowerPool": 50000, "manpowerCap": 80000, "warWeariness": 0 },
           "rulerId": "g1",

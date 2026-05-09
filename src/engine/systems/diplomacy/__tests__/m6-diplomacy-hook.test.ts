@@ -29,7 +29,6 @@ function makeRealm(id: string, overrides: Partial<Realm> = {}): Realm {
     capital: `${id}_capital`,
     initialSites: [],
     initialArmies: [],
-    aiPersonality: 'aggressive_random',
     economy: { treasury: 0, foodStores: 0, taxRate: 10 },
     stats: { manpowerPool: 1000, manpowerCap: 5000, warWeariness: 0 },
     traits: [],

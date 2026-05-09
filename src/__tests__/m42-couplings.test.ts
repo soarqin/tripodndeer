@@ -53,7 +53,6 @@ function makeRealm(id: string, overrides: Partial<Realm> = {}): Realm {
     capital: `site_${id}_capital`,
     initialSites: [],
     initialArmies: [],
-    aiPersonality: 'cautious',
     economy: { treasury: 5000, foodStores: 5000, taxRate: 10 },
     traits: [],
     politicalSystem: 'enfeoffment',

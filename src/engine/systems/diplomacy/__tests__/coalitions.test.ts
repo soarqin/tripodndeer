@@ -30,7 +30,6 @@ function makeRealm(id: string, manpowerPool: number): Realm {
     capital: `${id}_capital`,
     initialSites: [],
     initialArmies: [],
-    aiPersonality: 'aggressive_random',
     economy: { treasury: 0, foodStores: 0, taxRate: 10 },
     stats: { manpowerPool, manpowerCap: Math.max(5000, manpowerPool), warWeariness: 0 },
     traits: [],

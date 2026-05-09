@@ -11,7 +11,6 @@ type JsonRealm = {
   capital: string
   initialSites: string[]
   initialArmies: Array<{ id: string; manpower: number; location: string }>
-  aiPersonality: string
 }
 
 const sites = scenarioJson.sites as JsonSite[]

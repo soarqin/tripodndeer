@@ -298,3 +298,41 @@ is required.
 - No `as any` / `@ts-ignore` in M8 files
 - No empty catches, no `console.log`, no commented-out code
 - M5_PERSONALITY_WEIGHTS dead columns (recruit/diplomacy/economy) NOT newly connected — verified via collectTacticalOptions only emits attack/siege-continue/cut-supply/retreat/idle (per DoD OUT OF SCOPE)
+
+- T5.1 audit: `grep -r 'aiPersonality' src/ --include='*.ts' --include='*.tsx' --include='*.json' -l` found 112 files.
+- Most hits are test fixtures under `__tests__`; production code hits are concentrated in `src/engine/systems/ai/utility-scorer.ts`, `src/engine/world/factory.ts`, and `src/engine/world/migrations/v1-to-v3.ts`.
+- Data hits are limited to `src/content/m0/sites.json`.
+
+- T5.5 migration: `v1-to-v3` now preserves optional realm `archetype` through `RealmSchemaV2` and maps legacy V1 `aiPersonality` literals (`aggressive`, `cautious`, `aggressive_random`) to M8 archetypes before parsing.
+- T5.5 verification: targeted Vitest passed for `m9-mapper-archetype`, `v1-to-v3-mapping`, and existing `v1-to-v3`; full `pnpm typecheck` remains blocked by pre-existing widespread `Realm.aiPersonality` fixture errors outside this task.
+
+---
+
+## T8.3 / T8.4 / T8.7 — memory + drift test coverage (committed d7f1d6a / 5d933b3 / 3b38ec8)
+
+**Realm fixture gotcha**: `aiPersonality` was removed from the `Realm` interface. Existing tests under `src/engine/systems/diplomacy/__tests__/diplomatic-memory-phase.test.ts` still set it (workspace had stale mods); when copying fixtures, drop the field. New tests must NOT include `aiPersonality` on `Realm`.
+
+**diplomaticMemoryPhase determinism**: The phase does not consume RNG (`nextRng === rng`). Determinism test simulates 100 phase invocations advancing tick each time, compares `JSON.stringify([...memory.entries()])` between two runs. Sorted realm iteration (`a.id.localeCompare(b.id)`) guarantees stable Map insertion order.
+
+**Decay arithmetic**: `betrayalScore = memory.betrayalScore * 0.99` runs at the START of `updateMemoryForPair` — every call, regardless of new events. So:
+- score(0)=100 → after N phases = `100 * 0.99^N` (when history empty)
+- 1 betrayal pushed in phase 1 → score = 30 in phase 1, then `30 * 0.99^(N-1)` for subsequent decay-only phases
+- `lastObservedHistoryIdx` advance prevents re-summing the same event (verified by `events.length === 1` after 5 phases)
+
+**Drift clamp at scale**: `personalityDriftPhase` applies each rule at most once per phase (boolean trigger), not per matching event. To exercise clamp, must call phase repeatedly. After 1000 phases with `catastrophic_loss` + `repeated_betrayal_success` triggers active:
+- `caution`: 0.5 + 1000 * 0.05 = 50.5 → clamped to 1
+- `diplomaticTrust`: 0.5 - 1000 * 0.05 = -49.5 → clamped to 0
+- 5 untouched dims stay at 0.5
+- `prolonged_prosperity` cannot fire when `combat_observed` is in the recent window, because `hadRecentWar` returns true on combat_observed events
+
+**8 archetypes via `it.each`**: `M8_PERSONALITY_ARCHETYPE_LIST` (in `src/content/m2/balance/m8.ts`) is a `readonly` tuple of all 8 archetype literals. `it.each(M8_PERSONALITY_ARCHETYPE_LIST)` parametrises one test per archetype cleanly.
+
+**`M8_PERSONALITY_DIMENSIONS_COUNT === 8`**: This counts `RulerPersonalityProfile` keys including categorical `preferredStrategy` (7 numeric + 1 string). Clamp test verifies bounds on the 7 numeric dims and asserts `preferredStrategy` is preserved.
+
+---
+
+## F4 Scope Fidelity Check — 2026-05-09
+
+- Main deliverables inspected: diplomatic memory, difficulty multipliers/truncation, `aiPersonality` removal, personality drift, auto-battle, SaveDTO V3, phase order.
+- Functional scope mostly matches the requested M8.2 items; `PHASE_ORDER` has 27 phases with `diplomaticMemory` immediately after `historicalEvents`.
+- Scope hygiene is not clean: `git status --short` reports 122 changed/untracked paths, including many legacy tests/tools/content files outside the F4 deliverable list.

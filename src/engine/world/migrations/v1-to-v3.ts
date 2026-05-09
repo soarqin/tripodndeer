@@ -5,8 +5,7 @@ import {
   type M1DataV2,
   type M1DataV3,
 } from '~/shared/schemas'
-import { M5_PERSONALITY_DIMS_BASELINE } from '~/content/m2/balance/m5'
-import type { AIPersonality, PersonalityArchetype } from '~/shared/types'
+import type { PersonalityArchetype, RulerPersonalityProfile } from '~/shared/types'
 
 const PERSONALITY_ARCHETYPES: readonly PersonalityArchetype[] = [
   'conqueror',
@@ -19,40 +18,95 @@ const PERSONALITY_ARCHETYPES: readonly PersonalityArchetype[] = [
   'builder',
 ]
 
-function mapLegacyAiPersonality(ai: AIPersonality): PersonalityArchetype {
-  switch (ai) {
-    case 'aggressive':
-      return 'conqueror'
-    case 'cautious':
-      return 'steward'
-    case 'aggressive_random':
-      return 'schemer'
-  }
+const DEFAULT_PERSONALITY_DIMS: Readonly<Record<PersonalityArchetype, RulerPersonalityProfile>> = {
+  conqueror: {
+    expansionDrive: 0.85,
+    caution: 0.3,
+    vindictiveness: 0.6,
+    patience: 0.3,
+    diplomaticTrust: 0.4,
+    honor: 0.5,
+    reformInclination: 0.5,
+    preferredStrategy: 'blitz',
+  },
+  steward: {
+    expansionDrive: 0.2,
+    caution: 0.7,
+    vindictiveness: 0.2,
+    patience: 0.7,
+    diplomaticTrust: 0.6,
+    honor: 0.6,
+    reformInclination: 0.6,
+    preferredStrategy: 'attrition',
+  },
+  schemer: {
+    expansionDrive: 0.5,
+    caution: 0.6,
+    vindictiveness: 0.6,
+    patience: 0.6,
+    diplomaticTrust: 0.3,
+    honor: 0.3,
+    reformInclination: 0.4,
+    preferredStrategy: 'diplomatic',
+  },
+  learned: {
+    expansionDrive: 0.4,
+    caution: 0.6,
+    vindictiveness: 0.2,
+    patience: 0.7,
+    diplomaticTrust: 0.7,
+    honor: 0.8,
+    reformInclination: 0.4,
+    preferredStrategy: 'diplomatic',
+  },
+  tyrant: {
+    expansionDrive: 0.7,
+    caution: 0.25,
+    vindictiveness: 0.85,
+    patience: 0.3,
+    diplomaticTrust: 0.2,
+    honor: 0.2,
+    reformInclination: 0.3,
+    preferredStrategy: 'blitz',
+  },
+  incompetent: {
+    expansionDrive: 0.5,
+    caution: 0.5,
+    vindictiveness: 0.5,
+    patience: 0.5,
+    diplomaticTrust: 0.5,
+    honor: 0.5,
+    reformInclination: 0.5,
+    preferredStrategy: 'attrition',
+  },
+  benevolent: {
+    expansionDrive: 0.2,
+    caution: 0.6,
+    vindictiveness: 0.2,
+    patience: 0.7,
+    diplomaticTrust: 0.7,
+    honor: 0.7,
+    reformInclination: 0.5,
+    preferredStrategy: 'diplomatic',
+  },
+  builder: {
+    expansionDrive: 0.3,
+    caution: 0.55,
+    vindictiveness: 0.3,
+    patience: 0.7,
+    diplomaticTrust: 0.5,
+    honor: 0.6,
+    reformInclination: 0.85,
+    preferredStrategy: 'siege',
+  },
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-function isLegacyAiPersonality(value: unknown): value is AIPersonality {
-  return value === 'aggressive' || value === 'cautious' || value === 'aggressive_random'
-}
-
 function isPersonalityArchetype(value: unknown): value is PersonalityArchetype {
   return typeof value === 'string' && PERSONALITY_ARCHETYPES.includes(value as PersonalityArchetype)
-}
-
-function normalizeRealmFields(realm: unknown): unknown {
-  if (!isRecord(realm)) return realm
-  const { aiPersonality: legacyAiPersonality, ...withoutLegacyAi } = realm
-  if (withoutLegacyAi.archetype !== undefined) return withoutLegacyAi
-  if (!isLegacyAiPersonality(legacyAiPersonality)) return withoutLegacyAi
-  return { ...withoutLegacyAi, archetype: mapLegacyAiPersonality(legacyAiPersonality) }
-}
-
-function normalizeRawRealmFields(rawData: unknown): unknown {
-  if (!isRecord(rawData) || !Array.isArray(rawData.realms)) return rawData
-  return { ...rawData, realms: rawData.realms.map(normalizeRealmFields) }
 }
 
 function stripRealmV2Fields(realm: unknown): unknown {
@@ -69,11 +123,10 @@ function stripV1OnlyRealmFields(rawData: unknown): unknown {
 }
 
 function getNormalizedRealmArchetypes(rawData: unknown): ReadonlyMap<string, PersonalityArchetype> {
-  const normalized = normalizeRawRealmFields(rawData)
-  if (!isRecord(normalized) || !Array.isArray(normalized.realms)) return new Map()
+  if (!isRecord(rawData) || !Array.isArray(rawData.realms)) return new Map()
 
   const archetypes = new Map<string, PersonalityArchetype>()
-  for (const realm of normalized.realms) {
+  for (const realm of rawData.realms) {
     if (!isRecord(realm) || typeof realm.id !== 'string') continue
     if (isPersonalityArchetype(realm.archetype)) archetypes.set(realm.id, realm.archetype)
   }
@@ -81,9 +134,8 @@ function getNormalizedRealmArchetypes(rawData: unknown): ReadonlyMap<string, Per
 }
 
 function v1ToV2(rawData: unknown): M1DataV2 {
-  const normalized = normalizeRawRealmFields(rawData)
-  const v1 = M1DataSchema.parse(stripV1OnlyRealmFields(normalized))
-  const realmArchetypes = getNormalizedRealmArchetypes(normalized)
+  const v1 = M1DataSchema.parse(stripV1OnlyRealmFields(rawData))
+  const realmArchetypes = getNormalizedRealmArchetypes(rawData)
   const migrated = {
     ...v1,
     schema_version: 2 as const,
@@ -115,7 +167,7 @@ function ensureV2(rawData: unknown): M1DataV2 {
   if (version === undefined || version < 2) {
     return v1ToV2(rawData)
   }
-  return M1DataSchemaV2.parse(normalizeRawRealmFields(rawData))
+  return M1DataSchemaV2.parse(rawData)
 }
 
 function v2ToV3(v2: M1DataV2): M1DataV3 {
@@ -169,7 +221,7 @@ function v2ToV3(v2: M1DataV2): M1DataV3 {
       lifespan: 65,
       health: 80,
       personality: realm.archetype ?? 'incompetent',
-      personalityDims: { ...M5_PERSONALITY_DIMS_BASELINE[realm.archetype ?? 'incompetent'] },
+      personalityDims: { ...DEFAULT_PERSONALITY_DIMS[realm.archetype ?? 'incompetent'] },
       successionLawId: 'primogeniture' as const,
       inOfficeSinceTick: 0,
     }))

@@ -82,7 +82,6 @@ function makeArgs(overrides: ArgsOverrides = {}): DrawArgs {
     capital: 'site_1',
     initialSites: [],
     initialArmies: [],
-    aiPersonality: 'aggressive_random',
     economy: { treasury: 0, foodStores: 0, taxRate: 10 },
     traits: [],
     politicalSystem: 'enfeoffment',
@@ -181,13 +180,13 @@ describe('M7_ENABLED=false: fog gating disabled', () => {
     } as unknown as Site
     const realmQin = {
       id: PLAYER, displayName: 'Q', fullTitle: 'Q', color: '#1a1a1a',
-      capital: 'site_1', initialSites: [], initialArmies: [], aiPersonality: 'aggressive_random',
+      capital: 'site_1', initialSites: [], initialArmies: [],
       economy: { treasury: 0, foodStores: 0, taxRate: 10 }, traits: [],
       politicalSystem: 'enfeoffment',
     } as unknown as Realm
     const realmWei = {
       id: ENEMY, displayName: 'W', fullTitle: 'W', color: '#ff0000',
-      capital: 'site_2', initialSites: [], initialArmies: [], aiPersonality: 'aggressive_random',
+      capital: 'site_2', initialSites: [], initialArmies: [],
       economy: { treasury: 0, foodStores: 0, taxRate: 10 }, traits: [],
       politicalSystem: 'enfeoffment',
     } as unknown as Realm

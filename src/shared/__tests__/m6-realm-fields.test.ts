@@ -41,7 +41,6 @@ describe('M6 Realm fields', () => {
           capital: 'site_test',
           initialSites: [],
           initialArmies: [],
-          aiPersonality: 'cautious',
           economy: { treasury: 0, foodStores: 0, taxRate: 10 },
           traits: [],
           politicalSystem: 'enfeoffment',

@@ -39,7 +39,7 @@ function makeSite(id: string): Site {
 function makeRealm(id: string, color: string): Realm {
   return {
     id, displayName: '秦', fullTitle: '秦国', color,
-    capital: 'site_1', initialSites: [], initialArmies: [], aiPersonality: 'aggressive_random',
+    capital: 'site_1', initialSites: [], initialArmies: [],
     economy: { treasury: 0, foodStores: 0, taxRate: 10 },
     traits: [],
     politicalSystem: 'enfeoffment',

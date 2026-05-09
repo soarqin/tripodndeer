@@ -80,7 +80,6 @@ function makeRealm(id: string, opts: MakeRealmOpts = {}): Realm {
     capital: `${id}_capital`,
     initialSites: [],
     initialArmies: [],
-    aiPersonality: 'cautious',
     economy: {
       treasury: opts.treasury ?? 10000,
       foodStores: opts.foodStores ?? 10000,

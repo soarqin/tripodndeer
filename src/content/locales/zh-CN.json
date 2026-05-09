@@ -137,6 +137,12 @@
   "ui.realm.realm_lu.people": "鲁人",
   "ui.realm.realm_zhongshan.people": "中山人",
 
+  "difficulty.weak": "弱主",
+  "difficulty.common": "平王",
+  "difficulty.hero": "雄主",
+  "difficulty.hegemon": "霸主",
+  "difficulty.sage": "至圣",
+
   "ui.year_label": "公元前{{year}}年",
   "ui.year_short": "前{{year}}年",
   "ui.tick_label": "第{{tick}}旬",

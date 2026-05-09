@@ -34,7 +34,6 @@ function makeRealm(id: RealmId, treasury = 1000): Realm {
     capital: `site_${id}`,
     initialSites: [],
     initialArmies: [],
-    aiPersonality: 'cautious',
     economy: {
       treasury,
       foodStores: 1000,

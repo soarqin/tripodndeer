@@ -1,3 +1,5 @@
+import type { PersonalityArchetype, RulerPersonalityProfile } from '~/shared/types'
+
 export const M5_RULER_BASE_LIFESPAN = 65
 export const M5_RULER_LIFESPAN_VARIANCE = 5
 export const M5_HEALTH_DECREASE_PER_YEAR = 1
@@ -101,4 +103,87 @@ export const M5_SPECIALTY_WEIGHTS_RECRUITMENT: Record<string, number> = {
   spy: 0.08,
   scholar: 0.07,
   engineer: 0.05,
+}
+
+export const M5_PERSONALITY_DIMS_BASELINE: Readonly<Record<PersonalityArchetype, RulerPersonalityProfile>> = {
+  conqueror: {
+    expansionDrive: 0.85,
+    caution: 0.3,
+    vindictiveness: 0.6,
+    patience: 0.3,
+    diplomaticTrust: 0.4,
+    honor: 0.5,
+    reformInclination: 0.5,
+    preferredStrategy: 'blitz',
+  },
+  steward: {
+    expansionDrive: 0.2,
+    caution: 0.7,
+    vindictiveness: 0.2,
+    patience: 0.7,
+    diplomaticTrust: 0.6,
+    honor: 0.6,
+    reformInclination: 0.6,
+    preferredStrategy: 'attrition',
+  },
+  schemer: {
+    expansionDrive: 0.5,
+    caution: 0.6,
+    vindictiveness: 0.6,
+    patience: 0.6,
+    diplomaticTrust: 0.3,
+    honor: 0.3,
+    reformInclination: 0.4,
+    preferredStrategy: 'diplomatic',
+  },
+  learned: {
+    expansionDrive: 0.4,
+    caution: 0.6,
+    vindictiveness: 0.2,
+    patience: 0.7,
+    diplomaticTrust: 0.7,
+    honor: 0.8,
+    reformInclination: 0.4,
+    preferredStrategy: 'diplomatic',
+  },
+  tyrant: {
+    expansionDrive: 0.7,
+    caution: 0.25,
+    vindictiveness: 0.85,
+    patience: 0.3,
+    diplomaticTrust: 0.2,
+    honor: 0.2,
+    reformInclination: 0.3,
+    preferredStrategy: 'blitz',
+  },
+  incompetent: {
+    expansionDrive: 0.5,
+    caution: 0.5,
+    vindictiveness: 0.5,
+    patience: 0.5,
+    diplomaticTrust: 0.5,
+    honor: 0.5,
+    reformInclination: 0.5,
+    preferredStrategy: 'attrition',
+  },
+  benevolent: {
+    expansionDrive: 0.2,
+    caution: 0.6,
+    vindictiveness: 0.2,
+    patience: 0.7,
+    diplomaticTrust: 0.7,
+    honor: 0.7,
+    reformInclination: 0.5,
+    preferredStrategy: 'diplomatic',
+  },
+  builder: {
+    expansionDrive: 0.3,
+    caution: 0.55,
+    vindictiveness: 0.3,
+    patience: 0.7,
+    diplomaticTrust: 0.5,
+    honor: 0.6,
+    reformInclination: 0.85,
+    preferredStrategy: 'siege',
+  },
 }

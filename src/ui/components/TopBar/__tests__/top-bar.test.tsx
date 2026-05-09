@@ -18,7 +18,6 @@ const mockState = {
           capital: 'site_1',
           initialSites: [],
           initialArmies: [],
-          aiPersonality: 'aggressive_random',
           economy: {
             treasury: 12300,
             foodStores: 500,

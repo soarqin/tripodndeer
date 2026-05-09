@@ -25,7 +25,6 @@ function makeRealm(id: string, capital: string): Realm {
     capital,
     initialSites: [capital],
     initialArmies: [],
-    aiPersonality: 'aggressive_random',
     economy: { treasury: 0, foodStores: 0, taxRate: 10 },
     traits: [],
     politicalSystem: 'enfeoffment',

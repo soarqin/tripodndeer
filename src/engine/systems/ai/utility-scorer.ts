@@ -26,19 +26,7 @@ export function getPersonality(
   world: World,
   realmId: RealmId
 ): PersonalityArchetype {
-  const ruler = world.rulers.get(realmId)
-  if (ruler) {
-    return ruler.personality
-  }
-
-  const realm = world.realms.get(realmId)
-  const configured = realm?.aiPersonality
-
-  if (configured === 'aggressive') return 'conqueror'
-  if (configured === 'cautious') return 'steward'
-  if (configured === 'aggressive_random') return 'schemer'
-
-  return 'incompetent'
+  return world.rulers.get(realmId)?.personality ?? 'incompetent'
 }
 
 export function scoreOption(

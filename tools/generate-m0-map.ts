@@ -13,8 +13,8 @@ const NOISE_RATIO = 0.08
 const SITE_IDS = ['site_1', 'site_2', 'site_3', 'site_4', 'site_5'] as const
 const SITE_NAMES = ['邑甲', '邑乙', '邑丙', '邑丁', '邑戊'] as const
 const REALMS = [
-  { id: 'realm_red', displayName: '红', fullTitle: '红方', color: '#dc2626', capital: 'site_1', initialSites: ['site_1'], initialArmies: [], aiPersonality: 'aggressive_random' },
-  { id: 'realm_blue', displayName: '蓝', fullTitle: '蓝方', color: '#2563eb', capital: 'site_2', initialSites: ['site_2', 'site_3', 'site_4', 'site_5'], initialArmies: [], aiPersonality: 'aggressive_random' },
+  { id: 'realm_red', displayName: '红', fullTitle: '红方', color: '#dc2626', capital: 'site_1', initialSites: ['site_1'], initialArmies: [] },
+  { id: 'realm_blue', displayName: '蓝', fullTitle: '蓝方', color: '#2563eb', capital: 'site_2', initialSites: ['site_2', 'site_3', 'site_4', 'site_5'], initialArmies: [] },
 ]
 const INITIAL_OWNERSHIP: Record<string, string> = {
   site_1: 'realm_red',

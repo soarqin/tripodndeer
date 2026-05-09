@@ -38,6 +38,7 @@ import type {
   RelationKey,
   ReformId,
   SiteId,
+  DifficultyTier,
   World,
 } from '~/shared/types'
 import { bannerTextForCriticalEvent, type CriticalEventType } from '../critical-events'
@@ -97,7 +98,7 @@ export interface WorldActions {
   applyReformChoice: (realmId: RealmId, reformId: ReformId, choiceId: string) => void
   applyEventChainChoice: (chainId: EventChainId, choiceId: string) => void
   pauseOnCriticalEvent: (eventType: CriticalEventType, payload?: Record<string, unknown>) => void
-  loadWorld: (scenarioId: ScenarioId) => Promise<void>
+   loadWorld: (scenarioId: ScenarioId, difficulty?: DifficultyTier) => Promise<void>
   replaceWorldFromSave: (world: World) => void
   resetToBootPending: () => void
 }
@@ -251,11 +252,11 @@ function applyReadyWorld(state: GameStore, world: World, playerRealmId: RealmId)
 
 function createBootActions(set: StoreSet): Pick<WorldActions, 'loadWorld' | 'replaceWorldFromSave' | 'resetToBootPending'> {
   return {
-    loadWorld: async (scenarioId) => {
+    loadWorld: async (scenarioId, difficulty = 'hero') => {
       if (scenarioId === 'm1') {
         const data = loadM1Data()
         const playerRealmId: RealmId = 'realm_qin'
-        const world = createWorldFromM1Data(data, 42, playerRealmId)
+        const world = createWorldFromM1Data(data, 42, playerRealmId, difficulty)
         set((state) => {
           applyReadyWorld(state, world, playerRealmId)
         })
@@ -264,7 +265,7 @@ function createBootActions(set: StoreSet): Pick<WorldActions, 'loadWorld' | 'rep
 
       const data = await loadM9Data()
       const playerRealmId: RealmId = 'realm_qin'
-      const world = createWorldFromM9Data(data, 42, playerRealmId)
+      const world = createWorldFromM9Data(data, 42, playerRealmId, difficulty)
       set((state) => {
         applyReadyWorld(state, world, playerRealmId)
       })

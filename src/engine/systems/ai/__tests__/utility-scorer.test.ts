@@ -1,25 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { AIOption } from '../index'
-import { getPersonality, pickAction, scoreOption } from '../index'
-import type { Realm, RulerState, World } from '~/shared/types'
-import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
-
-function createMockWorld(
-  realmId: string,
-  realm: Partial<Realm> = {},
-  ruler: Partial<RulerState> | null = null
-): World {
-  const world = makeEmptyWorld()
-  const realms = new Map(world.realms)
-  realms.set(realmId, { id: realmId, ...realm } as Realm)
-
-  const rulers = new Map(world.rulers)
-  if (ruler) {
-    rulers.set(realmId, { realmId, ...ruler } as RulerState)
-  }
-
-  return { ...world, realms, rulers }
-}
+import { pickAction, scoreOption } from '../index'
 
 describe('utility scorer', () => {
   it('conqueror: attack scores higher than retreat', () => {
@@ -68,32 +49,6 @@ describe('utility scorer', () => {
 
     expect(diplomacyScore).toBeGreaterThan(attackScore)
     expect(economyScore).toBeGreaterThan(attackScore)
-  })
-
-  it("rulerless + no legacy field → returns 'incompetent'", () => {
-    const world = createMockWorld('realm_qin')
-    expect(getPersonality(world, 'realm_qin')).toBe('incompetent')
-  })
-
-  it("rulerless + legacy 'aggressive' → returns 'conqueror'", () => {
-    const world = createMockWorld('realm_qin', { aiPersonality: 'aggressive' })
-    expect(getPersonality(world, 'realm_qin')).toBe('conqueror')
-  })
-
-  it("rulerless + legacy 'aggressive_random' → returns 'schemer'", () => {
-    const world = createMockWorld('realm_qin', {
-      aiPersonality: 'aggressive_random',
-    })
-    expect(getPersonality(world, 'realm_qin')).toBe('schemer')
-  })
-
-  it('has ruler with personality → returns ruler.personality', () => {
-    const world = createMockWorld(
-      'realm_qin',
-      { aiPersonality: 'aggressive' },
-      { personality: 'learned' }
-    )
-    expect(getPersonality(world, 'realm_qin')).toBe('learned')
   })
 
   it('deterministic with same seed', () => {

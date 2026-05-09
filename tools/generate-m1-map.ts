@@ -18,18 +18,17 @@ type RealmDef = {
   displayName: string
   fullTitle: string
   color: string
-  aiPersonality: 'aggressive_random'
 }
 
 const REALMS: readonly RealmDef[] = [
-  { id: 'realm_qin', displayName: '秦', fullTitle: '秦国', color: '#1A1A1A', aiPersonality: 'aggressive_random' },
-  { id: 'realm_chu', displayName: '楚', fullTitle: '楚国', color: '#8B1A1A', aiPersonality: 'aggressive_random' },
-  { id: 'realm_qi', displayName: '齐', fullTitle: '齐国', color: '#2E5A6E', aiPersonality: 'aggressive_random' },
-  { id: 'realm_yan', displayName: '燕', fullTitle: '燕国', color: '#B0B0B0', aiPersonality: 'aggressive_random' },
-  { id: 'realm_han', displayName: '韩', fullTitle: '韩国', color: '#D8741A', aiPersonality: 'aggressive_random' },
-  { id: 'realm_zhao', displayName: '赵', fullTitle: '赵国', color: '#5B3A6F', aiPersonality: 'aggressive_random' },
-  { id: 'realm_wei', displayName: '魏', fullTitle: '魏国', color: '#4A8B5C', aiPersonality: 'aggressive_random' },
-  { id: 'realm_zhou', displayName: '周', fullTitle: '周王室', color: '#C8362F', aiPersonality: 'aggressive_random' },
+  { id: 'realm_qin', displayName: '秦', fullTitle: '秦国', color: '#1A1A1A' },
+  { id: 'realm_chu', displayName: '楚', fullTitle: '楚国', color: '#8B1A1A' },
+  { id: 'realm_qi', displayName: '齐', fullTitle: '齐国', color: '#2E5A6E' },
+  { id: 'realm_yan', displayName: '燕', fullTitle: '燕国', color: '#B0B0B0' },
+  { id: 'realm_han', displayName: '韩', fullTitle: '韩国', color: '#D8741A' },
+  { id: 'realm_zhao', displayName: '赵', fullTitle: '赵国', color: '#5B3A6F' },
+  { id: 'realm_wei', displayName: '魏', fullTitle: '魏国', color: '#4A8B5C' },
+  { id: 'realm_zhou', displayName: '周', fullTitle: '周王室', color: '#C8362F' },
 ] as const
 
 // ─── Deterministic PRNG ──────────────────────────────────────────────────────
@@ -501,7 +500,6 @@ type RealmOutput = {
   capital: string
   initialSites: string[]
   initialArmies: Array<{ id: string; manpower: number; location: string }>
-  aiPersonality: 'aggressive_random'
 }
 
 function buildRealmOutputs(sites: BuiltSite[], assignment: RealmAssignment): RealmOutput[] {
@@ -535,7 +533,6 @@ function buildRealmOutputs(sites: BuiltSite[], assignment: RealmAssignment): Rea
       capital,
       initialSites: sortedOwned,
       initialArmies,
-      aiPersonality: def.aiPersonality,
     })
   }
 
