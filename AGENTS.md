@@ -416,12 +416,13 @@ const world: World = {
 
 ## M8+ Deferred Items
 
+> M8 系列已全部交付（M8 + M8.1 + M8.2 + M8.3）。本 section 列举的剩余项均推到 M9.x / M10 / M12。
+
 以下功能明确延后，**不要在对应里程碑之前实现**：
 
 - 三层决策模型（Strategic/Operational/Tactical）（M8.x）
 - 外交 AI 记忆（"被欺骗的记忆"）（M8.x）
 - AI vs AI 自动对战 infra（M8.x）
-- 期望胜率分布平衡基准（M8.x）
 - 5 档难度分层（M8.x）
 - Dev mode AI introspection UI（M10）
 - Personality drift 随事件演化（M8.x）
