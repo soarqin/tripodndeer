@@ -216,6 +216,11 @@ T15: Behavior harness report aggregates taxRateFinal/taxRateInitial across seeds
 - Cross-task contamination issues: `src/engine/systems/diplomacy/lifecycle.ts` contains M8 balance usage outside T8/T9 files; `src/engine/systems/economy/__tests__/economy-phase.test.ts` contains M8 usage outside T11 production file.
 - Exact expected-file audit found 18 changed files outside the explicit T1-T18 file list, mostly supporting tests plus `diplomacy/integration.ts` and `diplomacy/lifecycle.ts`.
 
+## [F4] M8.3 baseline follow-up (2026-05-09)
+- `BatchProgress` can safely grow by one readonly field (`endTick`) without touching `BatchReport`; the CLI progress line can surface runtime ticks directly from `finalWorld.tick`.
+- The checked-in baseline is intentionally tiny (`samples: 2`, `maxTicks: 200`) because the `tsx` runner is too slow for the nominal 100-game baseline in this environment.
+- When updating the gap-analysis note, use the JSON distribution as the source of truth: Qin 2/2 wins, all other listed §7.2 realms 0/2.
+
 ## F3 Manual QA (2026-05-05)
 
 All 12 QA scenarios PASS. Summary:
@@ -336,3 +341,7 @@ is required.
 - Main deliverables inspected: diplomatic memory, difficulty multipliers/truncation, `aiPersonality` removal, personality drift, auto-battle, SaveDTO V3, phase order.
 - Functional scope mostly matches the requested M8.2 items; `PHASE_ORDER` has 27 phases with `diplomaticMemory` immediately after `historicalEvents`.
 - Scope hygiene is not clean: `git status --short` reports 122 changed/untracked paths, including many legacy tests/tools/content files outside the F4 deliverable list.
+
+## [2026-05-09] AGENTS.md maintenance note
+- `## M8+ Deferred Items` now includes a blockquote stating M8 is fully delivered.
+- Removed the obsolete `期望胜率分布平衡基准（M8.x）` line and kept the rest of AGENTS.md unchanged.
