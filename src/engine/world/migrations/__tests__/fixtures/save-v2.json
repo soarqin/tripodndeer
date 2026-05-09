@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 2,
+  "scenarioId": "m1",
+  "createdAt": 0,
+  "world": {
+    "date": { "yearBC": 453, "season": "spring", "month": 1, "xun": "shang" },
+    "tick": 0,
+    "sites": [],
+    "realms": [
+      [
+        "realm_qin",
+        {
+          "id": "realm_qin",
+          "displayName": "秦",
+          "fullTitle": "秦",
+          "color": "#dc2626",
+          "capital": "site_xianyang",
+          "initialSites": [],
+          "initialArmies": [],
+          "aiPersonality": "aggressive",
+          "economy": { "treasury": 1000, "food": 1000, "taxRate": 0.1 },
+          "stats": { "manpowerPool": 50000, "manpowerCap": 80000, "warWeariness": 0 },
+          "rulerId": "g1",
+          "traits": [],
+          "politicalSystem": "monarchy",
+          "status": "active"
+        }
+      ]
+    ],
+    "armies": [],
+    "edges": [],
+    "wars": [],
+    "peaceProposals": [],
+    "relations": [],
+    "diplomaticProposals": [],
+    "treaties": [],
+    "diplomacyHistory": [],
+    "coalitions": [],
+    "zhouInvestiture": [],
+    "generals": [
+      [
+        "g1",
+        {
+          "id": "g1",
+          "realmId": "realm_qin",
+          "name": "秦君",
+          "might": 12,
+          "command": 5000,
+          "loyalty": 100,
+          "specialty": "commander",
+          "ambition": "mid",
+          "age": 35,
+          "posts": ["ruler"],
+          "loyaltyState": "loyal",
+          "attrs": { "wu": 12, "zheng": 10, "jiao": 10, "mou": 10, "xue": 10, "po": 10 }
+        }
+      ]
+    ],
+    "rulers": [
+      [
+        "realm_qin",
+        {
+          "realmId": "realm_qin",
+          "generalId": "g1",
+          "age": 35,
+          "lifespan": 65,
+          "health": 100,
+          "personality": "conqueror",
+          "successionLawId": "primogeniture",
+          "inOfficeSinceTick": 0
+        }
+      ]
+    ],
+    "academies": [],
+    "eventChainStates": [],
+    "reformStates": [],
+    "disasterStates": [],
+    "tradeRoutes": [],
+    "factionInfluences": [],
+    "passes": [],
+    "adjacencyEdges": [],
+    "sieges": [],
+    "edicts": [],
+    "governorAssignments": [],
+    "intelligenceCoverage": [],
+    "spyMissions": [],
+    "counterIntelStates": [],
+    "provinces": [],
+    "regions": [],
+    "characterTemplates": [],
+    "localization": [],
+    "playerRealmId": "realm_qin",
+    "rngState": { "seed": 42, "counter": 0 },
+    "pendingOrders": [],
+    "aiState": []
+  }
+}

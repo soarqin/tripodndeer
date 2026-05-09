@@ -7,6 +7,7 @@ import {
   type SaveLoadError,
 } from '~/shared/types/save-dto'
 import { getDefaultPhases } from './factory'
+import { migrateSaveV2ToV3 } from './migrations/save-v2-to-v3'
 
 export function worldToSaveDTO(world: World, scenarioId: 'm1' | 'm9' = 'm1'): SaveDTO {
   return {
@@ -66,20 +67,24 @@ export function worldToSaveDTO(world: World, scenarioId: 'm1' | 'm9' = 'm1'): Sa
 
 export const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [1, 2, SAVE_DTO_VERSION]
 
+type SaveDTOWithVersion = Omit<SaveDTO, 'schemaVersion'> & { readonly schemaVersion: number }
+
 export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
-  if (!SUPPORTED_SAVE_DTO_VERSIONS.includes(dto.schemaVersion)) {
+  const inputDto = dto as SaveDTOWithVersion
+  if (!SUPPORTED_SAVE_DTO_VERSIONS.includes(inputDto.schemaVersion)) {
     return {
       ok: false,
       error: {
         kind: 'incompatible_version',
-        message: `Unsupported SaveDTO version: ${dto.schemaVersion}`,
-        got: dto.schemaVersion,
+        message: `Unsupported SaveDTO version: ${inputDto.schemaVersion}`,
+        got: inputDto.schemaVersion,
         expected: SAVE_DTO_VERSION,
       },
     }
   }
 
-  const sw = dto.world
+  const migratedDto = inputDto.schemaVersion === 2 ? migrateSaveV2ToV3(dto) : dto
+  const sw = migratedDto.world
   const factionInfluences = new Map(
     sw.factionInfluences.map(([key, value]): [string, FactionInfluenceState] => [
       key,
