@@ -52,6 +52,7 @@ export function App(): React.JSX.Element {
   const queuedModalCount = Math.max(0, modalQueue.length - 1)
   const closeModal = useGameStore((state) => state.closeModal)
   const openModal = useGameStore((state) => state.openModal)
+  const openCodex = useGameStore((state) => state.openCodex)
   const lastBattleResolution = useGameStore((state) => state.lastBattleResolution)
   const clearLastBattleResolution = useGameStore((state) => state.clearLastBattleResolution)
   const isPeacePanelOpen = useGameStore((state) => state.isPeacePanelOpen)
@@ -177,6 +178,7 @@ export function App(): React.JSX.Element {
       <BottomBar 
         onWanggong={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'wanggong' ? null : 'wanggong')}
         onJunshi={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'junshi' ? null : 'junshi')}
+        onShi={() => openCodex()}
         onNeizheng={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'neizheng' ? null : 'neizheng')}
         onRencai={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'rencai' ? null : 'rencai')}
         onWaijiao={() => useGameStore.getState().setActivePanel(useGameStore.getState().activePanel === 'waijiao' ? null : 'waijiao')}
