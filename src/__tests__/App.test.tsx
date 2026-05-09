@@ -69,4 +69,12 @@ describe('App', () => {
     
     expect(useGameStore.getState().bootStatus).toBe('pending')
   })
+
+  it('renders codex panel when activePanel is codex', () => {
+    useGameStore.setState({ activePanel: 'codex' })
+
+    render(<App />)
+
+    expect(screen.getByTestId('codex-panel')).toBeTruthy()
+  })
 })

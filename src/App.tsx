@@ -23,6 +23,8 @@ import { SuccessionModal } from '@/ui/components/SuccessionModal'
 import { DisasterReliefModal } from '@/ui/components/DisasterReliefModal'
 import { EventChainModal } from '@/ui/components/EventChainModal'
 import { ReformPromptModal } from '@/ui/components/ReformPromptModal'
+import { CodexPanel } from './ui/components/CodexPanel'
+import { useCodexHotkey } from './ui/components/CodexPanel/codex-hotkey'
 import { DevAIPanel } from '@/ui/components/DevAIPanel'
 import { ToastQueue } from '@/ui/components/ToastQueue'
 import { EventLogPanel } from '@/ui/components/EventLogPanel'
@@ -45,6 +47,7 @@ const ACTION_NAMES: Record<string, string> = {
 
 export function App(): React.JSX.Element {
   useRafDriver()
+  useCodexHotkey()
   const victorious = useVictory()
   const bootStatus = useGameStore((state) => state.bootStatus)
   const modalQueue = useGameStore((state) => state.modalQueue)
@@ -152,6 +155,7 @@ export function App(): React.JSX.Element {
         <CharacterPanel />
         <ArmyListPanel />
         <DiplomacyPanel />
+        {activePanel === 'codex' && <CodexPanel />}
         {activePanel === 'culture' && <CulturePanel />}
         {activePanel === 'espionage' && <EspionagePanel />}
         {activePanel === 'province-browser' && <ProvinceBrowserPanel />}
