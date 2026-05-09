@@ -22,6 +22,12 @@ function isYearStart(world: World): boolean {
   return world.date.season === 'spring' && world.date.month === 1 && world.date.xun === 'shang'
 }
 
+function clearOutgoingDiplomaticMemory(world: World, realmId: RealmId): World['diplomaticMemory'] {
+  return new Map(
+    [...world.diplomaticMemory.entries()].filter(([key]) => !key.startsWith(`${realmId}__`)),
+  )
+}
+
 function buildSuccessor(
   realmId: RealmId,
   heirId: GeneralId,
@@ -63,6 +69,7 @@ export function rulerLifecyclePhase(
   const rulers = new Map(world.rulers)
   const realms = new Map(world.realms)
   const generals = new Map(world.generals)
+  let diplomaticMemory = world.diplomaticMemory
   const events: GameEvent[] = []
 
   const sortedRealmIds = [...rulers.keys()].sort((a, b) => a.localeCompare(b))
@@ -101,6 +108,8 @@ export function rulerLifecyclePhase(
           realms.set(realmId, updatedRealm)
         }
 
+        diplomaticMemory = clearOutgoingDiplomaticMemory({ ...world, diplomaticMemory }, realmId)
+
         generals.delete(updatedRuler.generalId)
 
         const resolvedEvent: SuccessionResolvedEvent = {
@@ -119,7 +128,7 @@ export function rulerLifecyclePhase(
   }
 
   return {
-    world: { ...world, rulers, realms, generals },
+    world: { ...world, rulers, realms, generals, diplomaticMemory },
     nextRng: rng,
     events,
   }
