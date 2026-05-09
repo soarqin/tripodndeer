@@ -10,7 +10,7 @@ AI agent behavioral guidelines for this codebase. Read before making any changes
 
 **当前里程碑**: M0-M9 已交付。Wave 9: Refactor & Cleanup 已完成。
 
-**实施顺序**: M4(✅) → M5(✅) → M4.1(✅) → M4.2(✅) → M6(✅) → M7(✅) → M8(✅) → M9(✅) → Wave 9(✅)
+**实施顺序**: M4(✅) → M5(✅) → M4.1(✅) → M4.2(✅) → M6(✅) → M7(✅) → M8(✅) → M8.1(✅) → M8.2(✅) → M8.3(✅) → M9(✅) → Wave 9(✅)
 
 ---
 
@@ -45,6 +45,9 @@ interface World {
   peaceProposals: ReadonlyMap<PeaceProposalId, PeaceProposal>
   sieges: ReadonlyMap<SiegeId, Siege>
   academies: ReadonlyMap<AcademyId, Academy> // M6 学宫
+  aiState: ReadonlyMap<RealmId, AIState> // M8.1 三层 AI 决策持久化
+  difficulty: DifficultyTier // M8.2 难度分层
+  diplomaticMemory: ReadonlyMap<MemoryKey, DiplomaticMemory> // M8.2 外交记忆
   playerRealmId: RealmId
   rngState: RNGState
   phases: readonly TickPhase[]
@@ -55,7 +58,7 @@ interface World {
 ### Phase Pipeline (M2)
 
 ```
-aiStrategic (yearly) → aiOperational (monthly) → aiTactical (per-tick) → orderApply → march → siege → combat-v2 → culturalIdentity → manpower → espionagePhase → rulerLifecycle → characterLifecycle → recruitment → ideologyDrift → reform → victoryCheck → diplomacyLifecycle → economy → disaster → trade → faction → historicalEvents → prestigeUpdate
+aiStrategic (yearly) → aiOperational (monthly) → aiTactical (per-tick) → orderApply → march → siege → combat-v2 → culturalIdentity → manpower → espionagePhase → rulerLifecycle → characterLifecycle → characterSpawn → recruitment → ideologyDrift → reform → victoryCheck → diplomacyLifecycle → economy → disaster → trade → faction → historicalEvents → diplomaticMemory → personalityDrift → prestigeUpdate → realmDeactivation
 ```
 
 每个 phase 是纯函数：`(World, RNGState) → { world, nextRng, events }`
@@ -144,6 +147,14 @@ AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按
 | M8_PERSONALITY_DIMENSIONS_COUNT === 8                                               | `src/content/m2/__tests__/balance-m8.test.ts`                        |
 | getPersonality fallback uniform to 'incompetent'                                    | `src/engine/systems/ai/__tests__/utility-scorer.test.ts`             |
 | 8 archetype 字面值与 docs/design/07-ai.md §2.3 一一对应                             | `src/content/m2/__tests__/balance-m8.test.ts`                        |
+| All M8_1 balance constants prefixed M8_1\_                                         | `src/content/m2/__tests__/balance-m8_1.test.ts`                      |
+| conqueror.expansionAggression > steward.expansionAggression (Strategic weights)     | `src/content/m2/__tests__/balance-m8_1.test.ts`                      |
+| All M8_2 balance constants prefixed M8_2\_                                         | `src/content/m2/__tests__/balance-m8_2.test.ts`                      |
+| 5 档难度 keys (weak/common/hero/hegemon/sage)                                       | `src/content/m2/__tests__/balance-m8_2.test.ts`                      |
+| 6 类记忆事件全部在 M8_2_MEMORY_EVENT_BASE_WEIGHT                                   | `src/content/m2/__tests__/balance-m8_2.test.ts`                      |
+| Three-layer AI cadence: Strategic=yearly / Operational=monthly / Tactical=per-tick | `src/engine/systems/ai/__tests__/rng-skip.test.ts`                   |
+| Operational incompetent blend 在 weak/common 难度生效                               | `src/engine/systems/ai/__tests__/operational-incompetent-blend.test.ts` |
+| SaveDTO SAVE_DTO_VERSION === 3（含 aiState + diplomaticMemory）                     | `src/engine/world/__tests__/save-dto-m8_1.test.ts`                   |
 | M9_ENABLED=true (balance.ts)                                                        | `src/content/m2/__tests__/balance-m9.test.ts`                        |
 | M9 scenario 恰好 250 sites                                                          | `src/content/m9/__tests__/scenario-m9.test.ts`                       |
 | M9 12 realms registered (8 playable + 4 AI-only)                                   | `src/content/m2/__tests__/balance-m9.test.ts`                        |
@@ -286,6 +297,9 @@ const world: World = {
   intelligenceCoverage: new Map(), // ← M7 新增
   spyMissions: new Map(), // ← M7 新增
   counterIntelStates: new Map(), // ← M7 新增
+  aiState: new Map(), // ← M8.1 新增
+  difficulty: 'hero' as const, // ← M8.2 新增
+  diplomaticMemory: new Map(), // ← M8.2 新增
   playerRealmId: 'realm_qin',
   rngState: { seed: 42, counter: 0 },
   phases: [],
@@ -361,6 +375,23 @@ const world: World = {
 
 ---
 
+## M8 Subsystems Quick Reference
+
+| 子系统              | 主文件                                                 | 关键函数                                    |
+| ------------------- | ------------------------------------------------------ | ------------------------------------------- |
+| utility-scorer      | `src/engine/systems/ai/utility-scorer.ts`              | `scoreOption(ctx, option)`                  |
+| aiStrategicStep     | `src/engine/systems/ai/strategic.ts`                   | `aiStrategicStep(world, rng)`               |
+| aiOperationalStep   | `src/engine/systems/ai/operational.ts`                 | `aiOperationalStep(world, rng)`             |
+| aiTacticalStep      | `src/engine/systems/ai/tactical-step.ts`               | `aiTacticalStep(world, rng)`                |
+| diplomaticMemory    | `src/engine/systems/diplomacy/diplomatic-memory-phase.ts` | `diplomaticMemoryPhase(world, rng)`      |
+| personalityDrift    | `src/engine/systems/character/personality-drift-phase.ts` | `personalityDriftPhase(world, rng)`      |
+| runAutoBattle       | `src/engine/automation/auto-battle.ts`                 | `runAutoBattle(config)`, `runAutoBattleWithFinalWorld(config)` |
+| runAutoBattleBatch  | `src/engine/automation/auto-battle-batch.ts`           | `runAutoBattleBatch(config)`                |
+| behavior-metrics    | `src/engine/automation/behavior-metrics.ts`            | `computeBehaviorMetrics(world, scenarioStart)` |
+| winner-fallback     | `src/engine/automation/winner-fallback.ts`             | `getWinnerWithLargestActiveFallback(world)` |
+
+---
+
 ## M9 Subsystems Quick Reference
 
 | 子系统 | 主文件 | 关键函数 |
@@ -398,6 +429,11 @@ const world: World = {
 ❌ 不新增 Realm.stability 字段（用 factionInfluences 代理）
 ❌ 不在 army-render 之外的渲染层 gate visibility（M7.1 仅 army 范围）
 ❌ 不直接修改 M7_COVERAGE_TIER_* 数值（30/60/90 是设计契约）
+❌ 不在 Tactical 层创建战争/外交/谍报决策（Tactical 仅做军事行动选择）
+❌ 不绕过 aiState bootstrap（首次 tick 由 Strategic 自动填充，不要在 load 时注入）
+❌ 不让 personalityDrift 改变 archetype 字面值（drift 只改 dims，不改 personality 字段）
+❌ 不调整 M8_2_MEMORY_DECAY_FACTOR_PER_XUN 或 M8_2_COVERAGE_TIER_* 数值（是设计契约）
+❌ 不直接调用 aiPlanStep（已废弃，改用三层 phase pipeline）
 ```
 
 ---
@@ -418,18 +454,23 @@ const world: World = {
 
 > M8 系列已全部交付（M8 + M8.1 + M8.2 + M8.3）。本 section 列举的剩余项均推到 M9.x / M10 / M12。
 
+以下功能 M8.x 内已全部交付，**不要重新实现**：
+
+- 三层决策模型（Strategic/Operational/Tactical）✅ 已交付（M8.1）
+- 外交 AI 记忆（"被欺骗的记忆"）✅ 已交付（M8.2）
+- AI vs AI 自动对战 infra（`runAutoBattle` + `pnpm auto-battle` CLI）✅ 已交付（M8.2）
+- 5 档难度分层（weak/common/hero/hegemon/sage）✅ 已交付（M8.2）
+- Personality drift 随事件演化（`personalityDriftPhase`）✅ 已交付（M8.2）
+- 移除 `realm.aiPersonality` legacy 字段 ✅ 已交付（M8.2）
+- AI 胜率分布平衡基准测量（`runAutoBattleBatch` + 100 局 baseline）✅ 已交付（M8.3）
+
 以下功能明确延后，**不要在对应里程碑之前实现**：
 
-- 三层决策模型（Strategic/Operational/Tactical）（M8.x）
-- 外交 AI 记忆（"被欺骗的记忆"）（M8.x）
-- AI vs AI 自动对战 infra（M8.x）
-- 5 档难度分层（M8.x）
 - Dev mode AI introspection UI（M10）
-- Personality drift 随事件演化（M8.x）
-- Archetype 重命名 benevolent→opportunist / builder→zealot（M9 剧本里程碑）
+- Archetype 重命名 benevolent→opportunist / builder→zealot（M9.x）
 - UI 呈现 archetype（RulerOverviewPanel 加 archetype 标签）（M10）
-- 移除 realm.aiPersonality legacy 字段（M8.x）
-- Opportunist/Zealot 名册扩展（M9）
+- Opportunist/Zealot 名册扩展（M9.x）
+- Balance.ts 数值调优（按 §7.2 期望胜率分布）（M12）
 
 ## M9+ Deferred Items
 
