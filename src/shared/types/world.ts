@@ -1,4 +1,5 @@
 import type { AIState } from './ai-state'
+import type { DifficultyTier } from './difficulty'
 import type {
   RealmId,
   SiteId,
@@ -62,6 +63,7 @@ import type {
   TradeRoute,
   FactionInfluenceState,
 } from './reform-disaster-trade'
+import type { MemoryKey, DiplomaticMemory } from './diplomatic-memory'
 import type { CharacterAttributes, Specialty } from './character'
 
 export type PassId = string
@@ -233,6 +235,8 @@ export interface World {
   characterTemplates: ReadonlyMap<CharId, CharacterTemplate>
   localization: ReadonlyMap<string, string>
   aiState: ReadonlyMap<RealmId, AIState>
+  difficulty: DifficultyTier
+  diplomaticMemory: ReadonlyMap<MemoryKey, DiplomaticMemory>
   playerRealmId: RealmId
   rngState: RNGState // PRNG 状态在 World，不在 module 闭包
   phases: readonly TickPhase[] // Tick 阶段数组（M0 仅 1 个，但形状必须是数组）
