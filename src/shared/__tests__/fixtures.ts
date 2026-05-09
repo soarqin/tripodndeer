@@ -109,6 +109,8 @@ export function makeEmptyWorld(overrides: MakeEmptyWorldOverrides = {}): World {
     characterTemplates: new Map(),
     localization: new Map(),
     aiState: new Map(),
+    difficulty: 'common',
+    diplomaticMemory: new Map(),
     playerRealmId: 'realm_qin',
     rngState: { ...DEFAULT_RNG },
     phases: [],

@@ -7,6 +7,7 @@ import {
   M4_HOUSEHOLD_DIVISOR,
   M4_POPULATION_GROWTH_BASIS_POINTS,
   M4_TAX_RATE_DIVISOR,
+  M8_2_DIFFICULTY_PROFILES,
 } from '~/content/m2/balance'
 import {
   getEdictSettlementModifiers,
@@ -20,6 +21,7 @@ import {
 import { settlePeaceTributes } from '~/engine/systems/peace'
 import { getTraitModifiers } from '~/content/m4_1/trait-effects'
 import { applyAIEconomyDecision } from '~/engine/systems/ai/economy-decision'
+import { isAIRealm } from '~/engine/automation/sentinels'
 
 export function economyPhase(
   world: World,
@@ -32,6 +34,7 @@ export function economyPhase(
   let workingWorld = world
   const sites = new Map(world.sites)
   let edicts = world.edicts
+  const profile = M8_2_DIFFICULTY_PROFILES[world.difficulty]
 
   for (const realm of sortedRealms(world.realms)) {
     if (realm.id !== world.playerRealmId) {
@@ -40,6 +43,7 @@ export function economyPhase(
 
     const currentRealm = workingWorld.realms.get(realm.id) ?? realm
     const edictModifiers = getEdictSettlementModifiers(edicts, realm.id)
+    const economyMul = isAIRealm(workingWorld, realm.id) ? profile.aiEconomyMul : profile.playerEconomyMul
     const settlement = settleRealm(
       currentRealm,
       sortedSitesForRealm(world.sites, realm.id),
@@ -47,6 +51,7 @@ export function economyPhase(
       edictModifiers,
       world.governorAssignments,
       world.generals,
+      economyMul,
     )
     const realms = new Map(workingWorld.realms)
     realms.set(realm.id, settlement.realm)
@@ -67,6 +72,7 @@ function settleRealm(
   edictModifiers: EdictSettlementModifiers,
   governorAssignments: World['governorAssignments'],
   generals: World['generals'],
+  economyMul: number,
 ): { realm: Realm; treasuryDelta: number; foodStoresDelta: number } {
   let taxIncome = 0
   let foodProduction = 0
@@ -84,9 +90,11 @@ function settleRealm(
   }
 
   const traitModifiers = getTraitModifiers(realm)
-  const effectiveTaxIncome = applyBasisPointsDelta(
-    taxIncome,
-    edictModifiers.taxIncomeBasisPoints + traitModifiers.taxIncomeMultiplierBp,
+  const effectiveTaxIncome = Math.floor(
+    applyBasisPointsDelta(
+      taxIncome,
+      edictModifiers.taxIncomeBasisPoints + traitModifiers.taxIncomeMultiplierBp,
+    ) * economyMul,
   )
   const effectiveFoodProduction = applyBasisPointsDelta(
     foodProduction,
