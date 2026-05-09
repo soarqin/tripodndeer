@@ -73,7 +73,7 @@ function getUnifiedRealmId(world: World): RealmId | null {
   return (realm?.status ?? 'active') === 'active' ? realmId : null
 }
 
-function getWinnerRealmId(world: World): RealmId | null {
+export function getWinnerRealmId(world: World): RealmId | null {
   const unifiedRealmId = getUnifiedRealmId(world)
   if (unifiedRealmId) return unifiedRealmId
 
