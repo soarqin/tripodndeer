@@ -46,6 +46,12 @@ export function deactivateRealm(
     }
   }
 
+  const diplomaticMemory = new Map(
+    [...world.diplomaticMemory].filter(
+      ([key]) => !key.startsWith(`${realmId}__`) && !key.includes(`__${realmId}`),
+    ),
+  )
+
   return {
     world: {
       ...world,
@@ -54,6 +60,7 @@ export function deactivateRealm(
       wars,
       peaceProposals,
       sieges,
+      diplomaticMemory,
     },
     events: [
       {
