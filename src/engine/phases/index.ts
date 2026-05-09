@@ -1,3 +1,6 @@
+import { diplomaticMemoryPhase } from '~/engine/systems/diplomacy/diplomatic-memory-phase'
+import { personalityDriftPhase } from '~/engine/systems/character/personality-drift-phase'
+
 export const PHASE_NAMES = {
   AI_STRATEGIC: 'aiStrategic',
   AI_OPERATIONAL: 'aiOperational',
@@ -22,6 +25,8 @@ export const PHASE_NAMES = {
   TRADE: 'trade',
   FACTION: 'faction',
   HISTORICAL_EVENTS: 'historicalEvents',
+  DIPLOMATIC_MEMORY: 'diplomaticMemory',
+  PERSONALITY_DRIFT: 'personalityDrift',
   PRESTIGE_UPDATE: 'prestigeUpdate',
   REALM_DEACTIVATION: 'realmDeactivation',
 } as const
@@ -50,9 +55,16 @@ export const PHASE_ORDER: readonly string[] = [
   PHASE_NAMES.TRADE,
   PHASE_NAMES.FACTION,
   PHASE_NAMES.HISTORICAL_EVENTS,
+  PHASE_NAMES.DIPLOMATIC_MEMORY,
+  PHASE_NAMES.PERSONALITY_DRIFT,
   PHASE_NAMES.PRESTIGE_UPDATE,
   PHASE_NAMES.REALM_DEACTIVATION,
 ]
+
+export const PHASE_IMPLEMENTATIONS = {
+  [PHASE_NAMES.DIPLOMATIC_MEMORY]: diplomaticMemoryPhase,
+  [PHASE_NAMES.PERSONALITY_DRIFT]: personalityDriftPhase,
+} as const
 
 // Legacy phase name (kept for reference/regression testing)
 export const LEGACY_COMBAT = 'combat'

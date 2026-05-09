@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { PHASE_NAMES, PHASE_ORDER } from '../index'
 
 describe('phase chain constants', () => {
-  it('PHASE_ORDER has exactly 25 phases (M8.1: aiPlan replaced by 3-layer pipeline)', () => {
-    expect(PHASE_ORDER.length).toBe(25)
+  it('PHASE_ORDER has exactly 27 phases (M8.1: aiPlan replaced by 3-layer pipeline)', () => {
+    expect(PHASE_ORDER.length).toBe(27)
   })
 
   it('PHASE_ORDER is in correct order', () => {
@@ -30,8 +30,10 @@ describe('phase chain constants', () => {
     expect(PHASE_ORDER[20]).toBe(PHASE_NAMES.TRADE)
     expect(PHASE_ORDER[21]).toBe(PHASE_NAMES.FACTION)
     expect(PHASE_ORDER[22]).toBe(PHASE_NAMES.HISTORICAL_EVENTS)
-    expect(PHASE_ORDER[23]).toBe(PHASE_NAMES.PRESTIGE_UPDATE)
-    expect(PHASE_ORDER[24]).toBe(PHASE_NAMES.REALM_DEACTIVATION)
+    expect(PHASE_ORDER[23]).toBe(PHASE_NAMES.DIPLOMATIC_MEMORY)
+    expect(PHASE_ORDER[24]).toBe(PHASE_NAMES.PERSONALITY_DRIFT)
+    expect(PHASE_ORDER[25]).toBe(PHASE_NAMES.PRESTIGE_UPDATE)
+    expect(PHASE_ORDER[26]).toBe(PHASE_NAMES.REALM_DEACTIVATION)
   })
 
   it('CULTURAL_IDENTITY comes after COMBAT_V2 and before MANPOWER', () => {
@@ -84,9 +86,13 @@ describe('phase chain constants', () => {
 
   it('PRESTIGE_UPDATE comes after HISTORICAL_EVENTS and before REALM_DEACTIVATION', () => {
     const historicalIdx = PHASE_ORDER.indexOf(PHASE_NAMES.HISTORICAL_EVENTS)
+    const diplomaticIdx = PHASE_ORDER.indexOf(PHASE_NAMES.DIPLOMATIC_MEMORY)
+    const personalityIdx = PHASE_ORDER.indexOf(PHASE_NAMES.PERSONALITY_DRIFT)
     const prestigeIdx = PHASE_ORDER.indexOf(PHASE_NAMES.PRESTIGE_UPDATE)
     const deactivationIdx = PHASE_ORDER.indexOf(PHASE_NAMES.REALM_DEACTIVATION)
-    expect(prestigeIdx).toBe(historicalIdx + 1)
+    expect(diplomaticIdx).toBe(historicalIdx + 1)
+    expect(personalityIdx).toBe(diplomaticIdx + 1)
+    expect(prestigeIdx).toBe(personalityIdx + 1)
     expect(deactivationIdx).toBe(prestigeIdx + 1)
     expect(deactivationIdx).toBe(PHASE_ORDER.length - 1)
   })
