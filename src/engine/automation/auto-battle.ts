@@ -116,3 +116,20 @@ export function runAutoBattle(config: AutoBattleConfig): AutoBattleResult {
     finalRealmStats: buildFinalRealmStats(world),
   }
 }
+
+/**
+ * Like runAutoBattle but also returns the final World for post-hoc analysis (M8.3 batch use).
+ * The returned world is in the same state as when runAutoBattle would have stopped.
+ */
+export function runAutoBattleWithFinalWorld(config: AutoBattleConfig): { result: AutoBattleResult; finalWorld: World } {
+  let world = createAutoBattleWorld(config)
+  while (!shouldStop(world, config)) {
+    world = runTickPhases(world, world.rngState).world
+  }
+  const result: AutoBattleResult = {
+    winnerRealmId: getWinnerRealmId(world),
+    endTick: world.tick,
+    finalRealmStats: buildFinalRealmStats(world),
+  }
+  return { result, finalWorld: world }
+}

@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
+
+import { runAutoBattle, runAutoBattleWithFinalWorld } from '../auto-battle'
 import type {
   BatchConfig,
   BatchMeta,
@@ -8,6 +10,22 @@ import type {
   BehaviorMetricsAggregate,
   RealmDistribution,
 } from '../auto-battle-batch'
+import { runAutoBattleBatch } from '../auto-battle-batch'
+
+const M9_REALM_IDS = [
+  'realm_qin',
+  'realm_chu',
+  'realm_qi',
+  'realm_yan',
+  'realm_han',
+  'realm_zhao',
+  'realm_wei',
+  'realm_zhou',
+  'realm_yue',
+  'realm_song',
+  'realm_lu',
+  'realm_zhongshan',
+] as const
 
 describe('BatchReport schema', () => {
   it('BatchReport has exactly 5 top-level keys in correct order', () => {
@@ -113,4 +131,124 @@ describe('Batch type surfaces', () => {
     expect(runtime.runtimeMs).toBe(1)
     expect(behaviorMetrics.conqueror.sampleSize).toBe(0)
   })
+})
+
+describe('runAutoBattleBatch', () => {
+  let report: BatchReport
+
+  beforeAll(async () => {
+    report = await runAutoBattleBatch({
+      scenarioId: 'm9',
+      difficulty: 'hero',
+      seedStart: 1,
+      limit: 3,
+      maxTicks: 100,
+      stopCondition: 'unification',
+    })
+  }, 60000)
+
+  it('runAutoBattleWithFinalWorld returns a finalWorld', () => {
+    const { result, finalWorld } = runAutoBattleWithFinalWorld({
+      scenarioId: 'm9',
+      difficulty: 'hero',
+      seed: 42,
+      maxTicks: 100,
+      stopCondition: 'unification',
+    })
+
+    expect(finalWorld.tick).toBeGreaterThanOrEqual(0)
+    expect(result.endTick).toBe(finalWorld.tick)
+  }, 60000)
+
+  it('preserves the M8.2 runAutoBattle contract', () => {
+    const result = runAutoBattle({
+      scenarioId: 'm1',
+      difficulty: 'hero',
+      seed: 42,
+      maxTicks: 3,
+      stopCondition: 'tickLimit',
+    })
+
+    expect(result.endTick).toBe(3)
+    expect(result.finalRealmStats.size).toBeGreaterThan(0)
+  })
+
+  it('returns a basic report for multiple games', () => {
+    expect(report.meta.samples).toBe(3)
+    expect(Object.keys(report.distribution).length).toBe(12)
+    expect(report.runtime.runtimeMs).toBeGreaterThan(0)
+  })
+
+  it('calls progressCallback once per game', async () => {
+    const progressCallback = vi.fn()
+
+    await runAutoBattleBatch({
+      scenarioId: 'm9',
+      difficulty: 'hero',
+      seedStart: 1,
+      limit: 3,
+      maxTicks: 100,
+      stopCondition: 'unification',
+      progressCallback,
+    })
+
+    expect(progressCallback).toHaveBeenCalledTimes(3)
+    expect(progressCallback).toHaveBeenLastCalledWith(
+      expect.objectContaining({ gamesCompleted: 3, totalGames: 3 }),
+    )
+  }, 60000)
+
+  it('keeps unificationRate in [0, 1]', () => {
+    expect(report.outcomes.unificationRate).toBeGreaterThanOrEqual(0)
+    expect(report.outcomes.unificationRate).toBeLessThanOrEqual(1)
+  })
+
+  it('includes all 12 M9 realms in distribution', () => {
+    expect(Object.keys(report.distribution).sort()).toEqual([...M9_REALM_IDS].sort())
+  })
+
+  it('aggregates behavior metrics for the tracked archetypes', () => {
+    expect(Object.keys(report.behaviorMetrics).sort()).toEqual(['conqueror', 'schemer', 'steward'])
+  })
+
+  it('sets expected rates for playable realms', () => {
+    expect(report.distribution.realm_qin?.expectedRate).toBe(0.4)
+  })
+
+  it('omits expected rates for AI-only realms', () => {
+    expect(report.distribution.realm_lu?.expectedRate).toBeUndefined()
+  })
+
+  it('is deterministic for stable report fields', async () => {
+    const r1 = await runAutoBattleBatch({
+      scenarioId: 'm9',
+      difficulty: 'hero',
+      seedStart: 1,
+      limit: 2,
+      maxTicks: 100,
+      stopCondition: 'unification',
+    })
+    const r2 = await runAutoBattleBatch({
+      scenarioId: 'm9',
+      difficulty: 'hero',
+      seedStart: 1,
+      limit: 2,
+      maxTicks: 100,
+      stopCondition: 'unification',
+    })
+    const stable1 = {
+      meta: r1.meta,
+      outcomes: r1.outcomes,
+      distribution: r1.distribution,
+      behaviorMetrics: r1.behaviorMetrics,
+    }
+    const stable2 = {
+      meta: r2.meta,
+      outcomes: r2.outcomes,
+      distribution: r2.distribution,
+      behaviorMetrics: r2.behaviorMetrics,
+    }
+
+    expect(JSON.stringify(stable1)).toEqual(JSON.stringify(stable2))
+  }, 60000)
 })
