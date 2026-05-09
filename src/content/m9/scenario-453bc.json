@@ -23,7 +23,7 @@
       "full_title": "秦国",
       "capital": "site_xianyang",
       "status": "active",
-      "aiPersonality": "conqueror",
+      "archetype": "conqueror",
       "rulingHouse": "ying",
       "ideology_lean": {
         "fa": 80,
@@ -43,7 +43,7 @@
       "full_title": "楚国",
       "capital": "site_ying",
       "status": "active",
-      "aiPersonality": "builder",
+      "archetype": "builder",
       "rulingHouse": "mi",
       "ideology_lean": {
         "fa": 20,
@@ -63,7 +63,7 @@
       "full_title": "齐国",
       "capital": "site_linzi",
       "status": "active",
-      "aiPersonality": "schemer",
+      "archetype": "schemer",
       "rulingHouse": "jiang",
       "ideology_lean": {
         "fa": 20,
@@ -83,7 +83,7 @@
       "full_title": "燕国",
       "capital": "site_ji",
       "status": "active",
-      "aiPersonality": "incompetent",
+      "archetype": "incompetent",
       "rulingHouse": "ji",
       "ideology_lean": {
         "fa": 10,
@@ -103,7 +103,7 @@
       "full_title": "韩国",
       "capital": "site_yangzhai",
       "status": "active",
-      "aiPersonality": "incompetent",
+      "archetype": "incompetent",
       "rulingHouse": "han",
       "ideology_lean": {
         "fa": 50,
@@ -123,7 +123,7 @@
       "full_title": "赵国",
       "capital": "site_handan",
       "status": "active",
-      "aiPersonality": "conqueror",
+      "archetype": "conqueror",
       "rulingHouse": "zhao",
       "ideology_lean": {
         "fa": 30,
@@ -143,7 +143,7 @@
       "full_title": "魏国",
       "capital": "site_anyi",
       "status": "active",
-      "aiPersonality": "schemer",
+      "archetype": "schemer",
       "rulingHouse": "wei",
       "ideology_lean": {
         "fa": 40,
@@ -163,7 +163,7 @@
       "full_title": "东周",
       "capital": "site_luoyi",
       "status": "active",
-      "aiPersonality": "incompetent",
+      "archetype": "incompetent",
       "rulingHouse": "ji",
       "ideology_lean": {
         "fa": 10,
@@ -183,7 +183,7 @@
       "full_title": "越国",
       "capital": "site_kuaiji",
       "status": "active",
-      "aiPersonality": "incompetent",
+      "archetype": "incompetent",
       "rulingHouse": "siyue",
       "ideology_lean": {
         "fa": 20,
@@ -203,7 +203,7 @@
       "full_title": "宋国",
       "capital": "site_shangqiu",
       "status": "active",
-      "aiPersonality": "incompetent",
+      "archetype": "incompetent",
       "rulingHouse": "zi",
       "ideology_lean": {
         "fa": 10,
@@ -223,7 +223,7 @@
       "full_title": "鲁国",
       "capital": "site_qufu",
       "status": "active",
-      "aiPersonality": "learned",
+      "archetype": "learned",
       "rulingHouse": "ji",
       "ideology_lean": {
         "fa": 5,
@@ -243,7 +243,7 @@
       "full_title": "中山国",
       "capital": "site_lingshou_zhongshan",
       "status": "active",
-      "aiPersonality": "incompetent",
+      "archetype": "incompetent",
       "rulingHouse": "diren",
       "ideology_lean": {
         "fa": 20,
