@@ -34,6 +34,7 @@ export interface GameState {
   toastQueue: Toast[]
   eventLog: EventLogEntry[]
   previousClockSpeed: SpeedTier
+  codexPreviousClockSpeed: SpeedTier | null
   bootStatus: BootStatus
 }
 
@@ -112,6 +113,7 @@ export function makeInitialState(): GameState {
     toastQueue: [],
     eventLog: [],
     previousClockSpeed: '1x',
+    codexPreviousClockSpeed: null,
     bootStatus: 'pending',
   }
 }

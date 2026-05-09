@@ -46,6 +46,7 @@ export function createClockSlice(set: StoreSet): ClockActions {
         state.transientBanner = fresh.transientBanner
         state.modalQueue = castDraft(fresh.modalQueue)
         state.previousClockSpeed = fresh.previousClockSpeed
+        state.codexPreviousClockSpeed = fresh.codexPreviousClockSpeed
         state.bootStatus = fresh.bootStatus
       }),
   }

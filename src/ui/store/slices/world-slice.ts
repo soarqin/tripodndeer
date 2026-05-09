@@ -249,6 +249,7 @@ function applyReadyWorld(state: GameStore, world: World, playerRealmId: RealmId)
   state.events = castDraft([])
   state.diplomacyFeedback = castDraft([])
   state.modalQueue = castDraft([])
+  state.codexPreviousClockSpeed = null
 }
 
 function createBootActions(set: StoreSet): Pick<WorldActions, 'loadWorld' | 'replaceWorldFromSave' | 'resetToBootPending'> {
@@ -289,6 +290,7 @@ function createBootActions(set: StoreSet): Pick<WorldActions, 'loadWorld' | 'rep
         state.events = castDraft([])
         state.diplomacyFeedback = castDraft([])
         state.modalQueue = castDraft([])
+        state.codexPreviousClockSpeed = null
       }),
   }
 }
