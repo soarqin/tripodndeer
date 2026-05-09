@@ -108,14 +108,14 @@ interface InternalGameTrace {
 }
 
 export async function runAutoBattleBatch(config: BatchConfig): Promise<BatchReport> {
-  const startMs = performance.now()
+  const startMs = Date.now()
   const traces: InternalGameTrace[] = []
   let rollingMeanMs = 0
   const alpha = 0.3
 
   for (let i = 0; i < config.limit; i++) {
     const seed = config.seedStart + i
-    const gameStart = performance.now()
+    const gameStart = Date.now()
 
     const battleConfig: AutoBattleConfig = {
       scenarioId: config.scenarioId,
@@ -127,7 +127,7 @@ export async function runAutoBattleBatch(config: BatchConfig): Promise<BatchRepo
 
     const { result, finalWorld } = runAutoBattleWithFinalWorld(battleConfig)
 
-    const perGameMs = performance.now() - gameStart
+    const perGameMs = Date.now() - gameStart
     rollingMeanMs = i === 0 ? perGameMs : alpha * perGameMs + (1 - alpha) * rollingMeanMs
 
     const winnerRealmId = result.winnerRealmId ?? getWinnerWithLargestActiveFallback(finalWorld)
@@ -163,7 +163,7 @@ export async function runAutoBattleBatch(config: BatchConfig): Promise<BatchRepo
     })
   }
 
-  return buildBatchReport(config, traces, performance.now() - startMs)
+  return buildBatchReport(config, traces, Date.now() - startMs)
 }
 
 function buildBatchReport(
