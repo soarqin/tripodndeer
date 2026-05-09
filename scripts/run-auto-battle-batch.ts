@@ -19,7 +19,7 @@ function parseArgs(): {
   let limit = 100
   let seedStart = 1
   let output = '.sisyphus/evidence/m8_3-baseline.json'
-  let maxTicks = 100
+  let maxTicks = 7200
 
   for (const arg of args) {
     if (arg.startsWith('--limit=')) limit = Number.parseInt(arg.slice(8), 10)
@@ -28,7 +28,7 @@ function parseArgs(): {
     else if (arg.startsWith('--maxTicks=')) maxTicks = Number.parseInt(arg.slice(11), 10)
     else if (arg === '--help' || arg === '-h') {
       console.log('Usage: pnpm test:baseline [--limit=N] [--seed-start=N] [--output=path] [--maxTicks=N]')
-      console.log('Defaults: limit=100, seed-start=1, output=.sisyphus/evidence/m8_3-baseline.json, maxTicks=100')
+      console.log('Defaults: limit=100, seed-start=1, output=.sisyphus/evidence/m8_3-baseline.json, maxTicks=7200')
       process.exit(0)
     }
   }
