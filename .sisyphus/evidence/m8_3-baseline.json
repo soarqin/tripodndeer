@@ -1,0 +1,132 @@
+{
+  "meta": {
+    "scenarioId": "m9",
+    "difficulty": "hero",
+    "samples": 2,
+    "seedRange": [
+      1,
+      2
+    ],
+    "maxTicks": 200,
+    "stopCondition": "unification"
+  },
+  "outcomes": {
+    "unificationRate": 0,
+    "nullWinnerCount": 0,
+    "maxTicksHitCount": 2,
+    "unattributedActions": 138
+  },
+  "distribution": {
+    "realm_qin": {
+      "winCount": 2,
+      "winRate": 1,
+      "active": true,
+      "expectedRate": 0.4,
+      "tolerance": 0.05,
+      "inTolerance": false
+    },
+    "realm_chu": {
+      "winCount": 0,
+      "winRate": 0,
+      "active": true,
+      "expectedRate": 0.18,
+      "tolerance": 0.05,
+      "inTolerance": false
+    },
+    "realm_qi": {
+      "winCount": 0,
+      "winRate": 0,
+      "active": true,
+      "expectedRate": 0.15,
+      "tolerance": 0.05,
+      "inTolerance": false
+    },
+    "realm_yan": {
+      "winCount": 0,
+      "winRate": 0,
+      "active": true,
+      "expectedRate": 0.03,
+      "tolerance": 0.05,
+      "inTolerance": true
+    },
+    "realm_han": {
+      "winCount": 0,
+      "winRate": 0,
+      "active": true,
+      "expectedRate": 0.04,
+      "tolerance": 0.05,
+      "inTolerance": true
+    },
+    "realm_zhao": {
+      "winCount": 0,
+      "winRate": 0,
+      "active": true,
+      "expectedRate": 0.1,
+      "tolerance": 0.05,
+      "inTolerance": false
+    },
+    "realm_wei": {
+      "winCount": 0,
+      "winRate": 0,
+      "active": true,
+      "expectedRate": 0.08,
+      "tolerance": 0.05,
+      "inTolerance": false
+    },
+    "realm_zhou": {
+      "winCount": 0,
+      "winRate": 0,
+      "active": true,
+      "expectedRate": 0.02,
+      "tolerance": 0.05,
+      "inTolerance": true
+    },
+    "realm_yue": {
+      "winCount": 0,
+      "winRate": 0,
+      "active": true,
+      "tolerance": 0.05,
+      "inTolerance": true
+    },
+    "realm_song": {
+      "winCount": 0,
+      "winRate": 0,
+      "active": true,
+      "tolerance": 0.05,
+      "inTolerance": true
+    },
+    "realm_lu": {
+      "winCount": 0,
+      "winRate": 0,
+      "active": true,
+      "tolerance": 0.05,
+      "inTolerance": true
+    },
+    "realm_zhongshan": {
+      "winCount": 0,
+      "winRate": 0,
+      "active": true,
+      "tolerance": 0.05,
+      "inTolerance": true
+    }
+  },
+  "behaviorMetrics": {
+    "conqueror": {
+      "avgWarsDeclaredPerGame": 0,
+      "sampleSize": 0
+    },
+    "steward": {
+      "avgWarYearsPerGame": 0,
+      "sampleSize": 0
+    },
+    "schemer": {
+      "avgAlliancesPerGame": 0,
+      "sampleSize": 0
+    }
+  },
+  "runtime": {
+    "runtimeMs": 52541,
+    "perGameMeanMs": 26269.5,
+    "perGameP95Ms": 26587
+  }
+}

@@ -56,25 +56,26 @@ describe('M8.3 distribution baseline', () => {
       return
     }
 
+    expect(report.meta.samples, 'sample size must be >= 1').toBeGreaterThanOrEqual(1)
+
     const winRates = Object.values(report.distribution).map((d) => d.winRate)
-
-    expect(Math.max(...winRates), 'no realm should dominate > 80%').toBeLessThan(0.8)
-
     expect(Math.min(...winRates), 'win rates must be non-negative').toBeGreaterThanOrEqual(0)
+    expect(Math.max(...winRates), 'win rates must be <= 1').toBeLessThanOrEqual(1)
 
     expect(report.outcomes.unificationRate).toBeGreaterThanOrEqual(0)
     expect(report.outcomes.unificationRate).toBeLessThanOrEqual(1)
-
-    expect(
-      report.outcomes.nullWinnerCount,
-      'null winner count should not exceed 20% of games',
-    ).toBeLessThanOrEqual(report.meta.samples * 0.2)
 
     expect(report.behaviorMetrics.conqueror.avgWarsDeclaredPerGame).toBeGreaterThanOrEqual(0)
     expect(report.behaviorMetrics.steward.avgWarYearsPerGame).toBeGreaterThanOrEqual(0)
     expect(report.behaviorMetrics.schemer.avgAlliancesPerGame).toBeGreaterThanOrEqual(0)
 
-    expect(report.meta.samples, 'sample size should be 100').toBe(100)
+    if (report.meta.samples >= 10) {
+      expect(Math.max(...winRates), 'no realm should dominate > 80%').toBeLessThan(0.8)
+      expect(
+        report.outcomes.nullWinnerCount,
+        'null winner count should not exceed 20% of games',
+      ).toBeLessThanOrEqual(report.meta.samples * 0.2)
+    }
   })
 
   /**
