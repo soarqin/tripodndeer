@@ -79,6 +79,8 @@ export function CharacterBrowserPanel() {
 }
 
 function CharacterCard({ character, realmName, isExpanded, onClick }: { character: General, realmName: string, isExpanded: boolean, onClick: () => void }) {
+  const openCodex = useGameStore(s => s.openCodex)
+
   return (
     <div data-testid={`character-card-${character.id}`} className={styles.card} onClick={onClick}>
       <div className={styles.cardHeader}>
@@ -88,6 +90,16 @@ function CharacterCard({ character, realmName, isExpanded, onClick }: { characte
           <div className={styles.realm}>{realmName}</div>
           <div className={styles.specialty}>{character.specialty}</div>
         </div>
+        <button
+          type="button"
+          data-testid={`character-browser-panel-codex-link-${character.id}`}
+          onClick={(event) => {
+            event.stopPropagation()
+            openCodex(`character-${character.id}`)
+          }}
+        >
+          查看 Codex
+        </button>
       </div>
       {isExpanded && (
         <div data-testid="character-detail" className={styles.detail}>
@@ -106,6 +118,7 @@ function CharacterCard({ character, realmName, isExpanded, onClick }: { characte
 }
 
 function TemplateCard({ template, realmName, sites, isExpanded, onClick }: { template: CharacterTemplate, realmName: string, sites: ReadonlyMap<SiteId, Site>, isExpanded: boolean, onClick: () => void }) {
+  const openCodex = useGameStore(s => s.openCodex)
   const name = template.familyName + template.givenName
   const birthplaceSite = sites.get(template.birthplace)
   const birthplaceLabel = birthplaceSite ? birthplaceSite.name : template.birthplace
@@ -119,6 +132,16 @@ function TemplateCard({ template, realmName, sites, isExpanded, onClick }: { tem
           <div className={styles.years}>{template.birthYearBC} ~ {template.deathYearBC ?? '?'}</div>
           <div className={styles.specialty}>{template.specialty}</div>
         </div>
+        <button
+          type="button"
+          data-testid={`character-browser-panel-codex-link-${template.id}`}
+          onClick={(event) => {
+            event.stopPropagation()
+            openCodex(`character-${template.id}`)
+          }}
+        >
+          查看 Codex
+        </button>
       </div>
       {isExpanded && (
         <div data-testid="character-detail" className={styles.detail}>

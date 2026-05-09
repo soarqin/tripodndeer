@@ -14,6 +14,7 @@ export function CharacterPanel() {
   const assignPlayerPost = useGameStore((s) => s.assignPlayerPost)
   const unassignPlayerPost = useGameStore((s) => s.unassignPlayerPost)
   const assignPlayerGovernor = useGameStore((s) => s.assignPlayerGovernor)
+  const openCodex = useGameStore((s) => s.openCodex)
 
   const [selectedSiteIds, setSelectedSiteIds] = useState<Record<string, string>>({})
 
@@ -52,6 +53,13 @@ export function CharacterPanel() {
               <div key={general.id} className={styles.characterCard} data-testid="character-card">
                 <div className={styles.cardHeader}>
                   <span className={styles.name}>{general.name}</span>
+                  <button
+                    className={styles.button}
+                    onClick={() => openCodex(`character-${general.id}`)}
+                    data-testid="character-panel-codex-link"
+                  >
+                    查看 Codex
+                  </button>
                   <div className={styles.tags}>
                     {general.specialty && <span className={styles.tag}>{general.specialty}</span>}
                     {general.loyaltyState && <span className={styles.tag}>{general.loyaltyState}</span>}

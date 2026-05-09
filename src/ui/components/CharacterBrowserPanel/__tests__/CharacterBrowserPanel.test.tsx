@@ -6,13 +6,51 @@ import type { World } from '~/shared/types'
 
 describe('CharacterBrowserPanel', () => {
   beforeEach(() => {
+    useGameStore.getState().reset()
     useGameStore.setState({
       activePanel: 'character-browser',
       world: {
+        date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
+        tick: 0,
         generals: new Map(),
         characterTemplates: new Map(),
         realms: new Map(),
         sites: new Map(),
+        armies: new Map(),
+        edges: new Map(),
+        wars: new Map(),
+        peaceProposals: new Map(),
+        relations: new Map(),
+        diplomaticProposals: new Map(),
+        treaties: new Map(),
+        diplomacyHistory: [],
+        coalitions: new Map(),
+        zhouInvestiture: new Map(),
+        rulers: new Map(),
+        academies: new Map(),
+        eventChainStates: new Map(),
+        reformStates: new Map(),
+        disasterStates: new Map(),
+        tradeRoutes: new Map(),
+        factionInfluences: new Map(),
+        passes: new Map(),
+        adjacencyEdges: new Map(),
+        sieges: new Map(),
+        edicts: new Map(),
+        governorAssignments: new Map(),
+        intelligenceCoverage: new Map(),
+        spyMissions: new Map(),
+        counterIntelStates: new Map(),
+        provinces: new Map(),
+        regions: new Map(),
+        localization: new Map(),
+        aiState: new Map(),
+        difficulty: 'hero',
+        diplomaticMemory: new Map(),
+        playerRealmId: 'realm_qin',
+        rngState: { seed: 42, counter: 0 },
+        phases: [],
+        pendingOrders: [],
       } as unknown as World,
     })
   })
@@ -71,10 +109,15 @@ describe('CharacterBrowserPanel', () => {
     render(<CharacterBrowserPanel />)
     
     const aliveCard = screen.getByTestId('character-card-gen_1')
+    const aliveCodexLink = screen.getByTestId('character-browser-panel-codex-link-gen_1')
     expect(aliveCard).toBeDefined()
     expect(aliveCard.textContent).toContain('Bai Qi')
     expect(aliveCard.textContent).toContain('Qin')
     expect(aliveCard.textContent).toContain('military')
+
+    fireEvent.click(aliveCodexLink)
+    expect(useGameStore.getState().activePanel).toBe('codex')
+    expect(useGameStore.getState().selectedCodexEntryId).toBe('character-gen_1')
     
     expect(screen.queryByTestId('character-detail')).toBeNull()
     
@@ -90,10 +133,15 @@ describe('CharacterBrowserPanel', () => {
     expect(screen.queryByTestId('character-browser-empty-state')).toBeNull()
     
     const historyCard = screen.getByTestId('character-card-char_1')
+    const historyCodexLink = screen.getByTestId('character-browser-panel-codex-link-char_1')
     expect(historyCard).toBeDefined()
     expect(historyCard.textContent).toContain('BaiQi')
     expect(historyCard.textContent).toContain('Qin')
     expect(historyCard.textContent).toContain('332 ~ 257')
+
+    fireEvent.click(historyCodexLink)
+    expect(useGameStore.getState().activePanel).toBe('codex')
+    expect(useGameStore.getState().selectedCodexEntryId).toBe('character-char_1')
     
     fireEvent.click(historyCard)
     

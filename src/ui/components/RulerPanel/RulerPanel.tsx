@@ -28,6 +28,7 @@ const DIMENSION_LABELS: Record<string, string> = {
 export function RulerPanel() {
   const world = useGameStore((state) => state.world)
   const playerRealmId = useGameStore((state) => state.playerRealmId)
+  const openCodex = useGameStore((state) => state.openCodex)
 
   const ruler = world.rulers.get(playerRealmId)
   if (!ruler) return null
@@ -68,6 +69,14 @@ export function RulerPanel() {
           <Portrait name={general.name} realmId={playerRealmId} size={48} />
           <span className={styles.name}>{general.name}</span>
         </div>
+        <button
+          type="button"
+          className={styles.button}
+          onClick={() => openCodex(ruler.generalId ? `character-${ruler.generalId}` : undefined)}
+          data-testid="ruler-panel-codex-link"
+        >
+          查看 Codex
+        </button>
         <span
           className={styles.personality}
           title={personalityTooltip}
