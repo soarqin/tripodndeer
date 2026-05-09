@@ -8,7 +8,7 @@ import { migrateSaveV2ToV3 } from '../save-v2-to-v3'
 import saveV2Fixture from './fixtures/save-v2.json'
 
 const saveV2 = saveV2Fixture as unknown as SaveDTO
-const saveV2FixtureWorld = saveV2Fixture.world as Record<string, unknown> & {
+const saveV2FixtureWorld = saveV2Fixture.world as unknown as Record<string, unknown> & {
   rulers: Array<[string, Record<string, unknown>]>
 }
 

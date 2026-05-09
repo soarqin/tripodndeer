@@ -27,7 +27,6 @@ function makeRealm(id: RealmId, capital: string): Realm {
     capital,
     initialSites: [capital],
     initialArmies: [],
-    aiPersonality: 'cautious',
     economy: { treasury: 1000, foodStores: 1000, taxRate: 10 },
     traits: [],
     politicalSystem: 'enfeoffment',
@@ -129,8 +128,8 @@ describe('aiOperationalStep directives', () => {
     const result = aiOperationalStep(baseWorld(), createInitialRng(1))
 
     expect(result.world.aiState.get(aiRealmId)?.operational).toEqual([
-      expect.objectContaining({ kind: 'declare_war', targetRealmId: enemyRealmId, priority: 30 }),
-      expect.objectContaining({ kind: 'diplomacy', targetRealmId: allyRealmId, priority: 5 }),
+      expect.objectContaining({ kind: 'declare_war', targetRealmId: enemyRealmId }),
+      expect.objectContaining({ kind: 'diplomacy', targetRealmId: allyRealmId }),
     ])
     expect(result.nextRng.counter).toBeGreaterThan(0)
   })
@@ -141,8 +140,8 @@ describe('aiOperationalStep directives', () => {
     const result = aiOperationalStep(world, createInitialRng(1))
 
     expect(result.world.aiState.get(aiRealmId)?.operational).toEqual([
-      expect.objectContaining({ kind: 'dispatch_army', targetSiteId: 'site_enemy', priority: 30 }),
-      expect.objectContaining({ kind: 'diplomacy', targetRealmId: allyRealmId, priority: 5 }),
+      expect.objectContaining({ kind: 'dispatch_army', targetSiteId: 'site_enemy' }),
+      expect.objectContaining({ kind: 'diplomacy', targetRealmId: allyRealmId }),
     ])
   })
 

@@ -6,11 +6,13 @@ import { aiStrategicStep } from '@/engine/systems/ai/strategic'
 import { aiOperationalStep } from '@/engine/systems/ai/operational'
 import { aiTacticalStep } from '@/engine/systems/ai/tactical-step'
 import { characterLifecyclePhase, characterSpawnPhase } from '@/engine/systems/character'
+import { personalityDriftPhase } from '@/engine/systems/character/personality-drift-phase'
 import { combatV2Step } from '@/engine/systems/combat-v2'
 import { culturalIdentityPhase } from '@/engine/systems/culture/cultural-identity-phase'
 import { ideologyDriftPhase } from '@/engine/systems/culture/ideology-drift-phase'
 import { prestigeUpdatePhase } from '@/engine/systems/culture/prestige-update-phase'
 import { diplomacyLifecycleStep } from '@/engine/systems/diplomacy'
+import { diplomaticMemoryPhase } from '@/engine/systems/diplomacy/diplomatic-memory-phase'
 import { disasterPhase } from '@/engine/systems/disaster/disaster-phase'
 import { economyPhase } from '@/engine/systems/economy'
 import { espionagePhase } from '@/engine/systems/espionage/espionage-phase'
@@ -75,6 +77,8 @@ function phaseName(phase: TickPhase): string {
   if (phase === tradePhase) return 'trade'
   if (phase === factionPhase) return 'faction'
   if (phase === historicalEventsPhase) return 'historicalEvents'
+  if (phase === diplomaticMemoryPhase) return 'diplomaticMemory'
+  if (phase === personalityDriftPhase) return 'personalityDrift'
   if (phase === prestigeUpdatePhase) return 'prestigeUpdate'
   if (phase === realmDeactivationPhase) return 'realmDeactivation'
   return 'unknown'
@@ -244,6 +248,8 @@ describe('createWorldFromM1Data — structure', () => {
       tradePhase,
       factionPhase,
       historicalEventsPhase,
+      diplomaticMemoryPhase,
+      personalityDriftPhase,
       prestigeUpdatePhase,
       realmDeactivationPhase,
     ])

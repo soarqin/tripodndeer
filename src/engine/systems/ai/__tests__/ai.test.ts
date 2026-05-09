@@ -36,7 +36,6 @@ function makeRealm(id: string, capital: string): Realm {
     capital,
     initialSites: [capital],
     initialArmies: [],
-    aiPersonality: 'aggressive_random',
     economy: { treasury: 0, foodStores: 0, taxRate: 10 },
     traits: [],
     politicalSystem: 'enfeoffment',
@@ -283,10 +282,8 @@ describe('AI determinism', () => {
       'diplomacyEvent:relation_changed:realm_chu__realm_zhou',
       'diplomacyEvent:relation_changed:realm_qi__realm_zhou',
       'diplomacyEvent:coalition_changed:coalition_against_realm_chu',
-      'diplomacyEvent:coalition_changed:coalition_against_realm_qi',
       'diplomacyEvent:coalition_changed:coalition_against_realm_qin',
-      'diplomacyEvent:coalition_changed:coalition_against_realm_zhao',
-      'diplomacyEvent:proposal_created:realm_han__realm_qi',
+      'diplomacyEvent:proposal_created:realm_han__realm_zhou',
       'aiDeclaredWar:realm_han->realm_zhou',
       'aiDispatchedArmy:realm_han->site_012',
       'diplomacyEvent:war_declared:realm_han__realm_zhou',
@@ -303,8 +300,8 @@ describe('AI determinism', () => {
       'diplomacyEvent:relation_changed:realm_han__realm_zhao',
       'diplomacyEvent:relation_changed:realm_zhao__realm_zhou',
       'diplomacyEvent:coalition_changed:coalition_against_realm_chu',
-      'diplomacyEvent:coalition_changed:coalition_against_realm_han',
-      'diplomacyEvent:proposal_created:realm_qi__realm_wei',
+      'diplomacyEvent:coalition_changed:coalition_against_realm_qin',
+      'diplomacyEvent:proposal_created:realm_han__realm_qi',
       'aiDeclaredWar:realm_qi->realm_wei',
       'aiDispatchedArmy:realm_qi->site_018',
       'diplomacyEvent:war_declared:realm_qi__realm_wei',
@@ -336,7 +333,6 @@ describe('AI determinism', () => {
       'diplomacyEvent:relation_changed:realm_yan__realm_zhao',
       'diplomacyEvent:relation_changed:realm_wei__realm_zhou',
       'diplomacyEvent:relation_changed:realm_zhao__realm_zhou',
-      'diplomacyEvent:coalition_changed:coalition_against_realm_zhao',
       'diplomacyEvent:proposal_created:realm_qi__realm_yan',
       'aiDeclaredWar:realm_yan->realm_qi',
       'aiDispatchedArmy:realm_yan->site_045',
@@ -392,6 +388,29 @@ describe('AI determinism', () => {
 
 describe('aiPlanStep personality resolution', () => {
   it('uses the configured realm personality when choosing actions', () => {
+    const baseRulerDims = {
+      expansionDrive: 0.5,
+      diplomaticTrust: 0.5,
+      caution: 0.5,
+      honor: 0.5,
+      vindictiveness: 0.5,
+      reformInclination: 0.5,
+      patience: 0.5,
+      preferredStrategy: 'diplomatic' as const,
+    }
+    const stewardRuler = {
+      realmId: aiRealmId,
+      generalId: 'gen_ai_ruler',
+      age: 40,
+      lifespan: 65,
+      health: 80,
+      personality: 'steward' as const,
+      personalityDims: baseRulerDims,
+      successionLawId: 'primogeniture' as const,
+      inOfficeSinceTick: 0,
+    }
+    const conquerorRuler = { ...stewardRuler, personality: 'conqueror' as const }
+
     const world = baseWorld({
       sites: new Map([
         ['site_player', makeSite('site_player', playerRealmId, [], [])],
@@ -406,9 +425,10 @@ describe('aiPlanStep personality resolution', () => {
       ]),
       realms: new Map([
         [playerRealmId, makeRealm(playerRealmId, 'site_player')],
-        [aiRealmId, { ...makeRealm(aiRealmId, 'site_ai'), aiPersonality: 'cautious' }],
+        [aiRealmId, { ...makeRealm(aiRealmId, 'site_ai'),}],
         [enemyRealmId, makeRealm(enemyRealmId, 'site_enemy')],
       ]),
+      rulers: new Map([[aiRealmId, stewardRuler]]),
     })
 
     const cautiousResult = aiPlanStep(world, createInitialRng(1))
@@ -422,9 +442,10 @@ describe('aiPlanStep personality resolution', () => {
       ...world,
       realms: new Map([
         [playerRealmId, makeRealm(playerRealmId, 'site_player')],
-        [aiRealmId, { ...makeRealm(aiRealmId, 'site_ai'), aiPersonality: 'aggressive' as const }],
+        [aiRealmId, { ...makeRealm(aiRealmId, 'site_ai'),}],
         [enemyRealmId, makeRealm(enemyRealmId, 'site_enemy')],
       ]),
+      rulers: new Map([[aiRealmId, conquerorRuler]]),
     }
 
     const aggressiveResult = aiPlanStep(aggressiveWorld, createInitialRng(1))

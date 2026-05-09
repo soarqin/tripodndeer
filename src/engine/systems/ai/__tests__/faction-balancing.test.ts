@@ -21,7 +21,6 @@ function makeRealm(id: RealmId): Realm {
     capital: 'site_x',
     initialSites: [],
     initialArmies: [],
-    aiPersonality: 'aggressive_random',
     economy: { treasury: 0, foodStores: 0, taxRate: 0.1 },
     traits: [],
     politicalSystem: 'enfeoffment',
@@ -140,11 +139,12 @@ describe('evaluateFactionBalanceAction - basic', () => {
     const world = makeWorld({
       realm,
       playerRealmId: 'realm_player',
+      rulers: new Map([['realm_qin', makeRuler('realm_qin', 'steward')]]),
       factionInfluences: new Map([
         [
           'realm_qin',
           makeFactionState('realm_qin', [
-            ['military_meritocracy', 80],
+            ['military_meritocracy', 90],
             ['noble_clans', 10],
             ['royal_kin', 50],
             ['reformists', 50],
@@ -270,11 +270,12 @@ describe('evaluateFactionBalanceAction - basic', () => {
     const world = makeWorld({
       realm,
       playerRealmId: 'realm_player',
+      rulers: new Map([['realm_qin', makeRuler('realm_qin', 'schemer')]]),
       factionInfluences: new Map([
         [
           'realm_qin',
           makeFactionState('realm_qin', [
-            ['noble_clans', 80],
+            ['noble_clans', 90],
             ['military_meritocracy', 10],
             ['royal_kin', 50],
             ['reformists', 50],

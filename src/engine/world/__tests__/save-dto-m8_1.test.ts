@@ -6,19 +6,19 @@ import { M1DataSchemaV8 } from '~/shared/schemas/world'
 import { SAVE_DTO_VERSION, type SaveDTO } from '~/shared/types/save-dto'
 
 describe('SaveDTO M8.1 - V2 with aiState forward-compat', () => {
-  it('SAVE_DTO_VERSION is 2', () => {
-    expect(SAVE_DTO_VERSION).toBe(2)
+  it('SAVE_DTO_VERSION is 3', () => {
+    expect(SAVE_DTO_VERSION).toBe(3)
   })
 
   it('World.schema_version is still 8 (independent version system)', () => {
     expect(M1DataSchemaV8.shape.schema_version.value).toBe(8)
   })
 
-  it('worldToSaveDTO writes schemaVersion=2 and empty aiState', () => {
+  it('worldToSaveDTO writes schemaVersion=3 and empty aiState', () => {
     const world = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
     const dto = worldToSaveDTO(world)
 
-    expect(dto.schemaVersion).toBe(2)
+    expect(dto.schemaVersion).toBe(3)
     expect(dto.world.aiState).toEqual([])
   })
 

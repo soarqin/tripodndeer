@@ -21,11 +21,13 @@ import { aiStrategicStep } from '~/engine/systems/ai/strategic'
 import { aiOperationalStep } from '~/engine/systems/ai/operational'
 import { aiTacticalStep } from '~/engine/systems/ai/tactical-step'
 import { characterLifecyclePhase, characterSpawnPhase } from '~/engine/systems/character'
+import { personalityDriftPhase } from '~/engine/systems/character/personality-drift-phase'
 import { combatV2Step } from '~/engine/systems/combat-v2'
 import { culturalIdentityPhase } from '~/engine/systems/culture/cultural-identity-phase'
 import { ideologyDriftPhase } from '~/engine/systems/culture/ideology-drift-phase'
 import { prestigeUpdatePhase } from '~/engine/systems/culture/prestige-update-phase'
 import { diplomacyLifecycleStep } from '~/engine/systems/diplomacy'
+import { diplomaticMemoryPhase } from '~/engine/systems/diplomacy/diplomatic-memory-phase'
 import { disasterPhase } from '~/engine/systems/disaster/disaster-phase'
 import { economyPhase } from '~/engine/systems/economy'
 import { computeRealmAdjacency } from '~/engine/systems/espionage/adjacency'
@@ -326,6 +328,8 @@ export function getDefaultPhases(): readonly TickPhase[] {
     tradePhase,
     factionPhase,
     historicalEventsPhase,
+    diplomaticMemoryPhase,
+    personalityDriftPhase,
     prestigeUpdatePhase,
     realmDeactivationPhase,
   ]
@@ -611,7 +615,6 @@ function buildM9RealmMap(
       capital: r.capital,
       initialSites: initialSitesByRealm.get(r.id) ?? [],
       initialArmies: [],
-      aiPersonality: 'aggressive_random',
       economy: {
         treasury: r.startingTreasury,
         foodStores: r.startingManpower,

@@ -47,7 +47,6 @@ function makeRealm(id: RealmId, overrides: Partial<Realm> = {}): Realm {
     capital: `${id}_capital`,
     initialSites: [],
     initialArmies: [],
-    aiPersonality: 'cautious',
     economy: { treasury: 1000, foodStores: 1000, taxRate: 0.1 },
     traits: [],
     politicalSystem: 'enfeoffment',
@@ -388,11 +387,11 @@ describe('M5 edge case integration tests', () => {
     })
   })
 
-  describe('EC9: aiPersonality=aggressive_random migrates to ruler.personality=schemer', () => {
-    it('v2 fixture with aggressive_random produces v3 ruler with personality=schemer', () => {
+  describe('EC9: realm.archetype=schemer migrates to ruler.personality=schemer', () => {
+    it('v2 fixture with archetype=schemer produces v3 ruler with personality=schemer', () => {
       const realm = scenarioV2.realms[0]!
       const data = makeMakeV2({
-        realms: [{ ...realm, aiPersonality: 'aggressive_random', rulerId: 'gen_random' }],
+        realms: [{ ...realm, archetype: 'schemer', rulerId: 'gen_random' }],
         generals: [
           {
             id: 'gen_random',

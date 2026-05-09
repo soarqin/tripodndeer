@@ -31,7 +31,17 @@ function runTicks(world: World, n: number): World {
 }
 
 function worldHash(world: World): string {
-  return JSON.stringify(world, (_, value) => (value instanceof Map ? [...value.entries()] : value))
+  return JSON.stringify(world, (_, value) => {
+    if (value instanceof Map) return [...value.entries()]
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      const sorted: Record<string, unknown> = {}
+      for (const k of Object.keys(value as Record<string, unknown>).sort()) {
+        sorted[k] = (value as Record<string, unknown>)[k]
+      }
+      return sorted
+    }
+    return value
+  })
 }
 
 function writeEvidence(filename: string, content: string): void {

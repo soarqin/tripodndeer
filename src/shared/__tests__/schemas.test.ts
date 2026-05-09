@@ -229,6 +229,8 @@ describe('WorldSchema', () => {
     regions: new Map(),
     characterTemplates: new Map(),
     localization: new Map(),
+    difficulty: 'hero' as const,
+    diplomaticMemory: new Map(),
     playerRealmId: 'realm_red',
     rngState: { seed: 1, counter: 0 },
     phases: [],

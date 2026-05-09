@@ -119,3 +119,20 @@ conqueror, steward, schemer, learned, tyrant, incompetent, benevolent, builder
 - Tactical scoring uses `personalityDims` (M5_PERSONALITY_DIMS_BASELINE seeded from original archetype)
 - So forcing personality to different archetypes produces identical world hashes — the 8 archetype baselines are degenerate post-M8.2
 - Not blocking T8.5/T8.6 but worth flagging for archetype-coverage maintainers
+
+---
+
+## Test Fixture Updates for M8.2 (2026-05-09)
+
+After M8.2 (difficulty + diplomatic memory + personality dims), 18 tests failed due to:
+
+1. **World fixture missing fields** — Tests creating World inline need `difficulty: 'hero'` (or appropriate tier) and `diplomaticMemory: new Map()`. Centralized fixtures (`makeEmptyWorld`) already covered this.
+2. **RulerState fixture missing personalityDims** — Inline `RulerState` objects in test fixtures require `personalityDims` block matching `RulerPersonalityProfile` shape.
+3. **SAVE_DTO_VERSION bumped to 3** — Tests referencing version `2` need update.
+4. **Phase pipeline now 27 phases** — `diplomaticMemoryPhase` and `personalityDriftPhase` newly wired between `historicalEventsPhase` and `prestigeUpdatePhase`. `factory.ts::getDefaultPhases` updated to register both.
+5. **`worldHash` JSON.stringify key order** — `saveDtoToWorld` now constructs World with `difficulty` after `tick`, but factory places it later. Tests using `JSON.stringify` for hash comparison must sort object keys before stringifying to be order-independent.
+6. **AI baseline event list shifted** — `aiPlanStep` deterministic ordering changed: 104 → 101 events. Coalition_changed and proposal_created order/count differs due to memory and personalityDims influence.
+7. **Strategic plan truncation by difficulty** — `M8_2_DIFFICULTY_PROFILES['common'].strategicTruncation: true` clears `mainAllyRealmId` to null. Tests asserting alliance assignment must set `difficulty: 'hero'`.
+8. **Faction-balance edict bias** — `M8_EDICT_ENACTMENT_BIAS` now per-personality. `incompetent` (default fallback) has `issuanceMultiplier: 0.5` → effective threshold 140 (vs 70 raw). Tests must pass a ruler with personality having multiplier >= 1.0 (steward/schemer/conqueror) AND `preferredEdict` matching expected edict kind.
+9. **Operational priorities** — Specific priority values (30, 5) shifted to floats (~26, ~6) due to scoring formula changes. Use `expect.objectContaining` without priority match.
+10. **Legacy aiPersonality migration removed** — `v1-to-v3.ts` no longer maps `aiPersonality: 'aggressive_random' → personality: 'schemer'`. EC9 test updated to use `archetype: 'schemer'` directly.

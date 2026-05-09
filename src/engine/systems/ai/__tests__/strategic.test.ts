@@ -33,7 +33,6 @@ function makeRealm(id: RealmId, capital: string): Realm {
     capital,
     initialSites: [capital],
     initialArmies: [],
-    aiPersonality: 'cautious',
     economy: { treasury: 1000, foodStores: 1000, taxRate: 10 },
     traits: [],
     politicalSystem: 'enfeoffment',
@@ -97,6 +96,7 @@ function baseWorld(overrides: Partial<World> = {}): World {
   return makeEmptyWorld({
     date: { yearBC: 300, season: 'spring', month: 1, xun: 'shang' },
     tick: 36,
+    difficulty: 'hero',
     playerRealmId: 'realm_player',
     realms,
     sites: new Map([
