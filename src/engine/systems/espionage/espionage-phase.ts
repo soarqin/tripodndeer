@@ -9,6 +9,7 @@ import type {
 import { makeCoverageKey } from '~/shared/types'
 import { nextRng } from '~/engine/random'
 import { applyEventEffect } from '../events/event-chain-engine'
+import { pushDiplomacyHistory } from '../diplomacy/history'
 import { applyEspionageReactions } from './espionage-reactions'
 import {
   M7_COUNTER_DETECTION_BONUS_PER_LEVEL,
@@ -183,6 +184,23 @@ export function espionagePhase(
         const reactionResult = applyEspionageReactions(currentWorld, exposedMission)
         currentWorld = reactionResult.world
         for (const ev of reactionResult.events) events.push(ev)
+
+        events.push({
+          type: 'spy_caught',
+          payload: {
+            observerRealmId: mission.targetRealmId,
+            subjectRealmId: mission.spyRealmId,
+            missionId: mission.id,
+          },
+        })
+        const history = [...currentWorld.diplomacyHistory]
+        pushDiplomacyHistory(currentWorld, history, events, {
+          kind: 'spy_caught',
+          actorRealmId: mission.spyRealmId,
+          targetRealmId: mission.targetRealmId,
+          spyMissionId: mission.id,
+        })
+        currentWorld = { ...currentWorld, diplomacyHistory: history }
       } else {
         newMissions.set(mission.id, { ...mission, status: 'failed' })
         currentWorld = { ...currentWorld, spyMissions: newMissions }
