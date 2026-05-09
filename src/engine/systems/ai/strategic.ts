@@ -9,6 +9,7 @@ import type {
 } from '~/shared/types'
 import type { AIState, StrategicPlan } from '~/shared/types/ai-state'
 import type { ReformId } from '~/shared/types'
+import { M8_2_DIFFICULTY_PROFILES } from '~/content/m2/balance'
 import { M8_1_STRATEGIC_WEIGHTS } from '~/content/m2/balance/m8_1'
 import { nextRng } from '~/engine/random'
 import { isAtWar } from '~/engine/wars'
@@ -179,16 +180,22 @@ function planStrategicForRealm(
   const archetype = getPersonality(world, realm.id)
   const weights = M8_1_STRATEGIC_WEIGHTS[archetype]
   const target = findTargetSiteId(world, realm, weights.expansionAggression, rng)
+  const plan: StrategicPlan = {
+    targetSiteId: target.targetSiteId,
+    mainEnemyRealmId: findMainEnemyRealmId(world, realm, weights.enemyPersistence),
+    mainAllyRealmId: findMainAllyRealmId(world, realm, weights.allyPriority),
+    reformIntentId: findReformIntentId(world, realm, weights.reformInclination),
+    decidedAtTick: world.tick,
+    decidedForYearBC: world.date.yearBC,
+  }
+
+  const profile = M8_2_DIFFICULTY_PROFILES[world.difficulty]
+  const truncatedPlan: StrategicPlan = profile.strategicTruncation
+    ? { ...plan, mainAllyRealmId: null, reformIntentId: null }
+    : plan
 
   return {
-    plan: {
-      targetSiteId: target.targetSiteId,
-      mainEnemyRealmId: findMainEnemyRealmId(world, realm, weights.enemyPersistence),
-      mainAllyRealmId: findMainAllyRealmId(world, realm, weights.allyPriority),
-      reformIntentId: findReformIntentId(world, realm, weights.reformInclination),
-      decidedAtTick: world.tick,
-      decidedForYearBC: world.date.yearBC,
-    },
+    plan: truncatedPlan,
     nextRng: target.nextRng,
   }
 }
