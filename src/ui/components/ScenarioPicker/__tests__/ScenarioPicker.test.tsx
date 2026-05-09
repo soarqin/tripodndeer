@@ -33,7 +33,7 @@ describe('ScenarioPicker', () => {
     const m1Card = screen.getByTestId('scenario-card-m1')
     fireEvent.click(m1Card)
     
-    expect(mockLoadWorld).toHaveBeenCalledWith('m1')
+    expect(mockLoadWorld).toHaveBeenCalledWith('m1', 'hero')
     
     // Should show loading state
     expect(screen.getByText('加载中...')).toBeTruthy()

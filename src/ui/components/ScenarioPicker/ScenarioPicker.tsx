@@ -1,18 +1,29 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { SCENARIO_CONFIGS } from '~/content/scenarios/scenario-configs'
 import { useGameStore } from '~/ui/store/game-store'
+import type { DifficultyTier } from '~/shared/types'
+import zhCN from '~/content/locales/zh-CN.json'
 import styles from './ScenarioPicker.module.css'
 
 const DIFFICULTY_LABELS = { beginner: '入门', standard: '标准', advanced: '困难' }
 const DIFFICULTY_COLORS = { beginner: '#4CAF50', standard: '#2196F3', advanced: '#F44336' }
 
+const DIFFICULTY_OPTIONS: { value: DifficultyTier; labelKey: keyof typeof zhCN }[] = [
+  { value: 'weak', labelKey: 'difficulty.weak' },
+  { value: 'common', labelKey: 'difficulty.common' },
+  { value: 'hero', labelKey: 'difficulty.hero' },
+  { value: 'hegemon', labelKey: 'difficulty.hegemon' },
+  { value: 'sage', labelKey: 'difficulty.sage' },
+]
+
 export function ScenarioPicker(): React.JSX.Element {
   const loadWorld = useGameStore((state) => state.loadWorld)
   const [loading, setLoading] = React.useState(false)
+  const [difficulty, setDifficulty] = useState<DifficultyTier>('hero')
 
   async function handleSelect(id: 'm1' | 'm9') {
     setLoading(true)
-    await loadWorld(id)
+    await loadWorld(id, difficulty)
     // bootStatus becomes 'ready' → App re-renders main screen
   }
 
@@ -20,6 +31,24 @@ export function ScenarioPicker(): React.JSX.Element {
     <div className={styles.overlay} data-testid="scenario-picker">
       <div className={styles.container}>
         <h1 className={styles.title}>鼎鹿 · 选择剧本</h1>
+        
+        <div className={styles.difficultySelector}>
+          <label htmlFor="difficulty-select">难度选择：</label>
+          <select 
+            id="difficulty-select"
+            data-testid="difficulty-select"
+            value={difficulty} 
+            onChange={(e) => setDifficulty(e.target.value as DifficultyTier)}
+            disabled={loading}
+          >
+            {DIFFICULTY_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>
+                {zhCN[opt.labelKey]}{opt.value === 'hero' ? ' (hero - 默认)' : ''}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {loading && <div className={styles.loading}>加载中...</div>}
         <div className={styles.grid}>
           {SCENARIO_CONFIGS.map((config) => (

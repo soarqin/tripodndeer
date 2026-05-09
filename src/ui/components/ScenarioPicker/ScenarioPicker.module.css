@@ -9,6 +9,19 @@
 }
 .container { text-align: center; max-width: 800px; padding: 2rem; }
 .title { color: #e8d5a3; font-size: 2rem; margin-bottom: 2rem; }
+.difficultySelector {
+  margin-bottom: 2rem;
+  color: #e8d5a3;
+}
+.difficultySelector select {
+  background: #1a1a2e;
+  color: #e8d5a3;
+  border: 1px solid #333;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-left: 0.5rem;
+}
 .loading { color: #aaa; margin-bottom: 1rem; }
 .grid { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
 .card {
