@@ -12,6 +12,7 @@ import type {
   WarKey,
   World,
 } from '~/shared/types'
+import { memoryKey } from '~/shared/types'
 import { findTravelCost } from '~/engine/systems/march'
 import { isAtWar } from '~/engine/wars'
 import {
@@ -21,6 +22,7 @@ import {
 } from '~/engine/systems/diplomacy'
 import {
   M8_ALLIANCE_PROPENSITY,
+  M8_2_MEMORY_PUSHCANDIDATE_WEIGHT,
   M8_PEACE_ACCEPTANCE_THRESHOLD,
   M8_WAR_DECLARATION_BIAS,
 } from '~/content/m2/balance'
@@ -166,7 +168,10 @@ function pushCandidate(
 
   const receiverPersonality = getPersonality(world, targetRealmId)
   const acceptanceScore = scoreDiplomacyAcceptance(world, request, receiverPersonality)
-  const score = scoreDiplomacyCandidate(acceptanceScore, kind, personality)
+  const baseScore = scoreDiplomacyCandidate(acceptanceScore, kind, personality)
+  // M8.2: target's memory of proposing realm penalises candidate score by betrayalScore.
+  const memory = world.diplomaticMemory.get(memoryKey(targetRealmId, proposingRealmId))
+  const score = baseScore - (memory?.betrayalScore ?? 0) * M8_2_MEMORY_PUSHCANDIDATE_WEIGHT
   if (score < 0) return
   candidates.push({ kind, targetRealmId, score })
 }
