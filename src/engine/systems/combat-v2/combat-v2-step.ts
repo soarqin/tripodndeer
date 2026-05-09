@@ -2,6 +2,7 @@ import type {
   Academy,
   AcademyId,
   Army,
+  DiplomacyEvent,
   GameEvent,
   General,
   GeneralId,
@@ -15,6 +16,7 @@ import type {
   World,
 } from '~/shared/types'
 import { M6_ENABLED } from '~/content/m2/balance'
+import { pushDiplomacyHistory } from '~/engine/systems/diplomacy/history'
 import { resolveCombat } from './combat-v2'
 import type { BattleContext, Composition } from './combat-v2'
 
@@ -34,6 +36,27 @@ function findDefenders(
       candidate.location === destination &&
       candidate.realmId === destinationOwner,
   )
+}
+
+function isBorderSite(
+  sites: ReadonlyMap<SiteId, Site>,
+  siteId: SiteId,
+  attackerRealmId: RealmId,
+  defenderRealmId: RealmId,
+): boolean {
+  const site = sites.get(siteId)
+  if (!site) return false
+  let hasAttacker = site.ownerId === attackerRealmId
+  let hasDefender = site.ownerId === defenderRealmId
+  if (hasAttacker && hasDefender) return true
+  for (const neighborId of site.adjacency) {
+    const neighbor = sites.get(neighborId)
+    if (!neighbor) continue
+    if (neighbor.ownerId === attackerRealmId) hasAttacker = true
+    if (neighbor.ownerId === defenderRealmId) hasDefender = true
+    if (hasAttacker && hasDefender) return true
+  }
+  return false
 }
 
 function findPassOnEdge(world: World, fromSiteId: SiteId | null, toSiteId: SiteId): Pass | null {
@@ -91,6 +114,7 @@ export function combatV2Step(
   const passes = new Map<PassId, Pass>(world.passes)
   const realms = new Map<RealmId, Realm>(world.realms)
   const academies = new Map<AcademyId, Academy>(world.academies)
+  const diplomacyHistory: DiplomacyEvent[] = [...world.diplomacyHistory]
   let generals = world.generals
 
   for (const army of world.armies.values()) {
@@ -128,6 +152,13 @@ export function combatV2Step(
     }
 
     const result = resolveCombat(ctx)
+    const armySizeTotal =
+      army.manpower + defenders.reduce((sum, defender) => sum + defender.manpower, 0)
+    const borderSite =
+      defenderRealmId !== null
+        ? isBorderSite(world.sites, destination, army.realmId, defenderRealmId)
+        : false
+
     events.push({
       type: 'battleResolved',
       payload: {
@@ -135,8 +166,25 @@ export function combatV2Step(
         attackerRealmId: army.realmId,
         defenderRealmId,
         siteId: destination,
+        armySizeTotal,
+        borderSite,
       },
     })
+
+    if (defenderRealmId !== null && defenderRealmId !== army.realmId) {
+      const victorRealmId: RealmId =
+        result.winner === 'attacker' ? army.realmId : defenderRealmId
+      pushDiplomacyHistory(world, diplomacyHistory, events, {
+        kind: 'combat_observed',
+        actorRealmId: army.realmId,
+        targetRealmId: defenderRealmId,
+        combatPayload: {
+          armySizeTotal,
+          borderSite,
+          victorRealmId,
+        },
+      })
+    }
     generals = applyGeneralDeaths(armies, generals, result.deadGenerals, destination, events)
     const currentAttacker = armies.get(army.id) ?? army
 
@@ -223,7 +271,7 @@ export function combatV2Step(
   }
 
   return {
-    world: { ...world, sites, armies, generals, passes, realms, academies },
+    world: { ...world, sites, armies, generals, passes, realms, academies, diplomacyHistory },
     nextRng: rng,
     events,
   }
