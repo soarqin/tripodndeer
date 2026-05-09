@@ -49,7 +49,19 @@ export const DiplomaticActionKindSchema = z.enum(['alliance', 'non_aggression', 
 export const DiplomaticProposalStatusSchema = z.enum(['pending', 'accepted', 'rejected', 'expired', 'cancelled'])
 export const DiplomaticTreatyKindSchema = z.enum(['alliance', 'non_aggression', 'tribute', 'marriage', 'truce'])
 export const DiplomaticTreatyStatusSchema = z.enum(['active', 'expired', 'cancelled', 'broken'])
-export const DiplomacyEventKindSchema = z.enum(['proposal_created', 'proposal_resolved', 'treaty_created', 'treaty_ended', 'war_declared', 'betrayal', 'relation_changed', 'coalition_changed', 'zhou_investiture_changed'])
+export const DiplomacyEventKindSchema = z.enum([
+  'proposal_created',
+  'proposal_resolved',
+  'treaty_created',
+  'treaty_ended',
+  'war_declared',
+  'betrayal',
+  'relation_changed',
+  'coalition_changed',
+  'zhou_investiture_changed',
+  'combat_observed',
+  'spy_caught',
+])
 export const DiplomacyEventReasonSchema = z.enum(['war_declaration_against_treaty'])
 export const CoalitionStatusSchema = z.enum(['forming', 'active', 'dissolved'])
 
@@ -100,9 +112,16 @@ export const DiplomacyEventSchema = z.object({
   targetRealmId: RealmIdSchema.nullable(),
   proposalId: DiplomaticProposalIdSchema.optional(),
   treatyId: TreatyIdSchema.optional(),
+  treatyKind: DiplomaticTreatyKindSchema.optional(),
   relationKey: RelationKeySchema.optional(),
   coalitionId: CoalitionIdSchema.optional(),
   reason: DiplomacyEventReasonSchema.optional(),
+  combatPayload: z.object({
+    armySizeTotal: z.number().int().nonnegative(),
+    borderSite: z.boolean(),
+    victorRealmId: RealmIdSchema,
+  }).optional(),
+  spyMissionId: z.string().min(1).optional(),
 })
 
 export const CoalitionStateSchema = z.object({

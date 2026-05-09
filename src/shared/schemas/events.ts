@@ -18,6 +18,27 @@ export const PoliticalSystemSchema = z.enum(['enfeoffment', 'commandery', 'legal
 
 export const ZhouInvestitureRankSchema = z.enum(['duke', 'marquis', 'count', 'viscount', 'baron'])
 
+export const BattleResolvedEventSchema = z.object({
+  type: z.literal('battleResolved'),
+  payload: z.object({
+    battleResolution: z.unknown(),
+    attackerRealmId: RealmIdSchema,
+    defenderRealmId: RealmIdSchema,
+    siteId: SiteIdSchema,
+    armySizeTotal: z.number().int().nonnegative(),
+    borderSite: z.boolean(),
+  }),
+})
+
+export const SpyCaughtEventSchema = z.object({
+  type: z.literal('spy_caught'),
+  payload: z.object({
+    observerRealmId: RealmIdSchema,
+    subjectRealmId: RealmIdSchema,
+    missionId: z.string().min(1),
+  }),
+})
+
 export const EffectSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('realm.treasury'), realmId: RealmIdSchema, delta: z.number() }),
   z.object({ type: z.literal('character.create'), generalId: z.string().min(1), realmId: RealmIdSchema, name: z.string().min(1) }),
