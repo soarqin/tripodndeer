@@ -50,6 +50,9 @@ export interface UiActions {
   openContextMenu: (payload: { siteId: SiteId; x: number; y: number }) => void
   closeContextMenu: () => void
   setActivePanel: (panel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | 'espionage' | 'codex' | 'province-browser' | 'region-browser' | 'character-browser' | null) => void
+  openCodex: (entryId?: string | null) => void
+  closeCodex: () => void
+  selectCodexEntry: (id: string) => void
   openDiplomacyPanel: (realmId: RealmId) => void
   closeDiplomacyPanel: () => void
   openPeacePanel: () => void
@@ -119,6 +122,31 @@ export function createUiSlice(set: StoreSet): UiActions {
     setActivePanel: (panel) =>
       set((state) => {
         state.activePanel = panel
+      }),
+    openCodex: (entryId) =>
+      set((state) => {
+        state.activePanel = 'codex'
+        state.selectedCodexEntryId = entryId ?? null
+        if (state.clockState.speed !== 'pause') {
+          state.codexPreviousClockSpeed = state.clockState.speed
+          state.clockState = engineSetSpeed(state.clockState, 'pause')
+          return
+        }
+
+        state.codexPreviousClockSpeed = null
+      }),
+    closeCodex: () =>
+      set((state) => {
+        state.activePanel = null
+        state.selectedCodexEntryId = null
+        if (state.codexPreviousClockSpeed !== null) {
+          state.clockState = engineSetSpeed(state.clockState, state.codexPreviousClockSpeed)
+          state.codexPreviousClockSpeed = null
+        }
+      }),
+    selectCodexEntry: (id) =>
+      set((state) => {
+        state.selectedCodexEntryId = id
       }),
     openDiplomacyPanel: (realmId) =>
       set((state) => {
