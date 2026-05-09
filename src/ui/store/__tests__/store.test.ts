@@ -70,11 +70,14 @@ describe('store reset', () => {
     store.tick(10000)
     expect(useGameStore.getState().world.tick).toBeGreaterThan(0)
 
+    useGameStore.getState().selectedCodexEntryId = 'codex-entry-1'
+
     useGameStore.getState().reset()
     const after = useGameStore.getState()
     expect(after.world.tick).toBe(0)
     expect(after.clockState.speed).toBe('pause')
     expect(after.clockState.realTimeAccum).toBe(0)
+    expect(after.selectedCodexEntryId).toBeNull()
   })
 })
 
@@ -144,6 +147,12 @@ describe('ui store panel and banner actions', () => {
     useGameStore.getState().setActivePanel('junshi')
 
     expect(selectActivePanel(useGameStore.getState())).toBe('junshi')
+  })
+
+  it('setActivePanel accepts codex', () => {
+    useGameStore.getState().setActivePanel('codex')
+
+    expect(selectActivePanel(useGameStore.getState())).toBe('codex')
   })
 
   it('showBanner sets transientBanner with text', () => {

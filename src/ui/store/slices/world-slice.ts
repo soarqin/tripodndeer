@@ -242,6 +242,7 @@ function applyReadyWorld(state: GameStore, world: World, playerRealmId: RealmId)
   state.lastBattleResolution = null
   state.contextMenu = null
   state.activePanel = null
+  state.selectedCodexEntryId = null
   state.diplomacyTargetRealmId = null
   state.isPeacePanelOpen = false
   state.transientBanner = null
@@ -281,6 +282,7 @@ function createBootActions(set: StoreSet): Pick<WorldActions, 'loadWorld' | 'rep
         state.lastBattleResolution = null
         state.contextMenu = null
         state.activePanel = null
+        state.selectedCodexEntryId = null
         state.diplomacyTargetRealmId = null
         state.isPeacePanelOpen = false
         state.transientBanner = null

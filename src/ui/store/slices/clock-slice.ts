@@ -41,6 +41,7 @@ export function createClockSlice(set: StoreSet): ClockActions {
         state.lastBattleResolution = fresh.lastBattleResolution
         state.contextMenu = fresh.contextMenu
         state.activePanel = fresh.activePanel
+        state.selectedCodexEntryId = fresh.selectedCodexEntryId
         state.diplomacyTargetRealmId = fresh.diplomacyTargetRealmId
         state.transientBanner = fresh.transientBanner
         state.modalQueue = castDraft(fresh.modalQueue)

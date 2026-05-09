@@ -8,6 +8,7 @@ beforeEach(() => {
 describe('bootStatus default', () => {
   it('defaults to pending in fresh store after reset', () => {
     expect(useGameStore.getState().bootStatus).toBe('pending')
+    expect(useGameStore.getState().selectedCodexEntryId).toBeNull()
   })
 })
 
@@ -57,12 +58,14 @@ describe('resetToBootPending action', () => {
     expect(useGameStore.getState().bootStatus).toBe('ready')
 
     useGameStore.getState().setActivePanel('junshi')
+    useGameStore.getState().selectedCodexEntryId = 'codex-entry-1'
     useGameStore.getState().resetToBootPending()
 
     const state = useGameStore.getState()
     expect(state.bootStatus).toBe('pending')
     expect(state.activePanel).toBeNull()
     expect(state.selectedArmyId).toBeNull()
+    expect(state.selectedCodexEntryId).toBeNull()
   })
 })
 
@@ -75,6 +78,7 @@ describe('replaceWorldFromSave action', () => {
 
     useGameStore.getState().resetToBootPending()
     expect(useGameStore.getState().bootStatus).toBe('pending')
+    useGameStore.getState().selectedCodexEntryId = 'codex-entry-1'
 
     useGameStore.getState().replaceWorldFromSave(savedWorld)
 
@@ -83,5 +87,6 @@ describe('replaceWorldFromSave action', () => {
     expect(state.world.tick).toBe(12345)
     expect(state.world.sites.size).toBe(50)
     expect(state.playerRealmId).toBe(savedWorld.playerRealmId)
+    expect(state.selectedCodexEntryId).toBeNull()
   })
 })

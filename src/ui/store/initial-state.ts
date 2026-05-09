@@ -25,7 +25,8 @@ export interface GameState {
   selectedArmyId: ArmyId | null
   lastBattleResolution: BattleResolution | null
   contextMenu: { siteId: SiteId; x: number; y: number } | null
-  activePanel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | 'espionage' | 'province-browser' | 'region-browser' | 'character-browser' | null
+  activePanel: 'wanggong' | 'junshi' | 'neizheng' | 'rencai' | 'waijiao' | 'culture' | 'espionage' | 'codex' | 'province-browser' | 'region-browser' | 'character-browser' | null
+  selectedCodexEntryId: string | null
   diplomacyTargetRealmId: RealmId | null
   isPeacePanelOpen: boolean
   transientBanner: { text: string; createdAt: number } | null
@@ -103,6 +104,7 @@ export function makeInitialState(): GameState {
     lastBattleResolution: null,
     contextMenu: null,
     activePanel: null,
+    selectedCodexEntryId: null,
     diplomacyTargetRealmId: null,
     isPeacePanelOpen: false,
     transientBanner: null,
