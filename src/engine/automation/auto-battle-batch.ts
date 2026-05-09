@@ -48,6 +48,7 @@ export interface BatchProgress {
   readonly totalGames: number
   readonly etaMs: number
   readonly lastWinner: RealmId | null
+  readonly endTick: number
 }
 
 export interface BatchReport {
@@ -160,6 +161,7 @@ export async function runAutoBattleBatch(config: BatchConfig): Promise<BatchRepo
       totalGames: config.limit,
       etaMs,
       lastWinner: winnerRealmId,
+      endTick: finalWorld.tick,
     })
   }
 

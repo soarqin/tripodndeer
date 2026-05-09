@@ -68,7 +68,7 @@ async function main(): Promise<void> {
       const etaSec = Math.round(state.etaMs / 1000)
       console.log(
         `Game ${state.gamesCompleted}/${state.totalGames} complete` +
-        ` (winner: ${state.lastWinner ?? 'none'}, ETA: ~${etaSec}s)`
+        ` (winner: ${state.lastWinner ?? 'none'}, ticks: ${state.endTick}, ETA: ~${etaSec}s)`
       )
     },
   }
