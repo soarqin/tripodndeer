@@ -59,3 +59,13 @@
 ## [2026-05-09] aiPersonality removal scope
 - Production code no longer references `aiPersonality`; legacy compatibility branches were removed instead of retained.
 - Invariant tests now scan non-test `src/**/*.ts` files directly so regressions fail fast.
+
+- Kept `getWinnerRealmId` unchanged except for the `export` keyword so the original auto-battle behavior stays identical.
+- Implemented fallback logic in a separate module to keep batch-run behavior out of `runAutoBattle`.
+## 2026-05-09
+- Kept `BatchMetrics` inline in `auto-battle-batch.ts` because `behavior-metrics.ts` was not present yet during typecheck.
+- Split the type-surface commit from the unrelated test-fixture type fix so the batch schema change stayed atomic.
+
+## T3.1 + T3.4 batch CLI
+- Default batch smoke runtime must stay short for `pnpm test:baseline --limit=2 --seed-start=1 --output=/tmp/smoke.json`, so the CLI defaults `maxTicks` to 100 while still accepting explicit overrides.
+- Kept `batch-report.ts` as a minimal serializer/markdown helper to satisfy the CLI contract without adding new batch abstractions.

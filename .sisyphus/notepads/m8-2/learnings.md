@@ -149,3 +149,13 @@ After M8.2 (difficulty + diplomatic memory + personality dims), 18 tests failed 
 ### Evidence layout
 - `.sisyphus/evidence/final-qa/01-...08-...` per-scenario logs
 - `.sisyphus/evidence/final-qa/VERDICT.md` summary table
+
+- Added a batch-only winner fallback wrapper that reuses `getWinnerRealmId` first, then falls back to the active realm with the largest site count and ID-based tie break.
+- The automation tests need a full `World` fixture because `src/shared/types/World` is broad even when the scenario under test only reads `realms` and `sites`.
+## 2026-05-09
+- `auto-battle-batch` can stay types-only while `runAutoBattleBatch` is a stub; this keeps schema work decoupled from execution logic.
+- `DifficultyTier` is constrained to `weak | common | hero | hegemon | sage`; older tests using `normal` fail typecheck until updated.
+
+## T3.1 + T3.4 batch CLI
+- The batch runner is viable as a thin CLI wrapper over `runAutoBattleBatch`; the only extra plumbing needed is progress logging plus JSON/Markdown writes.
+- A smoke-friendly default `maxTicks` matters more than the long-run example in the prompt for keeping the baseline command under a few minutes.

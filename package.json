@@ -18,7 +18,8 @@
     "gen:locale-types": "tsx scripts/gen-locale-types.ts",
     "generate:m0-map": "tsx tools/generate-m0-map.ts",
     "generate:m1-map": "tsx tools/generate-m1-map.ts",
-    "auto-battle": "tsx scripts/auto-battle.ts"
+    "auto-battle": "tsx scripts/auto-battle.ts",
+    "test:baseline": "tsx scripts/run-auto-battle-batch.ts"
   },
   "dependencies": {
     "idb": "^8.0.3",
