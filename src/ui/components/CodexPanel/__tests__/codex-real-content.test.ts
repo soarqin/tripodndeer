@@ -34,7 +34,7 @@ describe('codex real content smoke test', () => {
   it('does not contain broken codex:// internal links', () => {
     const entries = loadStaticEntries()
     const entryIds = new Set(entries.map((entry) => entry.id))
-    const linkPattern = /\[([^\]]+)\]\(codex:\/\/([^\)]+)\)/g
+    const linkPattern = /\[([^\]]+)\]\(codex:\/\/([^)]+)\)/g
 
     for (const entry of entries) {
       for (const match of entry.body.matchAll(linkPattern)) {

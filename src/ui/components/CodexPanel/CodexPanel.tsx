@@ -3,7 +3,7 @@ import { useGameStore } from '~/ui/store/game-store'
 import { loadStaticEntries, deriveCharacterEntries } from './codex-data-loader'
 import { renderMarkdown } from './markdown-renderer'
 import { CODEX_EMPTY_STATE_M1_CHARACTERS, CODEX_EMPTY_SEARCH_RESULTS } from '~/content/codex/empty-state-messages'
-import type { CodexCategory, CodexEntry } from './codex-types'
+import type { CodexCategory } from './codex-types'
 import styles from './CodexPanel.module.css'
 
 export function CodexPanel() {
