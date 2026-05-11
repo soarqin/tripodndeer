@@ -42,6 +42,7 @@ import type {
   World,
 } from '~/shared/types'
 import type { ScenarioId } from '~/shared'
+import type { TutorialStepId } from '~/shared/types/tutorial'
 import { bannerTextForCriticalEvent, type CriticalEventType } from '../critical-events'
 import type { GameStore, StoreSet } from '../game-store'
 import { closeQueuedModal } from './ui-slice'
@@ -99,7 +100,8 @@ export interface WorldActions {
   applyReformChoice: (realmId: RealmId, reformId: ReformId, choiceId: string) => void
   applyEventChainChoice: (chainId: EventChainId, choiceId: string) => void
   pauseOnCriticalEvent: (eventType: CriticalEventType, payload?: Record<string, unknown>) => void
-   loadWorld: (scenarioId: ScenarioId, difficulty?: DifficultyTier) => Promise<void>
+  dismissTutorialHint: (stepId: TutorialStepId) => void
+  loadWorld: (scenarioId: ScenarioId, difficulty?: DifficultyTier) => Promise<void>
   replaceWorldFromSave: (world: World) => void
   resetToBootPending: () => void
 }
@@ -296,7 +298,7 @@ function createBootActions(set: StoreSet): Pick<WorldActions, 'loadWorld' | 'rep
   }
 }
 
-function createDecisionActions(set: StoreSet): Pick<WorldActions, 'applyDisasterChoice' | 'applyReformChoice' | 'applyEventChainChoice' | 'pauseOnCriticalEvent'> {
+function createDecisionActions(set: StoreSet): Pick<WorldActions, 'applyDisasterChoice' | 'applyReformChoice' | 'applyEventChainChoice' | 'pauseOnCriticalEvent' | 'dismissTutorialHint'> {
   return {
     applyDisasterChoice: (disasterId, choiceId) =>
       set((state) => {
@@ -352,6 +354,19 @@ function createDecisionActions(set: StoreSet): Pick<WorldActions, 'applyDisaster
           text: bannerTextForCriticalEvent(eventType),
           createdAt: state.world.tick,
         }
+      }),
+    dismissTutorialHint: (stepId) =>
+      set((state) => {
+        const tutorialState = state.world.tutorialState
+        if (tutorialState === null) return
+
+        state.world = castDraft({
+          ...state.world,
+          tutorialState: {
+            ...tutorialState,
+            dismissedStepHints: new Set([...tutorialState.dismissedStepHints, stepId]),
+          },
+        })
       }),
   }
 }
