@@ -1,0 +1,255 @@
+{
+  "schema_version": 8,
+  "edges": {
+    "e_001": { "id": "e_001", "curveType": "polyline", "travel_cost": 1, "anchors": [[80, 80], [120, 80]] },
+    "e_002": { "id": "e_002", "curveType": "polyline", "travel_cost": 1, "anchors": [[120, 80], [100, 120]] },
+    "e_003": { "id": "e_003", "curveType": "polyline", "travel_cost": 1, "anchors": [[100, 120], [80, 80]] },
+    "e_004": { "id": "e_004", "curveType": "polyline", "travel_cost": 1, "anchors": [[180, 80], [220, 80]] },
+    "e_005": { "id": "e_005", "curveType": "polyline", "travel_cost": 1, "anchors": [[220, 80], [200, 120]] },
+    "e_006": { "id": "e_006", "curveType": "polyline", "travel_cost": 1, "anchors": [[200, 120], [180, 80]] },
+    "e_007": { "id": "e_007", "curveType": "polyline", "travel_cost": 1, "anchors": [[280, 80], [320, 80]] },
+    "e_008": { "id": "e_008", "curveType": "polyline", "travel_cost": 1, "anchors": [[320, 80], [300, 120]] },
+    "e_009": { "id": "e_009", "curveType": "polyline", "travel_cost": 1, "anchors": [[300, 120], [280, 80]] },
+    "e_010": { "id": "e_010", "curveType": "polyline", "travel_cost": 1, "anchors": [[230, 180], [270, 180]] },
+    "e_011": { "id": "e_011", "curveType": "polyline", "travel_cost": 1, "anchors": [[270, 180], [250, 220]] },
+    "e_012": { "id": "e_012", "curveType": "polyline", "travel_cost": 1, "anchors": [[250, 220], [230, 180]] },
+    "e_013": { "id": "e_013", "curveType": "polyline", "travel_cost": 1, "anchors": [[180, 280], [220, 280]] },
+    "e_014": { "id": "e_014", "curveType": "polyline", "travel_cost": 1, "anchors": [[220, 280], [200, 320]] },
+    "e_015": { "id": "e_015", "curveType": "polyline", "travel_cost": 1, "anchors": [[200, 320], [180, 280]] },
+    "e_016": { "id": "e_016", "curveType": "polyline", "travel_cost": 1, "anchors": [[130, 330], [170, 330]] },
+    "e_017": { "id": "e_017", "curveType": "polyline", "travel_cost": 1, "anchors": [[170, 330], [150, 370]] },
+    "e_018": { "id": "e_018", "curveType": "polyline", "travel_cost": 1, "anchors": [[150, 370], [130, 330]] },
+    "e_019": { "id": "e_019", "curveType": "polyline", "travel_cost": 1, "anchors": [[80, 380], [120, 380]] },
+    "e_020": { "id": "e_020", "curveType": "polyline", "travel_cost": 1, "anchors": [[120, 380], [100, 420]] },
+    "e_021": { "id": "e_021", "curveType": "polyline", "travel_cost": 1, "anchors": [[100, 420], [80, 380]] },
+    "e_022": { "id": "e_022", "curveType": "polyline", "travel_cost": 1, "anchors": [[330, 280], [370, 280]] },
+    "e_023": { "id": "e_023", "curveType": "polyline", "travel_cost": 1, "anchors": [[370, 280], [350, 320]] },
+    "e_024": { "id": "e_024", "curveType": "polyline", "travel_cost": 1, "anchors": [[350, 320], [330, 280]] },
+    "e_025": { "id": "e_025", "curveType": "polyline", "travel_cost": 1, "anchors": [[430, 330], [470, 330]] },
+    "e_026": { "id": "e_026", "curveType": "polyline", "travel_cost": 1, "anchors": [[470, 330], [450, 370]] },
+    "e_027": { "id": "e_027", "curveType": "polyline", "travel_cost": 1, "anchors": [[450, 370], [430, 330]] },
+    "e_028": { "id": "e_028", "curveType": "polyline", "travel_cost": 1, "anchors": [[380, 380], [420, 380]] },
+    "e_029": { "id": "e_029", "curveType": "polyline", "travel_cost": 1, "anchors": [[420, 380], [400, 420]] },
+    "e_030": { "id": "e_030", "curveType": "polyline", "travel_cost": 1, "anchors": [[400, 420], [380, 380]] }
+  },
+  "sites": [
+    {
+      "id": "site_yongcheng",
+      "name": "雍城",
+      "position": [100, 100],
+      "boundary": [
+        { "edge": "e_001", "reverse": false },
+        { "edge": "e_002", "reverse": false },
+        { "edge": "e_003", "reverse": false }
+      ]
+    },
+    {
+      "id": "site_xianyang",
+      "name": "咸阳",
+      "position": [200, 100],
+      "boundary": [
+        { "edge": "e_004", "reverse": false },
+        { "edge": "e_005", "reverse": false },
+        { "edge": "e_006", "reverse": false }
+      ]
+    },
+    {
+      "id": "site_shancheng",
+      "name": "陕城",
+      "position": [300, 100],
+      "boundary": [
+        { "edge": "e_007", "reverse": false },
+        { "edge": "e_008", "reverse": false },
+        { "edge": "e_009", "reverse": false }
+      ]
+    },
+    {
+      "id": "site_jiameng",
+      "name": "葭萌",
+      "position": [250, 200],
+      "boundary": [
+        { "edge": "e_010", "reverse": false },
+        { "edge": "e_011", "reverse": false },
+        { "edge": "e_012", "reverse": false }
+      ]
+    },
+    {
+      "id": "site_pi",
+      "name": "郫",
+      "position": [200, 300],
+      "boundary": [
+        { "edge": "e_013", "reverse": false },
+        { "edge": "e_014", "reverse": false },
+        { "edge": "e_015", "reverse": false }
+      ]
+    },
+    {
+      "id": "site_chengdu",
+      "name": "成都",
+      "position": [150, 350],
+      "boundary": [
+        { "edge": "e_016", "reverse": false },
+        { "edge": "e_017", "reverse": false },
+        { "edge": "e_018", "reverse": false }
+      ]
+    },
+    {
+      "id": "site_taideng",
+      "name": "台登",
+      "position": [100, 400],
+      "boundary": [
+        { "edge": "e_019", "reverse": false },
+        { "edge": "e_020", "reverse": false },
+        { "edge": "e_021", "reverse": false }
+      ]
+    },
+    {
+      "id": "site_jiangzhou",
+      "name": "江州",
+      "position": [350, 300],
+      "boundary": [
+        { "edge": "e_022", "reverse": false },
+        { "edge": "e_023", "reverse": false },
+        { "edge": "e_024", "reverse": false }
+      ]
+    },
+    {
+      "id": "site_yufu",
+      "name": "鱼复",
+      "position": [450, 350],
+      "boundary": [
+        { "edge": "e_025", "reverse": false },
+        { "edge": "e_026", "reverse": false },
+        { "edge": "e_027", "reverse": false }
+      ]
+    },
+    {
+      "id": "site_langling",
+      "name": "阆陵",
+      "position": [400, 400],
+      "boundary": [
+        { "edge": "e_028", "reverse": false },
+        { "edge": "e_029", "reverse": false },
+        { "edge": "e_030", "reverse": false }
+      ]
+    }
+  ],
+  "realms": [
+    {
+      "id": "realm_qin_tutorial",
+      "displayName": "秦",
+      "fullTitle": "秦国",
+      "color": "#B22222",
+      "capital": "site_xianyang",
+      "initialSites": ["site_xianyang", "site_yongcheng", "site_shancheng"],
+      "initialArmies": [
+        { "id": "army_qin_tutorial_1", "manpower": 5000, "location": "site_xianyang" }
+      ],
+      "economy": { "treasury": 500, "foodStores": 600, "taxRate": 10 },
+      "rulerId": "char_qin_huiwen_tutorial",
+      "traits": [],
+      "politicalSystem": "legalist_centralized",
+      "prestige": 50,
+      "ideologyLean": { "fa": 60, "ru": 10, "dao": 10, "mo": 5, "zonghen": 10, "bing": 5 },
+      "warVictoriesThisYear": 0,
+      "status": "active",
+      "rulingHouse": "ying"
+    },
+    {
+      "id": "realm_shu_tutorial",
+      "displayName": "蜀",
+      "fullTitle": "蜀国",
+      "color": "#228B22",
+      "capital": "site_chengdu",
+      "initialSites": ["site_chengdu", "site_pi", "site_taideng"],
+      "initialArmies": [
+        { "id": "army_shu_tutorial_1", "manpower": 3000, "location": "site_chengdu" }
+      ],
+      "economy": { "treasury": 300, "foodStores": 500, "taxRate": 10 },
+      "rulerId": "char_shu_king_tutorial",
+      "traits": [],
+      "politicalSystem": "enfeoffment",
+      "prestige": 40,
+      "ideologyLean": { "fa": 5, "ru": 15, "dao": 30, "mo": 5, "zonghen": 5, "bing": 5 },
+      "warVictoriesThisYear": 0,
+      "status": "active",
+      "rulingHouse": "du"
+    },
+    {
+      "id": "realm_ba_tutorial",
+      "displayName": "巴",
+      "fullTitle": "巴国",
+      "color": "#4169E1",
+      "capital": "site_jiangzhou",
+      "initialSites": ["site_jiangzhou", "site_yufu", "site_langling"],
+      "initialArmies": [
+        { "id": "army_ba_tutorial_1", "manpower": 2500, "location": "site_jiangzhou" }
+      ],
+      "economy": { "treasury": 250, "foodStores": 400, "taxRate": 10 },
+      "rulerId": "char_ba_baron_tutorial",
+      "traits": [],
+      "politicalSystem": "enfeoffment",
+      "prestige": 35,
+      "ideologyLean": { "fa": 5, "ru": 10, "dao": 30, "mo": 5, "zonghen": 5, "bing": 5 },
+      "warVictoriesThisYear": 0,
+      "status": "active",
+      "rulingHouse": "ji"
+    },
+    {
+      "id": "realm_ju_tutorial",
+      "displayName": "苴",
+      "fullTitle": "苴国",
+      "color": "#DAA520",
+      "capital": "site_jiameng",
+      "initialSites": ["site_jiameng"],
+      "initialArmies": [],
+      "economy": { "treasury": 100, "foodStores": 200, "taxRate": 10 },
+      "rulerId": "char_ju_marquis_tutorial",
+      "traits": [],
+      "politicalSystem": "enfeoffment",
+      "prestige": 25,
+      "ideologyLean": { "fa": 5, "ru": 15, "dao": 20, "mo": 5, "zonghen": 5, "bing": 5 },
+      "warVictoriesThisYear": 0,
+      "status": "active",
+      "rulingHouse": "ji"
+    }
+  ],
+  "initialOwnership": {
+    "site_xianyang": "realm_qin_tutorial",
+    "site_yongcheng": "realm_qin_tutorial",
+    "site_shancheng": "realm_qin_tutorial",
+    "site_jiameng": "realm_ju_tutorial",
+    "site_chengdu": "realm_shu_tutorial",
+    "site_pi": "realm_shu_tutorial",
+    "site_taideng": "realm_shu_tutorial",
+    "site_jiangzhou": "realm_ba_tutorial",
+    "site_yufu": "realm_ba_tutorial",
+    "site_langling": "realm_ba_tutorial"
+  },
+  "initialArmies": [],
+  "initialWars": [],
+  "generals": [],
+  "passes": [],
+  "adjacencyEdges": [],
+  "peaceProposals": [],
+  "relations": [],
+  "diplomaticProposals": [],
+  "treaties": [],
+  "diplomacyHistory": [],
+  "coalitions": [],
+  "zhouInvestiture": [],
+  "rulers": [],
+  "eventChainStates": [],
+  "reformStates": [],
+  "disasterStates": [],
+  "tradeRoutes": [],
+  "factionInfluences": [],
+  "academies": [],
+  "intelligenceCoverage": {},
+  "counterIntelStates": [],
+  "spyMissions": [],
+  "provinces": [],
+  "regions": [],
+  "characterTemplates": [],
+  "localization": {}
+}

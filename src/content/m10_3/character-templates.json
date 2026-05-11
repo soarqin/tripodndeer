@@ -1,0 +1,128 @@
+{
+  "templates": [
+    {
+      "id": "char_qin_huiwen_tutorial",
+      "givenName": "驷",
+      "familyName": "嬴",
+      "realmId": "realm_qin_tutorial",
+      "birthYearBC": 356,
+      "deathYearBC": 311,
+      "birthplace": "site_xianyang",
+      "specialty": "commander",
+      "attributes": {
+        "wu": 4,
+        "zheng": 5,
+        "jiao": 4,
+        "mou": 5,
+        "xue": 4,
+        "po": 4
+      },
+      "historicalNotes": "秦惠文王，在位期间任用张仪行连横、命司马错灭蜀，奠定秦国并巴蜀之基。",
+      "source": "史记",
+      "aliases": ["秦惠文王", "嬴驷"]
+    },
+    {
+      "id": "char_sima_cuo_tutorial",
+      "givenName": "错",
+      "familyName": "司马",
+      "realmId": "realm_qin_tutorial",
+      "birthYearBC": 340,
+      "deathYearBC": null,
+      "birthplace": "site_xianyang",
+      "specialty": "commander",
+      "attributes": {
+        "wu": 5,
+        "zheng": 3,
+        "jiao": 2,
+        "mou": 4,
+        "xue": 3,
+        "po": 4
+      },
+      "historicalNotes": "秦国名将，主张「得蜀则得楚」之策，亲率大军灭蜀、巴、苴三国，为秦取得南方根基。",
+      "source": "史记"
+    },
+    {
+      "id": "char_zhang_yi_tutorial",
+      "givenName": "仪",
+      "familyName": "张",
+      "realmId": "realm_qin_tutorial",
+      "birthYearBC": 360,
+      "deathYearBC": 310,
+      "birthplace": "site_xianyang",
+      "specialty": "diplomat",
+      "attributes": {
+        "wu": 2,
+        "zheng": 4,
+        "jiao": 5,
+        "mou": 5,
+        "xue": 4,
+        "po": 4
+      },
+      "historicalNotes": "纵横家代表人物，秦相，首创「连横」之策。在伐蜀之议中力主先攻韩，与司马错相争，最终采纳司马错灭蜀之策。",
+      "source": "史记",
+      "aliases": ["张子"]
+    },
+    {
+      "id": "char_shu_king_tutorial",
+      "givenName": "蜀王",
+      "familyName": "杜",
+      "realmId": "realm_shu_tutorial",
+      "birthYearBC": 350,
+      "deathYearBC": 316,
+      "birthplace": "site_chengdu",
+      "specialty": "administrator",
+      "attributes": {
+        "wu": 3,
+        "zheng": 3,
+        "jiao": 3,
+        "mou": 2,
+        "xue": 2,
+        "po": 3
+      },
+      "historicalNotes": "蜀国末代君主，与巴国长期交战，又与苴侯反目，最终引秦兵入蜀，国破身死。",
+      "source": "其他",
+      "aliases": ["蜀侯"]
+    },
+    {
+      "id": "char_ba_baron_tutorial",
+      "givenName": "巴子",
+      "familyName": "姬",
+      "realmId": "realm_ba_tutorial",
+      "birthYearBC": 350,
+      "deathYearBC": 316,
+      "birthplace": "site_jiangzhou",
+      "specialty": "commander",
+      "attributes": {
+        "wu": 4,
+        "zheng": 2,
+        "jiao": 2,
+        "mou": 2,
+        "xue": 2,
+        "po": 3
+      },
+      "historicalNotes": "巴国末代君主，与蜀国争锋，被秦兵所灭。巴人以勇悍著称，曾参与武王伐纣。",
+      "source": "其他",
+      "aliases": ["巴侯"]
+    },
+    {
+      "id": "char_ju_marquis_tutorial",
+      "givenName": "苴侯",
+      "familyName": "姬",
+      "realmId": "realm_ju_tutorial",
+      "birthYearBC": 350,
+      "deathYearBC": 316,
+      "birthplace": "site_jiameng",
+      "specialty": "diplomat",
+      "attributes": {
+        "wu": 2,
+        "zheng": 3,
+        "jiao": 4,
+        "mou": 3,
+        "xue": 2,
+        "po": 2
+      },
+      "historicalNotes": "苴国君主，本为蜀王宗室封于葭萌。后与蜀王反目，私通巴国，向秦求救，遂引秦灭蜀之战。",
+      "source": "其他"
+    }
+  ]
+}
