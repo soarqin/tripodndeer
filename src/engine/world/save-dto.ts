@@ -1,4 +1,5 @@
 import { M5_PERSONALITY_DIMS_BASELINE } from '~/content/m2/balance'
+import type { ScenarioId } from '~/shared'
 import type { FactionId, FactionInfluenceState, IntelligenceCoverage, RulerState, World } from '~/shared/types'
 import {
   SAVE_DTO_VERSION,
@@ -8,8 +9,9 @@ import {
 } from '~/shared/types/save-dto'
 import { getDefaultPhases } from './factory'
 import { migrateSaveV2ToV3 } from './migrations/save-v2-to-v3'
+import { migrateSaveV3ToV4 } from './migrations/save-v3-to-v4'
 
-export function worldToSaveDTO(world: World, scenarioId: 'm1' | 'm9' = 'm1'): SaveDTO {
+export function worldToSaveDTO(world: World, scenarioId: ScenarioId = 'm1'): SaveDTO {
   return {
     schemaVersion: SAVE_DTO_VERSION,
     scenarioId,
@@ -65,7 +67,7 @@ export function worldToSaveDTO(world: World, scenarioId: 'm1' | 'm9' = 'm1'): Sa
   }
 }
 
-export const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [1, 2, SAVE_DTO_VERSION]
+export const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [1, 2, 3, 4]
 
 type SaveDTOWithVersion = Omit<SaveDTO, 'schemaVersion'> & { readonly schemaVersion: number }
 
@@ -83,7 +85,13 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
     }
   }
 
-  const migratedDto = inputDto.schemaVersion === 2 ? migrateSaveV2ToV3(dto) : dto
+  let migratedDto: SaveDTOWithVersion = inputDto
+  if (migratedDto.schemaVersion === 2) {
+    migratedDto = migrateSaveV2ToV3(migratedDto as SaveDTO) as SaveDTOWithVersion
+  }
+  if (migratedDto.schemaVersion === 3) {
+    migratedDto = migrateSaveV3ToV4(migratedDto as SaveDTO) as SaveDTOWithVersion
+  }
   const sw = migratedDto.world
   const factionInfluences = new Map(
     sw.factionInfluences.map(([key, value]): [string, FactionInfluenceState] => [
@@ -150,5 +158,17 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
       phases: getDefaultPhases(),
       pendingOrders: sw.pendingOrders,
     },
+  }
+}
+
+export interface HintSaveState {
+  readonly seenHints: Record<string, true>
+  readonly hintsEnabled: boolean
+}
+
+export function saveDtoToHintState(dto: SaveDTO): HintSaveState {
+  return {
+    seenHints: dto.seenHints ? { ...dto.seenHints } : {},
+    hintsEnabled: dto.hintsEnabled ?? true,
   }
 }

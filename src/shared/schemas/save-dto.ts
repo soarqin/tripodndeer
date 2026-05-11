@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { SAVE_DTO_VERSION } from '~/shared/types/save-dto'
 import { RulerPersonalityProfileSchema, PersonalityArchetypeSchema } from './character'
 import { DifficultyTierSchema } from './difficulty'
+import { ScenarioIdSchema } from './scenario'
 
 const keyValueTuple = z.tuple([z.string().min(1), z.unknown()])
 const numericKeyValueTuple = z.tuple([z.string().min(1), z.number()])
@@ -71,7 +72,11 @@ export const SerializedWorldSchema = z.object({
 
 export const SaveDTOSchema = z.object({
   schemaVersion: z.literal(SAVE_DTO_VERSION),
-  scenarioId: z.enum(['m1', 'm9']),
+  scenarioId: ScenarioIdSchema,
   createdAt: z.number().int().nonnegative(),
   world: SerializedWorldSchema,
+  seenHints: z.record(z.literal(true)).optional(),
+  hintsEnabled: z.boolean().optional(),
 })
+
+export const saveDtoSchema = SaveDTOSchema

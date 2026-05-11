@@ -2,6 +2,7 @@ import type { AIState } from './ai-state'
 import type { General, GeneralId, FactionId, RulerPersonalityProfile, RulerState } from './character'
 import type { AdjacencyEdge, AdjacencyEdgeId, Army, ArmyId, EdgeId, MapEdge, RealmId, Site, SiteId } from './core'
 import type { DifficultyTier } from './difficulty'
+import type { ScenarioId } from './scenario'
 import type {
   CoalitionId,
   CoalitionState,
@@ -41,7 +42,7 @@ import type {
   RNGState,
 } from './world'
 
-export const SAVE_DTO_VERSION = 3 as const
+export const SAVE_DTO_VERSION = 4 as const
 
 export type SaveLoadErrorKind = 'incompatible_version' | 'parse_error' | 'missing_data'
 
@@ -110,7 +111,9 @@ export interface SerializedWorld {
 
 export interface SaveDTO {
   readonly schemaVersion: typeof SAVE_DTO_VERSION
-  readonly scenarioId: 'm1' | 'm9'
+  readonly scenarioId: ScenarioId
   readonly createdAt: number
   readonly world: SerializedWorld
+  readonly seenHints?: Readonly<Record<string, true>>
+  readonly hintsEnabled?: boolean
 }

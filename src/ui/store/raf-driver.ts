@@ -6,6 +6,7 @@ import { useGameStore } from './game-store'
 import { M10_AUTOSAVE_INTERVAL } from '@/content/m2/balance'
 import { worldToSaveDTO } from '@/engine/world/save-dto'
 import { saveSlot } from './persistence/slot-crud'
+import type { ScenarioId } from '~/shared'
 
 /**
  * RAF 驱动 hook。
@@ -29,7 +30,7 @@ export function useRafDriver(): void {
         const newWorld = useGameStore.getState().world
         
         if (newWorld.tick > oldTick && newWorld.tick % M10_AUTOSAVE_INTERVAL === 0 && newWorld.tick > 0 && useGameStore.getState().bootStatus === 'ready') {
-          const scenarioId: 'm1' | 'm9' = newWorld.sites.size === 250 ? 'm9' : 'm1'
+          const scenarioId: ScenarioId = newWorld.sites.size === 250 ? 'm9' : 'm1'
           const dto = worldToSaveDTO(newWorld, scenarioId)
           const playerRealm = newWorld.realms.get(newWorld.playerRealmId)
           const metadata = { 

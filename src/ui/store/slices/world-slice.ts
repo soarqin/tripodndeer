@@ -41,11 +41,12 @@ import type {
   DifficultyTier,
   World,
 } from '~/shared/types'
+import type { ScenarioId } from '~/shared'
 import { bannerTextForCriticalEvent, type CriticalEventType } from '../critical-events'
 import type { GameStore, StoreSet } from '../game-store'
 import { closeQueuedModal } from './ui-slice'
 
-export type ScenarioId = 'm1' | 'm9'
+export type { ScenarioId } from '~/shared'
 
 export interface DiplomacyActionFeedback {
   readonly id: string

@@ -1,4 +1,5 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
+import type { ScenarioId } from '~/shared'
 
 const DB_NAME = 'tripodndeer-saves'
 const DB_VERSION = 1
@@ -8,7 +9,7 @@ export interface SaveMetadata {
   name: string
   createdAt: number
   tick: number
-  scenarioId: 'm1' | 'm9'
+  scenarioId: ScenarioId
   playerRealmName: string
 }
 
