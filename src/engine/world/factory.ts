@@ -1,5 +1,7 @@
 import m0Data from '@/content/m0/sites.json'
 import m1Data from '@/content/m1/scenario.json'
+import tutorialScenario from '@/content/m10_3/scenario.json'
+import tutorialCharacters from '@/content/m10_3/character-templates.json'
 import { INITIAL_DATE } from '@/shared/constants'
 import {
   M0DataSchema,
@@ -799,6 +801,149 @@ export function createWorldFromM9Data(
     scenarioId: 'm9' as const,
     tutorialState: null,
     rngState: { seed, counter: 0 },
+    phases: getDefaultPhases(),
+    pendingOrders: [],
+  }
+}
+
+const TUTORIAL_START_DATE = {
+  yearBC: 316,
+  season: 'spring',
+  month: 1,
+  xun: 'shang',
+} as const
+
+function buildTutorialRealmMap(realms: readonly Realm[]): Map<RealmId, Realm> {
+  const realmMap = new Map<RealmId, Realm>()
+  for (const realm of realms) {
+    realmMap.set(realm.id, {
+      ...realm,
+      economy: realm.economy ?? {
+        treasury: M4_DEFAULT_REALM_TREASURY,
+        foodStores: M4_DEFAULT_REALM_FOOD_STORES,
+        taxRate: M4_DEFAULT_TAX_RATE,
+      },
+      traits: realm.traits ?? [],
+      politicalSystem: realm.politicalSystem ?? 'enfeoffment',
+      prestige: realm.prestige ?? 40,
+      ideologyLean: realm.ideologyLean ?? zeroIdeologyLean(),
+      warVictoriesThisYear: realm.warVictoriesThisYear ?? 0,
+    })
+  }
+  return realmMap
+}
+
+function buildTutorialGenerals(
+  templates: readonly CharacterTemplate[],
+  tick: number,
+  currentYearBC: number,
+): Map<GeneralId, General> {
+  const generals = new Map<GeneralId, General>()
+  for (const t of templates) {
+    const age = t.birthYearBC - currentYearBC
+    const name = `${t.familyName}${t.givenName}`
+    generals.set(t.id, {
+      id: t.id,
+      realmId: t.realmId,
+      name,
+      might: t.attributes.wu,
+      command: t.attributes.wu,
+      loyalty: 80,
+      attrs: t.attributes,
+      specialty: t.specialty,
+      ambition: 'mid',
+      age,
+      recruitedAtTick: tick,
+      posts: [],
+      loyaltyState: 'loyal',
+    })
+  }
+  return generals
+}
+
+export function createWorldFromTutorialData(opts?: { seed?: number }): World {
+  const data = M1DataSchemaV8.parse(tutorialScenario)
+  const templates = tutorialCharacters.templates as readonly CharacterTemplate[]
+
+  const realms = buildTutorialRealmMap(data.realms)
+  const sites = buildSites(data.sites, data.edges, data.initialOwnership, realms)
+  const edges = buildEdgesMap(data.edges)
+  const adjacency = computeRealmAdjacency(data.sites, data.initialOwnership)
+
+  const armies = new Map<ArmyId, Army>()
+  for (const realm of data.realms) {
+    for (const template of realm.initialArmies) {
+      armies.set(template.id, {
+        id: template.id,
+        realmId: realm.id,
+        manpower: template.manpower,
+        location: template.location,
+        state: 'idle',
+        destination: null,
+        ticksRemaining: 0,
+        source: null,
+      })
+    }
+  }
+
+  const generals = buildTutorialGenerals(templates, 0, TUTORIAL_START_DATE.yearBC)
+
+  const characterTemplates = new Map<CharId, CharacterTemplate>()
+  for (const t of templates) {
+    characterTemplates.set(t.id, t)
+  }
+
+  const realmIds = data.realms.map(r => r.id)
+
+  return {
+    date: { ...TUTORIAL_START_DATE },
+    tick: 0,
+    sites,
+    realms,
+    armies,
+    edges,
+    wars: new Map<WarKey, WarState>(),
+    peaceProposals: new Map<PeaceProposalId, PeaceProposal>(),
+    relations: new Map<RelationKey, DiplomaticRelation>(),
+    diplomaticProposals: new Map<DiplomaticProposalId, DiplomaticProposal>(),
+    treaties: new Map<TreatyId, Treaty>(),
+    diplomacyHistory: [],
+    coalitions: new Map<CoalitionId, CoalitionState>(),
+    zhouInvestiture: new Map<RealmId, ZhouInvestitureState>(),
+    generals,
+    rulers: new Map<RealmId, RulerState>(),
+    academies: new Map<AcademyId, Academy>(),
+    eventChainStates: new Map<EventChainId, EventChainState>(),
+    reformStates: new Map<RealmId, ReformState>(),
+    disasterStates: new Map<RealmId, DisasterState>(),
+    tradeRoutes: new Map<TradeRouteId, TradeRoute>(),
+    factionInfluences: new Map<RealmId, FactionInfluenceState>(),
+    passes: new Map<PassId, Pass>(),
+    adjacencyEdges: new Map<AdjacencyEdgeId, AdjacencyEdge>(),
+    sieges: new Map<SiegeId, Siege>(),
+    edicts: new Map<EdictId, EdictState>(),
+    governorAssignments: new Map<SiteId, GovernorAssignment>(),
+    intelligenceCoverage: buildInitialIntelligenceCoverage(realmIds, adjacency),
+    spyMissions: new Map<SpyMissionId, SpyMission>(),
+    counterIntelStates: buildInitialCounterIntelStates(realmIds),
+    provinces: new Map<ProvinceId, Province>(),
+    regions: new Map<RegionId, Region>(),
+    characterTemplates,
+    localization: new Map<string, string>(),
+    aiState: new Map(),
+    difficulty: 'weak' as const,
+    diplomaticMemory: new Map<MemoryKey, DiplomaticMemory>(),
+    playerRealmId: 'realm_qin_tutorial',
+    scenarioId: 'tutorial' as const,
+    tutorialState: {
+      currentStep: 'panel-tour',
+      completedSteps: new Set(),
+      startedAt: { ...TUTORIAL_START_DATE },
+      dismissedStepHints: new Set(),
+      panelsOpened: new Set(),
+      timeoutHintShown: false,
+    },
+    rngState: { seed: opts?.seed ?? 42, counter: 0 },
     phases: getDefaultPhases(),
     pendingOrders: [],
   }
