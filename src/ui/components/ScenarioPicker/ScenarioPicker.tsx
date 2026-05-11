@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { SCENARIO_CONFIGS } from '~/content/scenarios/scenario-configs'
 import { useGameStore } from '~/ui/store/game-store'
+import type { ScenarioId } from '~/shared'
 import type { DifficultyTier } from '~/shared/types'
 import zhCN from '~/content/locales/zh-CN.json'
 import styles from './ScenarioPicker.module.css'
@@ -21,7 +22,7 @@ export function ScenarioPicker(): React.JSX.Element {
   const [loading, setLoading] = React.useState(false)
   const [difficulty, setDifficulty] = useState<DifficultyTier>('hero')
 
-  async function handleSelect(id: 'm1' | 'm9') {
+  async function handleSelect(id: ScenarioId) {
     setLoading(true)
     await loadWorld(id, difficulty)
     // bootStatus becomes 'ready' → App re-renders main screen

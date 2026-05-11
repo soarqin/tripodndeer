@@ -2,14 +2,15 @@ import { describe, it, expect } from 'vitest'
 import { SCENARIO_CONFIGS } from '../scenario-configs'
 
 describe('SCENARIO_CONFIGS', () => {
-  it('contains exactly 2 configs', () => {
-    expect(SCENARIO_CONFIGS.length).toBe(2)
+  it('contains exactly 3 configs', () => {
+    expect(SCENARIO_CONFIGS.length).toBe(3)
   })
 
-  it('contains m1 and m9 ids', () => {
+  it('contains m1, m9, and tutorial ids', () => {
     const ids = SCENARIO_CONFIGS.map((c) => c.id)
     expect(ids).toContain('m1')
     expect(ids).toContain('m9')
+    expect(ids).toContain('tutorial')
   })
 
   it('has all required fields for each config', () => {
