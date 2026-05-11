@@ -8,9 +8,9 @@ AI agent behavioral guidelines for this codebase. Read before making any changes
 
 战国策略游戏引擎原型。Vite + React + TypeScript strict，纯函数引擎 + Zustand UI 层。
 
-**当前里程碑**: M0-M9 已交付。Wave 9: Refactor & Cleanup 已完成。
+**当前里程碑**: M0-M9 已交付。Wave 9: Refactor & Cleanup 已完成。M10 持续中（M10.1 史书百科 ✅、M10.2 渐进提示 ✅）。
 
-**实施顺序**: M4(✅) → M5(✅) → M4.1(✅) → M4.2(✅) → M6(✅) → M7(✅) → M8(✅) → M8.1(✅) → M8.2(✅) → M8.3(✅) → M9(✅) → Wave 9(✅)
+**实施顺序**: M4(✅) → M5(✅) → M4.1(✅) → M4.2(✅) → M6(✅) → M7(✅) → M8(✅) → M8.1(✅) → M8.2(✅) → M8.3(✅) → M9(✅) → Wave 9(✅) → M10(♾️持续) → M10.1(✅) → M10.2(✅)
 
 ---
 
@@ -154,12 +154,16 @@ AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按
 | 6 类记忆事件全部在 M8_2_MEMORY_EVENT_BASE_WEIGHT                                   | `src/content/m2/__tests__/balance-m8_2.test.ts`                      |
 | Three-layer AI cadence: Strategic=yearly / Operational=monthly / Tactical=per-tick | `src/engine/systems/ai/__tests__/rng-skip.test.ts`                   |
 | Operational incompetent blend 在 weak/common 难度生效                               | `src/engine/systems/ai/__tests__/operational-incompetent-blend.test.ts` |
-| SaveDTO SAVE_DTO_VERSION === 3（含 aiState + diplomaticMemory）                     | `src/engine/world/__tests__/save-dto-m8_1.test.ts`                   |
+| SaveDTO SAVE_DTO_VERSION === 4（v3 含 aiState + diplomaticMemory；v4 加 seenHints + hintsEnabled） | `src/engine/world/__tests__/save-dto-m8_1.test.ts` + `src/shared/__tests__/save-dto-m10_2.test.ts` |
 | M9_ENABLED=true (balance.ts)                                                        | `src/content/m2/__tests__/balance-m9.test.ts`                        |
 | M9 scenario 恰好 250 sites                                                          | `src/content/m9/__tests__/scenario-m9.test.ts`                       |
 | M9 12 realms registered (8 playable + 4 AI-only)                                   | `src/content/m2/__tests__/balance-m9.test.ts`                        |
 | Forbidden anachronism strings absent in event text                                  | `src/content/__tests__/m9-historical-fidelity.test.ts`               |
 | M9 character templates spawn within birthYear+20 window                             | `src/engine/systems/character/__tests__/character-spawn.test.ts`     |
+| `src/content/m10_2/hints.ts` 含 10 条 HintEntry（uniqueIds）                       | `src/content/m10_2/__tests__/hint-ids-unique.test.ts`                |
+| HintEntry.codexEntryId 全部链回 Codex（有效 link）                                  | `src/content/m10_2/__tests__/codex-link-validity.test.ts`            |
+| multi-trigger hint 按字母序排队（determinism）                                       | `src/ui/coordinator/__tests__/multi-trigger-determinism.test.ts`     |
+| M1 剧本不触发 hint（gating）                                                         | `src/ui/coordinator/__tests__/m1-gating.test.ts`                     |
 
 ---
 
@@ -404,6 +408,95 @@ const world: World = {
 
 ---
 
+## M10 Subsystems Quick Reference
+
+| 子系统 | 主文件 | 关键函数 |
+| --- | --- | --- |
+| createWorldFromM9Data | `src/engine/world/factory.ts` | `createWorldFromM9Data(data, opts)` |
+| loadWorld action | `src/ui/store/slices/world-slice.ts` | `loadWorld(scenarioId, difficulty?)` / `replaceWorldFromSave(world)` |
+| SaveDTO 双向转换 | `src/engine/world/save-dto.ts` | `worldToSaveDTO(world, scenarioId)` / `saveDtoToWorld(dto)` |
+| 启动屏 ScenarioPicker | `src/ui/components/ScenarioPicker/ScenarioPicker.tsx` | M1 / M9 卡片 + 缩略地图 + 难度标签 |
+| 三浏览器面板 | `src/ui/components/ProvinceBrowserPanel/` / `RegionBrowserPanel/` / `CharacterBrowserPanel/` | Province / Region / Character browser |
+| 持久化 IndexedDB | `src/ui/store/persistence/db.ts` / `slot-crud.ts` | `saveSlot`, `loadSlot`, `listSlots`, `deleteSlot`, `getMetadata` |
+| Save/Load 模态 | `src/ui/components/SaveLoadModal/` | 5 槽 + auto 槽 UI |
+| RulerPanel archetype tooltip | `src/ui/components/RulerPanel/` | 决策权重摘要 tooltip |
+| Dev AI 视察 | `src/ui/components/DevAIPanel/` | `?devAI=1` + `import.meta.env.DEV` 双门控 |
+| 头像占位 | `src/ui/components/Portrait/` | `Portrait` + `portrait-generator.ts`（姓氏字符 + realm 主题色 SVG） |
+| 通知 L1-L4 | `src/ui/store/notification-severity-map.ts` + `src/ui/components/ToastQueue/` + `src/ui/components/EventLogPanel/` | L1 Modal+暂停 / L2 Toast / L3 Banner / L4 Log |
+
+---
+
+## M10.1 Subsystems Quick Reference
+
+| 子系统 | 主文件 | 关键函数 |
+| --- | --- | --- |
+| CodexPanel | `src/ui/components/CodexPanel/CodexPanel.tsx` | 左侧分类树 + 右侧词条详情 + 搜索 |
+| Markdown 渲染器 | `src/ui/components/CodexPanel/markdown-renderer.ts` | 自制 md→JSX（H1-H3 / 粗 / 列表 / 段落 / `codex://` 链接） |
+| Codex 数据加载 | `src/ui/components/CodexPanel/codex-data-loader.ts` | Vite glob 加载 md + 从 `world.characterTemplates` 派生 |
+| Codex 快捷键 | `src/ui/components/CodexPanel/codex-hotkey.ts` | Shift+/ 全局监听器（含 input-target guard） |
+| 手写 md 条目 | `src/content/codex/mechanics/` 15 条 + `src/content/codex/history/` 10 条 | 共 25 条手写 + 90 条从人物模板派生 |
+| Specialty 中文映射 | `src/content/codex/specialty-display-names.ts` | 9 值 specialty 中文显示名 |
+
+---
+
+## M10.2 Subsystems Quick Reference
+
+| 子系统 | 主文件 | 关键函数 |
+| --- | --- | --- |
+| HintEntry 内容 | `src/content/m10_2/hints.ts` | 10 条 HintEntry TS const（标题 + 正文 + codexEntryId） |
+| HintModal 组件 | `src/ui/components/HintModal/HintModalContent.tsx` + `buildHintModalPayload.ts` | 短文本 modal + 「查看详情」跳 Codex + 「知道了」关闭 |
+| Hint slice | `src/ui/store/slices/hint-slice.ts` | `seenHints` / `hintsEnabled` + 6 actions |
+| Hint 协调器 | `src/ui/coordinator/use-hint-coordinator.ts` | 每 tick ≤1 hint 入队，字母序排队 |
+| Modal hint hook | `src/ui/hooks/use-modal-with-hint.ts` | 4 个事件 modal 触发点拦截 |
+| SaveDTO v3→v4 迁移 | `src/engine/world/migrations/save-v3-to-v4.ts` | `migrateSaveV3ToV4` 默认 `seenHints={}`, `hintsEnabled=true` |
+
+---
+
+## Documentation Sync Policy (MUST DO when finishing a milestone)
+
+> 与「What NOT to Do」反向对仗：每完成一个里程碑或重大子任务，必须同步以下 5 处文档。
+> 历史教训：M6 / M7 / M8 / M8.1 / M8.2 / M8.3 / M9 / Wave 9 / M10 / M10.1 / M10.2 多次交付未同步 AGENTS.md 与 roadmap，导致后续 planning 出现记忆错位。
+
+### 必须同步的 5 处文档
+
+1. **AGENTS.md 顶部「当前里程碑」+「实施顺序」**
+   - 在「当前里程碑」一行追加新里程碑名 + 已交付状态
+   - 在「实施顺序」流程图末尾追加 `→ M{X}(✅)`
+
+2. **AGENTS.md「Critical Invariants」表**
+   - 为新里程碑新增的关键契约加守护条目
+   - 必须有真实测试文件 path（不能空指针）
+
+3. **AGENTS.md「{M_X} Subsystems Quick Reference」**
+   - 新增一段，按既有格式 `| 子系统 | 主文件 | 关键函数 |`
+   - 每条 row 的 path 必须真实存在
+
+4. **AGENTS.md「What NOT to Do」**
+   - 补该里程碑引入的具体禁项（如版本回退、绕过 hook、对称 key 滥用等）
+
+5. **docs/design/11-roadmap.md**
+   - §2 总览表加新里程碑行（或在原行后加子项）
+   - §16 MVP「Must Have / Should Have」相应条目状态更新
+   - §17 Alpha / Beta / 1.0 描述同步
+   - Changelog 末尾追加条目（日期 + 变更 + 作者）
+
+### 完成里程碑时的检查清单
+
+- [ ] AGENTS.md 顶部 2 行 metadata 已更新
+- [ ] Critical Invariants 表新增 ≥ 1 守护项（且测试文件已存在）
+- [ ] Subsystems Quick Reference 新增章节
+- [ ] What NOT to Do 补 ≥ 1 相关禁项
+- [ ] roadmap §2 / §16 / §17 / Changelog 四处全部同步
+- [ ] 提交 commit 时在 message 写明 `docs(agents,roadmap): sync M{X} delivery`
+
+### 违反代价
+
+- 后续 planning 会基于过时 AGENTS.md 做错误判断
+- Sisyphus 执行 plan 时找不到守护契约 → invariants 漂移
+- 用户记忆与文档脱节 → 反复确认浪费时间
+
+---
+
 ## What NOT to Do
 
 ```
@@ -434,13 +527,17 @@ const world: World = {
 ❌ 不让 personalityDrift 改变 archetype 字面值（drift 只改 dims，不改 personality 字段）
 ❌ 不调整 M8_2_MEMORY_DECAY_FACTOR_PER_XUN 或 M8_2_COVERAGE_TIER_* 数值（是设计契约）
 ❌ 不直接调用 aiPlanStep（已废弃，改用三层 phase pipeline）
+❌ 不绕过 hint coordinator 直接向 modalQueue 推送 hint（必须通过 use-hint-coordinator）
+❌ 不回退 SaveDTO SAVE_DTO_VERSION（版本号只能递增，不能降回 v3）
+❌ 不在 hint-slice actions 之外修改 seenHints / hintsEnabled（只通过 hint-slice dispatch）
+❌ 不让 HintModal 进入 modalQueue（HintModal 通过 ModalPriority 排序，不走 modalQueue push）
 ```
 
 ---
 
 ## M5+ Deferred Items
 
-以下功能明确延后，**不要在对应里程碑之前实现**：
+以下原 M5 之前推迟的功能已全部交付，**不要重新实现**：
 
 - 将领学/谋维度实际效果（M5）✅ 已交付
 - 8 种 AI 性格 archetype（M5）✅ 已交付
@@ -463,16 +560,21 @@ const world: World = {
 - Personality drift 随事件演化（`personalityDriftPhase`）✅ 已交付（M8.2）
 - 移除 `realm.aiPersonality` legacy 字段 ✅ 已交付（M8.2）
 - AI 胜率分布平衡基准测量（`runAutoBattleBatch` + 100 局 baseline）✅ 已交付（M8.3）
+- Dev mode AI 视察 UI ✅ 已交付（M10）
+- UI 呈现 archetype（RulerPanel archetype tooltip）✅ 已交付（M10）
 
 以下功能明确延后，**不要在对应里程碑之前实现**：
 
-- Dev mode AI introspection UI（M10）
 - Archetype 重命名 benevolent→opportunist / builder→zealot（M9.x）
-- UI 呈现 archetype（RulerOverviewPanel 加 archetype 标签）（M10）
 - Opportunist/Zealot 名册扩展（M9.x）
 - Balance.ts 数值调优（按 §7.2 期望胜率分布）（M12）
 
 ## M9+ Deferred Items
+
+以下 M9+ 推迟项已在 M10 交付，**不要重新实现**：
+
+- UI 面板（province/region/character browser）✅ 已交付（M10）
+- Scenario picker UI ✅ 已交付（M10）
 
 以下功能明确延后，**不要在对应里程碑之前实现**：
 
@@ -490,5 +592,3 @@ const world: World = {
 - 玩家自定义起始日期沙盒（v2）
 - 联姻 / 质子 / 朝聘（v1.x）
 - 越/宋/鲁/中山 任一改 playable（M9.1）
-- UI 面板（province/region/character browser）（M10）
-- Scenario picker UI（M10）
