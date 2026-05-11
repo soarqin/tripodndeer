@@ -4,23 +4,23 @@ import { ArmyListPanel } from '../ArmyListPanel'
 import type { Army, General } from '~/shared/types'
 
 const mockSelectArmy = vi.fn()
+const mockRecordPanelOpened = vi.fn()
 let mockActivePanel: 'wanggong' | 'junshi' | null = 'junshi'
 let mockArmies: Army[] = []
 let mockSelectedArmy: Army | null = null
 let mockGenerals: Map<string, General> = new Map()
 
 vi.mock('~/ui/store', () => ({
-  useGameStore: (selector: (state: { selectArmy: typeof mockSelectArmy }) => unknown) => {
-    // We need to handle both direct state selectors and the state => state.selectArmy pattern
+  useGameStore: (selector: (state: { selectArmy: typeof mockSelectArmy; recordPanelOpened: typeof mockRecordPanelOpened }) => unknown) => {
     if (typeof selector === 'function') {
       const state = {
         selectArmy: mockSelectArmy,
+        recordPanelOpened: mockRecordPanelOpened,
       }
       try {
         return selector(state)
-      } catch (e) {
-        // If it throws, it's likely one of our mocked selectors from selectors.ts
-        // We'll handle those in the selectors mock below
+      } catch {
+        return undefined
       }
     }
     return undefined

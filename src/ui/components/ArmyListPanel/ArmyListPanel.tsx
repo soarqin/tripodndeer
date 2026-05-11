@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useGameStore } from '~/ui/store'
 import { selectAllPlayerArmies, selectActivePanel, selectSelectedArmy, useGenerals } from '~/ui/store/selectors'
 import styles from './ArmyListPanel.module.css'
@@ -7,7 +8,13 @@ export function ArmyListPanel() {
   const armies = useGameStore(selectAllPlayerArmies)
   const selectedArmy = useGameStore(selectSelectedArmy)
   const selectArmy = useGameStore(state => state.selectArmy)
+  const recordPanelOpened = useGameStore(state => state.recordPanelOpened)
   const generals = useGenerals()
+
+  const isVisible = activePanel === 'junshi'
+  useEffect(() => {
+    if (isVisible) recordPanelOpened('army')
+  }, [isVisible, recordPanelOpened])
 
   if (activePanel !== 'junshi') return null
 

@@ -3,21 +3,23 @@ import { render, screen } from '@testing-library/react'
 import { RealmOverviewPanel } from './RealmOverviewPanel'
 import type { Army, Realm, Site, WarState, World } from '~/shared/types'
 
+const mockRecordPanelOpened = vi.fn()
 let mockActivePanel: 'wanggong' | 'junshi' | null = 'wanggong'
 let mockRealm: Realm | null = null
 let mockArmies: Army[] = []
 let mockWorld: Partial<World> = {}
 
 vi.mock('~/ui/store', () => ({
-  useGameStore: (selector: (state: { world: Partial<World> }) => unknown) => {
+  useGameStore: (selector: (state: { world: Partial<World>; recordPanelOpened: typeof mockRecordPanelOpened }) => unknown) => {
     if (typeof selector === 'function') {
       const state = {
-        world: mockWorld
+        world: mockWorld,
+        recordPanelOpened: mockRecordPanelOpened,
       }
       try {
         return selector(state)
-      } catch (e) {
-        // Ignore
+      } catch {
+        return undefined
       }
     }
     return undefined

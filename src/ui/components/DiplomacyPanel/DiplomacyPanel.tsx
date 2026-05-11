@@ -8,7 +8,7 @@ import {
   selectPlayerZhouInvestiture,
 } from '~/ui/store/selectors'
 import styles from './DiplomacyPanel.module.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { cosineSimilarity } from '~/engine/systems/culture/ideology-distance'
 import { M6_PRESTIGE_DIFFERENTIAL_WEIGHT, M6_IDEOLOGY_DISTANCE_WEIGHT, M7_FAILURE_ATTITUDE_DELTA, M7_FAILURE_TRUST_DELTA } from '~/content/m2/balance'
 
@@ -48,8 +48,14 @@ export function DiplomacyPanel() {
   const feedbackList = useGameStore(selectDiplomacyFeedback)
   const coalitionPressure = useGameStore(selectCoalitionPressure)
   const zhouInvestiture = useGameStore(selectPlayerZhouInvestiture)
+  const recordPanelOpened = useGameStore(state => state.recordPanelOpened)
 
   const targetRealm = useGameStore(state => targetRealmId ? state.world.realms.get(targetRealmId) : undefined)
+
+  const isVisible = (targetRealmId !== null || activePanel === 'waijiao') && playerRealm !== undefined
+  useEffect(() => {
+    if (isVisible) recordPanelOpened('diplomacy')
+  }, [isVisible, recordPanelOpened])
 
   const [localFeedback, setLocalFeedback] = useState<{ ok: boolean; message: string } | null>(null)
 

@@ -50,7 +50,8 @@ describe('DiplomacyPanel', () => {
       world: { realms: new Map() },
       closeDiplomacyPanel: mockCloseDiplomacyPanel,
       submitPlayerDiplomacyAction: mockSubmitPlayerDiplomacyAction,
-      openPeacePanel: mockOpenPeacePanel
+      openPeacePanel: mockOpenPeacePanel,
+      recordPanelOpened: vi.fn(),
     }
   })
 

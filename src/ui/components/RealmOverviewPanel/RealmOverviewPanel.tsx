@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useGameStore } from '~/ui/store'
 import { selectPlayerRealm, selectAllPlayerArmies, selectActivePanel } from '~/ui/store/selectors'
 import { RulerPanel } from '../RulerPanel'
@@ -23,6 +24,12 @@ export function RealmOverviewPanel() {
   const realm = useGameStore(selectPlayerRealm)
   const armies = useGameStore(selectAllPlayerArmies)
   const world = useGameStore(state => state.world)
+  const recordPanelOpened = useGameStore(state => state.recordPanelOpened)
+
+  const isVisible = activePanel === 'wanggong' && realm !== undefined
+  useEffect(() => {
+    if (isVisible) recordPanelOpened('realm')
+  }, [isVisible, recordPanelOpened])
 
   if (activePanel !== 'wanggong') return null
   if (!realm) return null
