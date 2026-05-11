@@ -1,9 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useGameStore } from '~/ui/store'
 import { M5_ARMY_CAP_BONUS_PER_WU, M5_GOVERNOR_TAX_BONUS_PER_ZHENG } from '~/content/m2/balance'
 import { selectActivePanel, useGenerals, useSites, selectPlayerGovernorAssignments } from '~/ui/store/selectors'
 import { RecruitmentLog } from '../RecruitmentLog'
+import { buildHintModalPayload } from '@/ui/components/HintModal/buildHintModalPayload'
+import { HINTS } from '@/content/m10_2/hints'
+import { getCurrentScenarioId } from '@/ui/coordinator/use-hint-coordinator'
 import styles from './CharacterPanel.module.css'
+
+const HINT_ID = 'hint_recruitment'
 
 export function CharacterPanel() {
   const activePanel = useGameStore(selectActivePanel)
@@ -15,6 +20,28 @@ export function CharacterPanel() {
   const unassignPlayerPost = useGameStore((s) => s.unassignPlayerPost)
   const assignPlayerGovernor = useGameStore((s) => s.assignPlayerGovernor)
   const openCodex = useGameStore((s) => s.openCodex)
+  const world = useGameStore((s) => s.world)
+  const seenHints = useGameStore((s) => s.seenHints)
+  const hintsEnabled = useGameStore((s) => s.hintsEnabled)
+  const openModal = useGameStore((s) => s.openModal)
+  const markHintSeen = useGameStore((s) => s.markHintSeen)
+  const closeModal = useGameStore((s) => s.closeModal)
+
+  useEffect(() => {
+    if (!hintsEnabled) return
+    if (getCurrentScenarioId(world) !== 'm9') return
+    if (seenHints[HINT_ID]) return
+
+    const entry = HINTS.find(h => h.id === HINT_ID)
+    if (!entry) return
+
+    openModal(buildHintModalPayload(
+      entry,
+      () => { markHintSeen(HINT_ID); closeModal(); openCodex(entry.codexEntryId) },
+      () => { markHintSeen(HINT_ID); closeModal() },
+    ))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const [selectedSiteIds, setSelectedSiteIds] = useState<Record<string, string>>({})
 

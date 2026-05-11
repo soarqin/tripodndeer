@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { SCENARIO_CONFIGS } from '~/content/scenarios/scenario-configs'
 import { useGameStore } from '~/ui/store/game-store'
-import type { ScenarioId } from '~/shared'
 import type { DifficultyTier } from '~/shared/types'
 import zhCN from '~/content/locales/zh-CN.json'
 import styles from './ScenarioPicker.module.css'

@@ -52,8 +52,6 @@ export function ObjectivePanel(): React.JSX.Element | null {
           {TUTORIAL_STEPS.map((step) => {
             const isCompleted = completedSteps.has(step.id)
             const isCurrent = currentStep === step.id
-            const isFuture = !isCompleted && !isCurrent
-
             let itemClass = styles.stepFuture
             let icon = '○'
 

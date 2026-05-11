@@ -11,6 +11,11 @@ import styles from './DiplomacyPanel.module.css'
 import { useEffect, useState } from 'react'
 import { cosineSimilarity } from '~/engine/systems/culture/ideology-distance'
 import { M6_PRESTIGE_DIFFERENTIAL_WEIGHT, M6_IDEOLOGY_DISTANCE_WEIGHT, M7_FAILURE_ATTITUDE_DELTA, M7_FAILURE_TRUST_DELTA } from '~/content/m2/balance'
+import { buildHintModalPayload } from '@/ui/components/HintModal/buildHintModalPayload'
+import { HINTS } from '@/content/m10_2/hints'
+import { getCurrentScenarioId } from '@/ui/coordinator/use-hint-coordinator'
+
+const HINT_ID = 'hint_alliance'
 
 const ACTION_LABELS: Record<string, string> = {
   envoy: '遣使',
@@ -48,14 +53,33 @@ export function DiplomacyPanel() {
   const feedbackList = useGameStore(selectDiplomacyFeedback)
   const coalitionPressure = useGameStore(selectCoalitionPressure)
   const zhouInvestiture = useGameStore(selectPlayerZhouInvestiture)
-  const recordPanelOpened = useGameStore(state => state.recordPanelOpened)
-
+  const world = useGameStore(state => state.world)
+  const seenHints = useGameStore(state => state.seenHints)
+  const hintsEnabled = useGameStore(state => state.hintsEnabled)
+  const openModal = useGameStore(state => state.openModal)
+  const markHintSeen = useGameStore(state => state.markHintSeen)
+  const closeModal = useGameStore(state => state.closeModal)
+  const openCodex = useGameStore(state => state.openCodex)
   const targetRealm = useGameStore(state => targetRealmId ? state.world.realms.get(targetRealmId) : undefined)
 
   const isVisible = (targetRealmId !== null || activePanel === 'waijiao') && playerRealm !== undefined
+  useEffect(() => { if (isVisible) useGameStore.getState().recordPanelOpened('diplomacy') }, [isVisible])
+
   useEffect(() => {
-    if (isVisible) recordPanelOpened('diplomacy')
-  }, [isVisible, recordPanelOpened])
+    if (!hintsEnabled) return
+    if (getCurrentScenarioId(world) !== 'm9') return
+    if (seenHints[HINT_ID]) return
+
+    const entry = HINTS.find(h => h.id === HINT_ID)
+    if (!entry) return
+
+    openModal(buildHintModalPayload(
+      entry,
+      () => { markHintSeen(HINT_ID); closeModal(); openCodex(entry.codexEntryId) },
+      () => { markHintSeen(HINT_ID); closeModal() },
+    ))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const [localFeedback, setLocalFeedback] = useState<{ ok: boolean; message: string } | null>(null)
 

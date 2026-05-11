@@ -1,15 +1,43 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useGameStore } from '~/ui/store/game-store'
 import type { World, Realm } from '~/shared/types'
+import { buildHintModalPayload } from '@/ui/components/HintModal/buildHintModalPayload'
+import { HINTS } from '@/content/m10_2/hints'
+import { getCurrentScenarioId } from '@/ui/coordinator/use-hint-coordinator'
 import styles from './CulturePanel.module.css'
 
 type CultureTab = 'cultural' | 'ideology' | 'academy'
+
+const HINT_ID = 'hint_academy'
 
 export function CulturePanel() {
   const [activeTab, setActiveTab] = useState<CultureTab>('cultural')
   const world = useGameStore(s => s.world)
   const playerRealmId = world?.playerRealmId
   const playerRealm = world?.realms.get(playerRealmId ?? '')
+  const seenHints = useGameStore(s => s.seenHints)
+  const hintsEnabled = useGameStore(s => s.hintsEnabled)
+  const openModal = useGameStore(s => s.openModal)
+  const markHintSeen = useGameStore(s => s.markHintSeen)
+  const closeModal = useGameStore(s => s.closeModal)
+  const openCodex = useGameStore(s => s.openCodex)
+
+  useEffect(() => {
+    if (!hintsEnabled) return
+    if (!world) return
+    if (getCurrentScenarioId(world) !== 'm9') return
+    if (seenHints[HINT_ID]) return
+
+    const entry = HINTS.find(h => h.id === HINT_ID)
+    if (!entry) return
+
+    openModal(buildHintModalPayload(
+      entry,
+      () => { markHintSeen(HINT_ID); closeModal(); openCodex(entry.codexEntryId) },
+      () => { markHintSeen(HINT_ID); closeModal() },
+    ))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   
   return (
     <div data-testid="culture-panel" className={styles.culturePanel}>

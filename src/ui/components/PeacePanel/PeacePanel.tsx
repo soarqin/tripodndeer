@@ -1,9 +1,14 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useGameStore } from '~/ui/store'
 import { selectPlayerRealm } from '~/ui/store/selectors'
 import { scoreProposalAcceptance } from '~/engine/systems/peace/proposal-lifecycle'
 import type { PeaceTerm, RealmId, SiteId, PeaceProposal } from '~/shared/types'
+import { buildHintModalPayload } from '@/ui/components/HintModal/buildHintModalPayload'
+import { HINTS } from '@/content/m10_2/hints'
+import { getCurrentScenarioId } from '@/ui/coordinator/use-hint-coordinator'
 import styles from './PeacePanel.module.css'
+
+const HINT_ID = 'hint_peace'
 
 interface PeacePanelProps {
   targetRealmId: RealmId
@@ -14,6 +19,28 @@ export function PeacePanel({ targetRealmId, onClose }: PeacePanelProps) {
   const world = useGameStore(state => state.world)
   const playerRealm = useGameStore(selectPlayerRealm)
   const issueOrder = useGameStore(state => state.issueOrder)
+  const seenHints = useGameStore(state => state.seenHints)
+  const hintsEnabled = useGameStore(state => state.hintsEnabled)
+  const openModal = useGameStore(state => state.openModal)
+  const markHintSeen = useGameStore(state => state.markHintSeen)
+  const closeModal = useGameStore(state => state.closeModal)
+  const openCodex = useGameStore(state => state.openCodex)
+
+  useEffect(() => {
+    if (!hintsEnabled) return
+    if (getCurrentScenarioId(world) !== 'm9') return
+    if (seenHints[HINT_ID]) return
+
+    const entry = HINTS.find(h => h.id === HINT_ID)
+    if (!entry) return
+
+    openModal(buildHintModalPayload(
+      entry,
+      () => { markHintSeen(HINT_ID); closeModal(); openCodex(entry.codexEntryId) },
+      () => { markHintSeen(HINT_ID); closeModal() },
+    ))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const [selectedSites, setSelectedSites] = useState<Set<SiteId>>(new Set())
   const [indemnity, setIndemnity] = useState<number>(0)

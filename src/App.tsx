@@ -27,7 +27,9 @@ import { CodexPanel } from './ui/components/CodexPanel'
 import { useCodexHotkey } from './ui/components/CodexPanel/codex-hotkey'
 import { DevAIPanel } from '@/ui/components/DevAIPanel'
 import { ToastQueue } from '@/ui/components/ToastQueue'
+import { ObjectivePanel } from '@/ui/components/ObjectivePanel'
 import { EventLogPanel } from '@/ui/components/EventLogPanel'
+import { useHintCoordinator } from '@/ui/coordinator/use-hint-coordinator'
 import { useRafDriver } from '@/ui/store/raf-driver'
 import { useGameStore, ModalPriority } from '@/ui/store/game-store'
 import { isVictorious } from '@/engine/systems/victory'
@@ -48,6 +50,7 @@ const ACTION_NAMES: Record<string, string> = {
 export function App(): React.JSX.Element {
   useRafDriver()
   useCodexHotkey()
+  useHintCoordinator()
   const victorious = useVictory()
   const bootStatus = useGameStore((state) => state.bootStatus)
   const modalQueue = useGameStore((state) => state.modalQueue)
@@ -136,7 +139,7 @@ export function App(): React.JSX.Element {
       <DisasterReliefModal />
       <EventChainModal />
       <ReformPromptModal />
-      {modal && (
+      {modal && activePanel !== 'codex' && (
         <Modal
           title={modal.title}
           content={modal.content}
@@ -224,6 +227,7 @@ export function App(): React.JSX.Element {
       <TimeControlBar />
       <DevAIPanel />
       <ToastQueue />
+      <ObjectivePanel />
       <EventLogPanel />
       {import.meta.env.DEV && (
         <button
