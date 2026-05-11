@@ -167,6 +167,8 @@ export function baseWorld(overrides: Partial<World> = {}): World {
     difficulty: 'hero',
     diplomaticMemory: new Map(),
     playerRealmId: qin,
+    scenarioId: 'm1',
+    tutorialState: null,
     rngState: { seed: 42, counter: 0 },
     phases: [],
     pendingOrders: [],

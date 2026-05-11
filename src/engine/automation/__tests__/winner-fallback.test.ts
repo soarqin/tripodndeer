@@ -47,6 +47,8 @@ function makeWorld(
     difficulty: 'common',
     diplomaticMemory: new Map(),
     playerRealmId: 'realm_a',
+    scenarioId: 'm1',
+    tutorialState: null,
     rngState: { seed: 1, counter: 0 },
     phases: [],
     pendingOrders: [],

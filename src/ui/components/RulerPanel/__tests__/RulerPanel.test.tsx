@@ -92,6 +92,8 @@ describe('RulerPanel', () => {
         difficulty: 'hero',
         diplomaticMemory: new Map(),
         playerRealmId: 'realm_qin',
+        scenarioId: 'm1',
+        tutorialState: null,
         rngState: { seed: 42, counter: 0 },
         phases: [],
         pendingOrders: [],
