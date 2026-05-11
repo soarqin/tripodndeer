@@ -19,12 +19,13 @@ describe('ScenarioPicker', () => {
     })
   })
 
-  it('renders scenario picker with 2 cards', () => {
+  it('renders scenario picker with 3 cards', () => {
     render(<ScenarioPicker />)
     
     expect(screen.getByTestId('scenario-picker')).toBeTruthy()
     expect(screen.getByTestId('scenario-card-m1')).toBeTruthy()
     expect(screen.getByTestId('scenario-card-m9')).toBeTruthy()
+    expect(screen.getByTestId('scenario-card-tutorial')).toBeTruthy()
   })
 
   it('calls loadWorld with correct id when clicking a card', async () => {
@@ -38,5 +39,16 @@ describe('ScenarioPicker', () => {
     // Should show loading state
     expect(screen.getByText('加载中...')).toBeTruthy()
     expect(m1Card.hasAttribute('disabled')).toBe(true)
+  })
+
+  it('renders NEW badge for tutorial card and skips difficulty selector', async () => {
+    render(<ScenarioPicker />)
+    
+    const tutorialCard = screen.getByTestId('scenario-card-tutorial')
+    expect(tutorialCard.textContent).toContain('NEW')
+    
+    fireEvent.click(tutorialCard)
+    
+    expect(mockLoadWorld).toHaveBeenCalledWith('tutorial')
   })
 })

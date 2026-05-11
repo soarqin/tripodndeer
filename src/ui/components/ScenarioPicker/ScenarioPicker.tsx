@@ -22,9 +22,13 @@ export function ScenarioPicker(): React.JSX.Element {
   const [loading, setLoading] = React.useState(false)
   const [difficulty, setDifficulty] = useState<DifficultyTier>('hero')
 
-  async function handleSelect(id: ScenarioId) {
+  async function handleSelect(config: typeof SCENARIO_CONFIGS[number]) {
     setLoading(true)
-    await loadWorld(id, difficulty)
+    if (config.skipsDifficultySelector) {
+      await loadWorld(config.id)
+    } else {
+      await loadWorld(config.id, difficulty)
+    }
     // bootStatus becomes 'ready' → App re-renders main screen
   }
 
@@ -57,10 +61,11 @@ export function ScenarioPicker(): React.JSX.Element {
               key={config.id}
               className={styles.card}
               data-testid={`scenario-card-${config.id}`}
-              onClick={() => handleSelect(config.id)}
+              onClick={() => handleSelect(config)}
               disabled={loading}
             >
               <div className={styles.thumbnail}>
+                {config.isNew && <span className={styles.newBadge}>NEW</span>}
                 <svg width="120" height="80" viewBox="0 0 120 80">
                   <rect width="120" height="80" fill="#1a1a2e" rx="4"/>
                   <ellipse cx="60" cy="40" rx="40" ry="25" fill="none" stroke="#4a9eff" strokeWidth="1.5"/>
