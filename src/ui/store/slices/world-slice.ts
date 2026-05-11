@@ -6,6 +6,7 @@ import {
   loadM1Data,
   loadM9Data,
 } from '@/engine/world'
+import { createWorldFromTutorialData } from '~/engine/world/factory'
 import {
   applyDiplomacyAction,
   relationKey,
@@ -258,6 +259,14 @@ function applyReadyWorld(state: GameStore, world: World, playerRealmId: RealmId)
 function createBootActions(set: StoreSet): Pick<WorldActions, 'loadWorld' | 'replaceWorldFromSave' | 'resetToBootPending'> {
   return {
     loadWorld: async (scenarioId, difficulty = 'hero') => {
+      if (scenarioId === 'tutorial') {
+        const world = createWorldFromTutorialData()
+        set((state) => {
+          applyReadyWorld(state, world, world.playerRealmId)
+        })
+        return
+      }
+
       if (scenarioId === 'm1') {
         const data = loadM1Data()
         const playerRealmId: RealmId = 'realm_qin'
