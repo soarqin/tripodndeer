@@ -137,7 +137,7 @@ describe('useTutorialCoordinator', () => {
     expect(useGameStore.getState().modalQueue).toHaveLength(0)
   })
 
-  it('does not queue a modal when all tutorial steps are complete', () => {
+  it('queues the complete modal when all tutorial steps are complete', async () => {
     setReadyWorld(makeWorld('tutorial', makeTutorialState([
       'panel-tour',
       'diplomacy-ju',
@@ -148,7 +148,7 @@ describe('useTutorialCoordinator', () => {
 
     renderHook(() => useTutorialCoordinator())
 
-    expect(useGameStore.getState().modalQueue).toHaveLength(0)
+    await expectQueuedModal('tutorial-complete-modal')
   })
 
   it('dismiss action records dismissed step hints immutably', async () => {

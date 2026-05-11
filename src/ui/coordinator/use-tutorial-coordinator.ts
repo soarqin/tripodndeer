@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { TUTORIAL_HINTS } from '@/content/m10_3/tutorial-hints'
 import { TUTORIAL_STEPS } from '@/content/m10_3/tutorial-steps'
 import { buildTutorialHintPayload } from '@/ui/components/HintModal/buildTutorialHintPayload'
+import { buildTutorialCompletePayload } from '@/ui/components/TutorialCompleteModal'
 import { useGameStore } from '@/ui/store'
 import type { TutorialState, TutorialStepId } from '~/shared/types/tutorial'
 
@@ -28,7 +29,9 @@ export function useTutorialCoordinator(): void {
   const closeModal = useGameStore((state) => state.closeModal)
   const openCodex = useGameStore((state) => state.openCodex)
   const dismissTutorialHint = useGameStore((state) => state.dismissTutorialHint)
+  const resetToBootPending = useGameStore((state) => state.resetToBootPending)
   const queuedStepIdsRef = useRef<Set<TutorialStepId>>(new Set())
+  const completeModalQueuedRef = useRef(false)
 
   const completedStepsKey = useMemo(
     () => (world.tutorialState ? setKey(world.tutorialState.completedSteps) : ''),
@@ -68,4 +71,25 @@ export function useTutorialCoordinator(): void {
       },
     ))
   }, [bootStatus, closeModal, completedStepsKey, dismissTutorialHint, dismissedStepHintsKey, openCodex, openModal, world])
+
+  useEffect(() => {
+    if (bootStatus !== 'ready') return
+    if (world.scenarioId !== 'tutorial') return
+    if (world.tutorialState === null) return
+    if (completeModalQueuedRef.current) return
+
+    const allStepsCompleted = world.tutorialState.completedSteps.size === TUTORIAL_STEPS.length
+    if (world.tutorialState.currentStep === null && allStepsCompleted) {
+      completeModalQueuedRef.current = true
+      openModal(buildTutorialCompletePayload(
+        () => {
+          closeModal()
+          resetToBootPending()
+        },
+        () => {
+          closeModal()
+        }
+      ))
+    }
+  }, [bootStatus, closeModal, completedStepsKey, openModal, resetToBootPending, world])
 }
