@@ -43,6 +43,7 @@
 | **M10** | UI 完整 | ♾️ 持续 | 所有面板、通知、引导、教学 | 持续 | 每个里程碑同步 |
 | **M10.1** | 史书百科（Codex） | ✅ 已交付 | 左侧分类树 + 右侧词条 + 搜索；25 手写 + 90 派生条目 | - | CodexPanel + markdown-renderer |
 | **M10.2** | 渐进提示（首触 Modal） | ✅ 已交付 | 10 触发点 + SaveDTO v4 持久化 | - | HintModal + use-hint-coordinator |
+| **M10.3** | 引导剧本 | ✅ 已交付 | 秦灭巴蜀 10 邑 + 5 步教学 + ObjectivePanel + SaveDTO v5 | - | tutorialPhase + use-tutorial-coordinator |
 | **M11** | 存档系统 | ⏳ 后期 | 自动 + 手动 + 版本兼容 | 2–3 周 | 玩家可放心存档 |
 | **M12** | 平衡与抛光 | ⏳ 终前 | 数值平衡、性能、Bug | 4–6 周 | 首版发布 |
 
@@ -53,7 +54,7 @@
 M4 v1 已交付最小可行经济（参见 §7）。但 M4 设计文档（[`05-systems-statecraft.md`](./05-systems-statecraft.md) §3）中的"变法"、"灾害"、"派系"等内容**依赖人才系统**，因此**实施顺序重排**：
 
 ```
-M4 (✅) ──► M5 (✅) ──► M4.1 (✅) ──► M4.2 (✅) ──► M6 (✅) ──► M7 (✅) ──► M8 (✅) ──► M9 (✅) ──► Wave 9 (✅) ──► M10.1 (✅) ──► M10.2 (✅)
+M4 (✅) ──► M5 (✅) ──► M4.1 (✅) ──► M4.2 (✅) ──► M6 (✅) ──► M7 (✅) ──► M8 (✅) ──► M9 (✅) ──► Wave 9 (✅) ──► M10.1 (✅) ──► M10.2 (✅) ──► M10.3 (✅)
 ```
 
 **为什么 M5 提前**：变法需要"革新者"人才（商鞅、吴起），文化扩散需要"学者"产人才，谍报需要"间者"人才——所以人才骨架是后续所有里程碑的**共同前置**。把 M5 提到 M4.1 之前做，避免重复重构。
@@ -568,7 +569,7 @@ M4 (✅) ──► M5 (✅) ──► M4.1 (✅) ──► M4.2 (✅) ──► 
 - ✅ AI（多层决策、性格驱动、不作弊） **[M3/M5/M8 完整 8 性格 + 三层决策 ✅]**
 - ✅ 存档系统 **[M10 MVP ✅（IDB 5 槽 + auto）/ M11 完整版后期]**
 - ✅ 主屏 UI 完整 **[M10 持续]**
-- ✅ 引导剧本 **[M10.3 计划中]**
+- ✅ 引导剧本 **[M10.3 ✅ 已交付]**
 
 ### 16.2 可以没有（Should Have，但非必须）
 
@@ -591,7 +592,7 @@ M4 (✅) ──► M5 (✅) ──► M4.1 (✅) ──► M4.2 (✅) ──► 
 
 ## 17. 发布策略（Release Strategy）
 
-### 17.1 Alpha（M9 / Wave 9 / M10 / M10.1 / M10.2 已完成；Alpha 候选阶段）
+### 17.1 Alpha（M9 / Wave 9 / M10 / M10.1 / M10.2 / M10.3 已完成；Alpha 候选阶段）
 
 - 内部团队 + 5-10 位铁杆历史游戏玩家
 - 重点收集"手感"、"AI 行为"、"君主代际更替"反馈
@@ -656,3 +657,4 @@ M4 (✅) ──► M5 (✅) ──► M4.1 (✅) ──► M4.2 (✅) ──► 
 | 补记于 2026-05-11 | M10.1 史书百科（CodexPanel + 自制 markdown-renderer + codex-data-loader + 25 手写 md + 90 派生人物条目 + Shift+/ 快捷键 + BottomBar "史"按钮） | Sisyphus |
 | 补记于 2026-05-11 | M10.2 渐进提示（HintModal + hint-slice + use-hint-coordinator + use-modal-with-hint + 10 HintEntry + SaveDTO v4 + `save-v3-to-v4.ts` migration） | Sisyphus |
 | 2026-05-11 | 文档同步：AGENTS.md 顶部 metadata / Critical Invariants / M10 系列 Subsystems Quick Reference / Deferred Items 三段 / roadmap stale tag 回填（docs-sync-m10-backfill plan） | Sisyphus |
+| 2026-05-11 | M10.3 引导剧本（秦灭巴蜀 10 邑 + 5 步教学 + ObjectivePanel + TutorialCompleteModal + SaveDTO v5 + 30 分钟软超时） | Sisyphus |

@@ -8,9 +8,9 @@ AI agent behavioral guidelines for this codebase. Read before making any changes
 
 战国策略游戏引擎原型。Vite + React + TypeScript strict，纯函数引擎 + Zustand UI 层。
 
-**当前里程碑**: M0-M9 已交付。Wave 9: Refactor & Cleanup 已完成。M10 持续中（M10.1 史书百科 ✅、M10.2 渐进提示 ✅）。
+**当前里程碑**: M0-M9 已交付。Wave 9: Refactor & Cleanup 已完成。M10 持续中（M10.1 史书百科 ✅、M10.2 渐进提示 ✅、M10.3 引导剧本 ✅）。
 
-**实施顺序**: M4(✅) → M5(✅) → M4.1(✅) → M4.2(✅) → M6(✅) → M7(✅) → M8(✅) → M8.1(✅) → M8.2(✅) → M8.3(✅) → M9(✅) → Wave 9(✅) → M10(♾️持续) → M10.1(✅) → M10.2(✅)
+**实施顺序**: M4(✅) → M5(✅) → M4.1(✅) → M4.2(✅) → M6(✅) → M7(✅) → M8(✅) → M8.1(✅) → M8.2(✅) → M8.3(✅) → M9(✅) → Wave 9(✅) → M10(♾️持续) → M10.1(✅) → M10.2(✅) → M10.3(✅)
 
 ---
 
@@ -164,6 +164,10 @@ AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按
 | HintEntry.codexEntryId 全部链回 Codex（有效 link）                                  | `src/content/m10_2/__tests__/codex-link-validity.test.ts`            |
 | multi-trigger hint 按字母序排队（determinism）                                       | `src/ui/coordinator/__tests__/multi-trigger-determinism.test.ts`     |
 | M1 剧本不触发 hint（gating）                                                         | `src/ui/coordinator/__tests__/m1-gating.test.ts`                     |
+| M10.3 scenario 恰好 10 sites | `src/content/m10_3/__tests__/scenario-m10_3.test.ts` |
+| tutorialPhase 仅在 scenarioId='tutorial' 激活 | `src/engine/systems/tutorial/__tests__/tutorial-phase.test.ts` |
+| SAVE_DTO_VERSION === 5（v4 加 tutorialState + scenarioId） | `src/engine/world/migrations/__tests__/save-v4-to-v5.test.ts` |
+| 5 TutorialStepEntry id 一一对应 TutorialHintEntry | `src/content/m10_3/__tests__/hint-ids-unique.test.ts` |
 
 ---
 
@@ -452,6 +456,25 @@ const world: World = {
 
 ---
 
+## M10.3 Subsystems Quick Reference
+
+| 子系统 | 主文件 | 关键函数 |
+| --- | --- | --- |
+| tutorialPhase | `src/engine/systems/tutorial/tutorial-phase.ts` | `tutorialPhase(world, rng)` |
+| createWorldFromTutorialData | `src/engine/world/factory.ts` | `createWorldFromTutorialData(opts)` |
+| TutorialState types | `src/shared/types/tutorial.ts` | `TutorialState` / `TutorialStepId` / `TutorialHintEntry` |
+| TutorialStep predicate | `src/engine/systems/tutorial/predicate.ts` | `evaluateStepPredicate(world, stepId)` |
+| TutorialHints content | `src/content/m10_3/tutorial-hints.ts` | `TUTORIAL_HINTS` const |
+| TutorialSteps content | `src/content/m10_3/tutorial-steps.ts` | `TUTORIAL_STEPS` const |
+| SaveDTO v4→v5 migration | `src/engine/world/migrations/save-v4-to-v5.ts` | `migrateSaveV4ToV5(dto)` |
+| use-tutorial-coordinator | `src/ui/coordinator/use-tutorial-coordinator.ts` | `useTutorialCoordinator()` |
+| ObjectivePanel | `src/ui/components/ObjectivePanel/ObjectivePanel.tsx` | 右上角可收叠卡片 |
+| TutorialCompleteModal | `src/ui/components/TutorialCompleteModal/` | 完成 modal + 2 actions |
+| buildTutorialHintPayload | `src/ui/components/HintModal/buildTutorialHintPayload.ts` | `buildTutorialHintPayload(hint, onConfirm, onDismiss)` |
+| ModalPriority enum | `src/ui/store/slices/ui-slice.ts` | `TUTORIAL_STEP=200 / TUTORIAL_COMPLETE=210 / TUTORIAL_TIMEOUT=80` |
+
+---
+
 ## Documentation Sync Policy (MUST DO when finishing a milestone)
 
 > 与「What NOT to Do」反向对仗：每完成一个里程碑或重大子任务，必须同步以下 5 处文档。
@@ -531,6 +554,12 @@ const world: World = {
 ❌ 不回退 SaveDTO SAVE_DTO_VERSION（版本号只能递增，不能降回 v3）
 ❌ 不在 hint-slice actions 之外修改 seenHints / hintsEnabled（只通过 hint-slice dispatch）
 ❌ 不让 HintModal 进入 modalQueue（HintModal 通过 ModalPriority 排序，不走 modalQueue push）
+❌ 不要把 tutorial hint 写入 `seenHints`（违 Metis · 必须 `tutorialState.dismissedStepHints`）
+❌ 不要在 `tutorialPhase` 之外修改 `world.tutorialState`（仅白名单 actions：recordPanelOpened / dismissTutorialHint / recordTutorialTimeoutShown）
+❌ 不要把 `'tutorial'` 字面值硬编码到 `getCurrentScenarioId`（必须读 `world.scenarioId`）
+❌ 不要让 tutorialPhase 在非 tutorial 场景激活（守 isolation invariant）
+❌ 不要把超时阈值 write 成 magic number（必须 `M10_3_TIMEOUT_GAME_MONTHS = 24` 常量）
+❌ 不要把 SAVE_DTO_VERSION 从 5 回退（版本号只能递增）
 ```
 
 ---
