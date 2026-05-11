@@ -6,6 +6,10 @@ import type { RealmId, SiteId } from '~/shared/types'
 import type { GameStore, StoreSet } from '../game-store'
 
 export enum ModalPriority {
+  TUTORIAL_TIMEOUT = 80,
+  TUTORIAL_STEP = 200,
+  TUTORIAL_COMPLETE = 210,
+  HINT_FIRST_ENCOUNTER = 120,
   SUCCESSION_CRISIS = 100,
   EVENT_CHAIN = 80,
   REFORM_PROMPT = 60,
