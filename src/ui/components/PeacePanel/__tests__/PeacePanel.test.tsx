@@ -51,7 +51,9 @@ describe('PeacePanel', () => {
       ['realm_zhao', mockTargetRealm]
     ]),
     sites: new Map<string, Site>(),
-    generals: new Map()
+    generals: new Map(),
+    scenarioId: 'm1',
+    tutorialState: null,
   } as unknown as World
 
   beforeEach(() => {

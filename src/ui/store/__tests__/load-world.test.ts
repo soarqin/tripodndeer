@@ -74,7 +74,7 @@ describe('replaceWorldFromSave action', () => {
     await useGameStore.getState().loadWorld('m1')
 
     const baseWorld = useGameStore.getState().world
-    const savedWorld = { ...baseWorld, tick: 12345 }
+    const savedWorld = { ...baseWorld, tick: 12345, scenarioId: 'm1' as const, tutorialState: null }
 
     useGameStore.getState().resetToBootPending()
     expect(useGameStore.getState().bootStatus).toBe('pending')

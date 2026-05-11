@@ -14,7 +14,9 @@ vi.mock('../codex-data-loader', () => ({
 }))
 
 const dummyWorld = {
-  characterTemplates: new Map()
+  characterTemplates: new Map(),
+  scenarioId: 'm1',
+  tutorialState: null,
 } as unknown as World
 
 describe('CodexPanel', () => {

@@ -154,6 +154,8 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
       aiState: new Map(sw.aiState ?? []),
       diplomaticMemory: new Map(sw.diplomaticMemory ?? []),
       playerRealmId: sw.playerRealmId,
+      scenarioId: migratedDto.scenarioId,
+      tutorialState: null,
       rngState: sw.rngState,
       phases: getDefaultPhases(),
       pendingOrders: sw.pendingOrders,

@@ -13,6 +13,8 @@ describe('ProvinceBrowserPanel', () => {
         regions: new Map(),
         realms: new Map(),
         sites: new Map(),
+        scenarioId: 'm1',
+        tutorialState: null,
       } as unknown as World,
     })
   })
@@ -48,6 +50,8 @@ describe('ProvinceBrowserPanel', () => {
           ['site_1', { id: 'site_1', name: 'Nanzheng' }],
           ['site_2', { id: 'site_2', name: 'Chenggu' }],
         ]),
+        scenarioId: 'm9',
+        tutorialState: null,
       } as unknown as World,
     })
 

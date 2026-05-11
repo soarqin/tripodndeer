@@ -446,6 +446,8 @@ describe('aiPlanStep personality resolution', () => {
         [enemyRealmId, makeRealm(enemyRealmId, 'site_enemy')],
       ]),
       rulers: new Map([[aiRealmId, conquerorRuler]]),
+      scenarioId: 'm1',
+      tutorialState: null,
     }
 
     const aggressiveResult = aiPlanStep(aggressiveWorld, createInitialRng(1))

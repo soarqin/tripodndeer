@@ -7,7 +7,7 @@ import type { World } from '~/shared/types'
 describe('manpower tick', () => {
   it('skip on non-monthly tick', () => {
     const world = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
-    const worldAtTick1 = { ...world, tick: 1 }
+    const worldAtTick1 = { ...world, tick: 1, scenarioId: 'm1' as const, tutorialState: null }
     const result = manpowerTick(worldAtTick1 as World, world.rngState)
     expect(result.world).toBe(worldAtTick1)
   })
@@ -17,7 +17,7 @@ describe('manpower tick', () => {
     const qin = base.realms.get('realm_qin')!
     const realms = new Map(base.realms)
     realms.set('realm_qin', { ...qin, traits: [], stats: { manpowerPool: 0, manpowerCap: 80000, warWeariness: 0 } })
-    const world = { ...base, realms, tick: 0 } as World
+    const world = { ...base, realms, tick: 0, scenarioId: 'm1' as const, tutorialState: null } as World
     const result = manpowerTick(world, world.rngState)
     expect(result.world.realms.get('realm_qin')!.stats?.manpowerPool).toBe(500)
     expect(result.world.realms.get('realm_qin')!.stats?.warWeariness).toBe(0)
@@ -38,11 +38,11 @@ describe('manpower tick', () => {
       peaceProposalId: null,
     })
 
-    let world = { ...base, realms, wars, tick: 0 } as World
+    let world = { ...base, realms, wars, tick: 0, scenarioId: 'm1' as const, tutorialState: null } as World
 
     for (let i = 0; i < 12; i++) {
       const result = manpowerTick(world, world.rngState)
-      world = { ...result.world, tick: (i + 1) * 3 } as World
+      world = { ...result.world, tick: (i + 1) * 3, scenarioId: 'm1' as const, tutorialState: null } as World
     }
 
     const qinFinal = world.realms.get('realm_qin')!
@@ -55,7 +55,7 @@ describe('manpower tick', () => {
     const qin = base.realms.get('realm_qin')!
     const realms = new Map(base.realms)
     realms.set('realm_qin', { ...qin, traits: [], stats: { manpowerPool: 79900, manpowerCap: 80000, warWeariness: 0 } })
-    const world = { ...base, realms, tick: 0 } as World
+    const world = { ...base, realms, tick: 0, scenarioId: 'm1' as const, tutorialState: null } as World
     const result = manpowerTick(world, world.rngState)
     expect(result.world.realms.get('realm_qin')!.stats?.manpowerPool).toBe(80000)
   })

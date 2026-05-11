@@ -5,7 +5,7 @@ import type { World } from '~/shared/types/world'
 import { isAIRealm } from '../sentinels'
 
 function createWorld(playerRealmId: World['playerRealmId']): World {
-  return { playerRealmId } as unknown as World
+  return { playerRealmId, scenarioId: 'm1', tutorialState: null } as unknown as World
 }
 
 describe('isAIRealm', () => {

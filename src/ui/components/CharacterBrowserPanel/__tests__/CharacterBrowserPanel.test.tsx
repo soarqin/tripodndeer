@@ -48,6 +48,8 @@ describe('CharacterBrowserPanel', () => {
         difficulty: 'hero',
         diplomaticMemory: new Map(),
         playerRealmId: 'realm_qin',
+        scenarioId: 'm1',
+        tutorialState: null,
         rngState: { seed: 42, counter: 0 },
         phases: [],
         pendingOrders: [],
@@ -103,6 +105,8 @@ describe('CharacterBrowserPanel', () => {
         sites: new Map([
           ['site_xianyang', { id: 'site_xianyang', name: '咸阳' }],
         ]),
+        scenarioId: 'm9',
+        tutorialState: null,
       } as unknown as World,
     })
 

@@ -11,6 +11,8 @@ describe('RegionBrowserPanel', () => {
       world: {
         regions: new Map(),
         provinces: new Map(),
+        scenarioId: 'm1',
+        tutorialState: null,
       } as unknown as World,
     })
   })
@@ -38,6 +40,8 @@ describe('RegionBrowserPanel', () => {
           ['prov_1', { id: 'prov_1', name: 'Hanzhong' }],
           ['prov_2', { id: 'prov_2', name: 'Longxi' }],
         ]),
+        scenarioId: 'm9',
+        tutorialState: null,
       } as unknown as World,
     })
 

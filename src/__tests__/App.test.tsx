@@ -42,6 +42,8 @@ describe('App', () => {
         date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
         tick: 0,
         playerRealmId: 'realm_qin',
+        scenarioId: 'm1',
+        tutorialState: null,
       } as unknown as World,
       modalQueue: [],
     })

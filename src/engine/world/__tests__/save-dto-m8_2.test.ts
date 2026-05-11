@@ -33,6 +33,8 @@ describe('SaveDTO M8.2 V3 fields', () => {
       ...createM1World(),
       difficulty: 'sage',
       diplomaticMemory: new Map([[memoryKey, memory]]),
+      scenarioId: 'm1',
+      tutorialState: null,
     }
 
     const dto = worldToSaveDTO(world)

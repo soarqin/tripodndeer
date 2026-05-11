@@ -174,7 +174,7 @@ describe('M6 integration edge cases', () => {
 
       expect(dormantWorld.academies.get(academy.id)?.status).toBe('dormant')
 
-      const yearStartWorld: World = { ...dormantWorld, date: yearStart }
+      const yearStartWorld: World = { ...dormantWorld, date: yearStart, scenarioId: 'm1', tutorialState: null }
       const result = recruitmentPhase(yearStartWorld, yearStartWorld.rngState)
 
       const academyGenerals = [...result.world.generals.values()].filter((g) =>

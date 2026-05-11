@@ -69,6 +69,8 @@ describe('RealmOverviewPanel', () => {
       passes: new Map(),
       adjacencyEdges: new Map(),
       rulers: new Map(),
+      scenarioId: 'm1',
+      tutorialState: null,
     }
   })
 

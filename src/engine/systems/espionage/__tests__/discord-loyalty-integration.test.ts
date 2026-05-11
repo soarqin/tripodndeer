@@ -226,6 +226,8 @@ describe('§12.3.C acceptance: discord events lower enemy general loyalty', () =
     const worldAfterFirst: World = {
       ...r1.world,
       spyMissions: newMissions,
+      scenarioId: 'm1',
+      tutorialState: null,
     }
     const r2 = espionagePhase(worldAfterFirst, SUCCESS_RNG)
     const targetAfter2 = r2.world.generals.get('gen_target')!

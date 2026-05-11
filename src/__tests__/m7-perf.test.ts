@@ -79,6 +79,8 @@ describe('M7 performance budget', () => {
     const world: World = {
       ...baseWorld,
       spyMissions: buildSeededMissions(baseWorld),
+      scenarioId: 'm1',
+      tutorialState: null,
     }
 
     const times: number[] = []
@@ -122,6 +124,8 @@ describe('M7 performance budget', () => {
     const world: World = {
       ...baseWorld,
       spyMissions: buildSeededMissions(baseWorld),
+      scenarioId: 'm1',
+      tutorialState: null,
     }
 
     const phaseTimes: number[] = []

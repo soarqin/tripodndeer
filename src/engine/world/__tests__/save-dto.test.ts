@@ -90,6 +90,8 @@ describe('SaveDTO conversion', () => {
     const original: World = {
       ...createM1World(),
       factionInfluences: new Map([['realm_qin', factionInfluence]]),
+      scenarioId: 'm1',
+      tutorialState: null,
     }
     const restored = restore(worldToSaveDTO(original))
     const restoredInfluence = restored.factionInfluences.get('realm_qin')

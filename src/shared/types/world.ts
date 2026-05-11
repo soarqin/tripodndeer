@@ -64,6 +64,8 @@ import type {
 } from './reform-disaster-trade'
 import type { MemoryKey, DiplomaticMemory } from './diplomatic-memory'
 import type { CharacterAttributes, Specialty } from './character'
+import type { ScenarioId } from './scenario'
+import type { TutorialState } from './tutorial'
 
 export type PassId = string
 export type ProvinceId = string
@@ -236,6 +238,8 @@ export interface World {
   difficulty: DifficultyTier
   diplomaticMemory: ReadonlyMap<MemoryKey, DiplomaticMemory>
   playerRealmId: RealmId
+  scenarioId: ScenarioId
+  tutorialState: TutorialState | null
   rngState: RNGState // PRNG 状态在 World，不在 module 闭包
   phases: readonly TickPhase[] // Tick 阶段数组（M0 仅 1 个，但形状必须是数组）
   pendingOrders: readonly Order[]

@@ -31,6 +31,8 @@ describe('SaveLoadModal', () => {
     sites: new Map(),
     realms: new Map([['realm_qin', { displayName: '秦' }]]),
     playerRealmId: 'realm_qin',
+    scenarioId: 'm1',
+    tutorialState: null,
   }
   
   const mockReplaceWorldFromSave = vi.fn()
@@ -107,7 +109,7 @@ describe('SaveLoadModal', () => {
     
     vi.mocked(saveDtoToWorld).mockReturnValue({
       ok: true,
-      value: {} as unknown as World
+      value: { scenarioId: 'm1', tutorialState: null } as unknown as World
     })
     
     render(<SaveLoadModal mode="load" />)

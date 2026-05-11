@@ -105,7 +105,13 @@ describe('player gate: reform-phase does not auto-advance for player realm', () 
 
     const start = useGameStore.getState().world
     const advancedTick = start.tick + 36
-    const advancedWorld: World = { ...start, tick: advancedTick, date: { ...start.date, yearBC: start.date.yearBC - 1 } }
+    const advancedWorld: World = {
+      ...start,
+      tick: advancedTick,
+      date: { ...start.date, yearBC: start.date.yearBC - 1 },
+      scenarioId: 'm1',
+      tutorialState: null,
+    }
     const result = reformPhase(advancedWorld, advancedWorld.rngState)
 
     const next = result.world.reformStates.get(playerRealmId)
@@ -130,13 +136,19 @@ describe('player gate: reform-phase does not auto-advance for player realm', () 
     useGameStore.setState((state) => {
       const generals = new Map<string, General>(state.world.generals)
       generals.set(reformer.id, reformer)
-      const world: World = { ...state.world, generals }
+      const world: World = { ...state.world, generals, scenarioId: 'm1', tutorialState: null }
       state.world = castDraft(injectReformState(world, aiRealmId, reformState))
     })
 
     const start = useGameStore.getState().world
     const advancedTick = start.tick + 36
-    const advancedWorld: World = { ...start, tick: advancedTick, date: { ...start.date, yearBC: start.date.yearBC - 1 } }
+    const advancedWorld: World = {
+      ...start,
+      tick: advancedTick,
+      date: { ...start.date, yearBC: start.date.yearBC - 1 },
+      scenarioId: 'm1',
+      tutorialState: null,
+    }
     const result = reformPhase(advancedWorld, advancedWorld.rngState)
 
     const next = result.world.reformStates.get(aiRealmId)

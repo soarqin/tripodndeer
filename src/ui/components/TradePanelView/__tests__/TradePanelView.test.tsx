@@ -6,6 +6,8 @@ import type { GameStoreState } from '~/ui/store/game-store'
 
 interface MockWorld {
   playerRealmId: string
+  scenarioId: 'm1'
+  tutorialState: null
   tradeRoutes: Map<string, TradeRoute>
 }
 
@@ -21,6 +23,8 @@ describe('TradePanelView', () => {
   beforeEach(() => {
     mockWorld = {
       playerRealmId: 'realm_qin',
+      scenarioId: 'm1',
+      tutorialState: null,
       tradeRoutes: new Map<string, TradeRoute>()
     }
   })

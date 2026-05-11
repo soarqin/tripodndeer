@@ -112,6 +112,8 @@ export function makeEmptyWorld(overrides: MakeEmptyWorldOverrides = {}): World {
     difficulty: 'common',
     diplomaticMemory: new Map(),
     playerRealmId: 'realm_qin',
+    scenarioId: 'm1',
+    tutorialState: null,
     rngState: { ...DEFAULT_RNG },
     phases: [],
     pendingOrders: [],
