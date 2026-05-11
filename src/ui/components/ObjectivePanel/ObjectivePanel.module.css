@@ -118,3 +118,73 @@
 .badge:hover {
   background-color: rgba(40, 40, 40, 0.95);
 }
+
+.footer {
+  padding: 8px 12px;
+  border-top: 1px solid #444;
+  background-color: #222;
+  display: flex;
+  justify-content: center;
+}
+
+.exitBtn {
+  background: none;
+  border: 1px solid #666;
+  color: #ccc;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.exitBtn:hover {
+  background-color: #444;
+  color: #fff;
+  border-color: #888;
+}
+
+.confirmBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #ff9800;
+  text-align: center;
+}
+
+.confirmBox p {
+  margin: 0;
+}
+
+.confirmActions {
+  display: flex;
+  gap: 8px;
+}
+
+.confirmBtn {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.confirmBtn:hover {
+  background-color: #b71c1c;
+}
+
+.cancelBtn {
+  background-color: #555;
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background-color: #777;
+}

@@ -38,6 +38,9 @@ export const TopBar = React.memo(function TopBar() {
   const tick = useWorldTick()
   const speed = useSpeed()
   const openSaveLoadModal = useGameStore(state => state.openSaveLoadModal)
+  const resetToBootPending = useGameStore(state => state.resetToBootPending)
+  const isTutorial = useGameStore(state => state.world.scenarioId === 'tutorial')
+  const [showExitConfirm, setShowExitConfirm] = React.useState(false)
   const totalManpower = armies.reduce((sum, army) => sum + army.manpower, 0)
   const realmLabel = realm ? `${realm.displayName} ${realm.fullTitle}` : '未知势力'
   
@@ -72,6 +75,34 @@ export const TopBar = React.memo(function TopBar() {
         >
           读档
         </button>
+        {isTutorial && (
+          showExitConfirm ? (
+            <div className={styles.exitConfirmBox}>
+              <span className={styles.exitConfirmText}>确定退出教学？</span>
+              <button
+                className={styles.exitConfirmBtn}
+                onClick={() => resetToBootPending()}
+                data-testid="topbar-exit-tutorial-confirm"
+              >
+                确定
+              </button>
+              <button
+                className={styles.exitCancelBtn}
+                onClick={() => setShowExitConfirm(false)}
+              >
+                取消
+              </button>
+            </div>
+          ) : (
+            <button
+              className={styles.systemBtn}
+              onClick={() => setShowExitConfirm(true)}
+              data-testid="topbar-exit-tutorial-btn"
+            >
+              退出教学
+            </button>
+          )
+        )}
         <span className={styles.resourceChip} data-testid="top-bar-treasury" title="国库">
           💰 {formatResource(realm?.economy?.treasury)}
         </span>

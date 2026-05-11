@@ -5,7 +5,9 @@ import styles from './ObjectivePanel.module.css'
 
 export function ObjectivePanel(): React.JSX.Element | null {
   const world = useGameStore((state) => state.world)
+  const resetToBootPending = useGameStore((state) => state.resetToBootPending)
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   if (world.scenarioId !== 'tutorial' || !world.tutorialState) {
     return null
@@ -71,6 +73,36 @@ export function ObjectivePanel(): React.JSX.Element | null {
             )
           })}
         </ul>
+        <div className={styles.footer}>
+          {showConfirm ? (
+            <div className={styles.confirmBox}>
+              <p>确定退出教学？教学进度将丢失</p>
+              <div className={styles.confirmActions}>
+                <button
+                  className={styles.confirmBtn}
+                  onClick={() => resetToBootPending()}
+                  data-testid="exit-tutorial-confirm"
+                >
+                  确定
+                </button>
+                <button
+                  className={styles.cancelBtn}
+                  onClick={() => setShowConfirm(false)}
+                >
+                  取消
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              className={styles.exitBtn}
+              onClick={() => setShowConfirm(true)}
+              data-testid="exit-tutorial-btn"
+            >
+              退出教学
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
