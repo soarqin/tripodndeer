@@ -1,5 +1,6 @@
 import { diplomaticMemoryPhase } from '~/engine/systems/diplomacy/diplomatic-memory-phase'
 import { personalityDriftPhase } from '~/engine/systems/character/personality-drift-phase'
+import { tutorialPhase } from '~/engine/systems/tutorial/tutorial-phase'
 
 export const PHASE_NAMES = {
   AI_STRATEGIC: 'aiStrategic',
@@ -29,6 +30,7 @@ export const PHASE_NAMES = {
   PERSONALITY_DRIFT: 'personalityDrift',
   PRESTIGE_UPDATE: 'prestigeUpdate',
   REALM_DEACTIVATION: 'realmDeactivation',
+  TUTORIAL: 'tutorialPhase',
 } as const
 
 export const PHASE_ORDER: readonly string[] = [
@@ -59,11 +61,13 @@ export const PHASE_ORDER: readonly string[] = [
   PHASE_NAMES.PERSONALITY_DRIFT,
   PHASE_NAMES.PRESTIGE_UPDATE,
   PHASE_NAMES.REALM_DEACTIVATION,
+  PHASE_NAMES.TUTORIAL,
 ]
 
 export const PHASE_IMPLEMENTATIONS = {
   [PHASE_NAMES.DIPLOMATIC_MEMORY]: diplomaticMemoryPhase,
   [PHASE_NAMES.PERSONALITY_DRIFT]: personalityDriftPhase,
+  [PHASE_NAMES.TUTORIAL]: tutorialPhase,
 } as const
 
 // Legacy phase name (kept for reference/regression testing)

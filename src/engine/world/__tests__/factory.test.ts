@@ -26,6 +26,7 @@ import { reformPhase } from '@/engine/systems/reform'
 import { rulerLifecyclePhase } from '@/engine/systems/ruler'
 import { siegeStep } from '@/engine/systems/siege'
 import { tradePhase } from '@/engine/systems/trade/trade-phase'
+import { tutorialPhase } from '@/engine/systems/tutorial/tutorial-phase'
 import { victoryCheckStep } from '@/engine/systems/victory'
 import { realmDeactivationPhase } from '@/engine/wars/realm-deactivation'
 import {
@@ -81,6 +82,7 @@ function phaseName(phase: TickPhase): string {
   if (phase === personalityDriftPhase) return 'personalityDrift'
   if (phase === prestigeUpdatePhase) return 'prestigeUpdate'
   if (phase === realmDeactivationPhase) return 'realmDeactivation'
+  if (phase === tutorialPhase) return 'tutorialPhase'
   return 'unknown'
 }
 
@@ -252,6 +254,7 @@ describe('createWorldFromM1Data — structure', () => {
       personalityDriftPhase,
       prestigeUpdatePhase,
       realmDeactivationPhase,
+      tutorialPhase,
     ])
     expect(world.phases.map(phaseName)).toEqual(PHASE_ORDER)
 

@@ -45,6 +45,7 @@ import { rulerLifecyclePhase } from '~/engine/systems/ruler'
 import { siegeStep } from '~/engine/systems/siege'
 import { tradePhase } from '~/engine/systems/trade/trade-phase'
 import { victoryCheckStep } from '~/engine/systems/victory'
+import { tutorialPhase } from '~/engine/systems/tutorial/tutorial-phase'
 import { realmDeactivationPhase } from '~/engine/wars/realm-deactivation'
 import {
   M4_BASE_FOOD_PRODUCTION_PER_HOUSEHOLD,
@@ -334,6 +335,7 @@ export function getDefaultPhases(): readonly TickPhase[] {
     personalityDriftPhase,
     prestigeUpdatePhase,
     realmDeactivationPhase,
+    tutorialPhase,
   ]
 }
 

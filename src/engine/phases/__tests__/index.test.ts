@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { PHASE_NAMES, PHASE_ORDER } from '../index'
 
 describe('phase chain constants', () => {
-  it('PHASE_ORDER has exactly 27 phases (M8.1: aiPlan replaced by 3-layer pipeline)', () => {
-    expect(PHASE_ORDER.length).toBe(27)
+  it('PHASE_ORDER has exactly 28 phases (M8.1: aiPlan replaced by 3-layer pipeline, M10.3 adds tutorial)', () => {
+    expect(PHASE_ORDER.length).toBe(28)
   })
 
   it('PHASE_ORDER is in correct order', () => {
@@ -34,6 +34,7 @@ describe('phase chain constants', () => {
     expect(PHASE_ORDER[24]).toBe(PHASE_NAMES.PERSONALITY_DRIFT)
     expect(PHASE_ORDER[25]).toBe(PHASE_NAMES.PRESTIGE_UPDATE)
     expect(PHASE_ORDER[26]).toBe(PHASE_NAMES.REALM_DEACTIVATION)
+    expect(PHASE_ORDER[27]).toBe(PHASE_NAMES.TUTORIAL)
   })
 
   it('CULTURAL_IDENTITY comes after COMBAT_V2 and before MANPOWER', () => {
@@ -94,6 +95,7 @@ describe('phase chain constants', () => {
     expect(personalityIdx).toBe(diplomaticIdx + 1)
     expect(prestigeIdx).toBe(personalityIdx + 1)
     expect(deactivationIdx).toBe(prestigeIdx + 1)
-    expect(deactivationIdx).toBe(PHASE_ORDER.length - 1)
+    expect(PHASE_ORDER[deactivationIdx + 1]).toBe(PHASE_NAMES.TUTORIAL)
+    expect(PHASE_ORDER[PHASE_ORDER.length - 1]).toBe(PHASE_NAMES.TUTORIAL)
   })
 })
