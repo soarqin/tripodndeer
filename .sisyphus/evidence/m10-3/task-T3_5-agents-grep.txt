@@ -1,0 +1,4 @@
+11:**当前里程碑**: M0-M9 已交付。Wave 9: Refactor & Cleanup 已完成。M10 持续中（M10.1 史书百科 ✅、M10.2 渐进提示 ✅、M10.3 引导剧本 ✅）。
+13:**实施顺序**: M4(✅) → M5(✅) → M4.1(✅) → M4.2(✅) → M6(✅) → M7(✅) → M8(✅) → M8.1(✅) → M8.2(✅) → M8.3(✅) → M9(✅) → Wave 9(✅) → M10(♾️持续) → M10.1(✅) → M10.2(✅) → M10.3(✅)
+167:| M10.3 scenario 恰好 10 sites | `src/content/m10_3/__tests__/scenario-m10_3.test.ts` |
+459:## M10.3 Subsystems Quick Reference
