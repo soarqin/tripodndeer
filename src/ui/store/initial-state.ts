@@ -21,6 +21,8 @@ export interface GameState {
   clockState: ClockState
   events: readonly GameEvent[]
   diplomacyFeedback: readonly DiplomacyActionFeedback[]
+  seenHints: Record<string, true>
+  hintsEnabled: boolean
   playerRealmId: RealmId
   selectedArmyId: ArmyId | null
   lastBattleResolution: BattleResolution | null
@@ -100,6 +102,8 @@ export function makeInitialState(): GameState {
     clockState: { speed: 'pause', realTimeAccum: 0 },
     events: [],
     diplomacyFeedback: [],
+    seenHints: {},
+    hintsEnabled: true,
     playerRealmId,
     selectedArmyId: null,
     lastBattleResolution: null,

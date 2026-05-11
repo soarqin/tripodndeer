@@ -7,6 +7,7 @@ import { createBattleSlice, type BattleActions } from './slices/battle-slice'
 import { createUiSlice, type UiActions } from './slices/ui-slice'
 import { createSuccessionSlice, type SuccessionActions } from './slices/succession-slice'
 import { createWorldSlice, type WorldActions } from './slices/world-slice'
+import { createHintSlice, type HintSlice } from './slices/hint-slice'
 
 // Vite 注入的 import.meta.env 类型增强（避免依赖 vite/client 全局类型）
 
@@ -30,6 +31,7 @@ export type GameStore = GameState
   & UiActions
   & SuccessionActions
   & WorldActions
+  & HintSlice
 
 export type GameStoreState = GameStore
 
@@ -42,7 +44,7 @@ export type StoreSet = (updater: (state: GameStore) => void) => void
  * - immer 中间件让我们以可变写法替换整字段（World 引用本身仍由 engine 重新构造）
  */
 export const useGameStore = create<GameStore>()(
-  immer((set) => ({
+  immer((set, get) => ({
     ...makeInitialState(),
     ...createClockSlice(set),
     ...createSelectionSlice(set),
@@ -50,6 +52,7 @@ export const useGameStore = create<GameStore>()(
     ...createUiSlice(set),
     ...createSuccessionSlice(set),
     ...createWorldSlice(set),
+    ...createHintSlice(set, get),
   })),
 )
 
