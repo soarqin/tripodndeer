@@ -4,6 +4,23 @@ import { SAVE_DTO_VERSION } from '~/shared/types/save-dto'
 import { RulerPersonalityProfileSchema, PersonalityArchetypeSchema } from './character'
 import { DifficultyTierSchema } from './difficulty'
 import { ScenarioIdSchema } from './scenario'
+import { PanelIdSchema, TutorialStepIdSchema } from './tutorial'
+
+const GameDateSchema = z.object({
+  yearBC: z.number().int(),
+  season: z.enum(['spring', 'summer', 'autumn', 'winter']),
+  month: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+  xun: z.enum(['shang', 'zhong', 'xia']),
+})
+
+export const TutorialStateDTOSchema = z.object({
+  currentStep: TutorialStepIdSchema.nullable(),
+  completedSteps: z.array(TutorialStepIdSchema),
+  startedAt: GameDateSchema,
+  dismissedStepHints: z.array(TutorialStepIdSchema),
+  panelsOpened: z.array(PanelIdSchema),
+  timeoutHintShown: z.boolean(),
+})
 
 const keyValueTuple = z.tuple([z.string().min(1), z.unknown()])
 const numericKeyValueTuple = z.tuple([z.string().min(1), z.number()])
@@ -77,6 +94,7 @@ export const SaveDTOSchema = z.object({
   world: SerializedWorldSchema,
   seenHints: z.record(z.literal(true)).optional(),
   hintsEnabled: z.boolean().optional(),
+  tutorialState: TutorialStateDTOSchema.nullable().optional(),
 })
 
 export const saveDtoSchema = SaveDTOSchema

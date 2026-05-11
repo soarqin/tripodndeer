@@ -2,12 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import { M5_PERSONALITY_DIMS_BASELINE } from '~/content/m2/balance'
 import { saveDtoToWorld } from '~/engine/world/save-dto'
-import { SaveDTOSchema } from '~/shared/schemas/save-dto'
-import { SAVE_DTO_VERSION, type SaveDTO } from '~/shared/types/save-dto'
+import { type SaveDTO, type SaveDTOAnyVersion } from '~/shared/types/save-dto'
 import { migrateSaveV2ToV3 } from '../save-v2-to-v3'
 import saveV2Fixture from './fixtures/save-v2.json'
 
-const saveV2 = saveV2Fixture as unknown as SaveDTO
+const saveV2 = saveV2Fixture as unknown as SaveDTOAnyVersion
 const saveV2FixtureWorld = saveV2Fixture.world as unknown as Record<string, unknown> & {
   rulers: Array<[string, Record<string, unknown>]>
 }
@@ -16,13 +15,12 @@ describe('migrateSaveV2ToV3', () => {
   it("defaults difficulty to 'hero', diplomaticMemory to empty, and derives ruler personalityDims", () => {
     const migrated = migrateSaveV2ToV3(saveV2)
 
-    expect(migrated.schemaVersion).toBe(SAVE_DTO_VERSION)
+    expect(migrated.schemaVersion).toBe(3)
     expect(migrated.world.difficulty).toBe('hero')
     expect(migrated.world.diplomaticMemory).toEqual([])
     expect(migrated.world.rulers[0]?.[1].personalityDims).toEqual(
       M5_PERSONALITY_DIMS_BASELINE.conqueror,
     )
-    expect(SaveDTOSchema.parse(migrated)).toEqual(migrated)
   })
 
   it('does not mutate the V2 fixture', () => {
@@ -37,7 +35,7 @@ describe('migrateSaveV2ToV3', () => {
   })
 
   it('loads the V2 fixture through saveDtoToWorld', () => {
-    const result = saveDtoToWorld(saveV2)
+    const result = saveDtoToWorld(saveV2 as unknown as SaveDTO)
 
     expect(result.ok).toBe(true)
     if (!result.ok) throw new Error(result.error.message)

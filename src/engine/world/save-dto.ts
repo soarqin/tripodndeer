@@ -1,21 +1,48 @@
 import { M5_PERSONALITY_DIMS_BASELINE } from '~/content/m2/balance'
 import type { ScenarioId } from '~/shared'
 import type { FactionId, FactionInfluenceState, IntelligenceCoverage, RulerState, World } from '~/shared/types'
+import type { TutorialState } from '~/shared/types/tutorial'
 import {
   SAVE_DTO_VERSION,
   type Result,
   type SaveDTO,
+  type SaveDTOAnyVersion,
   type SaveLoadError,
+  type TutorialStateDTO,
 } from '~/shared/types/save-dto'
 import { getDefaultPhases } from './factory'
 import { migrateSaveV2ToV3 } from './migrations/save-v2-to-v3'
 import { migrateSaveV3ToV4 } from './migrations/save-v3-to-v4'
+import { migrateSaveV4ToV5 } from './migrations/save-v4-to-v5'
+
+function serializeTutorialState(state: TutorialState): TutorialStateDTO {
+  return {
+    currentStep: state.currentStep,
+    completedSteps: [...state.completedSteps],
+    startedAt: state.startedAt,
+    dismissedStepHints: [...state.dismissedStepHints],
+    panelsOpened: [...state.panelsOpened],
+    timeoutHintShown: state.timeoutHintShown,
+  }
+}
+
+function deserializeTutorialState(dto: TutorialStateDTO): TutorialState {
+  return {
+    currentStep: dto.currentStep,
+    completedSteps: new Set(dto.completedSteps),
+    startedAt: dto.startedAt,
+    dismissedStepHints: new Set(dto.dismissedStepHints),
+    panelsOpened: new Set(dto.panelsOpened),
+    timeoutHintShown: dto.timeoutHintShown,
+  }
+}
 
 export function worldToSaveDTO(world: World, scenarioId: ScenarioId = 'm1'): SaveDTO {
   return {
     schemaVersion: SAVE_DTO_VERSION,
-    scenarioId,
+    scenarioId: world.scenarioId ?? scenarioId,
     createdAt: Date.now(),
+    tutorialState: world.tutorialState ? serializeTutorialState(world.tutorialState) : null,
     world: {
       date: world.date,
       tick: world.tick,
@@ -67,12 +94,10 @@ export function worldToSaveDTO(world: World, scenarioId: ScenarioId = 'm1'): Sav
   }
 }
 
-export const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [1, 2, 3, 4]
-
-type SaveDTOWithVersion = Omit<SaveDTO, 'schemaVersion'> & { readonly schemaVersion: number }
+export const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [1, 2, 3, 4, 5]
 
 export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
-  const inputDto = dto as SaveDTOWithVersion
+  const inputDto = dto as SaveDTOAnyVersion
   if (!SUPPORTED_SAVE_DTO_VERSIONS.includes(inputDto.schemaVersion)) {
     return {
       ok: false,
@@ -85,12 +110,15 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
     }
   }
 
-  let migratedDto: SaveDTOWithVersion = inputDto
+  let migratedDto: SaveDTOAnyVersion = inputDto
   if (migratedDto.schemaVersion === 2) {
-    migratedDto = migrateSaveV2ToV3(migratedDto as SaveDTO) as SaveDTOWithVersion
+    migratedDto = migrateSaveV2ToV3(migratedDto)
   }
   if (migratedDto.schemaVersion === 3) {
-    migratedDto = migrateSaveV3ToV4(migratedDto as SaveDTO) as SaveDTOWithVersion
+    migratedDto = migrateSaveV3ToV4(migratedDto)
+  }
+  if (migratedDto.schemaVersion === 4) {
+    migratedDto = migrateSaveV4ToV5(migratedDto)
   }
   const sw = migratedDto.world
   const factionInfluences = new Map(
@@ -155,7 +183,9 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
       diplomaticMemory: new Map(sw.diplomaticMemory ?? []),
       playerRealmId: sw.playerRealmId,
       scenarioId: migratedDto.scenarioId,
-      tutorialState: null,
+      tutorialState: migratedDto.tutorialState
+        ? deserializeTutorialState(migratedDto.tutorialState)
+        : null,
       rngState: sw.rngState,
       phases: getDefaultPhases(),
       pendingOrders: sw.pendingOrders,

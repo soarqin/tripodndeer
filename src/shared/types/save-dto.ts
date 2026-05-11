@@ -26,6 +26,7 @@ import type { CounterIntelState, CoverageKey, SpyMission, SpyMissionId } from '.
 import type { EventChainId, EventChainState } from './events'
 import type { DisasterState, ReformState, TradeRoute, TradeRouteId } from './reform-disaster-trade'
 import type { DiplomaticMemory, MemoryKey } from './diplomatic-memory'
+import type { PanelId, TutorialStepId } from './tutorial'
 import type {
   Academy,
   AcademyId,
@@ -42,7 +43,7 @@ import type {
   RNGState,
 } from './world'
 
-export const SAVE_DTO_VERSION = 4 as const
+export const SAVE_DTO_VERSION = 5 as const
 
 export type SaveLoadErrorKind = 'incompatible_version' | 'parse_error' | 'missing_data'
 
@@ -64,6 +65,15 @@ export interface SerializedFactionInfluence {
 
 export interface SerializedRulerState extends Omit<RulerState, 'personalityDims'> {
   readonly personalityDims?: RulerPersonalityProfile
+}
+
+export interface TutorialStateDTO {
+  readonly currentStep: TutorialStepId | null
+  readonly completedSteps: readonly TutorialStepId[]
+  readonly startedAt: GameDate
+  readonly dismissedStepHints: readonly TutorialStepId[]
+  readonly panelsOpened: readonly PanelId[]
+  readonly timeoutHintShown: boolean
 }
 
 export interface SerializedWorld {
@@ -116,4 +126,7 @@ export interface SaveDTO {
   readonly world: SerializedWorld
   readonly seenHints?: Readonly<Record<string, true>>
   readonly hintsEnabled?: boolean
+  readonly tutorialState?: TutorialStateDTO | null
 }
+
+export type SaveDTOAnyVersion = Omit<SaveDTO, 'schemaVersion'> & { readonly schemaVersion: number }

@@ -1,10 +1,10 @@
 import { M5_PERSONALITY_DIMS_BASELINE } from '~/content/m2/balance'
-import { SAVE_DTO_VERSION, type SaveDTO } from '~/shared/types/save-dto'
+import type { SaveDTOAnyVersion } from '~/shared/types/save-dto'
 
-export function migrateSaveV2ToV3(v2: SaveDTO): SaveDTO {
+export function migrateSaveV2ToV3(v2: SaveDTOAnyVersion): SaveDTOAnyVersion {
   return {
     ...v2,
-    schemaVersion: SAVE_DTO_VERSION,
+    schemaVersion: 3,
     world: {
       ...v2.world,
       difficulty: v2.world.difficulty ?? 'hero',
