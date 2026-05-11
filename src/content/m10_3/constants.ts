@@ -1,0 +1,1 @@
+export const M10_3_TIMEOUT_GAME_MONTHS = 24

@@ -102,6 +102,7 @@ export interface WorldActions {
   applyEventChainChoice: (chainId: EventChainId, choiceId: string) => void
   pauseOnCriticalEvent: (eventType: CriticalEventType, payload?: Record<string, unknown>) => void
   dismissTutorialHint: (stepId: TutorialStepId) => void
+  recordTutorialTimeoutShown: () => void
   loadWorld: (scenarioId: ScenarioId, difficulty?: DifficultyTier) => Promise<void>
   replaceWorldFromSave: (world: World) => void
   resetToBootPending: () => void
@@ -307,7 +308,7 @@ function createBootActions(set: StoreSet): Pick<WorldActions, 'loadWorld' | 'rep
   }
 }
 
-function createDecisionActions(set: StoreSet): Pick<WorldActions, 'applyDisasterChoice' | 'applyReformChoice' | 'applyEventChainChoice' | 'pauseOnCriticalEvent' | 'dismissTutorialHint'> {
+function createDecisionActions(set: StoreSet): Pick<WorldActions, 'applyDisasterChoice' | 'applyReformChoice' | 'applyEventChainChoice' | 'pauseOnCriticalEvent' | 'dismissTutorialHint' | 'recordTutorialTimeoutShown'> {
   return {
     applyDisasterChoice: (disasterId, choiceId) =>
       set((state) => {
@@ -374,6 +375,19 @@ function createDecisionActions(set: StoreSet): Pick<WorldActions, 'applyDisaster
           tutorialState: {
             ...tutorialState,
             dismissedStepHints: new Set([...tutorialState.dismissedStepHints, stepId]),
+          },
+        })
+      }),
+    recordTutorialTimeoutShown: () =>
+      set((state) => {
+        const tutorialState = state.world.tutorialState
+        if (tutorialState === null || tutorialState.timeoutHintShown) return
+
+        state.world = castDraft({
+          ...state.world,
+          tutorialState: {
+            ...tutorialState,
+            timeoutHintShown: true,
           },
         })
       }),

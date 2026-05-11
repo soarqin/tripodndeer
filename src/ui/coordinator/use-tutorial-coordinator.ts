@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { TUTORIAL_HINTS } from '@/content/m10_3/tutorial-hints'
+import { M10_3_TIMEOUT_GAME_MONTHS } from '@/content/m10_3/constants'
 import { TUTORIAL_STEPS } from '@/content/m10_3/tutorial-steps'
 import { buildTutorialHintPayload } from '@/ui/components/HintModal/buildTutorialHintPayload'
 import { buildTutorialCompletePayload } from '@/ui/components/TutorialCompleteModal'
 import { useGameStore } from '@/ui/store'
+import { ModalPriority } from '@/ui/store/slices/ui-slice'
+import type { GameDate } from '~/shared'
 import type { TutorialState, TutorialStepId } from '~/shared/types/tutorial'
 
 const ORDERED_TUTORIAL_STEPS = [...TUTORIAL_STEPS].sort((a, b) => {
@@ -13,6 +16,21 @@ const ORDERED_TUTORIAL_STEPS = [...TUTORIAL_STEPS].sort((a, b) => {
 
 function setKey(values: ReadonlySet<TutorialStepId>): string {
   return [...values].sort((a, b) => a.localeCompare(b)).join('|')
+}
+
+const SEASON_ORDER: Record<GameDate['season'], number> = {
+  spring: 0,
+  summer: 1,
+  autumn: 2,
+  winter: 3,
+}
+
+function toMonthIndex(date: GameDate): number {
+  return SEASON_ORDER[date.season] * 3 + (date.month - 1)
+}
+
+function getElapsedGameMonths(startedAt: GameDate, currentDate: GameDate): number {
+  return (startedAt.yearBC - currentDate.yearBC) * 12 + (toMonthIndex(currentDate) - toMonthIndex(startedAt))
 }
 
 export function getNextTutorialHintStepId(tutorialState: TutorialState): TutorialStepId | null {
@@ -29,6 +47,7 @@ export function useTutorialCoordinator(): void {
   const closeModal = useGameStore((state) => state.closeModal)
   const openCodex = useGameStore((state) => state.openCodex)
   const dismissTutorialHint = useGameStore((state) => state.dismissTutorialHint)
+  const recordTutorialTimeoutShown = useGameStore((state) => state.recordTutorialTimeoutShown)
   const resetToBootPending = useGameStore((state) => state.resetToBootPending)
   const queuedStepIdsRef = useRef<Set<TutorialStepId>>(new Set())
   const completeModalQueuedRef = useRef(false)
@@ -41,6 +60,27 @@ export function useTutorialCoordinator(): void {
     () => (world.tutorialState ? setKey(world.tutorialState.dismissedStepHints) : ''),
     [world.tutorialState],
   )
+
+  useEffect(() => {
+    if (bootStatus !== 'ready') return
+    if (world.scenarioId !== 'tutorial') return
+    if (world.tutorialState === null) return
+    if (world.tutorialState.currentStep === null) return
+    if (world.tutorialState.timeoutHintShown) return
+
+    const elapsedMonths = getElapsedGameMonths(world.tutorialState.startedAt, world.date)
+    if (elapsedMonths < M10_3_TIMEOUT_GAME_MONTHS) return
+
+    openModal({
+      title: '教学进行中',
+      content: `已游戏 ${M10_3_TIMEOUT_GAME_MONTHS} 个月，教学仍可继续。如需帮助，可查看各步骤提示。`,
+      actions: [],
+      dismissable: true,
+      priority: ModalPriority.TUTORIAL_TIMEOUT,
+      testId: 'tutorial-timeout-modal',
+    })
+    recordTutorialTimeoutShown()
+  }, [bootStatus, openModal, recordTutorialTimeoutShown, world])
 
   useEffect(() => {
     if (bootStatus !== 'ready') return
