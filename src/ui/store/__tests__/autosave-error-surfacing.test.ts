@@ -78,7 +78,10 @@ describe('useRafDriver autosave error surfacing', () => {
   async function triggerAutosave(): Promise<AutosaveStore> {
     const store = makeStore()
     vi.mocked(useGameStore.getState).mockImplementation(() => store as never)
-    vi.mocked(saveSlot).mockRejectedValueOnce(new DOMException('QuotaExceededError'))
+    vi.mocked(saveSlot).mockResolvedValueOnce({
+      ok: false,
+      error: { kind: 'quota_exceeded', message: '存储空间已满' },
+    })
 
     renderHook(() => useRafDriver())
     expect(requestAnimationFrame).toHaveBeenCalledTimes(1)
@@ -108,7 +111,7 @@ describe('useRafDriver autosave error surfacing', () => {
   it('does not enqueue a toast when autosave succeeds', async () => {
     const store = makeStore()
     vi.mocked(useGameStore.getState).mockImplementation(() => store as never)
-    vi.mocked(saveSlot).mockResolvedValueOnce(undefined)
+    vi.mocked(saveSlot).mockResolvedValueOnce({ ok: true, value: undefined })
 
     renderHook(() => useRafDriver())
     act(() => {

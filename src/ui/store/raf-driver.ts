@@ -44,11 +44,16 @@ export function useRafDriver(): void {
             scenarioId, 
             playerRealmName: playerRealm ? playerRealm.displayName : '未知势力' 
           }
-          saveSlot('auto', dto, metadata).catch((err: unknown) => {
-            const msg = err instanceof Error ? err.message : String(err)
-            useGameStore.getState().enqueueToast('[错误] 自动存档失败：' + msg, 5000)
-            console.error('[autosave] failed', err)
-          })
+          saveSlot('auto', dto, metadata)
+            .then((result) => {
+              if (result.ok) return
+              useGameStore.getState().enqueueToast('[错误] 自动存档失败：' + result.error.message, 5000)
+            })
+            .catch((err: unknown) => {
+              const msg = err instanceof Error ? err.message : String(err)
+              useGameStore.getState().enqueueToast('[错误] 自动存档失败：' + msg, 5000)
+              console.error('[autosave] failed', err)
+            })
         }
       }
       lastTime = now

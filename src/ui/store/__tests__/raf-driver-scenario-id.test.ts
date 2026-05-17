@@ -14,7 +14,7 @@ vi.mock('../game-store', () => ({
 }))
 
 vi.mock('../persistence/slot-crud', () => ({
-  saveSlot: vi.fn(() => Promise.resolve()),
+  saveSlot: vi.fn(() => Promise.resolve({ ok: true, value: undefined })),
 }))
 
 vi.mock('@/engine/world/save-dto', () => ({
