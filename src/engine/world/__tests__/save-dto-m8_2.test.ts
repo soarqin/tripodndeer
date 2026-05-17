@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { M5_PERSONALITY_DIMS_BASELINE } from '~/content/m2/balance'
 import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
 import { saveDtoToWorld, worldToSaveDTO } from '~/engine/world/save-dto'
 import { SaveDTOSchema } from '~/shared/schemas/save-dto'
@@ -51,7 +50,7 @@ describe('SaveDTO M8.2 V3 fields', () => {
     )
   })
 
-  it('loads V2 fixtures without V3 fields by applying defaults', () => {
+  it('rejects V2 fixtures with incompatible_version (no migration since M11)', () => {
     const dto = worldToSaveDTO({
       ...createM1World(),
       difficulty: 'hegemon',
@@ -68,12 +67,10 @@ describe('SaveDTO M8.2 V3 fields', () => {
       world: { ...v2World, rulers: v2Rulers },
     } as unknown as SaveDTO
 
-    const restored = restore(v2Dto)
-
-    expect(restored.difficulty).toBe('hero')
-    expect(restored.diplomaticMemory.size).toBe(0)
-    for (const ruler of restored.rulers.values()) {
-      expect(ruler.personalityDims).toEqual(M5_PERSONALITY_DIMS_BASELINE[ruler.personality])
+    const result = saveDtoToWorld(v2Dto)
+    expect(result.ok).toBe(false)
+    if (!result.ok) {
+      expect(result.error.kind).toBe('incompatible_version')
     }
   })
 })
