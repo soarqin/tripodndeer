@@ -658,3 +658,4 @@ M4 (✅) ──► M5 (✅) ──► M4.1 (✅) ──► M4.2 (✅) ──► 
 | 补记于 2026-05-11 | M10.2 渐进提示（HintModal + hint-slice + use-hint-coordinator + use-modal-with-hint + 10 HintEntry + SaveDTO v4 + `save-v3-to-v4.ts` migration） | Sisyphus |
 | 2026-05-11 | 文档同步：AGENTS.md 顶部 metadata / Critical Invariants / M10 系列 Subsystems Quick Reference / Deferred Items 三段 / roadmap stale tag 回填（docs-sync-m10-backfill plan） | Sisyphus |
 | 2026-05-11 | M10.3 引导剧本（秦灭巴蜀 10 邑 + 5 步教学 + ObjectivePanel + TutorialCompleteModal + SaveDTO v5 + 30 分钟软超时） | Sisyphus |
+| 2026-05-17 | M10 final cleanup：README.md 同步 M0-M10.3；M8 之前的 monolithic AI dispatcher 函数（每 3 tick 跑 diplomacy + espionage + tactical 的兼容包装）彻底下线，源码与导出全部移除；AI 测试迁移至三层 pipeline (strategic / operational / tactical) API；docs/design/07-ai.md §2.0 公开 API 表述更新为三层 API + planEspionageAction；AGENTS.md AI Subsystems Quick Reference + What NOT to Do 双点同步；AGENTS.md 测试数字与 runtime 校准（含 runtime 退化 caveat）；为 M11 存档系统设计提供干净基线 | Sisyphus |

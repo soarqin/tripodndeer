@@ -6,7 +6,7 @@
 
 ## 项目现状 (Current Status)
 
-目前项目已完成 **M0 至 M9** 所有里程碑的交付，并顺利完成了 **Wave 9: Refactor & Cleanup** 大规模重构工作。
+目前项目已完成 **M0 至 M10.3** 所有里程碑的交付，并顺利完成了 **Wave 9: Refactor & Cleanup** 大规模重构工作。
 
 - **M0-M1**: 核心循环与地图基础
 - **M2**: 军事系统 (Combat v2, 攻城, 关隘)
@@ -17,6 +17,10 @@
 - **M7**: 谍报系统 (情报覆盖、间者行动)
 - **M8**: AI 决策模型 (8 种性格原型, 三层决策架构)
 - **M9**: 完整剧本支持 (250 站点, 历史人物名册, i18n 核心)
+- **M10**: UI 完整（剧本选择、存档系统 MVP、Province/Region/Character 浏览器、Toast/EventLog）
+- **M10.1**: 史书百科（CodexPanel + 25+ 手写条目 + 90+ 派生人物条目）
+- **M10.2**: 渐进提示系统（10 条 HintEntry + use-hint-coordinator）
+- **M10.3**: 引导剧本（10 邑教程场景 + tutorialPhase + ObjectivePanel）
 - **Refactor-Cleanup**: 架构纯化、代码瘦身、模块化重组完成
 
 ## 技术栈 (Tech Stack)
