@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { aiPlanStep } from '~/engine/systems/ai'
+import { aiOperationalStep } from '~/engine/systems/ai/operational'
 import { applyEventEffect } from '~/engine/systems/events/event-chain-engine'
 import { realmDeactivationPhase } from '~/engine/wars/realm-deactivation'
 import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
@@ -157,7 +157,7 @@ describe('realmDeactivationPhase', () => {
       rngState: { seed: 123, counter: 0 },
     })
 
-    const result = aiPlanStep(world, world.rngState)
+    const result = aiOperationalStep(world, world.rngState)
 
     expect(result.nextRng).toEqual(world.rngState)
     expect(result.events).toEqual([])

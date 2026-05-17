@@ -310,7 +310,7 @@ export function getDefaultPhases(): readonly TickPhase[] {
     aiStrategicStep,
     aiOperationalStep,
     aiTacticalStep,
-    // aiPlanStep removed — replaced by 3-layer AI pipeline above
+    // Legacy monolithic AI dispatcher removed — replaced by 3-layer pipeline above
     orderApplyStep,
     marchStep,
     siegeStep,

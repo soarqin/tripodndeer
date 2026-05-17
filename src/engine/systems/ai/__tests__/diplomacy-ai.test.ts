@@ -13,7 +13,7 @@ import { createInitialRng } from '~/engine/random'
 import { diplomacyLifecycleStep, relationKey } from '~/engine/systems/diplomacy'
 import { warKey } from '~/engine/wars'
 import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
-import { aiPlanStep } from '../index'
+import { aiOperationalStep } from '../operational'
 
 const DATE = { yearBC: 300, season: 'spring', month: 1, xun: 'shang' } as const
 
@@ -154,8 +154,8 @@ describe('deterministic AI diplomacy planner', () => {
       coalitions: new Map([[`coalition_against_${qin}`, antiQinCoalition()]]),
     })
 
-    const first = aiPlanStep(world, createInitialRng(7))
-    const second = aiPlanStep(world, createInitialRng(7))
+    const first = aiOperationalStep(world, createInitialRng(7))
+    const second = aiOperationalStep(world, createInitialRng(7))
 
     expect(serializeDiplomacy(second.world)).toBe(serializeDiplomacy(first.world))
     expect(first.world.diplomaticProposals.size).toBeGreaterThanOrEqual(1)
@@ -166,7 +166,7 @@ describe('deterministic AI diplomacy planner', () => {
     const friendlyHanWei = makeRelation(han, wei, 100, 100)
     const friendlyHanZhao = makeRelation(han, zhao, 100, 100)
     const friendlyWeiZhao = makeRelation(wei, zhao, 100, 100)
-    const result = aiPlanStep(baseWorld({
+    const result = aiOperationalStep(baseWorld({
       relations: new Map([
         [friendlyHanWei.key, friendlyHanWei],
         [friendlyHanZhao.key, friendlyHanZhao],
@@ -185,7 +185,7 @@ describe('deterministic AI diplomacy planner', () => {
 
   it('uses diplomacy lifecycle scoring to accept AI-created proposals', () => {
     const relation = makeRelation(han, wei, 90, 95)
-    const planned = aiPlanStep(baseWorld({ relations: new Map([[relation.key, relation]]) }), createInitialRng(9))
+    const planned = aiOperationalStep(baseWorld({ relations: new Map([[relation.key, relation]]) }), createInitialRng(9))
     const resolved = diplomacyLifecycleStep(planned.world, planned.nextRng)
 
     expect(planned.world.diplomaticProposals.size).toBe(1)
@@ -195,7 +195,7 @@ describe('deterministic AI diplomacy planner', () => {
 
   it('creates a peace proposal for an AI realm at war through diplomacy validation', () => {
     const relation = makeRelation(han, wei, 90, 95)
-    const result = aiPlanStep(baseWorld({
+    const result = aiOperationalStep(baseWorld({
       realms: new Map([
         [qin, makeRealm(qin, 200_000)],
         [han, makeRealm(han)],
@@ -218,7 +218,7 @@ describe('deterministic AI diplomacy planner', () => {
   it('respects active truces before coalition or hostile-relation war declarations', () => {
     const hostile = makeRelation(han, qin, -90, 5)
     const truce = makeTreaty('truce', han, qin, 30)
-    const result = aiPlanStep(baseWorld({
+    const result = aiOperationalStep(baseWorld({
       relations: new Map([[hostile.key, hostile]]),
       treaties: new Map([[truce.id, truce]]),
       coalitions: new Map([[`coalition_against_${qin}`, antiQinCoalition([han, wei])]]),
@@ -232,7 +232,7 @@ describe('deterministic AI diplomacy planner', () => {
     const relation = makeRelation(han, wei, 100, 100)
     const existingProposal = makeProposal('non_aggression', wei, han)
     const treaty = makeTreaty('non_aggression', han, wei)
-    const result = aiPlanStep(baseWorld({
+    const result = aiOperationalStep(baseWorld({
       realms: new Map([
         [qin, makeRealm(qin, 200_000)],
         [han, makeRealm(han)],

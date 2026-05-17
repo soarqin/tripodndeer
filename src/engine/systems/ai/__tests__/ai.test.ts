@@ -1,18 +1,29 @@
 // M8.1 three-layer AI model: Strategic (yearly) / Operational (monthly) / Tactical (per-tick)
-// aiPlanStep is @deprecated; tests below preserve its monolithic-monthly behavior for
-// backward compatibility. New per-layer cadence assertions live in the
-// 'three-layer cadence (M8.1)' describe block and target aiStrategicStep,
-// aiOperationalStep, and aiTacticalStep directly.
+// Tests target aiStrategicStep / aiOperationalStep / aiTacticalStep directly.
 import { describe, expect, it } from 'vitest'
 import type { Army, GameEvent, MapEdge, Realm, RNGState, Site, WarState, World } from '~/shared/types'
+import type { OperationalDirective } from '~/shared/types/ai-state'
 import { createInitialRng } from '~/engine/random'
 import { warKey } from '~/engine/wars'
 import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
 import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
-import { aiPlanStep } from '../index'
 import { aiStrategicStep } from '../strategic'
 import { aiOperationalStep } from '../operational'
 import { aiTacticalStep } from '../tactical-step'
+
+function runThreeLayer(
+  world: World,
+  rng: RNGState
+): { world: World; nextRng: RNGState; events: readonly GameEvent[] } {
+  const s = aiStrategicStep(world, rng)
+  const o = aiOperationalStep(s.world, s.nextRng)
+  const t = aiTacticalStep(o.world, o.nextRng)
+  return {
+    world: t.world,
+    nextRng: t.nextRng,
+    events: [...s.events, ...o.events, ...t.events],
+  }
+}
 
 function makeWarState(): WarState {
   return {
@@ -66,15 +77,6 @@ function makeArmy(id: string, realmId: string, location: string, state: Army['st
     ticksRemaining: 0,
     source: null,
   }
-}
-
-function eventOrderKey(event: GameEvent): string {
-  if (event.type === 'diplomacyEvent') {
-    const payload = event.payload as { kind: string; relationKey?: string; coalitionId?: string }
-    return `${event.type}:${payload.kind}:${payload.relationKey ?? payload.coalitionId ?? ''}`
-  }
-  const payload = event.payload as { byRealm?: string; againstRealm?: string; realmId?: string; targetSiteId?: string }
-  return `${event.type}:${payload.byRealm ?? payload.realmId ?? ''}->${payload.againstRealm ?? payload.targetSiteId ?? ''}`
 }
 
 function baseWorld(overrides: Partial<World> = {}): World {
@@ -171,66 +173,48 @@ describe('three-layer cadence (M8.1)', () => {
   })
 })
 
-describe('aiPlanStep cadence and realm eligibility (deprecated, M8 monolith)', () => {
-  it('does nothing off monthly ticks', () => {
-    const world = baseWorld({ tick: 1 })
-    const rng = createInitialRng(1)
-
-    const result = aiPlanStep(world, rng)
-
-    expect(result).toEqual({ world, nextRng: rng, events: [] })
-  })
-
-  it('may act on monthly ticks', () => {
-    const result = aiPlanStep(baseWorld(), createInitialRng(1))
-
-    expect(result.events.map(event => event.type)).toContain('aiDispatchedArmy')
-  })
-})
-
-describe('aiPlanStep skip conditions', () => {
-  it('skips the player realm', () => {
+describe('3-layer AI skip conditions', () => {
+  it('aiOperationalStep skips the player realm', () => {
     const world = baseWorld({
       playerRealmId: aiRealmId,
       realms: new Map([[aiRealmId, makeRealm(aiRealmId, 'site_ai')]]),
     })
     const rng = createInitialRng(1)
 
-    const result = aiPlanStep(world, rng)
+    const result = aiOperationalStep(world, rng)
 
     expect(result.events).toEqual([])
     expect(result.nextRng).toEqual(rng)
     expect(result.world.armies.get('army_ai')).toEqual(world.armies.get('army_ai'))
   })
 
-  it('skips a realm with zero idle armies', () => {
+  it('aiOperationalStep produces no events when the only AI realm has no plan or peers', () => {
     const world = baseWorld({
       armies: new Map([['army_ai', makeArmy('army_ai', aiRealmId, 'site_ai', 'marching')]]),
       realms: new Map([[aiRealmId, makeRealm(aiRealmId, 'site_ai')]]),
     })
 
-    const result = aiPlanStep(world, createInitialRng(1))
+    const result = aiOperationalStep(world, createInitialRng(1))
 
     expect(result.events).toEqual([])
-    expect(result.nextRng.counter).toBe(0)
   })
 
-  it('skips a realm with no adjacent enemy sites', () => {
+  it('aiOperationalStep produces no events when no adjacent enemy sites exist', () => {
     const sites = new Map(baseWorld().sites)
     sites.set('site_ai', makeSite('site_ai', aiRealmId, ['site_friend'], ['edge_ai_enemy']))
     sites.set('site_friend', makeSite('site_friend', aiRealmId, ['site_ai'], ['edge_ai_enemy']))
 
-    const result = aiPlanStep(baseWorld({ sites }), createInitialRng(1))
+    const result = aiOperationalStep(baseWorld({ sites }), createInitialRng(1))
 
     expect(result.events).toEqual([])
   })
 
-  it('is deterministic for the same seed and same world', () => {
+  it('aiOperationalStep is deterministic for the same seed and same world', () => {
     const world = baseWorld()
     const rng = createInitialRng(1)
 
-    const first = aiPlanStep(world, rng)
-    const second = aiPlanStep(world, rng)
+    const first = aiOperationalStep(world, rng)
+    const second = aiOperationalStep(world, rng)
 
     expect(second).toEqual(first)
   })
@@ -242,9 +226,9 @@ describe('AI determinism', () => {
     const world = createWorldFromM1Data(data, 42, 'realm_qin')
     const rng: RNGState = { seed: 42, counter: 0 }
 
-    const result1 = aiPlanStep(world, rng)
-    const result2 = aiPlanStep(world, rng)
-    const result3 = aiPlanStep(world, rng)
+    const result1 = runThreeLayer(world, rng)
+    const result2 = runThreeLayer(world, rng)
+    const result3 = runThreeLayer(world, rng)
 
     const armies1 = [...result1.world.armies.values()].map(army => `${army.state}:${army.destination ?? ''}`)
     const armies2 = [...result2.world.armies.values()].map(army => `${army.state}:${army.destination ?? ''}`)
@@ -255,139 +239,10 @@ describe('AI determinism', () => {
     expect(result1.nextRng).toEqual(result2.nextRng)
     expect(result1.nextRng).toEqual(result3.nextRng)
   })
-
-  it('locks fixed-seed M1 action and diplomacy event ordering', () => {
-    // M8.1 baseline as of 2026-05; differs from M8 due to three-layer RNG distribution
-    // (M8 personality-aware scoring + tactical refactor cumulatively shifted the
-    // option ordering; aiPlanStep behavior is preserved for back-compat but the
-    // upstream pickAction/scoring helpers consume RNG slightly differently now)
-    const world = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
-    const result = aiPlanStep(world, { seed: 42, counter: 0 })
-
-    expect(result.nextRng).toEqual({ seed: 42, counter: 7 })
-    expect(result.events.map(eventOrderKey)).toEqual([
-      'aiDeclaredWar:realm_chu->realm_qi',
-      'aiDispatchedArmy:realm_chu->site_041',
-      'diplomacyEvent:war_declared:realm_chu__realm_qi',
-      'diplomacyEvent:relation_changed:realm_chu__realm_han',
-      'diplomacyEvent:relation_changed:realm_han__realm_qi',
-      'diplomacyEvent:relation_changed:realm_chu__realm_qin',
-      'diplomacyEvent:relation_changed:realm_qi__realm_qin',
-      'diplomacyEvent:relation_changed:realm_chu__realm_wei',
-      'diplomacyEvent:relation_changed:realm_qi__realm_wei',
-      'diplomacyEvent:relation_changed:realm_chu__realm_yan',
-      'diplomacyEvent:relation_changed:realm_qi__realm_yan',
-      'diplomacyEvent:relation_changed:realm_chu__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_qi__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_chu__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_qi__realm_zhou',
-      'diplomacyEvent:coalition_changed:coalition_against_realm_chu',
-      'diplomacyEvent:coalition_changed:coalition_against_realm_qin',
-      'diplomacyEvent:proposal_created:realm_han__realm_zhou',
-      'aiDeclaredWar:realm_han->realm_zhou',
-      'aiDispatchedArmy:realm_han->site_012',
-      'diplomacyEvent:war_declared:realm_han__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_chu__realm_han',
-      'diplomacyEvent:relation_changed:realm_chu__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_han__realm_qi',
-      'diplomacyEvent:relation_changed:realm_qi__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_han__realm_qin',
-      'diplomacyEvent:relation_changed:realm_qin__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_han__realm_wei',
-      'diplomacyEvent:relation_changed:realm_wei__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_han__realm_yan',
-      'diplomacyEvent:relation_changed:realm_yan__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_han__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_zhao__realm_zhou',
-      'diplomacyEvent:coalition_changed:coalition_against_realm_chu',
-      'diplomacyEvent:coalition_changed:coalition_against_realm_qin',
-      'diplomacyEvent:proposal_created:realm_han__realm_qi',
-      'aiDeclaredWar:realm_qi->realm_wei',
-      'aiDispatchedArmy:realm_qi->site_018',
-      'diplomacyEvent:war_declared:realm_qi__realm_wei',
-      'diplomacyEvent:relation_changed:realm_chu__realm_qi',
-      'diplomacyEvent:relation_changed:realm_chu__realm_wei',
-      'diplomacyEvent:relation_changed:realm_han__realm_qi',
-      'diplomacyEvent:relation_changed:realm_han__realm_wei',
-      'diplomacyEvent:relation_changed:realm_qi__realm_qin',
-      'diplomacyEvent:relation_changed:realm_qin__realm_wei',
-      'diplomacyEvent:relation_changed:realm_qi__realm_yan',
-      'diplomacyEvent:relation_changed:realm_wei__realm_yan',
-      'diplomacyEvent:relation_changed:realm_qi__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_wei__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_qi__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_wei__realm_zhou',
-      'diplomacyEvent:proposal_created:realm_wei__realm_zhou',
-      'aiDeclaredWar:realm_wei->realm_zhao',
-      'aiDispatchedArmy:realm_wei->site_021',
-      'diplomacyEvent:war_declared:realm_wei__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_chu__realm_wei',
-      'diplomacyEvent:relation_changed:realm_chu__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_han__realm_wei',
-      'diplomacyEvent:relation_changed:realm_han__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_qi__realm_wei',
-      'diplomacyEvent:relation_changed:realm_qi__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_qin__realm_wei',
-      'diplomacyEvent:relation_changed:realm_qin__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_wei__realm_yan',
-      'diplomacyEvent:relation_changed:realm_yan__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_wei__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_zhao__realm_zhou',
-      'diplomacyEvent:proposal_created:realm_qi__realm_yan',
-      'aiDeclaredWar:realm_yan->realm_qi',
-      'aiDispatchedArmy:realm_yan->site_045',
-      'diplomacyEvent:war_declared:realm_qi__realm_yan',
-      'diplomacyEvent:relation_changed:realm_chu__realm_yan',
-      'diplomacyEvent:relation_changed:realm_chu__realm_qi',
-      'diplomacyEvent:relation_changed:realm_han__realm_yan',
-      'diplomacyEvent:relation_changed:realm_han__realm_qi',
-      'diplomacyEvent:relation_changed:realm_qin__realm_yan',
-      'diplomacyEvent:relation_changed:realm_qi__realm_qin',
-      'diplomacyEvent:relation_changed:realm_wei__realm_yan',
-      'diplomacyEvent:relation_changed:realm_qi__realm_wei',
-      'diplomacyEvent:relation_changed:realm_yan__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_qi__realm_zhao',
-      'diplomacyEvent:relation_changed:realm_yan__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_qi__realm_zhou',
-      'diplomacyEvent:proposal_created:realm_qi__realm_zhao',
-      'aiDispatchedArmy:realm_zhao->site_018',
-      'diplomacyEvent:proposal_created:realm_qi__realm_zhou',
-      'aiDeclaredWar:realm_zhou->realm_chu',
-      'aiDispatchedArmy:realm_zhou->site_009',
-      'diplomacyEvent:war_declared:realm_chu__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_han__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_chu__realm_han',
-      'diplomacyEvent:relation_changed:realm_qi__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_chu__realm_qi',
-      'diplomacyEvent:relation_changed:realm_qin__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_chu__realm_qin',
-      'diplomacyEvent:relation_changed:realm_wei__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_chu__realm_wei',
-      'diplomacyEvent:relation_changed:realm_yan__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_chu__realm_yan',
-      'diplomacyEvent:relation_changed:realm_zhao__realm_zhou',
-      'diplomacyEvent:relation_changed:realm_chu__realm_zhao',
-    ])
-    expect([...result.world.armies.values()].filter(army => army.state !== 'idle').map(army => ({
-      id: army.id,
-      state: army.state,
-      destination: army.destination,
-      ticksRemaining: army.ticksRemaining,
-      source: army.source,
-    }))).toEqual([
-      { id: 'army_chu_1', state: 'marching', destination: 'site_041', ticksRemaining: 1, source: 'site_002' },
-      { id: 'army_qi_1', state: 'marching', destination: 'site_018', ticksRemaining: 1, source: 'site_005' },
-      { id: 'army_yan_2', state: 'marching', destination: 'site_045', ticksRemaining: 1, source: 'site_013' },
-      { id: 'army_han_2', state: 'marching', destination: 'site_012', ticksRemaining: 1, source: 'site_031' },
-      { id: 'army_zhao_1', state: 'marching', destination: 'site_018', ticksRemaining: 1, source: 'site_014' },
-      { id: 'army_wei_2', state: 'marching', destination: 'site_021', ticksRemaining: 1, source: 'site_010' },
-      { id: 'army_zhou_2', state: 'marching', destination: 'site_009', ticksRemaining: 1, source: 'site_012' },
-    ])
-  })
 })
 
-describe('aiPlanStep personality resolution', () => {
-  it('uses the configured realm personality when choosing actions', () => {
+describe('3-layer AI personality resolution', () => {
+  it('aiTacticalStep applies retreat for steward and dispatch+war for conqueror', () => {
     const baseRulerDims = {
       expansionDrive: 0.5,
       diplomaticTrust: 0.5,
@@ -411,7 +266,18 @@ describe('aiPlanStep personality resolution', () => {
     }
     const conquerorRuler = { ...stewardRuler, personality: 'conqueror' as const }
 
-    const world = baseWorld({
+    const dispatchDirective: OperationalDirective = {
+      id: 'dispatch_1',
+      kind: 'dispatch_army',
+      priority: 10,
+      armyId: 'army_ai',
+      targetRealmId: enemyRealmId,
+      targetSiteId: 'site_enemy',
+      createdAtTick: 0,
+      expiresAtTick: 100,
+    }
+
+    const cautiousWorld = baseWorld({
       sites: new Map([
         ['site_player', makeSite('site_player', playerRealmId, [], [])],
         ['site_ai', makeSite('site_ai', aiRealmId, ['site_enemy', 'site_friend'], ['edge_ai_enemy'])],
@@ -423,15 +289,11 @@ describe('aiPlanStep personality resolution', () => {
         ['army_ai', { ...makeArmy('army_ai', aiRealmId, 'site_ai'), manpower: 45 }],
         ['army_enemy', { ...makeArmy('army_enemy', enemyRealmId, 'site_ai'), manpower: 70 }],
       ]),
-      realms: new Map([
-        [playerRealmId, makeRealm(playerRealmId, 'site_player')],
-        [aiRealmId, { ...makeRealm(aiRealmId, 'site_ai'),}],
-        [enemyRealmId, makeRealm(enemyRealmId, 'site_enemy')],
-      ]),
       rulers: new Map([[aiRealmId, stewardRuler]]),
+      aiState: new Map([[aiRealmId, { strategic: null, operational: [dispatchDirective] }]]),
     })
 
-    const cautiousResult = aiPlanStep(world, createInitialRng(1))
+    const cautiousResult = aiTacticalStep(cautiousWorld, createInitialRng(1))
 
     expect(cautiousResult.events[0]).toEqual({
       type: 'aiRetreatedArmy',
@@ -439,18 +301,11 @@ describe('aiPlanStep personality resolution', () => {
     })
 
     const aggressiveWorld: World = {
-      ...world,
-      realms: new Map([
-        [playerRealmId, makeRealm(playerRealmId, 'site_player')],
-        [aiRealmId, { ...makeRealm(aiRealmId, 'site_ai'),}],
-        [enemyRealmId, makeRealm(enemyRealmId, 'site_enemy')],
-      ]),
+      ...cautiousWorld,
       rulers: new Map([[aiRealmId, conquerorRuler]]),
-      scenarioId: 'm1',
-      tutorialState: null,
     }
 
-    const aggressiveResult = aiPlanStep(aggressiveWorld, createInitialRng(1))
+    const aggressiveResult = aiTacticalStep(aggressiveWorld, createInitialRng(1))
 
     expect(aggressiveResult.events[0]).toEqual({
       type: 'aiDeclaredWar',
@@ -463,22 +318,36 @@ describe('aiPlanStep personality resolution', () => {
   })
 })
 
-describe('aiPlanStep target selection', () => {
-  it('only attacks adjacent sites, not long-range enemy sites', () => {
+describe('3-layer AI target selection', () => {
+  it('aiOperationalStep does not dispatch when no adjacent enemy site exists', () => {
     const sites = new Map(baseWorld().sites)
     sites.set('site_ai', makeSite('site_ai', aiRealmId, ['site_player'], ['edge_ai_enemy']))
     sites.set('site_player', makeSite('site_player', aiRealmId, ['site_ai', 'site_enemy'], ['edge_ai_enemy', 'edge_enemy_distant']))
 
-    const result = aiPlanStep(baseWorld({ sites }), createInitialRng(1))
+    const result = aiOperationalStep(baseWorld({ sites }), createInitialRng(1))
 
     expect(result.events).toEqual([])
     expect(result.world.armies.get('army_ai')?.destination).toBeNull()
   })
 })
 
-describe('aiPlanStep war and dispatch effects', () => {
-  it('declares war on the first attack against an owned target realm', () => {
-    const result = aiPlanStep(baseWorld(), createInitialRng(1))
+describe('3-layer AI war and dispatch effects', () => {
+  it('aiTacticalStep declares war on the first attack against an owned target realm', () => {
+    const dispatchDirective: OperationalDirective = {
+      id: 'dispatch_1',
+      kind: 'dispatch_army',
+      priority: 10,
+      armyId: 'army_ai',
+      targetRealmId: enemyRealmId,
+      targetSiteId: 'site_enemy',
+      createdAtTick: 0,
+      expiresAtTick: 100,
+    }
+    const world = baseWorld({
+      aiState: new Map([[aiRealmId, { strategic: null, operational: [dispatchDirective] }]]),
+    })
+
+    const result = aiTacticalStep(world, createInitialRng(1))
 
     expect(result.world.wars.has(warKey(aiRealmId, enemyRealmId))).toBe(true)
     expect(result.events[0]).toEqual({
@@ -487,31 +356,23 @@ describe('aiPlanStep war and dispatch effects', () => {
     })
   })
 
-  it('does not redeclare war when already at war', () => {
-    const world = baseWorld({ wars: new Map([[warKey(aiRealmId, enemyRealmId), makeWarState()]]) })
-
-    const result = aiPlanStep(world, createInitialRng(1))
-
-    expect(result.events.filter(event => event.type === 'aiDeclaredWar')).toEqual([])
-    expect(result.events.map(event => event.type)).toEqual(['aiDispatchedArmy'])
-  })
-
-  it('changes the dispatched army state to marching', () => {
-    const result = aiPlanStep(baseWorld(), createInitialRng(1))
-    const army = result.world.armies.get('army_ai')
-
-    expect(army).toMatchObject({
-      state: 'marching',
-      destination: 'site_enemy',
-      ticksRemaining: 5,
-      source: 'site_ai',
+  it('aiTacticalStep does not modify non-AI realm armies', () => {
+    const dispatchDirective: OperationalDirective = {
+      id: 'dispatch_1',
+      kind: 'dispatch_army',
+      priority: 10,
+      armyId: 'army_ai',
+      targetRealmId: enemyRealmId,
+      targetSiteId: 'site_enemy',
+      createdAtTick: 0,
+      expiresAtTick: 100,
+    }
+    const world = baseWorld({
+      wars: new Map([[warKey(aiRealmId, enemyRealmId), makeWarState()]]),
+      aiState: new Map([[aiRealmId, { strategic: null, operational: [dispatchDirective] }]]),
     })
-  })
 
-  it('does not modify non-AI realm armies', () => {
-    const world = baseWorld()
-
-    const result = aiPlanStep(world, createInitialRng(1))
+    const result = aiTacticalStep(world, createInitialRng(1))
 
     expect(result.world.armies.get('army_player')).toEqual(world.armies.get('army_player'))
     expect(result.world.armies.get('army_enemy')).toEqual(world.armies.get('army_enemy'))

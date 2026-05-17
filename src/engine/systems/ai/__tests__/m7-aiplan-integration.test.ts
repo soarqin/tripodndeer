@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { aiPlanStep } from '../ai'
+import { aiOperationalStep } from '../operational'
 import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type {
+  GameDate,
   General,
   GeneralId,
   PersonalityArchetype,
@@ -86,6 +87,7 @@ function buildWorld(opts: {
   targets?: readonly RealmId[]
   tick?: number
   playerRealmId?: RealmId
+  date?: GameDate
 }): World {
   const targets = opts.targets ?? [CHU, ZHAO]
   const realms = new Map<RealmId, Realm>()
@@ -108,16 +110,20 @@ function buildWorld(opts: {
     rulers.set(opts.spyRealmId, makeRuler(opts.spyRealmId, opts.personality))
   }
 
-  return makeEmptyWorld({
+  const overrides: Parameters<typeof makeEmptyWorld>[0] = {
     tick: opts.tick ?? 0,
     realms,
     generals,
     rulers,
     playerRealmId: opts.playerRealmId ?? 'realm_player_unused',
-  })
+  }
+  if (opts.date) {
+    overrides.date = opts.date
+  }
+  return makeEmptyWorld(overrides)
 }
 
-describe('aiPlanStep + planEspionageAction integration', () => {
+describe('aiOperationalStep + planEspionageAction integration', () => {
   it('§12.3.B — Schemer + low trust env produces a mission with kind=rumor', () => {
     const world = buildWorld({
       spyRealmId: QIN,
@@ -126,7 +132,7 @@ describe('aiPlanStep + planEspionageAction integration', () => {
       tick: 0,
     })
 
-    const result = aiPlanStep(world, { seed: 1, counter: 0 })
+    const result = aiOperationalStep(world, { seed: 1, counter: 0 })
 
     expect(result.world.spyMissions.size).toBeGreaterThan(0)
     const mission = [...result.world.spyMissions.values()].find(
@@ -144,7 +150,7 @@ describe('aiPlanStep + planEspionageAction integration', () => {
       tick: 0,
     })
 
-    const result = aiPlanStep(world, { seed: 1, counter: 0 })
+    const result = aiOperationalStep(world, { seed: 1, counter: 0 })
 
     const mission = [...result.world.spyMissions.values()].find(
       (m) => m.spyRealmId === QIN,
@@ -161,7 +167,7 @@ describe('aiPlanStep + planEspionageAction integration', () => {
       tick: 0,
     })
 
-    const result = aiPlanStep(world, { seed: 1, counter: 0 })
+    const result = aiOperationalStep(world, { seed: 1, counter: 0 })
     const qinMissions = [...result.world.spyMissions.values()].filter(
       (m) => m.spyRealmId === QIN,
     )
@@ -176,8 +182,8 @@ describe('aiPlanStep + planEspionageAction integration', () => {
       tick: 0,
     })
 
-    const r1 = aiPlanStep(world, { seed: 42, counter: 0 })
-    const r2 = aiPlanStep(world, { seed: 42, counter: 0 })
+    const r1 = aiOperationalStep(world, { seed: 42, counter: 0 })
+    const r2 = aiOperationalStep(world, { seed: 42, counter: 0 })
 
     const m1 = [...r1.world.spyMissions.values()][0]
     const m2 = [...r2.world.spyMissions.values()][0]
@@ -193,7 +199,7 @@ describe('aiPlanStep + planEspionageAction integration', () => {
       )
       return { ...actual, M7_ENABLED: false }
     })
-    const { aiPlanStep: gatedPlan } = await import('../ai')
+    const { aiOperationalStep: gatedPlan } = await import('../operational')
 
     const world = buildWorld({
       spyRealmId: QIN,
@@ -218,22 +224,23 @@ describe('aiPlanStep + planEspionageAction integration', () => {
       playerRealmId: QIN,
     })
 
-    const result = aiPlanStep(world, { seed: 1, counter: 0 })
+    const result = aiOperationalStep(world, { seed: 1, counter: 0 })
     const qinMissions = [...result.world.spyMissions.values()].filter(
       (m) => m.spyRealmId === QIN,
     )
     expect(qinMissions).toHaveLength(0)
   })
 
-  it('Skips espionage when AI tick is not divisible by 3 (planning cadence)', () => {
+  it('Skips espionage when xun is not shang (monthly cadence)', () => {
     const world = buildWorld({
       spyRealmId: QIN,
       withSpy: true,
       personality: 'schemer',
       tick: 1,
+      date: { yearBC: 260, season: 'spring', month: 1, xun: 'zhong' },
     })
 
-    const result = aiPlanStep(world, { seed: 1, counter: 0 })
+    const result = aiOperationalStep(world, { seed: 1, counter: 0 })
     expect(result.world.spyMissions.size).toBe(0)
   })
 })

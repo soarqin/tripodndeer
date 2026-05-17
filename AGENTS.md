@@ -327,7 +327,7 @@ const world: World = {
 | 兵源      | `src/engine/systems/manpower/manpower.ts`        | `manpowerTick`                     |
 | 议和      | `src/engine/systems/peace/proposal-lifecycle.ts` | `acceptProposal`, `rejectProposal` |
 | 战争      | `src/engine/wars/wars.ts`                        | `declareWarWithCasus`, `endWar`    |
-| AI        | `src/engine/systems/ai/ai.ts`                    | `aiPlanStep`, `planEspionageAction` |
+| AI        | `src/engine/systems/ai/ai.ts`                    | `aiStrategicStep`, `aiOperationalStep`, `aiTacticalStep`, `planEspionageAction` |
 | AI 战术   | `src/engine/systems/ai/tactics/`                 | siege / cut-supply / retreat       |
 
 ---
@@ -549,7 +549,7 @@ const world: World = {
 ❌ 不绕过 aiState bootstrap（首次 tick 由 Strategic 自动填充，不要在 load 时注入）
 ❌ 不让 personalityDrift 改变 archetype 字面值（drift 只改 dims，不改 personality 字段）
 ❌ 不调整 M8_2_MEMORY_DECAY_FACTOR_PER_XUN 或 M8_2_COVERAGE_TIER_* 数值（是设计契约）
-❌ 不直接调用 aiPlanStep（已废弃，改用三层 phase pipeline）
+❌ 不要重新引入 monolithic AI dispatcher——使用三层 pipeline（aiStrategicStep / aiOperationalStep / aiTacticalStep）
 ❌ 不绕过 hint coordinator 直接向 modalQueue 推送 hint（必须通过 use-hint-coordinator）
 ❌ 不回退 SaveDTO SAVE_DTO_VERSION（版本号只能递增，不能降回 v3）
 ❌ 不在 hint-slice actions 之外修改 seenHints / hintsEnabled（只通过 hint-slice dispatch）
