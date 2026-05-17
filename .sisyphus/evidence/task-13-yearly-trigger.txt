@@ -1,0 +1,4 @@
+pnpm test src/ui/store/__tests__/raf-driver-yearly-save.test.ts ✅
+pnpm typecheck ✅
+
+Verified yearly autosave trigger on yearBC change plus visibilitychange catch-up.
