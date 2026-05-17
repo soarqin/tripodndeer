@@ -1,6 +1,8 @@
 import { compressWorld, decompressWorld, isCompressed } from './compression'
 import { getDb, type SaveMetadata } from './db'
 import { SaveDTOSchema } from '~/shared/schemas/save-dto'
+import { M11_QUOTA_BLOCK_THRESHOLD_PCT, M11_QUOTA_CACHE_TTL_MS, M11_QUOTA_PRIVATE_FALLBACK_MB, M11_QUOTA_WARN_THRESHOLD_PCT } from '~/content/m2/balance/m11'
+import { ModalPriority, useGameStore } from '../game-store'
 import { SAVE_DTO_VERSION, type Result, type SaveDTO, type SaveLoadError } from '~/shared/types/save-dto'
 
 export const SLOT_IDS = ['slot1', 'slot2', 'slot3', 'slot4', 'slot5', 'auto'] as const
@@ -29,6 +31,19 @@ interface StoredSaveRecord {
   metadata: SaveMetadata
 }
 
+interface QuotaSnapshot {
+  usage: number
+  quota: number
+  timestamp: number
+  estimateFn: StorageManager['estimate']
+}
+
+let quotaCache: QuotaSnapshot | null = null
+
+export function resetQuotaCacheForTesting(): void {
+  quotaCache = null
+}
+
 function readSchemaVersion(value: unknown): number | null {
   if (typeof value !== 'object' || value === null || !('schemaVersion' in value)) return null
   const schemaVersion = (value as { schemaVersion: unknown }).schemaVersion
@@ -41,8 +56,57 @@ function readStoredWorld(value: unknown): string | null {
   return typeof world === 'string' ? world : null
 }
 
-export async function saveSlot(slotId: SlotId, dto: SaveDTO, metadata: SaveMetadata): Promise<void> {
+async function checkQuota(): Promise<{ usage: number; quota: number } | null> {
+  const storage = globalThis.navigator?.storage
+  if (!storage?.estimate) return null
+
+  const now = Date.now()
+  if (quotaCache && quotaCache.estimateFn === storage.estimate && now - quotaCache.timestamp < M11_QUOTA_CACHE_TTL_MS) {
+    return { usage: quotaCache.usage, quota: quotaCache.quota }
+  }
+
+  try {
+    const estimate = await storage.estimate()
+    const usage = estimate.usage ?? 0
+    const quota = estimate.quota ?? M11_QUOTA_PRIVATE_FALLBACK_MB * 1024 * 1024
+    quotaCache = { usage, quota, timestamp: now, estimateFn: storage.estimate }
+    return { usage, quota }
+  } catch {
+    return null
+  }
+}
+
+function warnQuotaNearLimit(): void {
+  useGameStore.getState().enqueueToast('存储空间不足，请删除旧存档', 5000)
+}
+
+function showQuotaExceededModal(): void {
+  useGameStore.getState().openModal({
+    title: '存储空间已满',
+    content: '存储空间已满，无法保存。请删除旧存档后重试。',
+    actions: [{ id: 'ok', label: '知道了', onClick: () => useGameStore.getState().closeModal(), primary: true }],
+    dismissable: true,
+    priority: ModalPriority.GENERIC,
+    testId: 'quota-exceeded-modal',
+  })
+}
+
+export async function saveSlot(slotId: SlotId, dto: SaveDTO, metadata: SaveMetadata): Promise<Result<void, SaveLoadError>> {
   SaveDTOSchema.parse(dto)
+
+  const quotaInfo = await checkQuota()
+  if (quotaInfo) {
+    const pct = (quotaInfo.usage / quotaInfo.quota) * 100
+    if (pct >= M11_QUOTA_BLOCK_THRESHOLD_PCT) {
+      if (slotId !== 'auto') {
+        showQuotaExceededModal()
+      }
+      return { ok: false, error: { kind: 'quota_exceeded', message: '存储空间已满，无法保存' } }
+    }
+    if (pct >= M11_QUOTA_WARN_THRESHOLD_PCT) {
+      warnQuotaNearLimit()
+    }
+  }
 
   const worldStr = JSON.stringify(dto.world)
   const compressedWorld = compressWorld(worldStr)
@@ -60,7 +124,19 @@ export async function saveSlot(slotId: SlotId, dto: SaveDTO, metadata: SaveMetad
   const record: StoredSaveRecord = { slotId, dto: stored, metadata }
 
   const db = await getDb()
-  await db.put('saves', record)
+  try {
+    await db.put('saves', record)
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'QuotaExceededError') {
+      if (slotId !== 'auto') {
+        showQuotaExceededModal()
+      }
+      return { ok: false, error: { kind: 'quota_exceeded', message: '存储空间已满' } }
+    }
+    throw err
+  }
+
+  return { ok: true, value: undefined }
 }
 
 export async function loadSlot(slotId: SlotId): Promise<Result<SaveSlot, SaveLoadError>> {

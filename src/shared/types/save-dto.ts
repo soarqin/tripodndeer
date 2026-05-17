@@ -45,14 +45,30 @@ import type {
 
 export const SAVE_DTO_VERSION = 6 as const
 
-export type SaveLoadErrorKind = 'incompatible_version' | 'parse_error' | 'missing_data'
+export type SaveLoadError =
+  | { readonly kind: 'missing_data'; readonly message: string }
+  | {
+      readonly kind: 'incompatible_version'
+      readonly message: string
+      readonly got: number
+      readonly expected: number
+    }
+  | {
+      readonly kind: 'newer_version'
+      readonly message: string
+      readonly got: number
+      readonly expected: number
+    }
+  | { readonly kind: 'parse_error'; readonly message: string }
+  | {
+      readonly kind: 'corrupted'
+      readonly message: string
+      readonly originalSlotId: string
+      readonly quarantineSlotId: string
+    }
+  | { readonly kind: 'quota_exceeded'; readonly message: string }
 
-export interface SaveLoadError {
-  readonly kind: SaveLoadErrorKind
-  readonly message: string
-  readonly got?: number
-  readonly expected?: number
-}
+export type SaveLoadErrorKind = SaveLoadError['kind']
 
 export type Result<T, E> =
   | { readonly ok: true; readonly value: T }
