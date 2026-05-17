@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isVictorious, victoryCheckStep } from '../victory'
+import { isVictorious, isDefeated, victoryCheckStep } from '../victory'
 import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { RNGState, Site, World } from '~/shared/types'
 
@@ -55,6 +55,23 @@ describe('isVictorious', () => {
   })
 })
 
+describe('isDefeated', () => {
+  it('returns true when player owns no sites', () => {
+    const world = makeWorld({ site_1: 'realm_han', site_2: 'realm_zhao' }, 'realm_qin')
+    expect(isDefeated(world)).toBe(true)
+  })
+
+  it('returns false when player owns at least one site', () => {
+    const world = makeWorld({ site_1: 'realm_qin', site_2: 'realm_han' }, 'realm_qin')
+    expect(isDefeated(world)).toBe(false)
+  })
+
+  it('returns false when there are no sites', () => {
+    const world = makeWorld({}, 'realm_qin')
+    expect(isDefeated(world)).toBe(false)
+  })
+})
+
 describe('victoryCheckStep', () => {
   it('emits victoryAchieved when player owns all sites', () => {
     const world = makeWorld({ site_1: 'realm_qin' }, 'realm_qin')
@@ -65,7 +82,16 @@ describe('victoryCheckStep', () => {
     expect(events[0]?.payload).toEqual({ realmId: 'realm_qin' })
   })
 
-  it('emits no events when player does not own all sites', () => {
+  it('emits playerDefeated when player owns no sites', () => {
+    const world = makeWorld({ site_1: 'realm_han' }, 'realm_qin')
+    const { events } = victoryCheckStep(world, rng)
+
+    expect(events).toHaveLength(1)
+    expect(events[0]?.type).toBe('playerDefeated')
+    expect(events[0]?.payload).toEqual({ realmId: 'realm_qin' })
+  })
+
+  it('emits no events when player does not own all sites but owns at least one', () => {
     const world = makeWorld({ site_1: 'realm_qin', site_2: 'realm_han' }, 'realm_qin')
     const { events } = victoryCheckStep(world, rng)
 

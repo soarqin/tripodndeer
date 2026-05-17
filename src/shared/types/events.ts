@@ -117,6 +117,13 @@ export interface GameEvent {
   payload: unknown
 }
 
+export interface PlayerDefeatedEvent {
+  readonly type: 'playerDefeated'
+  readonly payload: {
+    readonly realmId: RealmId
+  }
+}
+
 export interface BattleResolvedEvent {
   readonly type: 'battleResolved'
   readonly payload: {
