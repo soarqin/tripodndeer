@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { worldToSaveDTO } from '~/engine/world/save-dto'
+import { generateSummary } from '~/engine/world/save-summary'
 import { writeAutoRingBuffer } from '~/ui/store/persistence/auto-ring-buffer'
 import { useGameStore } from '~/ui/store/game-store'
 
@@ -22,6 +23,7 @@ export function usePageHideSave(): void {
         tick: state.world.tick,
         scenarioId: state.world.scenarioId,
         playerRealmName: playerRealm?.displayName ?? '未知势力',
+        summary: generateSummary(state.world, state.world.scenarioId),
       }).catch(() => {})
     }
 

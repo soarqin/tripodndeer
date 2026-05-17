@@ -5,6 +5,7 @@ import { getSeverity } from './notification-severity-map'
 import { useGameStore } from './game-store'
 import { M10_AUTOSAVE_INTERVAL } from '@/content/m2/balance'
 import { worldToSaveDTO } from '@/engine/world/save-dto'
+import { generateSummary } from '@/engine/world/save-summary'
 import { writeAutoRingBuffer } from './persistence/auto-ring-buffer'
 
 /**
@@ -35,6 +36,7 @@ export function useRafDriver(): void {
         tick: world.tick,
         scenarioId,
         playerRealmName: playerRealm ? playerRealm.displayName : '未知势力',
+        summary: generateSummary(world, scenarioId),
       }
       writeAutoRingBuffer(dto, metadata).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err)
