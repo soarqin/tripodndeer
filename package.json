@@ -11,7 +11,7 @@
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:perf": "vitest run --config vitest.perf.config.ts src/__tests__/perf.test.ts src/__tests__/m4_1-perf.test.ts src/__tests__/m42-perf.test.ts src/__tests__/m5-perf.test.ts src/__tests__/m6-perf.test.ts src/__tests__/m7-perf.test.ts src/__tests__/m8-perf-determinism.test.ts src/__tests__/m8_1-perf.test.ts src/__tests__/m9-perf-checkpoint.test.ts src/engine/systems/ai/__tests__/baseline-capture.test.ts",
+    "test:perf": "vitest run --config vitest.perf.config.ts src/__tests__/perf.test.ts src/__tests__/m4_1-perf.test.ts src/__tests__/m42-perf.test.ts src/__tests__/m5-perf.test.ts src/__tests__/m6-perf.test.ts src/__tests__/m7-perf.test.ts src/__tests__/m8-perf-determinism.test.ts src/__tests__/m8_1-perf.test.ts src/__tests__/m9-perf-checkpoint.test.ts src/engine/systems/ai/__tests__/baseline-capture.test.ts src/engine/world/__tests__/save-dto-compression-perf.test.ts",
     "test:behavior": "vitest run --config vitest.behavior.config.ts",
     "test:ui": "vitest --ui",
     "test:all": "pnpm typecheck && pnpm lint && pnpm test",
@@ -24,6 +24,7 @@
   "dependencies": {
     "idb": "^8.0.3",
     "immer": "^10",
+    "lz-string": "^1.5.0",
     "react": "^18.3",
     "react-dom": "^18.3",
     "zod": "^3.23",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@testing-library/react": "^15",
     "@types/d3-delaunay": "^6.0.4",
+    "@types/lz-string": "^1.5.0",
     "@types/node": "^25.6.0",
     "@types/react": "^18",
     "@types/react-dom": "^18",

@@ -78,6 +78,12 @@ module.exports = {
       },
     },
     {
+      files: ['src/engine/**/__tests__/**/*.ts', 'src/engine/**/__tests__/**/*.tsx'],
+      rules: {
+        'no-restricted-globals': 'off',
+      },
+    },
+    {
       files: ['src/**/*.ts', 'src/**/*.tsx'],
       rules: {
         'no-restricted-imports': [

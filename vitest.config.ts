@@ -29,6 +29,7 @@ export default defineConfig({
       'src/__tests__/m8_1-perf.test.ts',
       'src/__tests__/m9-perf-checkpoint.test.ts',
       'src/engine/systems/ai/__tests__/baseline-capture.test.ts',
+      'src/engine/world/__tests__/save-dto-compression-perf.test.ts',
 
       'src/__tests__/m9-history-default-gravity.test.ts',
       'src/engine/systems/ai/__tests__/m8-behavior*.test.ts',
