@@ -114,7 +114,13 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
         playerRealmName: playerRealm ? playerRealm.displayName : '未知势力'
       }
       
-      await saveSlot(editingSlot, dto, metadata)
+      const result = await saveSlot(editingSlot, dto, metadata)
+      if (!result.ok) {
+        if (result.error.kind !== 'quota_exceeded') {
+          setError(result.error.message)
+        }
+        return
+      }
       void requestPersistentStorage().catch(() => {})
 
       setSlots(prev => ({ ...prev, [editingSlot]: metadata }))
