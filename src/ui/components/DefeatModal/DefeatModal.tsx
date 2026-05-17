@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useGameStore } from '@/ui/store/game-store'
 import type { OpenModalPayload } from '@/ui/store/slices/ui-slice'
 import { ModalPriority } from '@/ui/store/slices/ui-slice'
 import type { ModalAction } from '@/ui/components/Modal'
 import type { PlayerDefeatedEvent } from '~/shared/types'
+import { isDefeated } from '@/engine/systems/victory'
 import styles from './DefeatModal.module.css'
 
 export function DefeatModalContent() {
@@ -81,35 +82,49 @@ export function buildDefeatModalPayload(
 
 export function DefeatModal() {
   const events = useGameStore((state) => state.events)
+  const world = useGameStore((state) => state.world)
   const playerRealmId = useGameStore((state) => state.playerRealmId)
   const openModal = useGameStore((state) => state.openModal)
   const closeModal = useGameStore((state) => state.closeModal)
   const openSaveLoadModal = useGameStore((state) => state.openSaveLoadModal)
   const resetToBootPending = useGameStore((state) => state.resetToBootPending)
 
-  useEffect(() => {
-    const defeatEvent = events.find(
-      (e): e is PlayerDefeatedEvent => e.type === 'playerDefeated' && (e as PlayerDefeatedEvent).payload.realmId === playerRealmId
-    )
+  const shownForPlayerRef = useRef<string | null>(null)
 
-    if (defeatEvent) {
-      openModal(
-        buildDefeatModalPayload(
-          () => {
-            closeModal()
-          },
-          () => {
-            closeModal()
-            openSaveLoadModal('load')
-          },
-          () => {
-            closeModal()
-            resetToBootPending()
-          }
-        )
-      )
+  useEffect(() => {
+    if (shownForPlayerRef.current === playerRealmId) return
+
+    const defeatEvent = events.find(
+      (e): e is PlayerDefeatedEvent =>
+        e.type === 'playerDefeated' && (e as PlayerDefeatedEvent).payload.realmId === playerRealmId,
+    )
+    const defeatedByState = isDefeated(world)
+
+    if (!defeatEvent && !defeatedByState) return
+
+    shownForPlayerRef.current = playerRealmId
+    openModal(
+      buildDefeatModalPayload(
+        () => {
+          closeModal()
+        },
+        () => {
+          closeModal()
+          openSaveLoadModal('load')
+        },
+        () => {
+          closeModal()
+          resetToBootPending()
+        },
+      ),
+    )
+  }, [events, world, playerRealmId, openModal, closeModal, openSaveLoadModal, resetToBootPending])
+
+  useEffect(() => {
+    if (shownForPlayerRef.current !== null && shownForPlayerRef.current !== playerRealmId) {
+      shownForPlayerRef.current = null
     }
-  }, [events, playerRealmId, openModal, closeModal, openSaveLoadModal, resetToBootPending])
+  }, [playerRealmId])
 
   return null
 }

@@ -1,1 +1,1 @@
-export { isVictorious, victoryCheckStep } from './victory'
+export { isVictorious, isDefeated, victoryCheckStep } from './victory'

@@ -9,8 +9,19 @@ import type { SaveMetadata } from '@/ui/store/persistence/db'
 import type { World } from '@/shared/types'
 import type { GameStoreState } from '@/ui/store/game-store'
 
+const hoisted = vi.hoisted(() => ({
+  mockOpenModal: vi.fn(),
+  mockCloseModal: vi.fn(),
+}))
+
 vi.mock('@/ui/store', () => ({
-  useGameStore: Object.assign(vi.fn(), { setState: vi.fn() }),
+  useGameStore: Object.assign(vi.fn(), {
+    setState: vi.fn(),
+    getState: vi.fn(() => ({
+      openModal: hoisted.mockOpenModal,
+      closeModal: hoisted.mockCloseModal,
+    })),
+  }),
 }))
 
 vi.mock('@/ui/store/persistence/slot-crud', async () => {
@@ -282,5 +293,81 @@ describe('SaveLoadModal', () => {
       expect(renameSlot).not.toHaveBeenCalled()
       expect(screen.getByTestId('save-load-error').textContent).toContain('存档名称不能为空')
     })
+  })
+})
+
+describe('SaveLoadModal review-fix behaviors', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    vi.mocked(useGameStore).mockImplementation((selector) =>
+      selector({
+        world: {
+          date: { yearBC: 260, season: 'spring', month: 1, xun: 'shang' },
+          tick: 100,
+          sites: new Map(),
+          realms: new Map([['realm_qin', { displayName: '秦' }]]),
+          playerRealmId: 'realm_qin',
+          scenarioId: 'm1',
+          tutorialState: null,
+        },
+        replaceWorldFromSave: vi.fn(),
+        closeModal: vi.fn(),
+      } as unknown as GameStoreState),
+    )
+  })
+
+  it('opens corrupted-save L1 modal when loadSlot returns corrupted error', async () => {
+    vi.mocked(listSlots).mockResolvedValue([
+      { slotId: 'slot1', name: 'Broken Save', createdAt: 123, tick: 100, scenarioId: 'm1', playerRealmName: '秦' },
+    ])
+    vi.mocked(loadSlot).mockResolvedValue({
+      ok: false,
+      error: {
+        kind: 'corrupted',
+        message: 'bad data',
+        originalSlotId: 'slot1',
+        quarantineSlotId: 'quarantine_slot1_123',
+      },
+    })
+
+    render(<SaveLoadModal mode="load" />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('slot-slot1-meta')).toBeTruthy()
+    })
+
+    fireEvent.click(screen.getByTestId('slot-slot1'))
+
+    await waitFor(() => {
+      expect(hoisted.mockOpenModal).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: '存档损坏',
+          testId: 'corrupted-save-modal',
+        }),
+      )
+    })
+  })
+
+  it('displays summary text when SaveMetadata.summary is present', async () => {
+    vi.mocked(listSlots).mockResolvedValue([
+      {
+        slotId: 'slot1',
+        name: 'Saved Game',
+        createdAt: 123,
+        tick: 100,
+        scenarioId: 'm1',
+        playerRealmName: '秦',
+        summary: '秦昭襄王二十年 · 伐赵',
+      },
+    ])
+
+    render(<SaveLoadModal mode="load" />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('slot-slot1-summary')).toBeTruthy()
+    })
+
+    expect(screen.getByTestId('slot-slot1-summary').textContent).toBe('秦昭襄王二十年 · 伐赵')
   })
 })

@@ -24,6 +24,19 @@ export interface SavesDB extends DBSchema {
 
 let dbPromise: Promise<IDBPDatabase<SavesDB>> | null = null
 
+type IdbEventName = 'blocked' | 'blocking' | 'terminated'
+type IdbEventListener = (name: IdbEventName) => void
+
+let listener: IdbEventListener | null = null
+
+export function setIdbEventListener(next: IdbEventListener | null): void {
+  listener = next
+}
+
+function notifyIdbEvent(name: IdbEventName): void {
+  if (listener) listener(name)
+}
+
 export function getDb(): Promise<IDBPDatabase<SavesDB>> {
   if (!dbPromise) {
     dbPromise = openDB<SavesDB>(DB_NAME, DB_VERSION, {
@@ -32,6 +45,23 @@ export function getDb(): Promise<IDBPDatabase<SavesDB>> {
           db.createObjectStore('saves', { keyPath: 'slotId' })
         }
       },
+      blocked() {
+        console.warn('[db] IDB upgrade blocked by another tab')
+        notifyIdbEvent('blocked')
+      },
+      blocking() {
+        console.warn('[db] IDB version change pending; closing connection')
+        notifyIdbEvent('blocking')
+        if (dbPromise) {
+          void dbPromise.then((db) => db.close()).catch(() => {})
+          dbPromise = null
+        }
+      },
+      terminated() {
+        console.warn('[db] IDB connection terminated unexpectedly')
+        notifyIdbEvent('terminated')
+        dbPromise = null
+      },
     })
   }
   return dbPromise
@@ -39,4 +69,5 @@ export function getDb(): Promise<IDBPDatabase<SavesDB>> {
 
 export function resetDbForTesting(): void {
   dbPromise = null
+  listener = null
 }

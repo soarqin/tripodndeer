@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
-import { DefeatModalContent, buildDefeatModalPayload } from '../DefeatModal'
+import { render, screen } from '@testing-library/react'
+import { DefeatModalContent, DefeatModal, buildDefeatModalPayload } from '../DefeatModal'
 import { useGameStore, type GameStore } from '@/ui/store/game-store'
 import { makeEmptyWorld } from '~/shared/__tests__/fixtures'
 import type { Realm, Site, General, RulerState } from '~/shared/types'
@@ -54,6 +54,73 @@ describe('DefeatModalContent', () => {
     
     expect(screen.getByText('亡于:')).toBeDefined()
     expect(screen.getByText('赵')).toBeDefined()
+  })
+})
+
+describe('DefeatModal world-state subscription', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('opens modal when isDefeated(world) is true even without playerDefeated event', () => {
+    const openModal = vi.fn()
+    const closeModal = vi.fn()
+    const openSaveLoadModal = vi.fn()
+    const resetToBootPending = vi.fn()
+
+    const world = makeEmptyWorld({
+      playerRealmId: 'realm_qin',
+      sites: new Map<string, Site>([
+        ['site_handan', { id: 'site_handan', ownerId: 'realm_zhao' } as Site],
+      ]),
+      realms: new Map<string, Realm>([
+        ['realm_qin', { id: 'realm_qin', displayName: '秦', capital: 'site_xianyang' } as Realm],
+        ['realm_zhao', { id: 'realm_zhao', displayName: '赵', capital: 'site_handan' } as Realm],
+      ]),
+    })
+
+    vi.mocked(useGameStore).mockImplementation((selector) =>
+      selector({
+        events: [],
+        world,
+        playerRealmId: 'realm_qin',
+        openModal,
+        closeModal,
+        openSaveLoadModal,
+        resetToBootPending,
+      } as unknown as GameStore),
+    )
+
+    render(<DefeatModal />)
+
+    expect(openModal).toHaveBeenCalledTimes(1)
+    expect(openModal.mock.calls[0]?.[0]?.title).toBe('亡国录')
+  })
+
+  it('does not open modal when player still owns sites', () => {
+    const openModal = vi.fn()
+    const world = makeEmptyWorld({
+      playerRealmId: 'realm_qin',
+      sites: new Map<string, Site>([
+        ['site_xianyang', { id: 'site_xianyang', ownerId: 'realm_qin' } as Site],
+      ]),
+    })
+
+    vi.mocked(useGameStore).mockImplementation((selector) =>
+      selector({
+        events: [],
+        world,
+        playerRealmId: 'realm_qin',
+        openModal,
+        closeModal: vi.fn(),
+        openSaveLoadModal: vi.fn(),
+        resetToBootPending: vi.fn(),
+      } as unknown as GameStore),
+    )
+
+    render(<DefeatModal />)
+
+    expect(openModal).not.toHaveBeenCalled()
   })
 })
 

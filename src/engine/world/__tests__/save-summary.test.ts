@@ -1,6 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { createWorldFromM1Data, loadM1Data, createWorldFromTutorialData, loadM9Data, createWorldFromM9Data } from '~/engine/world/factory'
 import { generateSummary } from '~/engine/world/save-summary'
+import type { RulerPersonalityProfile } from '~/shared/types'
+
+const STUB_PERSONALITY_DIMS: RulerPersonalityProfile = {
+  expansionDrive: 0.5,
+  diplomaticTrust: 0.5,
+  caution: 0.5,
+  honor: 0.5,
+  vindictiveness: 0.5,
+  reformInclination: 0.5,
+  patience: 0.5,
+  preferredStrategy: 'siege',
+}
 
 describe('generateSummary', () => {
   it('M1 world produces valid summary', () => {
@@ -13,7 +25,7 @@ describe('generateSummary', () => {
       lifespan: 60,
       health: 100,
       personality: 'conqueror',
-      personalityDims: {} as any,
+      personalityDims: STUB_PERSONALITY_DIMS,
       successionLawId: 'primogeniture',
       inOfficeSinceTick: 0,
     })
@@ -37,7 +49,7 @@ describe('generateSummary', () => {
       lifespan: 60,
       health: 100,
       personality: 'conqueror',
-      personalityDims: {} as any,
+      personalityDims: STUB_PERSONALITY_DIMS,
       successionLawId: 'primogeniture',
       inOfficeSinceTick: 0,
     })

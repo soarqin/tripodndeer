@@ -33,8 +33,11 @@ import { ObjectivePanel } from '@/ui/components/ObjectivePanel'
 import { EventLogPanel } from '@/ui/components/EventLogPanel'
 import { useHintCoordinator } from '@/ui/coordinator/use-hint-coordinator'
 import { usePageHideSave } from '@/ui/hooks/use-page-hide-save'
+import { useSpyExposedModal } from '@/ui/hooks/use-spy-exposed-modal'
+import { useTestModalUrlParam } from '@/ui/hooks/use-test-modal-url-param'
+import { useIdbStatusMonitor } from '@/ui/hooks/use-idb-status-monitor'
 import { useRafDriver } from '@/ui/store/raf-driver'
-import { useGameStore, ModalPriority } from '@/ui/store/game-store'
+import { useGameStore } from '@/ui/store/game-store'
 import { isVictorious } from '@/engine/systems/victory'
 import styles from './App.module.css'
 
@@ -43,19 +46,15 @@ function useVictory(): boolean {
   return isVictorious(world)
 }
 
-const ACTION_NAMES: Record<string, string> = {
-  reconnaissance: '刺探',
-  rumor: '流言',
-  discord: '离间',
-  counter_intel: '反间',
-}
-
 export function App(): React.JSX.Element {
   useRafDriver()
   useCodexHotkey()
   useSaveHotkey()
   useHintCoordinator()
   usePageHideSave()
+  useSpyExposedModal()
+  useTestModalUrlParam()
+  useIdbStatusMonitor()
   const victorious = useVictory()
   const bootStatus = useGameStore((state) => state.bootStatus)
   const modalQueue = useGameStore((state) => state.modalQueue)
@@ -71,66 +70,6 @@ export function App(): React.JSX.Element {
   const closePeacePanel = useGameStore((state) => state.closePeacePanel)
 
   const activePanel = useGameStore((state) => state.activePanel)
-
-  React.useEffect(() => {
-    const unsubscribe = useGameStore.subscribe((state, prevState) => {
-      if (state.events === prevState.events) return
-      if (state.events.length === 0) return
-
-      for (const event of state.events) {
-        if (event.type === 'spyExposedHighRisk') {
-          const payload = event.payload as { spyRealmId: string; targetRealmId: string; action: string }
-          if (payload.spyRealmId === state.playerRealmId || payload.targetRealmId === state.playerRealmId) {
-            const spyRealm = state.world.realms.get(payload.spyRealmId)
-            const targetRealm = state.world.realms.get(payload.targetRealmId)
-            const spyName = spyRealm?.displayName ?? payload.spyRealmId
-            const targetName = targetRealm?.displayName ?? payload.targetRealmId
-            
-            const actionName = ACTION_NAMES[payload.action] ?? payload.action
-            const isOurSpy = payload.spyRealmId === state.playerRealmId
-            const content = isOurSpy
-              ? `我方派往 ${targetName} 的间者在执行 ${actionName} 任务时暴露了！`
-              : `我们在境内发现了来自 ${spyName} 的间者，其正在执行 ${actionName} 任务！`
-
-            useGameStore.getState().openModal({
-              title: '谍者暴露',
-              content,
-              priority: ModalPriority.EVENT_CHAIN,
-              actions: [
-                {
-                  id: 'close',
-                  label: '确认',
-                  primary: true,
-                  onClick: () => useGameStore.getState().closeModal(),
-                },
-              ],
-            })
-          }
-        }
-      }
-    })
-    return unsubscribe
-  }, [])
-
-  React.useEffect(() => {
-    if (import.meta.env.DEV) {
-      const params = new URLSearchParams(window.location.search)
-      if (params.get('test-modal') === 'basic') {
-        openModal({
-          title: 'Test Modal',
-          content: 'This is a test modal triggered by URL param.',
-          actions: [
-            {
-              id: 'confirm',
-              label: 'Confirm',
-              primary: true,
-              onClick: () => closeModal(),
-            },
-          ],
-        })
-      }
-    }
-  }, [openModal, closeModal])
 
   if (bootStatus === 'pending') {
     return <ScenarioPicker />

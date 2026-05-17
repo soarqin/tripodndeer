@@ -4,12 +4,12 @@ import { createWorldFromM1Data, loadM1Data } from '@/engine/world/factory'
 
 describe('save-thumbnail', () => {
   beforeEach(() => {
-    global.Path2D = class Path2D {
+    global.Path2D = class {
       moveTo() {}
       lineTo() {}
       bezierCurveTo() {}
       closePath() {}
-    } as any
+    } as unknown as typeof Path2D
 
     const mockContext = {
       fillRect: vi.fn(),
@@ -17,8 +17,10 @@ describe('save-thumbnail', () => {
       fill: vi.fn(),
       stroke: vi.fn(),
     }
-    
-    HTMLCanvasElement.prototype.getContext = vi.fn(() => mockContext as any)
+
+    HTMLCanvasElement.prototype.getContext = vi.fn(
+      () => mockContext,
+    ) as unknown as typeof HTMLCanvasElement.prototype.getContext
     HTMLCanvasElement.prototype.toDataURL = vi.fn(() => 'data:image/png;base64,mocked-base64-data')
   })
 
