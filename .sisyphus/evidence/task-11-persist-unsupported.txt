@@ -1,0 +1,3 @@
+Command: pnpm test src/ui/store/persistence/__tests__/persist-request.test.ts
+Result: PASS
+Notes: unsupported navigator.storage path is a no-op and does not break saves.

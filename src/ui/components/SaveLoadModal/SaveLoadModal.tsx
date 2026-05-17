@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useGameStore } from '@/ui/store'
 import { listSlots, saveSlot, loadSlot, type SlotId } from '@/ui/store/persistence/slot-crud'
+import { isPersisted, requestPersistentStorage } from '@/ui/store/persistence/persist-request'
 import type { SaveMetadata } from '@/ui/store/persistence/db'
 import { worldToSaveDTO, saveDtoToWorld, saveDtoToHintState } from '@/engine/world/save-dto'
 import { formatGameDate } from '@/engine/date/calendar'
@@ -20,12 +21,15 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
   const [error, setError] = useState<string | null>(null)
   const [editingSlot, setEditingSlot] = useState<SlotId | null>(null)
   const [saveName, setSaveName] = useState('')
+  const [persisted, setPersisted] = useState(false)
 
   const world = useGameStore(state => state.world)
   const replaceWorldFromSave = useGameStore(state => state.replaceWorldFromSave)
   const closeModal = useGameStore(state => state.closeModal)
 
   useEffect(() => {
+    isPersisted().then(setPersisted).catch(() => setPersisted(false))
+
     listSlots().then(metadataList => {
       const newSlots: Record<SlotId, SaveMetadata | null> = {
         slot1: null, slot2: null, slot3: null, slot4: null, slot5: null, auto: null
@@ -111,7 +115,8 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
       }
       
       await saveSlot(editingSlot, dto, metadata)
-      
+      void requestPersistentStorage().catch(() => {})
+
       setSlots(prev => ({ ...prev, [editingSlot]: metadata }))
       setEditingSlot(null)
       closeModal()
@@ -125,6 +130,9 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
   return (
     <div className={styles.container} data-testid="save-load-modal">
       {error && <div className={styles.error} data-testid="save-load-error">{error}</div>}
+      <div className={styles.persistStatus} data-testid="persist-status">
+        持久化存储：{persisted ? '已启用' : '未启用'}
+      </div>
       
       <div className={styles.slots}>
         {SLOTS.map(slotId => {
