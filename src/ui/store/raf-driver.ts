@@ -19,7 +19,7 @@ export function useRafDriver(): void {
   useEffect(() => {
     let rafId = 0
     let lastTime: number | null = null
-    let lastSavedYearBC: number | null = useGameStore.getState().world?.date.yearBC ?? null
+    let lastSavedYearBC: number | null = useGameStore.getState().world?.date?.yearBC ?? null
 
     const queueAutosave = (world = useGameStore.getState().world, name = '自动存档'): void => {
       const scenarioId = world.scenarioId
@@ -54,7 +54,7 @@ export function useRafDriver(): void {
         store.tick(cappedDelta)
         const newWorld = useGameStore.getState().world
 
-        const currentYearBC = newWorld.date.yearBC
+        const currentYearBC = newWorld?.date?.yearBC ?? 0
         if (lastSavedYearBC !== null && currentYearBC !== lastSavedYearBC) {
           queueAutosave(newWorld, `自动存档 (${Math.abs(currentYearBC)} BC)`)
           lastSavedYearBC = currentYearBC
@@ -75,9 +75,9 @@ export function useRafDriver(): void {
     const onVisibilityChange = (): void => {
       if (document.visibilityState !== 'visible') return
       const world = useGameStore.getState().world
-      if (world && lastSavedYearBC !== null && world.date.yearBC !== lastSavedYearBC) {
-        queueAutosave(world, `自动存档 (${Math.abs(world.date.yearBC)} BC)`)
-        lastSavedYearBC = world.date.yearBC
+      if (world && lastSavedYearBC !== null && (world.date?.yearBC ?? 0) !== lastSavedYearBC) {
+        queueAutosave(world, `自动存档 (${Math.abs(world.date?.yearBC ?? 0)} BC)`)
+        lastSavedYearBC = world.date?.yearBC ?? 0
       }
     }
 

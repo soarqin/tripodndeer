@@ -221,3 +221,21 @@
   font-size: 14px;
   outline: none;
 }
+
+.topActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.importTargetList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.importTargetList button {
+  text-align: left;
+  padding: 8px 12px;
+}

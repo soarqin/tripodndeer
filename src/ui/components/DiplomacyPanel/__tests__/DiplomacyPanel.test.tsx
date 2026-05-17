@@ -8,14 +8,20 @@ const mockOpenPeacePanel = vi.fn()
 
 let mockState: Record<string, unknown> = {}
 
-vi.mock('~/ui/store', () => ({
-  useGameStore: (selector: (state: Record<string, unknown>) => unknown) => {
-    if (typeof selector === 'function') {
-      return selector(mockState)
+vi.mock('~/ui/store', () => {
+  const useGameStoreMock = Object.assign(
+    (selector: (state: Record<string, unknown>) => unknown) => {
+      if (typeof selector === 'function') {
+        return selector(mockState)
+      }
+      return mockState[selector as string]
+    },
+    {
+      getState: () => mockState,
     }
-    return mockState[selector as string]
-  }
-}))
+  )
+  return { useGameStore: useGameStoreMock }
+})
 
 vi.mock('~/ui/store/selectors', () => ({
   selectDiplomacyTargetRealmId: (state: { diplomacyTargetRealmId: unknown }) => state.diplomacyTargetRealmId,

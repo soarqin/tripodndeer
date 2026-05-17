@@ -4,6 +4,7 @@ import { MANUAL_SLOT_IDS, AUTO_SLOT_IDS, listSlots, saveSlot, loadSlot, deleteSl
 import { isPersisted, requestPersistentStorage } from '@/ui/store/persistence/persist-request'
 import type { SaveMetadata } from '@/ui/store/persistence/db'
 import { worldToSaveDTO, saveDtoToWorld, saveDtoToHintState } from '@/engine/world/save-dto'
+import { generateSummary } from '@/engine/world/save-summary'
 import { formatGameDate } from '@/engine/date/calendar'
 import { Modal } from '@/ui/components/Modal/Modal'
 import { generateThumbnail } from '@/rendering/map/save-thumbnail'
@@ -22,6 +23,27 @@ function emptySlotMap(): Record<SlotId, SaveMetadata | null> {
     acc[id] = null
     return acc
   }, {} as Record<SlotId, SaveMetadata | null>)
+}
+
+function toastMessageForError(error: SaveLoadError): string {
+  switch (error.kind) {
+    case 'incompatible_version':
+      return `存档版本不兼容 (需要 v${error.expected}, 实际 v${error.got})`
+    case 'parse_error':
+      if (error.message === 'invalid JSON') return '导入失败：invalid JSON'
+      if (error.message === 'missing scenarioVersion' || error.message === 'invalid structure') {
+        return '存档结构异常'
+      }
+      return `导入失败：${error.message}`
+    case 'corrupted':
+      return '存档已损坏，已隔离'
+    case 'missing_data':
+      return '存档不存在'
+    case 'quota_exceeded':
+      return '存储空间已满'
+    case 'newer_version':
+      return `存档版本过新 (需要 v${error.expected}, 实际 v${error.got})`
+  }
 }
 
 export function SaveLoadModal({ mode }: SaveLoadModalProps) {
@@ -288,26 +310,36 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
             ) : (
               <div className={styles.slotNameRow}>
                 <div className={styles.slotName}>{meta.name}</div>
-                {isManual && (
-                  <div className={styles.slotActions}>
-                    <button 
-                      className={styles.iconButton} 
-                      onClick={(e) => handleRenameClick(e, slotId as ManualSlotId, meta.name)}
-                      data-testid={`rename-btn-${slotId}`}
-                      title="重命名"
-                    >
-                      ✏
-                    </button>
-                    <button 
-                      className={styles.iconButton} 
-                      onClick={(e) => handleDeleteClick(e, slotId as ManualSlotId)}
-                      data-testid={`delete-btn-${slotId}`}
-                      title="删除"
-                    >
-                      删除
-                    </button>
-                  </div>
-                )}
+                <div className={styles.slotActions}>
+                  <button
+                    className={styles.iconButton}
+                    onClick={(e) => handleExportClick(e, slotId)}
+                    data-testid={`export-btn-${slotId}`}
+                    title="导出 JSON"
+                  >
+                    导出
+                  </button>
+                  {isManual && (
+                    <>
+                      <button
+                        className={styles.iconButton}
+                        onClick={(e) => handleRenameClick(e, slotId as ManualSlotId, meta.name)}
+                        data-testid={`rename-btn-${slotId}`}
+                        title="重命名"
+                      >
+                        ✏
+                      </button>
+                      <button
+                        className={styles.iconButton}
+                        onClick={(e) => handleDeleteClick(e, slotId as ManualSlotId)}
+                        data-testid={`delete-btn-${slotId}`}
+                        title="删除"
+                      >
+                        删除
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             )}
             <div className={styles.slotDetails}>
@@ -327,7 +359,26 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
       <div className={styles.persistStatus} data-testid="persist-status">
         持久化存储：{persisted ? '已启用' : '未启用'}
       </div>
-      
+
+      <div className={styles.topActions}>
+        <button
+          type="button"
+          onClick={handleImportButtonClick}
+          data-testid="import-save-btn"
+          className={styles.iconButton}
+        >
+          导入存档
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json,.json"
+          onChange={handleFileChange}
+          data-testid="import-file-input"
+          style={{ display: 'none' }}
+        />
+      </div>
+
       <div className={styles.section}>
         <h3 className={styles.sectionTitle}>手书史册</h3>
         <div className={styles.slots}>
@@ -372,6 +423,30 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
           onClose={() => setConfirmDeleteSlot(null)}
           testId="delete-confirm-modal"
         />
+      )}
+
+      {importFile && (
+        <div className={styles.editOverlay} data-testid="import-target-picker">
+          <div className={styles.editDialog}>
+            <h3>选择目标存档槽位</h3>
+            <div className={styles.importTargetList}>
+              {MANUAL_SLOT_IDS.map(id => (
+                <button
+                  key={id}
+                  type="button"
+                  className={styles.iconButton}
+                  onClick={() => handleImportTargetClick(id)}
+                  data-testid={`import-target-${id}`}
+                >
+                  {`存档 ${id.replace('slot', '')}${slots[id] ? `（覆盖：${slots[id]?.name}）` : '（空）'}`}
+                </button>
+              ))}
+            </div>
+            <div className={styles.editActions}>
+              <button type="button" onClick={handleImportCancel} data-testid="import-cancel-btn">取消</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
