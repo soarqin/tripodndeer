@@ -1,5 +1,6 @@
 import { compressWorld, decompressWorld, isCompressed } from './compression'
 import { getDb, type SaveMetadata } from './db'
+import { quarantineSlot } from './quarantine'
 import { SaveDTOSchema } from '~/shared/schemas/save-dto'
 import { M11_QUOTA_BLOCK_THRESHOLD_PCT, M11_QUOTA_CACHE_TTL_MS, M11_QUOTA_PRIVATE_FALLBACK_MB, M11_QUOTA_WARN_THRESHOLD_PCT } from '~/content/m2/balance/m11'
 import { ModalPriority, useGameStore } from '../game-store'
@@ -168,20 +169,47 @@ export async function loadSlot(slotId: SlotId): Promise<Result<SaveSlot, SaveLoa
   try {
     worldStr = isCompressed(storedWorld) ? decompressWorld(storedWorld) : storedWorld
   } catch {
-    return { ok: false, error: { kind: 'parse_error', message: 'Failed to decompress world data' } }
+    const quarantineId = await quarantineSlot(slotId)
+    return {
+      ok: false,
+      error: {
+        kind: 'corrupted',
+        message: 'Failed to decompress world data',
+        originalSlotId: slotId,
+        quarantineSlotId: quarantineId,
+      },
+    }
   }
 
   let worldObj: unknown
   try {
     worldObj = JSON.parse(worldStr)
   } catch {
-    return { ok: false, error: { kind: 'parse_error', message: 'Failed to parse world JSON' } }
+    const quarantineId = await quarantineSlot(slotId)
+    return {
+      ok: false,
+      error: {
+        kind: 'corrupted',
+        message: 'Failed to parse world JSON',
+        originalSlotId: slotId,
+        quarantineSlotId: quarantineId,
+      },
+    }
   }
 
   const logicalDto = { ...(record.dto as StoredSaveDTO), world: worldObj }
   const parsed = SaveDTOSchema.safeParse(logicalDto)
   if (!parsed.success) {
-    return { ok: false, error: { kind: 'parse_error', message: parsed.error.message } }
+    const quarantineId = await quarantineSlot(slotId)
+    return {
+      ok: false,
+      error: {
+        kind: 'corrupted',
+        message: parsed.error.message,
+        originalSlotId: slotId,
+        quarantineSlotId: quarantineId,
+      },
+    }
   }
 
   const dto = parsed.data as unknown as SaveDTO

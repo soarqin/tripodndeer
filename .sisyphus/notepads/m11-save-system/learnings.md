@@ -157,3 +157,36 @@
 - saveSlot writes StoredSaveDTO with world as compressed string
 - loadSlot expects world as string; legacy v6 records with world-as-object will fail at readStoredWorld → parse_error
 - Since this is the FIRST compression integration, no legacy data exists in production yet — safe
+
+## T9 Corruption Recovery + Quarantine — Completed
+
+### Files
+- NEW: `src/ui/store/persistence/quarantine.ts` (`quarantineSlot(slotId)` — rename to `${slotId}_quarantine_${Date.now()}`)
+- NEW: `src/ui/store/persistence/__tests__/quarantine.test.ts` (5 tests: 3 corruption modes + v5 regression + evidence)
+- MOD: `src/shared/types/save-dto.ts` — `SaveLoadError` converted to discriminated union; added `corrupted` + `newer_version` + `quota_exceeded` kinds; `SaveLoadErrorKind` derived via `SaveLoadError['kind']`
+- MOD: `src/ui/store/persistence/slot-crud.ts` — 3 catch blocks (decompress / JSON.parse / Zod safeParse) now call `quarantineSlot` and return `{ kind: 'corrupted', originalSlotId, quarantineSlotId }`
+- MOD: `src/engine/world/__tests__/save-dto.test.ts` + `save-dto-m8_1.test.ts` — added `if (result.error.kind !== 'incompatible_version') throw` narrowing for `.got` / `.expected` access
+
+### Architecture
+- "v6-shaped data that fails further processing" → quarantine. v5 envelope check returns `incompatible_version` BEFORE the corruption catch blocks (C2 already applied in T8).
+- The "Stored world field is missing or not a string" case still returns `parse_error` (not quarantined) — kept narrow per task spec which lists only the 3 catch blocks.
+- Quarantine slot ID format: `${slotId}_quarantine_${Date.now()}` — non-overlapping with `SLOT_IDS` namespace (`slot1..slot5`, `auto`).
+
+### Critical Decisions
+- Discriminated union (not optional fields) for `SaveLoadError` — task spec explicitly defined the union with required per-variant fields. Existing test files updated with narrowing instead.
+- `SaveLoadErrorKind` retained as a derived type alias (`SaveLoadError['kind']`) for backward compat with any future consumer using the kind alone.
+
+### Gotchas
+- Initial `Read` of `slot-crud.ts` returned a stale view (missing the T10 imports). My subsequent import-line edit then dropped `M11_QUOTA_*` and `useGameStore` / `ModalPriority` imports. Caught via typecheck and restored. **Lesson**: when editing import blocks, verify with `git diff` immediately after to catch silent drops.
+- `decompressWorld` throws ONLY when `isCompressed(input)` returns true AND `decompressFromUTF16` returns null. Tests must prefix bogus data with `'\x00lz\x00'` (COMPRESSED_PREFIX) to hit the throw path.
+- Non-compressed strings flow through `decompressWorld` as-is, so JSON.parse failure tests don't need the prefix.
+
+### Tests Status
+- `pnpm test src/ui/store/persistence/__tests__/quarantine.test.ts`: 5/5 pass
+- `pnpm typecheck`: 0 errors
+- `pnpm lint`: 0 errors, 0 warnings
+- `pnpm test` (full): 2927 pass, 11 fail (DiplomacyPanel pre-existing — unchanged from baseline)
+
+### Evidence
+- `.sisyphus/evidence/task-9-quarantine-flow.txt` — quarantine flow PASS, original deleted, quarantine present
+- `.sisyphus/evidence/task-9-quarantine-preserved.txt` — schemaVersion + metadata preserved post-quarantine

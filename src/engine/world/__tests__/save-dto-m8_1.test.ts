@@ -57,7 +57,9 @@ describe('SaveDTO M8.1 - V2 with aiState forward-compat', () => {
     const result = saveDtoToWorld(incompatible)
     expect(result.ok).toBe(false)
     if (result.ok) throw new Error('expected incompatible version failure')
-    expect(result.error.kind).toBe('incompatible_version')
+    if (result.error.kind !== 'incompatible_version') {
+      throw new Error(`expected incompatible_version, got ${result.error.kind}`)
+    }
     expect(result.error.got).toBe(999)
     expect(result.error.expected).toBe(SAVE_DTO_VERSION)
   })
