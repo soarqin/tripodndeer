@@ -1,0 +1,5 @@
+T10 quota block evidence
+- saveSlot blocks at 95% storage usage with quota_exceeded.
+- Manual saves open the quota modal path; autosaves stay toast-only.
+- Verified by pnpm test src/ui/store/persistence/__tests__/quota.test.ts and pnpm typecheck.
+- Result: PASS.

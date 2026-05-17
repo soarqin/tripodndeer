@@ -1,0 +1,4 @@
+T10 quota warning evidence
+- saveSlot warns at 80% storage usage via toast.
+- Verified by pnpm test src/ui/store/persistence/__tests__/quota.test.ts.
+- Result: PASS.

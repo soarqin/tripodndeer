@@ -88,6 +88,12 @@
 
 ### F1-F4: Final verification wave
 
+### T10 quota detection notes
+- `saveSlot` now returns `Result<void, SaveLoadError>` so callers can branch on `quota_exceeded` without relying on thrown errors.
+- Cache quota snapshots by `navigator.storage.estimate` function identity + TTL to avoid stale cross-test reuse when globals are stubbed.
+- Auto saves should surface quota failures as toast-only; manual saves can open the quota modal path.
+- `toastQueue` is not cleared by `reset()` alone; tests that inspect toasts should clear `toastQueue` explicitly.
+
 ## T11 Persistent Storage Request — Completed
 
 ### Files
