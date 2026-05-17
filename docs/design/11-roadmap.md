@@ -44,7 +44,7 @@
 | **M10.1** | 史书百科（Codex） | ✅ 已交付 | 左侧分类树 + 右侧词条 + 搜索；25 手写 + 90 派生条目 | - | CodexPanel + markdown-renderer |
 | **M10.2** | 渐进提示（首触 Modal） | ✅ 已交付 | 10 触发点 + SaveDTO v4 持久化 | - | HintModal + use-hint-coordinator |
 | **M10.3** | 引导剧本 | ✅ 已交付 | 秦灭巴蜀 10 邑 + 5 步教学 + ObjectivePanel + SaveDTO v5 | - | tutorialPhase + use-tutorial-coordinator |
-| **M11** | 存档系统 | ⏳ 后期 | 自动 + 手动 + 版本兼容 | 2–3 周 | 玩家可放心存档 |
+| **M11** | 存档系统 | ✅ 已交付 | 自动 + 手动 + 版本兼容 | 2–3 周 | 玩家可放心存档 |
 | **M12** | 平衡与抛光 | ⏳ 终前 | 数值平衡、性能、Bug | 4–6 周 | 首版发布 |
 
 > **总估算**：~12 个月人月（视团队规模可压缩或拉伸）。
@@ -567,7 +567,7 @@ M4 (✅) ──► M5 (✅) ──► M4.1 (✅) ──► M4.2 (✅) ──► 
 - ✅ 君主与人才（君主能力、关键人物、任免） **[M5 ✅]**
 - ✅ 一统胜利路径（其他路径 v1.x 逐步加入）
 - ✅ AI（多层决策、性格驱动、不作弊） **[M3/M5/M8 完整 8 性格 + 三层决策 ✅]**
-- ✅ 存档系统 **[M10 MVP ✅（IDB 5 槽 + auto）/ M11 完整版后期]**
+- ✅ 存档系统 **[M11 ✅ 完整版交付]**
 - ✅ 主屏 UI 完整 **[M10 持续]**
 - ✅ 引导剧本 **[M10.3 ✅ 已交付]**
 
@@ -592,7 +592,7 @@ M4 (✅) ──► M5 (✅) ──► M4.1 (✅) ──► M4.2 (✅) ──► 
 
 ## 17. 发布策略（Release Strategy）
 
-### 17.1 Alpha（M9 / Wave 9 / M10 / M10.1 / M10.2 / M10.3 已完成；Alpha 候选阶段）
+### 17.1 Alpha（M9 / Wave 9 / M10 / M10.1 / M10.2 / M10.3 / M11 已完成；Alpha 候选阶段）
 
 - 内部团队 + 5-10 位铁杆历史游戏玩家
 - 重点收集"手感"、"AI 行为"、"君主代际更替"反馈
@@ -659,3 +659,4 @@ M4 (✅) ──► M5 (✅) ──► M4.1 (✅) ──► M4.2 (✅) ──► 
 | 2026-05-11 | 文档同步：AGENTS.md 顶部 metadata / Critical Invariants / M10 系列 Subsystems Quick Reference / Deferred Items 三段 / roadmap stale tag 回填（docs-sync-m10-backfill plan） | Sisyphus |
 | 2026-05-11 | M10.3 引导剧本（秦灭巴蜀 10 邑 + 5 步教学 + ObjectivePanel + TutorialCompleteModal + SaveDTO v5 + 30 分钟软超时） | Sisyphus |
 | 2026-05-17 | M10 final cleanup：README.md 同步 M0-M10.3；M8 之前的 monolithic AI dispatcher 函数（每 3 tick 跑 diplomacy + espionage + tactical 的兼容包装）彻底下线，源码与导出全部移除；AI 测试迁移至三层 pipeline (strategic / operational / tactical) API；docs/design/07-ai.md §2.0 公开 API 表述更新为三层 API + planEspionageAction；AGENTS.md AI Subsystems Quick Reference + What NOT to Do 双点同步；AGENTS.md 测试数字与 runtime 校准（含 runtime 退化 caveat）；为 M11 存档系统设计提供干净基线 | Sisyphus |
+| 2026-05-18 | M11 存档系统完整版交付：LZ-string 压缩、IDB 存档 CRUD、Ring buffer 自动档、损坏隔离、配额检测、编年体摘要、缩略图生成、导出/导入、亡国 Modal、F9 快捷键 | Sisyphus |

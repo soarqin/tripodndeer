@@ -8,9 +8,9 @@ AI agent behavioral guidelines for this codebase. Read before making any changes
 
 战国策略游戏引擎原型。Vite + React + TypeScript strict，纯函数引擎 + Zustand UI 层。
 
-**当前里程碑**: M0-M9 已交付。Wave 9: Refactor & Cleanup 已完成。M10 持续中（M10.1 史书百科 ✅、M10.2 渐进提示 ✅、M10.3 引导剧本 ✅）。
+**当前里程碑**: M0-M9 已交付。Wave 9: Refactor & Cleanup 已完成。M10 持续中（M10.1 史书百科 ✅、M10.2 渐进提示 ✅、M10.3 引导剧本 ✅）。M11(✅)
 
-**实施顺序**: M4(✅) → M5(✅) → M4.1(✅) → M4.2(✅) → M6(✅) → M7(✅) → M8(✅) → M8.1(✅) → M8.2(✅) → M8.3(✅) → M9(✅) → Wave 9(✅) → M10(♾️持续) → M10.1(✅) → M10.2(✅) → M10.3(✅)
+**实施顺序**: M4(✅) → M5(✅) → M4.1(✅) → M4.2(✅) → M6(✅) → M7(✅) → M8(✅) → M8.1(✅) → M8.2(✅) → M8.3(✅) → M9(✅) → Wave 9(✅) → M10(♾️持续) → M10.1(✅) → M10.2(✅) → M10.3(✅) → M11(✅)
 
 ---
 
@@ -168,6 +168,14 @@ AI phase 中所有 `world.realms.values()` 和 `world.armies.values()` 必须按
 | tutorialPhase 仅在 scenarioId='tutorial' 激活 | `src/engine/systems/tutorial/__tests__/tutorial-phase.test.ts` |
 | SAVE_DTO_VERSION === 5（v4 加 tutorialState + scenarioId） | `src/engine/world/migrations/__tests__/save-v4-to-v5.test.ts` |
 | 5 TutorialStepEntry id 一一对应 TutorialHintEntry | `src/content/m10_3/__tests__/hint-ids-unique.test.ts` |
+| `SAVE_DTO_VERSION === 6`（含 scenarioVersion + 压缩 + hint 双向 wire） | `src/engine/world/__tests__/save-dto.test.ts` + `src/shared/__tests__/save-dto-field-stability.test.ts` |
+| SaveDTO v6 起 field 仅可加 optional（forward-compat） | `src/shared/__tests__/save-dto-field-stability.test.ts` |
+| Auto-save ring buffer 10 槽 (auto_0..auto_9), evict by oldest | `src/ui/store/persistence/__tests__/auto-ring-buffer.test.ts` |
+| LZ-string round-trip identity 对 M9 starter fixture | `src/engine/world/__tests__/save-dto-compression.test.ts` |
+| `world.scenarioId` 为存档 scenarioId 唯一来源（无 sites.size 启发式） | `src/ui/store/__tests__/raf-driver-scenario-id.test.ts` |
+| Engine 层零 IDB 依赖（不能 import `idb` / `~/ui/store/persistence`） | `src/engine/__tests__/architecture-purity.test.ts` |
+| Autosave 错误必须可观察（enqueueToast on failure） | `src/ui/store/__tests__/autosave-error-surfacing.test.ts` |
+| 单 saveSlot 入口（autosave + manual + import 共享，无直接 IDB put 调用） | `src/ui/store/persistence/__tests__/single-entry.test.ts` |
 
 ---
 
@@ -486,6 +494,24 @@ const world: World = {
 
 ---
 
+## M11 Subsystems Quick Reference
+
+| 子系统 | 主文件 | 关键函数 |
+|---|---|---|
+| LZ-string 压缩 | `src/ui/store/persistence/compression.ts` | `compressWorld`, `decompressWorld`, `isCompressed` |
+| 存档 CRUD | `src/ui/store/persistence/slot-crud.ts` | `saveSlot`, `loadSlot`, `deleteSlot`, `renameSlot`, `listSlots` |
+| Ring buffer | `src/ui/store/persistence/auto-ring-buffer.ts` | `writeAutoRingBuffer` |
+| 损坏隔离 | `src/ui/store/persistence/quarantine.ts` | `quarantineSlot` |
+| 配额检测 | `src/ui/store/persistence/slot-crud.ts` | `checkQuota` (inline) |
+| 持久存储请求 | `src/ui/store/persistence/persist-request.ts` | `requestPersistentStorage` |
+| 编年体摘要 | `src/engine/world/save-summary.ts` | `generateSummary` |
+| 缩略图生成 | `src/rendering/map/save-thumbnail.ts` | `generateThumbnail` |
+| 导出/导入 | `src/ui/components/SaveLoadModal/export-import.ts` | `exportSlot`, `importSave` |
+| 亡国 Modal | `src/ui/components/DefeatModal/DefeatModal.tsx` | `<DefeatModal />` |
+| F9 快捷键 | `src/ui/hooks/use-save-hotkey.ts` | `useSaveHotkey` |
+
+---
+
 ## Documentation Sync Policy (MUST DO when finishing a milestone)
 
 > 与「What NOT to Do」反向对仗：每完成一个里程碑或重大子任务，必须同步以下 5 处文档。
@@ -571,6 +597,17 @@ const world: World = {
 ❌ 不要让 tutorialPhase 在非 tutorial 场景激活（守 isolation invariant）
 ❌ 不要把超时阈值 write 成 magic number（必须 `M10_3_TIMEOUT_GAME_MONTHS = 24` 常量）
 ❌ 不要把 SAVE_DTO_VERSION 从 5 回退（版本号只能递增）
+❌ 不要回退 SAVE_DTO_VERSION（6 → 7 only，不能降回 5）
+❌ 不要删除 SaveDTO v6 字段（v6 起字段仅可加 optional）
+❌ 不要让 IDB 调用泄漏到 engine 层（architecture-purity 守护）
+❌ 不要重写 DB_NAME `tripodndeer-saves` 或 store `saves`
+❌ 不要在 ring buffer eviction 之外直接 db.put('saves')（必须经 saveSlot 或 writeAutoRingBuffer）
+❌ 不要在 import JSON 时跳过 Zod + scenarioVersion check
+❌ 不要让 thumbnail 同步阻塞 RAF（必须 async 后补）
+❌ 不要依赖 beforeunload 保证 save 成功（pagehide best-effort）
+❌ 不要把 v5 IDB record 触发 quarantine（必须返回 incompatible_version）
+❌ 不要在 autosave 路径触发 L1 modal（autosave 失败只用 L2 toast）
+❌ 不要把 yearly autosave 的 lastSavedYearBC 存到 SaveDTO（UI-only state）
 ```
 
 ---
