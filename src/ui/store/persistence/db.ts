@@ -11,6 +11,8 @@ export interface SaveMetadata {
   tick: number
   scenarioId: ScenarioId
   playerRealmName: string
+  summary?: string
+  thumbnail?: string
 }
 
 export interface SavesDB extends DBSchema {

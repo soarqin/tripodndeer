@@ -246,6 +246,21 @@ export async function deleteSlot(slotId: SlotId): Promise<void> {
   await db.delete('saves', slotId)
 }
 
+export async function renameSlot(slotId: ManualSlotId, newName: string): Promise<void> {
+  if (!newName.trim()) throw new Error('Name cannot be empty')
+  const db = await getDb()
+  const record = await db.get('saves', slotId)
+  if (!record) throw new Error(`Slot ${slotId} not found`)
+  await db.put('saves', { ...record, metadata: { ...record.metadata, name: newName.trim() } })
+}
+
+export async function updateSlotThumbnail(slotId: SlotId, thumbnail: string): Promise<void> {
+  const db = await getDb()
+  const record = await db.get('saves', slotId)
+  if (!record) return
+  await db.put('saves', { ...record, metadata: { ...record.metadata, thumbnail } })
+}
+
 export async function getMetadata(slotId: SlotId): Promise<SaveMetadata | null> {
   const db = await getDb()
   const record = await db.get('saves', slotId)

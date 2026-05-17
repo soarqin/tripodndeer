@@ -86,3 +86,24 @@ describe('slot-crud', () => {
     })
   })
 })
+
+  it('renames a slot', async () => {
+    const { dto, metadata } = makeDtoAndMetadata()
+    await saveSlot('slot1', dto, metadata)
+
+    const { renameSlot } = await import('../slot-crud')
+    await renameSlot('slot1', 'New Name')
+
+    const result = await loadSlot('slot1')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.value.metadata.name).toBe('New Name')
+  })
+
+  it('rejects empty name when renaming', async () => {
+    const { dto, metadata } = makeDtoAndMetadata()
+    await saveSlot('slot1', dto, metadata)
+
+    const { renameSlot } = await import('../slot-crud')
+    await expect(renameSlot('slot1', '   ')).rejects.toThrow('Name cannot be empty')
+  })
