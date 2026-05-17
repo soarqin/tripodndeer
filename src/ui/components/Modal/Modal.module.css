@@ -50,6 +50,15 @@
   line-height: 1.5;
 }
 
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  color: #aaa;
+  font-style: italic;
+}
+
 .footer {
   padding: 16px 24px;
   border-top: 1px solid #444;

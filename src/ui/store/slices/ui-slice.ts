@@ -113,6 +113,8 @@ export function clearQueuedModals(state: GameStore): void {
   state.clockState = engineSetSpeed(state.clockState, state.previousClockSpeed)
 }
 
+const LazySaveLoadModal = React.lazy(() => import('@/ui/components/SaveLoadModal/SaveLoadModal').then(m => ({ default: m.SaveLoadModal })))
+
 export function createUiSlice(set: StoreSet): UiActions {
   return {
     openContextMenu: (payload) =>
@@ -223,7 +225,7 @@ export function createUiSlice(set: StoreSet): UiActions {
       set((state) => {
         enqueueModal(state, {
           title: mode === 'save' ? '存档' : '读档',
-          content: React.createElement(React.lazy(() => import('@/ui/components/SaveLoadModal/SaveLoadModal').then(m => ({ default: m.SaveLoadModal }))), { mode }),
+          content: React.createElement(LazySaveLoadModal, { mode }),
           actions: [],
           dismissable: true,
           priority: ModalPriority.GENERIC,

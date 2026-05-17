@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, Suspense } from 'react'
 import styles from './Modal.module.css'
 
 export interface ModalAction {
@@ -95,7 +95,9 @@ export function Modal({ title, content, actions, dismissable = true, onClose, te
           </h2>
         </div>
         <div className={styles.content}>
-          {content}
+          <Suspense fallback={<div className={styles.loading}>加载中...</div>}>
+            {content}
+          </Suspense>
         </div>
         <div className={styles.footer}>
           {actions.map((action) => (
