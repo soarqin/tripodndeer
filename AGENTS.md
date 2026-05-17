@@ -268,14 +268,25 @@ M1 path: loadM1Data() → createWorldFromM1Data()
 ## Testing
 
 ```bash
-pnpm test          # 全部单元测试（2200+ 个，~25s）
+pnpm test          # 全部单元/功能测试（~2500 个，~30s）
 pnpm typecheck     # TypeScript 严格检查
 pnpm lint          # ESLint，0 警告模式
-pnpm test:perf     # 性能预算（100 tick，p95 < 200ms）
+pnpm test:perf     # 性能基准测试（仅收工时跑，见下）
 pnpm test:all      # typecheck + lint + test
 ```
 
 E2E 验证已迁移到 agent-browser CLI（agent 驱动的手动验证），不再有 Playwright 自动化套件。
+
+### 性能测试策略
+
+**`pnpm test:perf` 仅在每个里程碑收工时运行一次**，不在日常开发循环（TDD / CI 任务验证）中跑。
+
+原因：性能测试的目的是确保每个大版本不破坏实际运行时性能（M1 p95 < 200ms / M9 p95 < 500ms），而非检查功能完整性。这类测试单次耗时 30-90s（因 M9 250 站点场景），放进常规 `pnpm test` 会拖慢开发循环 10×。
+
+`pnpm test`（vitest.config.ts）已从 exclude 列表移除所有 `*-perf*.test.ts` 和 `baseline-capture.test.ts`。新增的性能测试文件**必须**：
+1. 文件名含 `-perf`（e.g. `m11-perf.test.ts`）
+2. 加入 `vitest.config.ts` exclude 列表
+3. 加入 `package.json` `test:perf` 命令的文件列表
 
 ### TDD 节奏
 

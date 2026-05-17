@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { PHASE_NAMES, PHASE_ORDER } from '../index'
 
 describe('phase pipeline membership', () => {
-  it('includes 27 phases', () => {
-    expect(PHASE_ORDER.length).toBe(27)
+  it('includes 28 phases', () => {
+    expect(PHASE_ORDER.length).toBe(28)
   })
 
   it('orders diplomaticMemory before personalityDrift before prestigeUpdate', () => {
