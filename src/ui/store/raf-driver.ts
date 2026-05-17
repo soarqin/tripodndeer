@@ -6,7 +6,6 @@ import { useGameStore } from './game-store'
 import { M10_AUTOSAVE_INTERVAL } from '@/content/m2/balance'
 import { worldToSaveDTO } from '@/engine/world/save-dto'
 import { saveSlot } from './persistence/slot-crud'
-import type { ScenarioId } from '~/shared'
 
 /**
  * RAF 驱动 hook。

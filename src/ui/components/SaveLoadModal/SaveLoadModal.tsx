@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useGameStore } from '@/ui/store'
 import { listSlots, saveSlot, loadSlot, type SlotId } from '@/ui/store/persistence/slot-crud'
 import type { SaveMetadata } from '@/ui/store/persistence/db'
@@ -95,7 +95,11 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
     
     try {
       const scenarioId = world.scenarioId
-      const dto = worldToSaveDTO(world, scenarioId)
+      const hintState = useGameStore.getState()
+      const dto = worldToSaveDTO(world, scenarioId, {
+        seenHints: hintState.seenHints,
+        hintsEnabled: hintState.hintsEnabled,
+      })
       const playerRealm = world.realms.get(world.playerRealmId)
       const metadata: SaveMetadata = {
         slotId: editingSlot,

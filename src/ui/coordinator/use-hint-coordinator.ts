@@ -4,11 +4,10 @@ import type { HintId } from '@/ui/components/HintModal/hint-types'
 import type { RealmId, ScenarioId, SiteId, World } from '~/shared/types'
 
 /**
- * getCurrentScenarioId: prefers world.scenarioId (M10.3+), with site-count fallback
- * for legacy fixtures: M1 = 50 sites, M9 = 250 sites (per AGENTS.md Critical Invariants).
+ * getCurrentScenarioId: reads the canonical world.scenarioId.
  */
 export function getCurrentScenarioId(world: World): ScenarioId {
-  return world.scenarioId ?? (world.sites.size >= 250 ? 'm9' : 'm1')
+  return world.scenarioId
 }
 
 /**

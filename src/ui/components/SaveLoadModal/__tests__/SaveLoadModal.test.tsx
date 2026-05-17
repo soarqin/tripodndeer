@@ -10,7 +10,7 @@ import type { World } from '@/shared/types'
 import type { GameStoreState } from '@/ui/store/game-store'
 
 vi.mock('@/ui/store', () => ({
-  useGameStore: vi.fn(),
+  useGameStore: Object.assign(vi.fn(), { setState: vi.fn() }),
 }))
 
 vi.mock('@/ui/store/persistence/slot-crud', () => ({
@@ -19,10 +19,14 @@ vi.mock('@/ui/store/persistence/slot-crud', () => ({
   loadSlot: vi.fn(),
 }))
 
-vi.mock('@/engine/world/save-dto', () => ({
-  worldToSaveDTO: vi.fn(),
-  saveDtoToWorld: vi.fn(),
-}))
+vi.mock('@/engine/world/save-dto', async () => {
+  const actual = await vi.importActual<typeof import('@/engine/world/save-dto')>('@/engine/world/save-dto')
+  return {
+    ...actual,
+    worldToSaveDTO: vi.fn(),
+    saveDtoToWorld: vi.fn(),
+  }
+})
 
 describe('SaveLoadModal', () => {
   const mockWorld = {
@@ -37,6 +41,7 @@ describe('SaveLoadModal', () => {
   
   const mockReplaceWorldFromSave = vi.fn()
   const mockCloseModal = vi.fn()
+  const mockSetState = vi.fn()
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -49,6 +54,7 @@ describe('SaveLoadModal', () => {
       }
       return selector(state as unknown as GameStoreState)
     })
+    ;(useGameStore as unknown as { setState: typeof mockSetState }).setState = mockSetState
     
     vi.mocked(listSlots).mockResolvedValue([])
   })
