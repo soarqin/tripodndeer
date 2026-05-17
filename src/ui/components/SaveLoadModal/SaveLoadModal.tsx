@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useGameStore } from '@/ui/store'
-import { MANUAL_SLOT_IDS, AUTO_SLOT_IDS, listSlots, saveSlot, loadSlot, deleteSlot, renameSlot, updateSlotThumbnail, type ManualSlotId, type AutoSlotId, type SlotId } from '@/ui/store/persistence/slot-crud'
+import { MANUAL_SLOT_IDS, AUTO_SLOT_IDS, listSlots, saveSlot, loadSlot, deleteSlot, renameSlot, updateSlotThumbnail, type ManualSlotId, type SlotId } from '@/ui/store/persistence/slot-crud'
 import { isPersisted, requestPersistentStorage } from '@/ui/store/persistence/persist-request'
 import type { SaveMetadata } from '@/ui/store/persistence/db'
 import { worldToSaveDTO, saveDtoToWorld, saveDtoToHintState } from '@/engine/world/save-dto'

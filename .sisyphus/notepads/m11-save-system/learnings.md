@@ -325,3 +325,78 @@
 ### Evidence
 - `.sisyphus/evidence/task-20-f9-load.txt`
 - When adding new features to a modal, ensure to handle state correctly and prevent actions (like loading/saving) while editing (e.g., renaming).
+## T19 编年体 Summary Template Generator — Completed
+
+### Files
+- NEW: `src/engine/world/save-summary.ts` — `generateSummary` with reign years, Chinese numerals, and classical verbs (伐, 盟).
+- NEW: `src/engine/world/__tests__/save-summary.test.ts` — tests for M1, M9, tutorial, and Zhou king fallback.
+- MOD: `src/ui/store/persistence/db.ts` — added `summary?: string` to `SaveMetadata`.
+- MOD: `src/ui/components/SaveLoadModal/SaveLoadModal.tsx` — integrated `generateSummary` into manual save.
+- MOD: `src/ui/store/raf-driver.ts` — integrated `generateSummary` into auto-save.
+- MOD: `src/ui/hooks/use-page-hide-save.ts` — integrated `generateSummary` into page-hide save.
+
+### Notes
+- Reign years are calculated as `Math.floor((world.tick - ruler.inOfficeSinceTick) / 36) + 1`.
+- Fallback to Zhou Nan Wang (周赧王) for M1/M9 if no player ruler is active.
+- Tutorial uses "公元前" + Chinese numerals.
+- Summary length is capped at 50 characters.
+
+### Verification
+- `pnpm vitest src/engine/world/__tests__/save-summary.test.ts` ✅
+- `pnpm typecheck` ✅
+
+
+## Defeat Modal Integration
+- `isDefeated` logic checks if player has 0 sites.
+- `victoryCheckStep` emits `playerDefeated` event.
+- `DefeatModal` listens to `playerDefeated` event and dispatches `openModal` with `buildDefeatModalPayload`.
+- `DefeatModal` uses `useGameStore` to get `world` state and calculate years survived, last ruler, and final cause.
+- `useGameStore` mock in tests needs to provide `.getState()` if the component uses it.
+
+## Task 18: Thumbnail Preview
+- Used `document.createElement('canvas')` for thumbnail generation to ensure JSDOM compatibility in tests.
+- Reused `buildSitePathFromBoundary` from `tile-cache.ts` to draw the map directly onto the thumbnail canvas, avoiding the overhead of creating a full tile cache.
+- Added `thumbnail?: string` to `SaveMetadata` in `db.ts`.
+- Updated `SaveLoadModal` to generate the thumbnail asynchronously after saving and display it in the slot row.
+- Fixed typecheck errors in `save-summary.ts` and `raf-driver.ts` caused by `world.date` being undefined in some tests.
+- Fixed `useGameStore.getState is not a function` in `DiplomacyPanel.test.tsx` by using `Object.assign` to attach `getState` to the mocked store function.
+
+## T22 JSON Export/Import Roundtrip — Completed
+
+### Files
+- NEW: `src/ui/components/SaveLoadModal/export-import.ts` (exportSlot/importSave)
+- NEW: `src/ui/components/SaveLoadModal/__tests__/export-import.test.ts` (10 tests)
+- MOD: `src/ui/components/SaveLoadModal/SaveLoadModal.tsx`
+  - Top-level "导入存档" button + hidden file input
+  - Per-used-slot "导出" button (manual AND auto slots)
+  - `importFile` state + target-slot picker overlay (5 manual slots, with "(覆盖：X)" annotation)
+  - `toastMessageForError` module-scope helper for SaveLoadError → user message mapping
+  - Side-fix: re-added missing `import { generateSummary }` (accidentally deleted in T19 commit 5d0c680)
+- MOD: `src/ui/components/SaveLoadModal/SaveLoadModal.module.css` (.topActions, .importTargetList)
+
+### Architecture
+- Export: `loadSlot → JSON.stringify(dto, null, 2) → Blob → URL.createObjectURL → anchor.click → URL.revokeObjectURL`. Plain uncompressed JSON (per task spec).
+- Import: `file.text() → JSON.parse → object guard → schemaVersion pre-check → scenarioVersion pre-check → SaveDTOSchema.safeParse → saveSlot`.
+- Pre-Zod version checks differentiate legacy v5 (→ `incompatible_version`) from generic structural errors (→ `parse_error` with distinct messages). Without these, all errors would collapse into a single Zod stack trace.
+
+### Critical Decisions
+- Pre-Zod schemaVersion check produces `incompatible_version` for v5 saves so UI can show "存档版本不兼容" toast. Skipping this would route v5 through Zod, returning a generic parse_error.
+- Pre-Zod scenarioVersion check produces a distinct "missing scenarioVersion" message → UI shows "存档结构异常" toast. Otherwise indistinguishable from Zod errors.
+- Imported metadata sets `createdAt = Date.now()` (NOT dto.createdAt) so imported entries sort as recently-created.
+- Filename sanitize regex: `/[^\w\u4e00-\u9fff]/g` → `_`. Preserves ASCII word chars + CJK; replaces punctuation/spaces/symbols with underscore. Empty result → fallback to `'save'`.
+
+### Gotchas
+- **jsdom 24 Blob has no `.text()` or `.arrayBuffer()`**. The test file imports `Blob` and `File` from `node:buffer` (Node 18+ native) and assigns them to globalThis in `beforeAll`. Without this, all `file.text()` calls throw `"text is not a function"` and import tests fail with confusing "invalid JSON" errors.
+- The `generateSummary` import was accidentally deleted in commit 5d0c680 ("feat(save): 编年体 summary template generator"). Despite the commit title, that commit also added export-import wiring placeholders (handlers + state + import lines) for my T22 work — but the export-import.ts file itself didn't exist. The result: HEAD had stub handlers calling nonexistent functions AND a broken generateSummary call site. My job was to fill in the export-import.ts and re-add the missing import.
+- `(parsed as { schemaVersion?: unknown }).schemaVersion` pattern follows existing slot-crud.ts (line 67-71). `as unknown` is NOT banned by `no-any.test.ts` (only `as any`, `@ts-ignore`, `@ts-expect-error`).
+- File API tests need polyfilled Blob — using `vi.stubGlobal('URL', {...})` for createObjectURL/revokeObjectURL works fine with jsdom; only Blob/File methods are missing.
+
+### Test Status
+- export-import.test.ts: 10/10 PASS
+- SaveLoadModal.test.tsx: 10/10 PASS (no regression)
+- Full src/ui/store/persistence/ + src/ui/components/SaveLoadModal/: 58/58 PASS
+- pnpm typecheck: 0 errors
+- pnpm lint on new files: 0 warnings (other unrelated lint errors from concurrent T18/T19/T21 are pre-existing)
+
+### Evidence
+- `.sisyphus/evidence/task-22-export-import-roundtrip.txt`
