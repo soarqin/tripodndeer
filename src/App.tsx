@@ -23,8 +23,10 @@ import { SuccessionModal } from '@/ui/components/SuccessionModal'
 import { DisasterReliefModal } from '@/ui/components/DisasterReliefModal'
 import { EventChainModal } from '@/ui/components/EventChainModal'
 import { ReformPromptModal } from '@/ui/components/ReformPromptModal'
+import { DefeatModal } from '@/ui/components/DefeatModal'
 import { CodexPanel } from './ui/components/CodexPanel'
 import { useCodexHotkey } from './ui/components/CodexPanel/codex-hotkey'
+import { useSaveHotkey } from './ui/hooks/use-save-hotkey'
 import { DevAIPanel } from '@/ui/components/DevAIPanel'
 import { ToastQueue } from '@/ui/components/ToastQueue'
 import { ObjectivePanel } from '@/ui/components/ObjectivePanel'
@@ -51,6 +53,7 @@ const ACTION_NAMES: Record<string, string> = {
 export function App(): React.JSX.Element {
   useRafDriver()
   useCodexHotkey()
+  useSaveHotkey()
   useHintCoordinator()
   usePageHideSave()
   const victorious = useVictory()
@@ -141,6 +144,7 @@ export function App(): React.JSX.Element {
       <DisasterReliefModal />
       <EventChainModal />
       <ReformPromptModal />
+      <DefeatModal />
       {modal && activePanel !== 'codex' && (
         <Modal
           title={modal.title}
