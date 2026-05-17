@@ -304,3 +304,24 @@
 ### Evidence
 - `.sisyphus/evidence/task-14-ruler-died-domain-event.txt`
 - `.sisyphus/evidence/task-14-ui-mapping.txt`
+
+## T20 F9 Quick-Load Hotkey — Completed
+
+### Files
+- NEW: `src/ui/hooks/use-save-hotkey.ts` — F9 listener, typing-target guard, latest `auto_*` slot lookup, confirmation modal, quick-load path
+- NEW: `src/ui/hooks/__tests__/use-save-hotkey.test.tsx` — modal, input guard, empty-auto toast, confirm callback load path
+- MOD: `src/App.tsx` — mounted `useSaveHotkey()` beside other global hotkeys
+
+### Notes
+- Reused the codex hotkey’s editable-target guard shape so F9 stays inert inside inputs / textareas / contenteditable nodes.
+- Latest auto slot selection is by `createdAt`, not slot order.
+- Quick-load restores both world state and hint state, matching SaveLoadModal load behavior.
+
+### Verification
+- `pnpm test src/ui/hooks/__tests__/use-save-hotkey.test.tsx` ✅
+- `pnpm typecheck` ✅
+- `lsp_diagnostics` on changed files ✅
+
+### Evidence
+- `.sisyphus/evidence/task-20-f9-load.txt`
+- When adding new features to a modal, ensure to handle state correctly and prevent actions (like loading/saving) while editing (e.g., renaming).

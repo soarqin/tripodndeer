@@ -1,0 +1,13 @@
+Task 20 evidence
+
+- Added `useSaveHotkey()` in `src/ui/hooks/use-save-hotkey.ts`
+- Mounted hook in `src/App.tsx`
+- Added tests for:
+  - F9 confirmation modal + latest auto slot selection
+  - input/textarea guard
+  - no auto slot toast
+
+Verification:
+- `pnpm test src/ui/hooks/__tests__/use-save-hotkey.test.tsx` ✅
+- `pnpm typecheck` ✅
+- `lsp_diagnostics` on changed files ✅
