@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useGameStore } from '@/ui/store'
 import { MANUAL_SLOT_IDS, AUTO_SLOT_IDS, listSlots, saveSlot, loadSlot, deleteSlot, renameSlot, updateSlotThumbnail, type ManualSlotId, type AutoSlotId, type SlotId } from '@/ui/store/persistence/slot-crud'
 import { isPersisted, requestPersistentStorage } from '@/ui/store/persistence/persist-request'
 import type { SaveMetadata } from '@/ui/store/persistence/db'
 import { worldToSaveDTO, saveDtoToWorld, saveDtoToHintState } from '@/engine/world/save-dto'
-import { generateSummary } from '@/engine/world/save-summary'
 import { formatGameDate } from '@/engine/date/calendar'
 import { Modal } from '@/ui/components/Modal/Modal'
 import { generateThumbnail } from '@/rendering/map/save-thumbnail'
+import { exportSlot, importSave } from './export-import'
+import type { SaveLoadError } from '@/shared/types/save-dto'
 import styles from './SaveLoadModal.module.css'
 
 export interface SaveLoadModalProps {
@@ -35,9 +36,13 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
   const [renamingSlot, setRenamingSlot] = useState<ManualSlotId | null>(null)
   const [renameValue, setRenameValue] = useState('')
 
+  const [importFile, setImportFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
   const world = useGameStore(state => state.world)
   const replaceWorldFromSave = useGameStore(state => state.replaceWorldFromSave)
   const closeModal = useGameStore(state => state.closeModal)
+  const enqueueToast = useGameStore(state => state.enqueueToast)
 
   const refreshSlots = async () => {
     try {
@@ -204,6 +209,42 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
     e.stopPropagation()
     setRenamingSlot(null)
     setError(null)
+  }
+
+  const handleExportClick = async (e: React.MouseEvent, slotId: SlotId) => {
+    e.stopPropagation()
+    const result = await exportSlot(slotId)
+    if (!result.ok) {
+      enqueueToast(toastMessageForError(result.error))
+    }
+  }
+
+  const handleImportButtonClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setImportFile(file)
+  }
+
+  const handleImportTargetClick = async (targetSlotId: ManualSlotId) => {
+    if (!importFile) return
+    const file = importFile
+    setImportFile(null)
+    const result = await importSave(file, targetSlotId)
+    if (!result.ok) {
+      enqueueToast(toastMessageForError(result.error))
+      return
+    }
+    await refreshSlots()
+    enqueueToast(`存档已导入至「${targetSlotId.replace('slot', '存档 ')}」`)
+  }
+
+  const handleImportCancel = () => {
+    setImportFile(null)
   }
 
   if (loading) return <div className={styles.container}>加载中...</div>

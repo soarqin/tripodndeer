@@ -43,18 +43,18 @@ export function generateSummary(world: World, scenarioId: ScenarioId): string {
   let dateStr = ''
 
   if (scenarioId === 'tutorial') {
-    dateStr = `公元前${toChineseNumeral(world.date.yearBC)}年`
+    dateStr = `公元前${toChineseNumeral(world.date?.yearBC ?? 0)}年`
   } else if (ruler) {
-    const general = world.generals.get(ruler.generalId)
+    const general = world.generals?.get(ruler.generalId)
     const rulerName = general?.name ?? playerRealm?.displayName ?? ''
     const reignYear = Math.floor((world.tick - ruler.inOfficeSinceTick) / TICKS_PER_YEAR) + 1
     dateStr = `${rulerName}${toChineseNumeral(reignYear)}年`
   } else {
-    const zhouYear = 314 - world.date.yearBC + 1
+    const zhouYear = 314 - (world.date?.yearBC ?? 0) + 1
     if (zhouYear > 0 && zhouYear <= 59) {
       dateStr = `周赧王${toChineseNumeral(zhouYear)}年`
     } else {
-      dateStr = `公元前${toChineseNumeral(world.date.yearBC)}年`
+      dateStr = `公元前${toChineseNumeral(world.date?.yearBC ?? 0)}年`
     }
   }
 
