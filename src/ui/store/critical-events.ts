@@ -65,3 +65,45 @@ export function detectCriticalEvent(
       return null
   }
 }
+
+export type CriticalAutosaveEventType =
+  | 'rulerDied'
+  | 'warDeclared'
+  | 'reformCompleted'
+  | 'investitureChanged'
+
+const CRITICAL_AUTOSAVE_NAME: Record<CriticalAutosaveEventType, string> = {
+  rulerDied: '君主薨逝自动存档',
+  warDeclared: '宣战自动存档',
+  reformCompleted: '变法完成自动存档',
+  investitureChanged: '册封变更自动存档',
+}
+
+export function getCriticalAutosaveName(
+  event: GameEvent,
+  playerRealmId: RealmId,
+): string | null {
+  if (!isRecord(event.payload)) return null
+  const payload = event.payload
+
+  switch (event.type) {
+    case 'rulerDied': {
+      if (payload.realmId !== playerRealmId) return null
+      return CRITICAL_AUTOSAVE_NAME.rulerDied
+    }
+    case 'warDeclared': {
+      if (payload.byRealm !== playerRealmId && payload.againstRealm !== playerRealmId) return null
+      return CRITICAL_AUTOSAVE_NAME.warDeclared
+    }
+    case 'reformCompleted': {
+      if (payload.realmId !== playerRealmId) return null
+      return CRITICAL_AUTOSAVE_NAME.reformCompleted
+    }
+    case 'investitureChanged': {
+      if (payload.newHolderId !== playerRealmId) return null
+      return CRITICAL_AUTOSAVE_NAME.investitureChanged
+    }
+    default:
+      return null
+  }
+}

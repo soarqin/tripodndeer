@@ -264,3 +264,43 @@
 ### Verification
 - `pnpm test src/ui/store/__tests__/raf-driver-yearly-save.test.ts` ✅
 - `pnpm typecheck` ✅
+
+## T14 Critical-Event Autosave Triggers — Completed
+
+### Files
+- MOD: `src/engine/__tests__/architecture-purity.test.ts` — added `'idb'` to BANNED_IMPORTS; added BANNED_LAYER_ALIASES for `~/ui/store/persistence` + `@/ui/store/persistence`; added 2 new test cases
+- MOD: `src/shared/types/events.ts` — added typed interfaces: `WarDeclaredEvent`, `ReformCompletedEvent`, `InvestitureChangedEvent`; imported `CasusBelliId` from `./diplomacy`
+- MOD: `src/engine/systems/events/event-chain-engine.ts` — `applyEventChainChoice` now scans choice.effects for `zhouInvestiture.grant` and pushes `investitureChanged` event with `{ newHolderId: realmId, rank }`
+- MOD: `src/ui/store/critical-events.ts` — added `CriticalAutosaveEventType` + `CRITICAL_AUTOSAVE_NAME` table + `getCriticalAutosaveName(event, playerRealmId)` returning string|null
+- MOD: `src/ui/store/raf-driver.ts` — subscriber now calls `getCriticalAutosaveName`; on non-null, calls `queueAutosave(world, name)`; `autosaveTriggered` flag ensures ≤1 autosave per event batch
+- NEW: `src/engine/systems/events/__tests__/investiture-changed-event.test.ts` — 4 tests using vi.mock to inject a synthetic chain (lin-xiangru-bi.json swapped)
+- NEW: `src/ui/store/__tests__/critical-event-autosave.test.ts` — 18 tests (11 pure-function + 7 subscriber-wiring)
+
+### Architecture
+- RulerDiedEvent already existed in events.ts (M5 era). 3 emission paths were already wired (ruler-lifecycle, orders, stage-progression).
+- Only investitureChanged was a NEW event emission, added inside `applyEventChainChoice` after `applyEventEffect` per-effect loop.
+- Engine-side detection is unconditional (any `zhouInvestiture.grant` effect → emit). UI-side gating is via `getCriticalAutosaveName` (player realm only).
+- Autosave is fire-and-forget: errors propagate through existing `.catch` on `writeAutoRingBuffer` (already wired in T12).
+
+### Critical Decisions
+- Did NOT register `zhou-investiture-chain.json` in `EVENT_CHAINS`. The chain has `realmId: "$currentRealm"` template strings that aren't substituted anywhere — registering would cause silent no-op effects. The new test uses `vi.mock` on `lin-xiangru-bi.json` to inject a synthetic chain with real realmId.
+- Engine emits unconditionally on grant effect. UI player-realm gating is intentional (autosaves protect player from THEIR critical events; AI-only events don't warrant rollback points).
+- `CasusBelliId` payload field on WarDeclaredEvent is optional (`?`) because not all war-declaration paths set it (e.g., `declareWarAndMarch` order).
+- `autosaveTriggered` flag is per-batch (not per-event). Multiple criticals in one tick → ONE autosave. This avoids ring-buffer churn under cascading-event scenarios.
+
+### Gotchas
+- `~/ui/store/persistence` was already caught by `isBannedLayerImport` (catches all of `~/ui/**`). Adding it to BANNED_LAYER_ALIASES is belt-and-suspenders.
+- vi.mock hoisting requires `await import` for the mocked module — top-level await syntax in test file works because vitest treats test files as ESM.
+- Mocking `lin-xiangru-bi.json` (a registered EVENT_CHAINS entry) replaces the whole chain — other tests using `event_lin_xiangru_bi` chain id won't see this mock because vi.mock is file-scoped.
+
+### Verification
+- `pnpm test src/engine/__tests__/architecture-purity.test.ts` — 8/8 PASS
+- `pnpm test src/engine/systems/events/__tests__/investiture-changed-event.test.ts` — 4/4 PASS
+- `pnpm test src/ui/store/__tests__/critical-event-autosave.test.ts` — 18/18 PASS
+- `pnpm typecheck` — 0 errors
+- `pnpm lint` — 0 errors, 0 warnings
+- `pnpm test` full — 2963 passed, 16 failed (all pre-existing: 11 DiplomacyPanel + 5 raf-driver mock fixture issues unchanged from master baseline), 1 skipped
+
+### Evidence
+- `.sisyphus/evidence/task-14-ruler-died-domain-event.txt`
+- `.sisyphus/evidence/task-14-ui-mapping.txt`

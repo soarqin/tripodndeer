@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { MAX_DELTA_MS } from '@/shared/constants'
-import { detectCriticalEvent } from './critical-events'
+import { detectCriticalEvent, getCriticalAutosaveName } from './critical-events'
 import { getSeverity } from './notification-severity-map'
 import { useGameStore } from './game-store'
 import { M10_AUTOSAVE_INTERVAL } from '@/content/m2/balance'
@@ -86,12 +86,21 @@ export function useRafDriver(): void {
       if (state.events.length === 0) return
 
       let criticalHandled = false
+      let autosaveTriggered = false
       for (const event of state.events) {
         if (!criticalHandled) {
           const critical = detectCriticalEvent(event, state.playerRealmId)
           if (critical !== null) {
             state.pauseOnCriticalEvent(critical.type, critical.payload)
             criticalHandled = true
+          }
+        }
+
+        if (!autosaveTriggered) {
+          const autosaveName = getCriticalAutosaveName(event, state.playerRealmId)
+          if (autosaveName !== null && state.bootStatus === 'ready') {
+            queueAutosave(state.world, autosaveName)
+            autosaveTriggered = true
           }
         }
 

@@ -2,7 +2,7 @@ import type { TerrainType } from '~/content/m2/balance'
 import type { RealmId, SiteId } from './core'
 import type { GeneralId, Specialty, PersonalityArchetype, FactionId } from './character'
 import type { Ideology, AcademyId, CulturalTag } from './world'
-import type { AttitudeBucket } from './diplomacy'
+import type { AttitudeBucket, CasusBelliId } from './diplomacy'
 
 export type EventChainId = string
 
@@ -219,5 +219,31 @@ export interface GovernorAssignmentRevokedEvent {
   readonly payload: {
     readonly siteId: SiteId
     readonly generalId: GeneralId
+  }
+}
+
+export interface WarDeclaredEvent {
+  readonly type: 'warDeclared'
+  readonly payload: {
+    readonly byRealm: RealmId
+    readonly againstRealm: RealmId
+    readonly casusBelli?: CasusBelliId | null
+  }
+}
+
+export interface ReformCompletedEvent {
+  readonly type: 'reformCompleted'
+  readonly payload: {
+    readonly realmId: RealmId
+    readonly reformId: string
+    readonly success: boolean
+  }
+}
+
+export interface InvestitureChangedEvent {
+  readonly type: 'investitureChanged'
+  readonly payload: {
+    readonly newHolderId: RealmId
+    readonly rank: ZhouInvestitureRank
   }
 }

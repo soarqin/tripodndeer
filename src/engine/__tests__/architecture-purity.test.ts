@@ -25,7 +25,8 @@ function getAllTsFiles(dir: string): string[] {
   return files
 }
 
-const BANNED_IMPORTS = ['react', 'react-dom', 'zustand', 'jsdom']
+const BANNED_IMPORTS = ['react', 'react-dom', 'zustand', 'jsdom', 'idb']
+const BANNED_LAYER_ALIASES = ['~/ui/store/persistence', '@/ui/store/persistence']
 const BANNED_GLOBALS = ['window.', 'document.', 'navigator.', 'requestAnimationFrame', 'cancelAnimationFrame']
 const IMPORT_PATTERN = /^\s*import\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"]/gm
 
@@ -35,6 +36,10 @@ function extractImportSpecifiers(content: string): string[] {
 
 function isBannedPackageImport(specifier: string): boolean {
   return BANNED_IMPORTS.some(banned => specifier === banned || specifier.startsWith(`${banned}/`))
+}
+
+function isBannedPersistenceAlias(specifier: string): boolean {
+  return BANNED_LAYER_ALIASES.some(banned => specifier === banned || specifier.startsWith(`${banned}/`))
 }
 
 function resolvesInsideDir(target: string, dir: string): boolean {
@@ -69,7 +74,11 @@ describe('engine architecture purity', () => {
     for (const file of files) {
       const content = fs.readFileSync(file, 'utf-8')
       for (const specifier of extractImportSpecifiers(content)) {
-        if (isBannedPackageImport(specifier) || isBannedLayerImport(file, specifier)) {
+        if (
+          isBannedPackageImport(specifier) ||
+          isBannedLayerImport(file, specifier) ||
+          isBannedPersistenceAlias(specifier)
+        ) {
           violations.push(`${path.relative(engineDir, file)}: imports ${specifier}`)
         }
       }
@@ -115,7 +124,18 @@ describe('engine architecture purity', () => {
     expect(isBannedPackageImport('react-dom/client')).toBe(true)
     expect(isBannedPackageImport('zustand/middleware')).toBe(true)
     expect(isBannedPackageImport('jsdom')).toBe(true)
+    expect(isBannedPackageImport('idb')).toBe(true)
+    expect(isBannedPackageImport('idb/with-async-ittr')).toBe(true)
     expect(isBannedPackageImport('~/shared/types')).toBe(false)
+  })
+
+  it('rejects persistence layer aliases (C1 — engine must not import idb/persistence)', () => {
+    expect(isBannedPersistenceAlias('~/ui/store/persistence')).toBe(true)
+    expect(isBannedPersistenceAlias('~/ui/store/persistence/auto-ring-buffer')).toBe(true)
+    expect(isBannedPersistenceAlias('@/ui/store/persistence')).toBe(true)
+    expect(isBannedPersistenceAlias('@/ui/store/persistence/db')).toBe(true)
+    expect(isBannedPersistenceAlias('~/ui/store')).toBe(false)
+    expect(isBannedPersistenceAlias('~/shared/types/save-dto')).toBe(false)
   })
 
   it('no banned browser globals in engine files', () => {

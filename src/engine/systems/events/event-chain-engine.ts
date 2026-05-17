@@ -362,8 +362,15 @@ export function applyEventChainChoice(
   if (!choice) return { world, events: [] }
 
   let currentWorld = world
+  const events: GameEvent[] = []
   for (const effect of choice.effects) {
     currentWorld = applyEventEffect(currentWorld, effect)
+    if (effect.type === 'zhouInvestiture.grant') {
+      events.push({
+        type: 'investitureChanged',
+        payload: { newHolderId: effect.realmId, rank: effect.rank },
+      })
+    }
   }
 
   const updatedState: EventChainState = {
@@ -375,7 +382,6 @@ export function applyEventChainChoice(
   }
 
   const eventChainStates = new Map(currentWorld.eventChainStates)
-  const events: GameEvent[] = []
 
   if (choice.nextStageId) {
     const nextState: EventChainState = {
