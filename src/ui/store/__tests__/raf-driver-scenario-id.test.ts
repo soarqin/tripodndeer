@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { M10_AUTOSAVE_INTERVAL } from '@/content/m2/balance'
 import { useRafDriver } from '../raf-driver'
 import { useGameStore } from '../game-store'
-import { saveSlot } from '../persistence/slot-crud'
+import { writeAutoRingBuffer } from '../persistence/auto-ring-buffer'
 import { worldToSaveDTO } from '@/engine/world/save-dto'
 
 vi.mock('../game-store', () => ({
@@ -13,8 +13,8 @@ vi.mock('../game-store', () => ({
   },
 }))
 
-vi.mock('../persistence/slot-crud', () => ({
-  saveSlot: vi.fn(() => Promise.resolve({ ok: true, value: undefined })),
+vi.mock('../persistence/auto-ring-buffer', () => ({
+  writeAutoRingBuffer: vi.fn(() => Promise.resolve()),
 }))
 
 vi.mock('@/engine/world/save-dto', () => ({
@@ -67,13 +67,12 @@ describe('useRafDriver autosave scenarioId', () => {
       rafCallback?.(16)
     })
 
-    expect(saveSlot).toHaveBeenCalledTimes(1)
+    expect(writeAutoRingBuffer).toHaveBeenCalledTimes(1)
     expect(worldToSaveDTO).toHaveBeenCalledWith(store.world, scenarioId, {
       seenHints: store.seenHints,
       hintsEnabled: store.hintsEnabled,
     })
-    expect(vi.mocked(saveSlot)).toHaveBeenCalledWith(
-      'auto',
+    expect(vi.mocked(writeAutoRingBuffer)).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ scenarioId }),
     )

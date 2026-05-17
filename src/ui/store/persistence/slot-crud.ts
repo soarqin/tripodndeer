@@ -6,8 +6,27 @@ import { M11_QUOTA_BLOCK_THRESHOLD_PCT, M11_QUOTA_CACHE_TTL_MS, M11_QUOTA_PRIVAT
 import { ModalPriority, useGameStore } from '../game-store'
 import { SAVE_DTO_VERSION, type Result, type SaveDTO, type SaveLoadError } from '~/shared/types/save-dto'
 
-export const SLOT_IDS = ['slot1', 'slot2', 'slot3', 'slot4', 'slot5', 'auto'] as const
+export const MANUAL_SLOT_IDS = ['slot1', 'slot2', 'slot3', 'slot4', 'slot5'] as const
+export const AUTO_SLOT_IDS = [
+  'auto_0',
+  'auto_1',
+  'auto_2',
+  'auto_3',
+  'auto_4',
+  'auto_5',
+  'auto_6',
+  'auto_7',
+  'auto_8',
+  'auto_9',
+] as const
+export const SLOT_IDS = [...MANUAL_SLOT_IDS, ...AUTO_SLOT_IDS] as const
 export type SlotId = (typeof SLOT_IDS)[number]
+export type ManualSlotId = (typeof MANUAL_SLOT_IDS)[number]
+export type AutoSlotId = (typeof AUTO_SLOT_IDS)[number]
+
+function isAutoSlotId(slotId: string): slotId is AutoSlotId {
+  return (AUTO_SLOT_IDS as readonly string[]).includes(slotId)
+}
 
 export interface SaveSlot {
   slotId: SlotId
@@ -99,7 +118,7 @@ export async function saveSlot(slotId: SlotId, dto: SaveDTO, metadata: SaveMetad
   if (quotaInfo) {
     const pct = (quotaInfo.usage / quotaInfo.quota) * 100
     if (pct >= M11_QUOTA_BLOCK_THRESHOLD_PCT) {
-      if (slotId !== 'auto') {
+      if (!isAutoSlotId(slotId)) {
         showQuotaExceededModal()
       }
       return { ok: false, error: { kind: 'quota_exceeded', message: '存储空间已满，无法保存' } }
@@ -129,7 +148,7 @@ export async function saveSlot(slotId: SlotId, dto: SaveDTO, metadata: SaveMetad
     await db.put('saves', record)
   } catch (err) {
     if (err instanceof DOMException && err.name === 'QuotaExceededError') {
-      if (slotId !== 'auto') {
+      if (!isAutoSlotId(slotId)) {
         showQuotaExceededModal()
       }
       return { ok: false, error: { kind: 'quota_exceeded', message: '存储空间已满' } }

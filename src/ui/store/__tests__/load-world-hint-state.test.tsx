@@ -8,11 +8,17 @@ import type { SaveDTO } from '@/shared/types/save-dto'
 import type { SaveMetadata } from '@/ui/store/persistence/db'
 import type { World } from '@/shared/types'
 
-vi.mock('@/ui/store/persistence/slot-crud', () => ({
-  listSlots: vi.fn(),
-  saveSlot: vi.fn(),
-  loadSlot: vi.fn(),
-}))
+vi.mock('@/ui/store/persistence/slot-crud', async () => {
+  const actual = await vi.importActual<typeof import('@/ui/store/persistence/slot-crud')>(
+    '@/ui/store/persistence/slot-crud',
+  )
+  return {
+    ...actual,
+    listSlots: vi.fn(),
+    saveSlot: vi.fn(),
+    loadSlot: vi.fn(),
+  }
+})
 
 vi.mock('@/engine/world/save-dto', async () => {
   const actual = await vi.importActual<typeof import('@/engine/world/save-dto')>('@/engine/world/save-dto')

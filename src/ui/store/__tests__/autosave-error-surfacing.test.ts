@@ -4,7 +4,7 @@ import { M10_AUTOSAVE_INTERVAL } from '@/content/m2/balance'
 import { worldToSaveDTO } from '@/engine/world/save-dto'
 import { useRafDriver } from '../raf-driver'
 import { useGameStore } from '../game-store'
-import { saveSlot } from '../persistence/slot-crud'
+import { writeAutoRingBuffer } from '../persistence/auto-ring-buffer'
 
 vi.mock('../game-store', () => ({
   useGameStore: {
@@ -13,8 +13,8 @@ vi.mock('../game-store', () => ({
   },
 }))
 
-vi.mock('../persistence/slot-crud', () => ({
-  saveSlot: vi.fn(),
+vi.mock('../persistence/auto-ring-buffer', () => ({
+  writeAutoRingBuffer: vi.fn(),
 }))
 
 vi.mock('@/engine/world/save-dto', () => ({
@@ -78,10 +78,7 @@ describe('useRafDriver autosave error surfacing', () => {
   async function triggerAutosave(): Promise<AutosaveStore> {
     const store = makeStore()
     vi.mocked(useGameStore.getState).mockImplementation(() => store as never)
-    vi.mocked(saveSlot).mockResolvedValueOnce({
-      ok: false,
-      error: { kind: 'quota_exceeded', message: '存储空间已满' },
-    })
+    vi.mocked(writeAutoRingBuffer).mockRejectedValueOnce(new Error('存储空间已满'))
 
     renderHook(() => useRafDriver())
     expect(requestAnimationFrame).toHaveBeenCalledTimes(1)
@@ -99,7 +96,7 @@ describe('useRafDriver autosave error surfacing', () => {
   it('enqueues a toast when autosave fails', async () => {
     const store = await triggerAutosave()
 
-    expect(saveSlot).toHaveBeenCalledTimes(1)
+    expect(writeAutoRingBuffer).toHaveBeenCalledTimes(1)
     expect(worldToSaveDTO).toHaveBeenCalledTimes(1)
     expect(store.toastQueue).toHaveLength(1)
     expect(store.toastQueue[0]?.text.startsWith('[错误]')).toBe(true)
@@ -111,7 +108,7 @@ describe('useRafDriver autosave error surfacing', () => {
   it('does not enqueue a toast when autosave succeeds', async () => {
     const store = makeStore()
     vi.mocked(useGameStore.getState).mockImplementation(() => store as never)
-    vi.mocked(saveSlot).mockResolvedValueOnce({ ok: true, value: undefined })
+    vi.mocked(writeAutoRingBuffer).mockResolvedValueOnce(undefined)
 
     renderHook(() => useRafDriver())
     act(() => {
@@ -122,7 +119,7 @@ describe('useRafDriver autosave error surfacing', () => {
     await Promise.resolve()
     await Promise.resolve()
 
-    expect(saveSlot).toHaveBeenCalledTimes(1)
+    expect(writeAutoRingBuffer).toHaveBeenCalledTimes(1)
     expect(store.toastQueue).toHaveLength(0)
     expect(store.enqueueToast).not.toHaveBeenCalled()
   })

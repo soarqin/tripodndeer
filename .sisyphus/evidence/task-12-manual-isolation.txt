@@ -1,0 +1,5 @@
+manual isolation PASS
+slot1Present=true
+slot1.createdAt=500
+slot1.name=手动
+totalSlots=11

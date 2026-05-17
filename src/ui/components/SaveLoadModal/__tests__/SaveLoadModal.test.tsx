@@ -13,11 +13,17 @@ vi.mock('@/ui/store', () => ({
   useGameStore: Object.assign(vi.fn(), { setState: vi.fn() }),
 }))
 
-vi.mock('@/ui/store/persistence/slot-crud', () => ({
-  listSlots: vi.fn(),
-  saveSlot: vi.fn(),
-  loadSlot: vi.fn(),
-}))
+vi.mock('@/ui/store/persistence/slot-crud', async () => {
+  const actual = await vi.importActual<typeof import('@/ui/store/persistence/slot-crud')>(
+    '@/ui/store/persistence/slot-crud',
+  )
+  return {
+    ...actual,
+    listSlots: vi.fn(),
+    saveSlot: vi.fn(),
+    loadSlot: vi.fn(),
+  }
+})
 
 vi.mock('@/engine/world/save-dto', async () => {
   const actual = await vi.importActual<typeof import('@/engine/world/save-dto')>('@/engine/world/save-dto')
@@ -59,16 +65,19 @@ describe('SaveLoadModal', () => {
     vi.mocked(listSlots).mockResolvedValue([])
   })
 
-  it('renders 6 slots in save mode', async () => {
+  it('renders 5 manual slots in save mode', async () => {
     render(<SaveLoadModal mode="save" />)
-    
+
     await waitFor(() => {
       expect(screen.getByTestId('save-load-modal')).toBeTruthy()
     })
-    
+
     expect(screen.getByTestId('slot-slot1')).toBeTruthy()
+    expect(screen.getByTestId('slot-slot2')).toBeTruthy()
+    expect(screen.getByTestId('slot-slot3')).toBeTruthy()
+    expect(screen.getByTestId('slot-slot4')).toBeTruthy()
     expect(screen.getByTestId('slot-slot5')).toBeTruthy()
-    expect(screen.getByTestId('slot-auto')).toBeTruthy()
+    expect(screen.queryByTestId('slot-auto')).toBeNull()
   })
 
   it('shows name input when clicking empty slot in save mode', async () => {

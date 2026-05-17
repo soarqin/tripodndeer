@@ -190,3 +190,51 @@
 ### Evidence
 - `.sisyphus/evidence/task-9-quarantine-flow.txt` — quarantine flow PASS, original deleted, quarantine present
 - `.sisyphus/evidence/task-9-quarantine-preserved.txt` — schemaVersion + metadata preserved post-quarantine
+
+## T12 10-Slot Ring Buffer — Completed
+
+### Files
+- MOD: `src/ui/store/persistence/slot-crud.ts` — SLOT_IDS now `[...MANUAL_SLOT_IDS, ...AUTO_SLOT_IDS]` (5 + 10 = 15); exports `MANUAL_SLOT_IDS`, `AUTO_SLOT_IDS`, `ManualSlotId`, `AutoSlotId`; quota-modal guard updated to `!isAutoSlotId(slotId)` (replaces the now-invalid `slotId !== 'auto'`)
+- NEW: `src/ui/store/persistence/auto-ring-buffer.ts` — `writeAutoRingBuffer(dto, metadata)` with C4 atomic `readwrite` transaction (read getAll → pick target → put → tx.done)
+- MOD: `src/ui/store/raf-driver.ts` — autosave now calls `writeAutoRingBuffer` (returns `Promise<void>`, errors handled via single `.catch` → toast)
+- MOD: `src/ui/components/SaveLoadModal/SaveLoadModal.tsx` — drops 'auto' card; iterates `MANUAL_SLOT_IDS` typed as `ManualSlotId`; `emptySlotMap()` helper builds the slot state Record dynamically
+- NEW: `src/ui/store/persistence/__tests__/auto-ring-buffer.test.ts` — 8 tests: first write, 10 fills declared order, 11th evicts oldest, repeat-eviction, manual slot1 untouched, listSlots returns 15, metadata.slotId rewritten, evidence file generation
+- NEW: `src/ui/store/persistence/__tests__/single-entry.test.ts` — M6 AST/regex invariant: forbidden IDB-on-saves patterns must not appear outside allowlist (`db.ts`, `slot-crud.ts`, `auto-ring-buffer.ts`, `quarantine.ts`, `compression.ts`, `**/__tests__/**`)
+- MOD: `src/ui/store/__tests__/raf-driver-scenario-id.test.ts` — mocks `writeAutoRingBuffer` instead of `saveSlot`; assertion drops the leading `'auto'` arg (ring buffer takes only `dto, metadata`)
+- MOD: `src/ui/store/__tests__/autosave-error-surfacing.test.ts` — same swap (`saveSlot` → `writeAutoRingBuffer`); error path now uses `mockRejectedValueOnce` (writeAutoRingBuffer returns `Promise<void>`, not `Result`)
+- MOD: `src/ui/components/SaveLoadModal/__tests__/SaveLoadModal.test.tsx` — mock uses `vi.importActual` to pass `MANUAL_SLOT_IDS` through; renamed test to "renders 5 manual slots", asserts `slot-auto` is null
+- MOD: `src/ui/store/__tests__/load-world-hint-state.test.tsx` — same mock fix (`importActual` partial)
+
+### Architecture
+- C4 invariant: read-evict-write inside ONE `db.transaction('saves', 'readwrite')` so concurrent autosaves can't double-write
+- Selection policy:
+  - Auto-record count < 10 → fill next empty slot in `AUTO_SLOT_IDS` declared order (auto_0, auto_1, …)
+  - Otherwise reduce to oldest by `metadata.createdAt` (numeric, not string compare)
+- `writeAutoRingBuffer` validates DTO via `SaveDTOSchema.parse` BEFORE entering the tx, so an invalid payload can't leave the store in a half-written state
+- World string is compressed via `compressWorld` (matches T8 saveSlot path)
+- Metadata `slotId` is OVERWRITTEN to the target slot inside the function — callers can pass any placeholder (raf-driver passes 'auto_0', but the ring buffer rewrites it)
+- The ring buffer does NOT check quota — autosaves are best-effort; quota-exceeded throws propagate via `.catch` in raf-driver and surface as toast
+
+### Critical Decisions
+- Returned `Promise<void>` (NOT `Result<void, SaveLoadError>`) per T12 spec — autosave path is fire-and-forget with a single catch handler
+- Did NOT remove `slotId !== 'auto'` quota-modal guard outright — replaced with `!isAutoSlotId(slotId)` so any future caller invoking saveSlot with an auto_* id still gets silent failure
+- Removed 'auto' card from SaveLoadModal: 'auto' is no longer a SlotId literal (would be typecheck error). Auto-save loading is deferred to T20 (F9 quickload) and T22 (export/import). The SaveLoadModal now strictly handles manual saves
+- M6 single-entry test uses regex-on-text (not ast-grep) — simpler for cross-file scanning. Allowlist set via absolute paths
+
+### Gotchas
+- `db.put('saves'` / `db.transaction('saves'` are detected by regex `\.put\s*\(\s*['"]saves['"]` so spacing variations are tolerated
+- `getDb(` is in FORBIDDEN_PATTERNS — any code outside the allowlist that imports `getDb` is a violation (caught both at import site and at call site)
+- Fake-indexeddb is reset between tests via `resetDbForTesting()` + `db.clear('saves')` (same pattern as slot-crud.test.ts)
+- The 11 DiplomacyPanel.test.tsx failures remain pre-existing and unrelated (confirmed via grep for non-DiplomacyPanel FAIL lines = 0)
+
+### Verification
+- `pnpm test src/ui/store/persistence/__tests__/auto-ring-buffer.test.ts` — 8/8 PASS
+- `pnpm test src/ui/store/persistence/__tests__/single-entry.test.ts` — 2/2 PASS
+- `pnpm test src/ui/store/persistence/__tests__/ src/ui/store/__tests__/raf-driver-scenario-id.test.ts src/ui/store/__tests__/autosave-error-surfacing.test.ts src/ui/components/SaveLoadModal/__tests__/SaveLoadModal.test.tsx src/ui/store/__tests__/load-world-hint-state.test.tsx` — all PASS (48 tests)
+- `pnpm typecheck` — 0 errors
+- `pnpm lint` — 0 errors, 0 warnings
+- `pnpm test` full — 2937 passed, 11 failed (DiplomacyPanel pre-existing), 1 skipped, 2949 total
+
+### Evidence
+- `.sisyphus/evidence/task-12-ring-eviction.txt` — auto_0 evicted (1000→2000), other 9 slots preserved with original timestamps
+- `.sisyphus/evidence/task-12-manual-isolation.txt` — slot1 (createdAt=500, name=手动) untouched after 11 ring writes, totalSlots=11 (1 manual + 10 auto)

@@ -5,7 +5,7 @@ import { getSeverity } from './notification-severity-map'
 import { useGameStore } from './game-store'
 import { M10_AUTOSAVE_INTERVAL } from '@/content/m2/balance'
 import { worldToSaveDTO } from '@/engine/world/save-dto'
-import { saveSlot } from './persistence/slot-crud'
+import { writeAutoRingBuffer } from './persistence/auto-ring-buffer'
 
 /**
  * RAF 驱动 hook。
@@ -36,19 +36,15 @@ export function useRafDriver(): void {
             hintsEnabled: hintState.hintsEnabled,
           })
           const playerRealm = newWorld.realms.get(newWorld.playerRealmId)
-          const metadata = { 
-            slotId: 'auto', 
-            name: '自动存档', 
-            createdAt: Date.now(), 
-            tick: newWorld.tick, 
-            scenarioId, 
-            playerRealmName: playerRealm ? playerRealm.displayName : '未知势力' 
+          const metadata = {
+            slotId: 'auto_0',
+            name: '自动存档',
+            createdAt: Date.now(),
+            tick: newWorld.tick,
+            scenarioId,
+            playerRealmName: playerRealm ? playerRealm.displayName : '未知势力',
           }
-          saveSlot('auto', dto, metadata)
-            .then((result) => {
-              if (result.ok) return
-              useGameStore.getState().enqueueToast('[错误] 自动存档失败：' + result.error.message, 5000)
-            })
+          writeAutoRingBuffer(dto, metadata)
             .catch((err: unknown) => {
               const msg = err instanceof Error ? err.message : String(err)
               useGameStore.getState().enqueueToast('[错误] 自动存档失败：' + msg, 5000)

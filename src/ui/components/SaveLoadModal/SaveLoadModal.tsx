@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useGameStore } from '@/ui/store'
-import { listSlots, saveSlot, loadSlot, type SlotId } from '@/ui/store/persistence/slot-crud'
+import { MANUAL_SLOT_IDS, listSlots, saveSlot, loadSlot, type ManualSlotId } from '@/ui/store/persistence/slot-crud'
 import { isPersisted, requestPersistentStorage } from '@/ui/store/persistence/persist-request'
 import type { SaveMetadata } from '@/ui/store/persistence/db'
 import { worldToSaveDTO, saveDtoToWorld, saveDtoToHintState } from '@/engine/world/save-dto'
@@ -11,15 +11,20 @@ export interface SaveLoadModalProps {
   mode: 'save' | 'load'
 }
 
-const SLOTS: SlotId[] = ['slot1', 'slot2', 'slot3', 'slot4', 'slot5', 'auto']
+const SLOTS: readonly ManualSlotId[] = MANUAL_SLOT_IDS
+
+function emptySlotMap(): Record<ManualSlotId, SaveMetadata | null> {
+  return SLOTS.reduce((acc, id) => {
+    acc[id] = null
+    return acc
+  }, {} as Record<ManualSlotId, SaveMetadata | null>)
+}
 
 export function SaveLoadModal({ mode }: SaveLoadModalProps) {
-  const [slots, setSlots] = useState<Record<SlotId, SaveMetadata | null>>({
-    slot1: null, slot2: null, slot3: null, slot4: null, slot5: null, auto: null
-  })
+  const [slots, setSlots] = useState<Record<ManualSlotId, SaveMetadata | null>>(emptySlotMap)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [editingSlot, setEditingSlot] = useState<SlotId | null>(null)
+  const [editingSlot, setEditingSlot] = useState<ManualSlotId | null>(null)
   const [saveName, setSaveName] = useState('')
   const [persisted, setPersisted] = useState(false)
 
@@ -31,12 +36,10 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
     isPersisted().then(setPersisted).catch(() => setPersisted(false))
 
     listSlots().then(metadataList => {
-      const newSlots: Record<SlotId, SaveMetadata | null> = {
-        slot1: null, slot2: null, slot3: null, slot4: null, slot5: null, auto: null
-      }
+      const newSlots = emptySlotMap()
       for (const meta of metadataList) {
-        if (SLOTS.includes(meta.slotId as SlotId)) {
-          newSlots[meta.slotId as SlotId] = meta
+        if ((SLOTS as readonly string[]).includes(meta.slotId)) {
+          newSlots[meta.slotId as ManualSlotId] = meta
         }
       }
       setSlots(newSlots)
@@ -47,17 +50,15 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
     })
   }, [])
 
-  const handleSlotClick = async (slotId: SlotId) => {
+  const handleSlotClick = async (slotId: ManualSlotId) => {
     setError(null)
-    
+
     if (mode === 'save') {
-      if (slotId === 'auto') return
-      
       const existing = slots[slotId]
       if (existing) {
         if (!window.confirm('确定要覆盖此存档吗？')) return
       }
-      
+
       setEditingSlot(slotId)
       setSaveName(existing?.name || `存档 ${formatGameDate(world.date)}`)
     } else {
@@ -143,18 +144,17 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
       <div className={styles.slots}>
         {SLOTS.map(slotId => {
           const meta = slots[slotId]
-          const isAuto = slotId === 'auto'
-          const disabled = (mode === 'save' && isAuto) || (mode === 'load' && !meta)
-          
+          const disabled = mode === 'load' && !meta
+
           return (
-            <div 
+            <div
               key={slotId}
               className={`${styles.slot} ${disabled ? styles.disabled : ''}`}
               data-testid={`slot-${slotId}`}
               onClick={() => !disabled && handleSlotClick(slotId)}
             >
               <div className={styles.slotHeader}>
-                <span className={styles.slotId}>{isAuto ? '自动存档' : `存档 ${slotId.replace('slot', '')}`}</span>
+                <span className={styles.slotId}>{`存档 ${slotId.replace('slot', '')}`}</span>
                 {meta && <span className={styles.slotDate}>{new Date(meta.createdAt).toLocaleString()}</span>}
               </div>
               

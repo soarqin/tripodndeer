@@ -1,0 +1,13 @@
+ring eviction PASS
+autoSlotCount=10
+auto_0.createdAt=2000 (was 1000, now 2000 after eviction)
+auto_0=2000
+auto_1=1001
+auto_2=1002
+auto_3=1003
+auto_4=1004
+auto_5=1005
+auto_6=1006
+auto_7=1007
+auto_8=1008
+auto_9=1009
