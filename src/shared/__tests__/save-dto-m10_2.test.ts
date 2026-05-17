@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { saveDtoToHintState } from '~/engine/world/save-dto'
+import { createWorldFromM1Data, loadM1Data } from '~/engine/world/factory'
+import { worldToSaveDTO } from '~/engine/world/save-dto'
 import { saveDtoSchema } from '../schemas/save-dto'
 import { SAVE_DTO_VERSION, type SaveDTO } from '../types/save-dto'
 
@@ -52,5 +54,24 @@ describe('SaveDTO v5 M10.2 fields', () => {
 
     expect(state.seenHints.hint_reform).toBe(true)
     expect(state.seenHints.hint_unknown_xxx).toBe(true)
+  })
+
+  it('should round-trip seenHints and hintsEnabled in worldToSaveDTO', () => {
+    const world = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
+    const dto = worldToSaveDTO(world, 'm1', {
+      seenHints: { 'first-conquest': true, 'dynasty-fall': true },
+      hintsEnabled: false,
+    })
+
+    expect(dto.seenHints).toEqual({ 'first-conquest': true, 'dynasty-fall': true })
+    expect(dto.hintsEnabled).toBe(false)
+  })
+
+  it('defaults seenHints and hintsEnabled when hintState is omitted', () => {
+    const world = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
+    const dto = worldToSaveDTO(world)
+
+    expect(dto.seenHints).toEqual({})
+    expect(dto.hintsEnabled).toBe(true)
   })
 })

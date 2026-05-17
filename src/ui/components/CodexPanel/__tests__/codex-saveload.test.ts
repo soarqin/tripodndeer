@@ -12,7 +12,11 @@ describe('codex save/load roundtrip', () => {
     await useGameStore.getState().loadWorld('m1')
     useGameStore.getState().openCodex('mechanic-legitimacy')
 
-    const saved = worldToSaveDTO(useGameStore.getState().world)
+    const store = useGameStore.getState()
+    const saved = worldToSaveDTO(store.world, 'm1', {
+      seenHints: store.seenHints,
+      hintsEnabled: store.hintsEnabled,
+    })
     expect(SAVE_DTO_VERSION).toBe(5)
     expect(saved).not.toHaveProperty('activePanel')
     expect(saved).not.toHaveProperty('selectedCodexEntryId')

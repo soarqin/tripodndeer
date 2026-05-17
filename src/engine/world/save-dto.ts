@@ -11,9 +11,6 @@ import {
   type TutorialStateDTO,
 } from '~/shared/types/save-dto'
 import { getDefaultPhases } from './factory'
-import { migrateSaveV2ToV3 } from './migrations/save-v2-to-v3'
-import { migrateSaveV3ToV4 } from './migrations/save-v3-to-v4'
-import { migrateSaveV4ToV5 } from './migrations/save-v4-to-v5'
 
 function serializeTutorialState(state: TutorialState): TutorialStateDTO {
   return {
@@ -37,12 +34,18 @@ function deserializeTutorialState(dto: TutorialStateDTO): TutorialState {
   }
 }
 
-export function worldToSaveDTO(world: World, scenarioId: ScenarioId = 'm1'): SaveDTO {
+export function worldToSaveDTO(
+  world: World,
+  scenarioId: ScenarioId = 'm1',
+  hintState?: HintSaveState,
+): SaveDTO {
   return {
     schemaVersion: SAVE_DTO_VERSION,
     scenarioId: world.scenarioId ?? scenarioId,
     createdAt: Date.now(),
     tutorialState: world.tutorialState ? serializeTutorialState(world.tutorialState) : null,
+    seenHints: hintState?.seenHints ?? {},
+    hintsEnabled: hintState?.hintsEnabled ?? true,
     world: {
       date: world.date,
       tick: world.tick,
@@ -94,7 +97,7 @@ export function worldToSaveDTO(world: World, scenarioId: ScenarioId = 'm1'): Sav
   }
 }
 
-export const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [1, 2, 3, 4, 5]
+export const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [5]
 
 export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
   const inputDto = dto as SaveDTOAnyVersion
@@ -110,17 +113,7 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
     }
   }
 
-  let migratedDto: SaveDTOAnyVersion = inputDto
-  if (migratedDto.schemaVersion === 2) {
-    migratedDto = migrateSaveV2ToV3(migratedDto)
-  }
-  if (migratedDto.schemaVersion === 3) {
-    migratedDto = migrateSaveV3ToV4(migratedDto)
-  }
-  if (migratedDto.schemaVersion === 4) {
-    migratedDto = migrateSaveV4ToV5(migratedDto)
-  }
-  const sw = migratedDto.world
+  const sw = inputDto.world
   const factionInfluences = new Map(
     sw.factionInfluences.map(([key, value]): [string, FactionInfluenceState] => [
       key,
@@ -182,9 +175,9 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
       aiState: new Map(sw.aiState ?? []),
       diplomaticMemory: new Map(sw.diplomaticMemory ?? []),
       playerRealmId: sw.playerRealmId,
-      scenarioId: migratedDto.scenarioId,
-      tutorialState: migratedDto.tutorialState
-        ? deserializeTutorialState(migratedDto.tutorialState)
+      scenarioId: inputDto.scenarioId,
+      tutorialState: inputDto.tutorialState
+        ? deserializeTutorialState(inputDto.tutorialState)
         : null,
       rngState: sw.rngState,
       phases: getDefaultPhases(),
@@ -194,7 +187,7 @@ export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
 }
 
 export interface HintSaveState {
-  readonly seenHints: Record<string, true>
+  readonly seenHints: Readonly<Record<string, true>>
   readonly hintsEnabled: boolean
 }
 

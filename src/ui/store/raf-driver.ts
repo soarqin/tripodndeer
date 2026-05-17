@@ -30,8 +30,12 @@ export function useRafDriver(): void {
         const newWorld = useGameStore.getState().world
         
         if (newWorld.tick > oldTick && newWorld.tick % M10_AUTOSAVE_INTERVAL === 0 && newWorld.tick > 0 && useGameStore.getState().bootStatus === 'ready') {
-          const scenarioId: ScenarioId = newWorld.sites.size === 250 ? 'm9' : 'm1'
-          const dto = worldToSaveDTO(newWorld, scenarioId)
+          const scenarioId = newWorld.scenarioId
+          const hintState = useGameStore.getState()
+          const dto = worldToSaveDTO(newWorld, scenarioId, {
+            seenHints: hintState.seenHints,
+            hintsEnabled: hintState.hintsEnabled,
+          })
           const playerRealm = newWorld.realms.get(newWorld.playerRealmId)
           const metadata = { 
             slotId: 'auto', 

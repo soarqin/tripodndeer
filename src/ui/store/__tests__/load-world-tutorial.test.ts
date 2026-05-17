@@ -41,6 +41,9 @@ describe('tutorial loadWorld action', () => {
         dismissedStepHints: new Set(['diplomacy-ju']),
         panelsOpened: new Set(['diplomacy']),
       },
+    }, 'm1', {
+      seenHints: useGameStore.getState().seenHints,
+      hintsEnabled: useGameStore.getState().hintsEnabled,
     })
     const restored = saveDtoToWorld(saved)
     expect(restored.ok).toBe(true)

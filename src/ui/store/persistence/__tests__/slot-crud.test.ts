@@ -10,7 +10,7 @@ import { deleteSlot, listSlots, loadSlot, saveSlot } from '../slot-crud'
 
 function makeDtoAndMetadata(): { dto: ReturnType<typeof worldToSaveDTO>; metadata: SaveMetadata } {
   const world = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
-  const dto = worldToSaveDTO(world, 'm1')
+  const dto = worldToSaveDTO(world, 'm1', { seenHints: {}, hintsEnabled: true })
   const playerRealmName = world.realms.get(world.playerRealmId)?.displayName ?? ''
 
   return {

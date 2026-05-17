@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useGameStore } from '@/ui/store'
 import { listSlots, saveSlot, loadSlot, type SlotId } from '@/ui/store/persistence/slot-crud'
 import type { SaveMetadata } from '@/ui/store/persistence/db'
-import { worldToSaveDTO, saveDtoToWorld } from '@/engine/world/save-dto'
+import { worldToSaveDTO, saveDtoToWorld, saveDtoToHintState } from '@/engine/world/save-dto'
 import { formatGameDate } from '@/engine/date/calendar'
 import styles from './SaveLoadModal.module.css'
 
@@ -76,8 +76,13 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
           setError(worldResult.error.message)
           return
         }
-        
+
         replaceWorldFromSave(worldResult.value)
+        const hintState = saveDtoToHintState(result.value.dto)
+        useGameStore.setState({
+          seenHints: hintState.seenHints,
+          hintsEnabled: hintState.hintsEnabled,
+        })
         closeModal()
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err))
@@ -89,7 +94,7 @@ export function SaveLoadModal({ mode }: SaveLoadModalProps) {
     if (!editingSlot) return
     
     try {
-      const scenarioId = world.sites.size === 250 ? 'm9' : 'm1'
+      const scenarioId = world.scenarioId
       const dto = worldToSaveDTO(world, scenarioId)
       const playerRealm = world.realms.get(world.playerRealmId)
       const metadata: SaveMetadata = {
