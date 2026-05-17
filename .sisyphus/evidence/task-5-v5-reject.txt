@@ -1,0 +1,37 @@
+TASK T5: SaveDTO v6 Strict v6-Only — v5 Rejection Evidence
+==========================================================
+
+Date: 2026-05-18
+
+CONTRACT
+--------
+- SUPPORTED_SAVE_DTO_VERSIONS = [6] (was [5] after T4)
+- saveDtoToWorld: schemaVersion !== 6 -> Err({kind: 'incompatible_version', got, expected: 6})
+- C2: classification happens BEFORE Zod parse / decompress (so v5 saves get user-facing toast, not quarantine)
+
+REJECTION TEST RESULT
+---------------------
+pnpm test --run src/engine/world/__tests__/save-dto.test.ts
+
+it('rejects legacy SaveDTO versions 1-5', () => {
+  for (const schemaVersion of [1, 2, 3, 4, 5] as const) {
+    const dto = { ...worldToSaveDTO(createM1World()), schemaVersion } as unknown as SaveDTO
+    const result = saveDtoToWorld(dto)
+    expect(result.ok).toBe(false)
+    expect(result.error.kind).toBe('incompatible_version')
+    expect(result.error.got).toBe(schemaVersion)
+    expect(result.error.expected).toBe(SAVE_DTO_VERSION)  // 6
+  }
+})
+
+PASS — all 5 legacy versions (1, 2, 3, 4, 5) rejected with kind='incompatible_version'
+and got=<version> and expected=6.
+
+ADDITIONAL COVERAGE
+-------------------
+- save-dto.test.ts: rejects incompatible SaveDTO versions (schemaVersion: 999)
+- save-dto-m8_1.test.ts: 'V1 save DTO (missing aiState) is rejected with incompatible_version (no migration since M11)'
+- save-dto-m8_2.test.ts: 'rejects V2 fixtures with incompatible_version (no migration since M11)'
+- slot-crud.test.ts: 'returns incompatible_version for unsupported save versions' (schemaVersion: 0)
+
+ALL PASS — no legacy version slips through.

@@ -1,3 +1,4 @@
+import { M11_SCENARIO_VERSIONS } from '~/content/m2/balance/m11'
 import { M5_PERSONALITY_DIMS_BASELINE } from '~/content/m2/balance'
 import type { ScenarioId } from '~/shared'
 import type { FactionId, FactionInfluenceState, IntelligenceCoverage, RulerState, World } from '~/shared/types'
@@ -39,9 +40,11 @@ export function worldToSaveDTO(
   scenarioId: ScenarioId = 'm1',
   hintState?: HintSaveState,
 ): SaveDTO {
+  const resolvedScenarioId = world.scenarioId ?? scenarioId
   return {
     schemaVersion: SAVE_DTO_VERSION,
-    scenarioId: world.scenarioId ?? scenarioId,
+    scenarioId: resolvedScenarioId,
+    scenarioVersion: M11_SCENARIO_VERSIONS[resolvedScenarioId],
     createdAt: Date.now(),
     tutorialState: world.tutorialState ? serializeTutorialState(world.tutorialState) : null,
     seenHints: hintState?.seenHints ?? {},
@@ -97,11 +100,11 @@ export function worldToSaveDTO(
   }
 }
 
-export const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [5]
+export const SUPPORTED_SAVE_DTO_VERSIONS: readonly number[] = [6]
 
 export function saveDtoToWorld(dto: SaveDTO): Result<World, SaveLoadError> {
   const inputDto = dto as SaveDTOAnyVersion
-  if (!SUPPORTED_SAVE_DTO_VERSIONS.includes(inputDto.schemaVersion)) {
+  if (inputDto.schemaVersion !== SAVE_DTO_VERSION) {
     return {
       ok: false,
       error: {

@@ -43,7 +43,7 @@ import type {
   RNGState,
 } from './world'
 
-export const SAVE_DTO_VERSION = 5 as const
+export const SAVE_DTO_VERSION = 6 as const
 
 export type SaveLoadErrorKind = 'incompatible_version' | 'parse_error' | 'missing_data'
 
@@ -122,11 +122,12 @@ export interface SerializedWorld {
 export interface SaveDTO {
   readonly schemaVersion: typeof SAVE_DTO_VERSION
   readonly scenarioId: ScenarioId
+  readonly scenarioVersion: string
   readonly createdAt: number
+  readonly tutorialState: TutorialStateDTO | null
   readonly world: SerializedWorld
   readonly seenHints?: Readonly<Record<string, true>>
   readonly hintsEnabled?: boolean
-  readonly tutorialState?: TutorialStateDTO | null
 }
 
 export type SaveDTOAnyVersion = Omit<SaveDTO, 'schemaVersion'> & { readonly schemaVersion: number }

@@ -90,11 +90,12 @@ export const SerializedWorldSchema = z.object({
 export const SaveDTOSchema = z.object({
   schemaVersion: z.literal(SAVE_DTO_VERSION),
   scenarioId: ScenarioIdSchema,
+  scenarioVersion: z.string().min(1),
   createdAt: z.number().int().nonnegative(),
+  tutorialState: TutorialStateDTOSchema.nullable(),
   world: SerializedWorldSchema,
   seenHints: z.record(z.literal(true)).optional(),
   hintsEnabled: z.boolean().optional(),
-  tutorialState: TutorialStateDTOSchema.nullable().optional(),
 })
 
 export const saveDtoSchema = SaveDTOSchema

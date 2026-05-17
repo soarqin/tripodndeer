@@ -119,8 +119,8 @@ describe('SaveDTO conversion', () => {
     )
   })
 
-  it('rejects legacy SaveDTO versions 1-4', () => {
-    for (const schemaVersion of [1, 2, 3, 4] as const) {
+  it('rejects legacy SaveDTO versions 1-5', () => {
+    for (const schemaVersion of [1, 2, 3, 4, 5] as const) {
       const dto = {
         ...worldToSaveDTO(createM1World()),
         schemaVersion,

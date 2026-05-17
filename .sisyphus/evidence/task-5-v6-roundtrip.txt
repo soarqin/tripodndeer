@@ -1,0 +1,69 @@
+TASK T5: SaveDTO v6 Strict v6-Only — v6 Round-Trip Evidence
+=============================================================
+
+Date: 2026-05-18
+Branch: master
+
+ARTIFACTS UPDATED
+-----------------
+- src/shared/types/save-dto.ts:46  SAVE_DTO_VERSION = 6
+- src/shared/types/save-dto.ts:122-130  SaveDTO.scenarioVersion: string (required), tutorialState: TutorialStateDTO | null (required)
+- src/shared/schemas/save-dto.ts:91-100  Zod literal(6), scenarioVersion: z.string().min(1), tutorialState non-optional
+- src/engine/world/save-dto.ts:1  Import M11_SCENARIO_VERSIONS
+- src/engine/world/save-dto.ts:37-52  worldToSaveDTO writes scenarioVersion = M11_SCENARIO_VERSIONS[resolvedScenarioId]
+- src/engine/world/save-dto.ts:101  SUPPORTED_SAVE_DTO_VERSIONS = [6]
+- src/engine/world/save-dto.ts:103-119  saveDtoToWorld checks schemaVersion === SAVE_DTO_VERSION (C2)
+
+TESTS UPDATED
+-------------
+- src/engine/world/__tests__/save-dto-m8_1.test.ts  v5 -> v6 assertions
+- src/engine/world/__tests__/save-dto.test.ts  rejects legacy 1-4 -> rejects legacy 1-5
+- src/shared/__tests__/save-dto-m10_2.test.ts  v5 -> v6 (describe + assertions)
+- src/ui/components/CodexPanel/__tests__/codex-saveload.test.ts  v5 -> v6 expectation
+- src/ui/store/__tests__/load-world-hint-state.test.tsx  v5 -> v6 mock DTOs
+
+NEW TEST
+--------
+- src/shared/__tests__/save-dto-field-stability.test.ts (6 tests, frozen v6 manifest):
+  * SAVE_DTO_VERSION === 6
+  * worldToSaveDTO emits exactly required ∪ optional manifest keys
+  * every required v6 field present
+  * SaveDTOSchema shape matches manifest (required vs optional verified)
+  * scenarioVersion is a non-empty string sourced from M11
+  * tutorialState always present (null for non-tutorial)
+
+V6 ROUND-TRIP RESULT
+--------------------
+pnpm test --run src/engine/world/__tests__/save-dto.test.ts
+
+ RUN  v1.6.1 /home/soar/src/tripodndeer
+ ✓ src/engine/world/__tests__/save-dto.test.ts  (7 tests) 1492ms
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+
+Tests covered:
+1. round-trips M1 world core state without phases in DTO
+2. preserves representative site and realm fields deeply
+3. reconstructs factionInfluences nested Map
+4. rejects incompatible SaveDTO versions (schemaVersion 999)
+5. rejects legacy SaveDTO versions 1-5
+6. keeps original and restored worlds deterministic after 100 ticks
+7. reconstructs default phases on load
+
+Round-trip covers all 33 Map fields + 10 scalar fields via SerializedWorld:
+  sites, realms, armies, edges, wars, peaceProposals, relations,
+  diplomaticProposals, treaties, diplomacyHistory, diplomaticMemory,
+  coalitions, zhouInvestiture, generals, rulers, academies,
+  eventChainStates, reformStates, disasterStates, tradeRoutes,
+  factionInfluences, passes, adjacencyEdges, sieges, edicts,
+  governorAssignments, intelligenceCoverage, spyMissions,
+  counterIntelStates, provinces, regions, characterTemplates,
+  localization (33 collection-like) + date, tick, difficulty,
+  playerRealmId, rngState, pendingOrders, aiState + top-level
+  schemaVersion, scenarioId, scenarioVersion, createdAt, tutorialState
+  (10+ scalar/top-level).
+
+LSP DIAGNOSTICS: clean on all touched files
+TYPECHECK: pass
+LINT: pass (0 warnings)
+TARGETED TESTS: 35/35 pass

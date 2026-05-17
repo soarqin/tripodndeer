@@ -17,7 +17,7 @@ describe('codex save/load roundtrip', () => {
       seenHints: store.seenHints,
       hintsEnabled: store.hintsEnabled,
     })
-    expect(SAVE_DTO_VERSION).toBe(5)
+    expect(SAVE_DTO_VERSION).toBe(6)
     expect(saved).not.toHaveProperty('activePanel')
     expect(saved).not.toHaveProperty('selectedCodexEntryId')
     expect(saved.world).not.toHaveProperty('activePanel')

@@ -45,7 +45,7 @@ describe('SaveLoadModal hint-state load roundtrip', () => {
     ])
 
     const dto = {
-      schemaVersion: 5,
+      schemaVersion: 6,
       world: {},
       seenHints: { 'first-conquest': true },
       hintsEnabled: false,
@@ -87,7 +87,7 @@ describe('SaveLoadModal hint-state load roundtrip', () => {
     ])
 
     const dto = {
-      schemaVersion: 5,
+      schemaVersion: 6,
       world: {},
     } as unknown as SaveDTO
 
