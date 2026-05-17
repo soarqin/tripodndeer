@@ -1,0 +1,17 @@
+git diff --stat
+ .sisyphus/evidence/task-T1.1-perf-baseline.json    |  14 +--
+ src/engine/world/__tests__/save-dto.test.ts        |  16 +++
+ .../migrations/__tests__/save-v2-to-v3.test.ts     |  48 --------
+ .../migrations/__tests__/save-v3-to-v4.test.ts     |  51 --------
+ .../migrations/__tests__/save-v4-to-v5.test.ts     | 136 ---------------------
+ src/engine/world/migrations/save-v2-to-v3.ts       |  23 ----
+ src/engine/world/migrations/save-v3-to-v4.ts       |  10 --
+ src/engine/world/migrations/save-v4-to-v5.ts       |  24 ----
+ src/engine/world/save-dto.ts                       |  33 ++---
+ src/shared/__tests__/save-dto-m10_2.test.ts        |  21 ++++
+ .../CodexPanel/__tests__/codex-saveload.test.ts    |   6 +-
+ src/ui/components/SaveLoadModal/SaveLoadModal.tsx  |   9 +-
+ src/ui/coordinator/use-hint-coordinator.ts         |   2 +-
+ src/ui/store/__tests__/load-world-tutorial.test.ts |   3 +
+ .../store/persistence/__tests__/slot-crud.test.ts  |   2 +-
+ src/ui/store/raf-driver.ts                         |   8 +-

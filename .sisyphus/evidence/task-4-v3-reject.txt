@@ -1,0 +1,2 @@
+PASS: saveDtoToWorld rejects legacy SaveDTO versions 1-4 with incompatible_version.
+Verified by src/engine/world/__tests__/save-dto.test.ts.

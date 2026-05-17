@@ -119,6 +119,22 @@ describe('SaveDTO conversion', () => {
     )
   })
 
+  it('rejects legacy SaveDTO versions 1-4', () => {
+    for (const schemaVersion of [1, 2, 3, 4] as const) {
+      const dto = {
+        ...worldToSaveDTO(createM1World()),
+        schemaVersion,
+      } as unknown as SaveDTO
+      const result = saveDtoToWorld(dto)
+
+      expect(result.ok).toBe(false)
+      if (result.ok) throw new Error('expected incompatible version failure')
+      expect(result.error.kind).toBe('incompatible_version')
+      expect(result.error.got).toBe(schemaVersion)
+      expect(result.error.expected).toBe(SAVE_DTO_VERSION)
+    }
+  })
+
   it('keeps original and restored worlds deterministic after 100 ticks', () => {
     const original = createM1World()
     const restored = restore(worldToSaveDTO(original))

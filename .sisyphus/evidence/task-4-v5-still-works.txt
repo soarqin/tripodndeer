@@ -1,0 +1,2 @@
+PASS: v5 SaveDTO still loads correctly through saveDtoToWorld.
+Verified by src/engine/world/__tests__/save-dto.test.ts.
