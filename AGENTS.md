@@ -268,7 +268,7 @@ M1 path: loadM1Data() → createWorldFromM1Data()
 ## Testing
 
 ```bash
-pnpm test          # 全部单元/功能测试（~2500 个，~30s）
+pnpm test          # 全部单元/功能测试（2902 个测试 / 350 文件；runtime 约 62s——M10 期间因 UI 测试增加显著上升，未来 perf wave 优化）
 pnpm typecheck     # TypeScript 严格检查
 pnpm lint          # ESLint，0 警告模式
 pnpm test:perf     # 性能基准测试（仅收工时跑，见下）

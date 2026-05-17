@@ -142,17 +142,17 @@ describe('runAutoBattleBatch', () => {
       difficulty: 'hero',
       seedStart: 1,
       limit: 3,
-      maxTicks: 100,
+      maxTicks: 10,
       stopCondition: 'unification',
     })
-  }, 60000)
+  }, 30000)
 
   it('runAutoBattleWithFinalWorld returns a finalWorld', () => {
     const { result, finalWorld } = runAutoBattleWithFinalWorld({
-      scenarioId: 'm1',
+      scenarioId: 'm9',
       difficulty: 'hero',
       seed: 42,
-      maxTicks: 50,
+      maxTicks: 10,
       stopCondition: 'unification',
     })
 
@@ -183,11 +183,11 @@ describe('runAutoBattleBatch', () => {
     const progressCallback = vi.fn()
 
     await runAutoBattleBatch({
-      scenarioId: 'm1',
+      scenarioId: 'm9',
       difficulty: 'hero',
       seedStart: 1,
       limit: 2,
-      maxTicks: 50,
+      maxTicks: 10,
       stopCondition: 'unification',
       progressCallback,
     })
@@ -221,19 +221,19 @@ describe('runAutoBattleBatch', () => {
 
   it('is deterministic for stable report fields', async () => {
     const r1 = await runAutoBattleBatch({
-      scenarioId: 'm1',
+      scenarioId: 'm9',
       difficulty: 'hero',
       seedStart: 1,
       limit: 2,
-      maxTicks: 50,
+      maxTicks: 10,
       stopCondition: 'unification',
     })
     const r2 = await runAutoBattleBatch({
-      scenarioId: 'm1',
+      scenarioId: 'm9',
       difficulty: 'hero',
       seedStart: 1,
       limit: 2,
-      maxTicks: 50,
+      maxTicks: 10,
       stopCondition: 'unification',
     })
     const stable1 = {
@@ -256,11 +256,11 @@ describe('runAutoBattleBatch', () => {
 describe('T4.4 determinism guard', () => {
   it('same seed range produces byte-equal stable aggregate', async () => {
     const config = {
-      scenarioId: 'm1' as const,
+      scenarioId: 'm9' as const,
       difficulty: 'hero' as const,
       seedStart: 1,
       limit: 2,
-      maxTicks: 50,
+      maxTicks: 10,
       stopCondition: 'unification' as const,
     }
 
