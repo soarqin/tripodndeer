@@ -32,7 +32,7 @@ describe('SaveDTO M8.1 - V2 with aiState forward-compat', () => {
     expect(result.value.sites.size).toBe(world.sites.size)
   })
 
-  it('V1 save DTO (missing aiState) loads via saveDtoToWorld without crash', () => {
+  it('V1 save DTO (missing aiState) is rejected with incompatible_version (no migration since M11)', () => {
     const world = createWorldFromM1Data(loadM1Data(), 42, 'realm_qin')
     const v2Dto = worldToSaveDTO(world)
     const v1World = { ...v2Dto.world } as Record<string, unknown>
@@ -44,9 +44,10 @@ describe('SaveDTO M8.1 - V2 with aiState forward-compat', () => {
     } as unknown as SaveDTO
 
     const result = saveDtoToWorld(v1Dto)
-    expect(result.ok).toBe(true)
-    if (!result.ok) throw new Error(result.error.message)
-    expect(result.value.sites.size).toBe(world.sites.size)
+    expect(result.ok).toBe(false)
+    if (!result.ok) {
+      expect(result.error.kind).toBe('incompatible_version')
+    }
   })
 
   it('rejects unsupported SaveDTO versions (e.g. 999)', () => {
