@@ -30,6 +30,7 @@ import { ToastQueue } from '@/ui/components/ToastQueue'
 import { ObjectivePanel } from '@/ui/components/ObjectivePanel'
 import { EventLogPanel } from '@/ui/components/EventLogPanel'
 import { useHintCoordinator } from '@/ui/coordinator/use-hint-coordinator'
+import { usePageHideSave } from '@/ui/hooks/use-page-hide-save'
 import { useRafDriver } from '@/ui/store/raf-driver'
 import { useGameStore, ModalPriority } from '@/ui/store/game-store'
 import { isVictorious } from '@/engine/systems/victory'
@@ -51,6 +52,7 @@ export function App(): React.JSX.Element {
   useRafDriver()
   useCodexHotkey()
   useHintCoordinator()
+  usePageHideSave()
   const victorious = useVictory()
   const bootStatus = useGameStore((state) => state.bootStatus)
   const modalQueue = useGameStore((state) => state.modalQueue)

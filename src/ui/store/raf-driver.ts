@@ -18,6 +18,30 @@ export function useRafDriver(): void {
   useEffect(() => {
     let rafId = 0
     let lastTime: number | null = null
+    let lastSavedYearBC: number | null = useGameStore.getState().world?.date.yearBC ?? null
+
+    const queueAutosave = (world = useGameStore.getState().world, name = '自动存档'): void => {
+      const scenarioId = world.scenarioId
+      const hintState = useGameStore.getState()
+      const dto = worldToSaveDTO(world, scenarioId, {
+        seenHints: hintState.seenHints,
+        hintsEnabled: hintState.hintsEnabled,
+      })
+      const playerRealm = world.realms.get(world.playerRealmId)
+      const metadata = {
+        slotId: 'auto_0',
+        name,
+        createdAt: Date.now(),
+        tick: world.tick,
+        scenarioId,
+        playerRealmName: playerRealm ? playerRealm.displayName : '未知势力',
+      }
+      writeAutoRingBuffer(dto, metadata).catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err)
+        useGameStore.getState().enqueueToast('[错误] 自动存档失败：' + msg, 5000)
+        console.error('[autosave] failed', err)
+      })
+    }
 
     const loop = (now: number): void => {
       if (lastTime !== null) {
@@ -27,29 +51,17 @@ export function useRafDriver(): void {
         const oldTick = store.world.tick
         store.tick(cappedDelta)
         const newWorld = useGameStore.getState().world
-        
+
+        const currentYearBC = newWorld.date.yearBC
+        if (lastSavedYearBC !== null && currentYearBC !== lastSavedYearBC) {
+          queueAutosave(newWorld, `自动存档 (${Math.abs(currentYearBC)} BC)`)
+          lastSavedYearBC = currentYearBC
+        } else if (lastSavedYearBC === null) {
+          lastSavedYearBC = currentYearBC
+        }
+
         if (newWorld.tick > oldTick && newWorld.tick % M10_AUTOSAVE_INTERVAL === 0 && newWorld.tick > 0 && useGameStore.getState().bootStatus === 'ready') {
-          const scenarioId = newWorld.scenarioId
-          const hintState = useGameStore.getState()
-          const dto = worldToSaveDTO(newWorld, scenarioId, {
-            seenHints: hintState.seenHints,
-            hintsEnabled: hintState.hintsEnabled,
-          })
-          const playerRealm = newWorld.realms.get(newWorld.playerRealmId)
-          const metadata = {
-            slotId: 'auto_0',
-            name: '自动存档',
-            createdAt: Date.now(),
-            tick: newWorld.tick,
-            scenarioId,
-            playerRealmName: playerRealm ? playerRealm.displayName : '未知势力',
-          }
-          writeAutoRingBuffer(dto, metadata)
-            .catch((err: unknown) => {
-              const msg = err instanceof Error ? err.message : String(err)
-              useGameStore.getState().enqueueToast('[错误] 自动存档失败：' + msg, 5000)
-              console.error('[autosave] failed', err)
-            })
+          queueAutosave(newWorld)
         }
       }
       lastTime = now
@@ -57,6 +69,17 @@ export function useRafDriver(): void {
     }
 
     rafId = requestAnimationFrame(loop)
+
+    const onVisibilityChange = (): void => {
+      if (document.visibilityState !== 'visible') return
+      const world = useGameStore.getState().world
+      if (world && lastSavedYearBC !== null && world.date.yearBC !== lastSavedYearBC) {
+        queueAutosave(world, `自动存档 (${Math.abs(world.date.yearBC)} BC)`)
+        lastSavedYearBC = world.date.yearBC
+      }
+    }
+
+    document.addEventListener('visibilitychange', onVisibilityChange)
 
     const unsubscribe = useGameStore.subscribe((state, prevState) => {
       if (state.events === prevState.events) return
@@ -94,6 +117,7 @@ export function useRafDriver(): void {
 
     return () => {
       cancelAnimationFrame(rafId)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
       unsubscribe()
     }
   }, [])

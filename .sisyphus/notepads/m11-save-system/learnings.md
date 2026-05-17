@@ -88,6 +88,22 @@
 
 ### F1-F4: Final verification wave
 
+## T15 Pagehide Best-Effort Save — Completed
+
+### Files
+- NEW: `src/ui/hooks/use-page-hide-save.ts`
+- MOD: `src/App.tsx` (mounted in root App)
+- NEW: `src/ui/hooks/__tests__/use-page-hide-save.test.ts`
+
+### Architecture
+- Best-effort save uses `pagehide` plus `visibilitychange === 'hidden'` for BFCache-friendly shutdown paths.
+- `worldToSaveDTO` must receive `{ seenHints, hintsEnabled }` from store state so save payload stays aligned with load-side hint state.
+- `writeAutoRingBuffer` is fire-and-forget; failures are swallowed intentionally.
+
+### Verification
+- `pnpm test src/ui/hooks/__tests__/use-page-hide-save.test.ts` ✅
+- `pnpm typecheck` ✅
+
 ### T10 quota detection notes
 - `saveSlot` now returns `Result<void, SaveLoadError>` so callers can branch on `quota_exceeded` without relying on thrown errors.
 - Cache quota snapshots by `navigator.storage.estimate` function identity + TTL to avoid stale cross-test reuse when globals are stubbed.
@@ -238,3 +254,13 @@
 ### Evidence
 - `.sisyphus/evidence/task-12-ring-eviction.txt` — auto_0 evicted (1000→2000), other 9 slots preserved with original timestamps
 - `.sisyphus/evidence/task-12-manual-isolation.txt` — slot1 (createdAt=500, name=手动) untouched after 11 ring writes, totalSlots=11 (1 manual + 10 auto)
+
+## T13 Yearly Autosave Trigger — Completed
+
+### Files
+- MOD: `src/ui/store/raf-driver.ts` — tracks `lastSavedYearBC`, keeps tick-based autosave, adds yearly autosave + visibilitychange catch-up
+- NEW: `src/ui/store/__tests__/raf-driver-yearly-save.test.ts` — same-year no save, year boundary save, multi-tick dedupe, visibilitychange catch-up
+
+### Verification
+- `pnpm test src/ui/store/__tests__/raf-driver-yearly-save.test.ts` ✅
+- `pnpm typecheck` ✅
