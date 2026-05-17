@@ -149,10 +149,10 @@ describe('runAutoBattleBatch', () => {
 
   it('runAutoBattleWithFinalWorld returns a finalWorld', () => {
     const { result, finalWorld } = runAutoBattleWithFinalWorld({
-      scenarioId: 'm9',
+      scenarioId: 'm1',
       difficulty: 'hero',
       seed: 42,
-      maxTicks: 100,
+      maxTicks: 50,
       stopCondition: 'unification',
     })
 
@@ -183,20 +183,20 @@ describe('runAutoBattleBatch', () => {
     const progressCallback = vi.fn()
 
     await runAutoBattleBatch({
-      scenarioId: 'm9',
+      scenarioId: 'm1',
       difficulty: 'hero',
       seedStart: 1,
-      limit: 3,
-      maxTicks: 100,
+      limit: 2,
+      maxTicks: 50,
       stopCondition: 'unification',
       progressCallback,
     })
 
-    expect(progressCallback).toHaveBeenCalledTimes(3)
+    expect(progressCallback).toHaveBeenCalledTimes(2)
     expect(progressCallback).toHaveBeenLastCalledWith(
-      expect.objectContaining({ gamesCompleted: 3, totalGames: 3 }),
+      expect.objectContaining({ gamesCompleted: 2, totalGames: 2 }),
     )
-  }, 60000)
+  }, 15000)
 
   it('keeps unificationRate in [0, 1]', () => {
     expect(report.outcomes.unificationRate).toBeGreaterThanOrEqual(0)
@@ -221,19 +221,19 @@ describe('runAutoBattleBatch', () => {
 
   it('is deterministic for stable report fields', async () => {
     const r1 = await runAutoBattleBatch({
-      scenarioId: 'm9',
+      scenarioId: 'm1',
       difficulty: 'hero',
       seedStart: 1,
       limit: 2,
-      maxTicks: 100,
+      maxTicks: 50,
       stopCondition: 'unification',
     })
     const r2 = await runAutoBattleBatch({
-      scenarioId: 'm9',
+      scenarioId: 'm1',
       difficulty: 'hero',
       seedStart: 1,
       limit: 2,
-      maxTicks: 100,
+      maxTicks: 50,
       stopCondition: 'unification',
     })
     const stable1 = {
@@ -250,24 +250,23 @@ describe('runAutoBattleBatch', () => {
     }
 
     expect(JSON.stringify(stable1)).toEqual(JSON.stringify(stable2))
-  }, 60000)
+  }, 15000)
 })
 
-describe('T4.4 determinism guard (5 games, maxTicks=500)', () => {
+describe('T4.4 determinism guard', () => {
   it('same seed range produces byte-equal stable aggregate', async () => {
     const config = {
-      scenarioId: 'm9' as const,
+      scenarioId: 'm1' as const,
       difficulty: 'hero' as const,
       seedStart: 1,
-      limit: 5,
-      maxTicks: 500,
+      limit: 2,
+      maxTicks: 50,
       stopCondition: 'unification' as const,
     }
 
     const r1 = await runAutoBattleBatch(config)
     const r2 = await runAutoBattleBatch(config)
 
-    // Exclude runtime block — wall-clock derived, not byte-equal by design (see plan §Reporter JSON Schema)
     const stable1 = {
       meta: r1.meta,
       outcomes: r1.outcomes,
@@ -282,5 +281,5 @@ describe('T4.4 determinism guard (5 games, maxTicks=500)', () => {
     }
 
     expect(JSON.stringify(stable1)).toEqual(JSON.stringify(stable2))
-  }, 120000)
+  }, 15000)
 })

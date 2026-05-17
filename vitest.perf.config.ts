@@ -17,5 +17,11 @@ export default defineConfig({
     ],
     environment: 'node',
     exclude: ['node_modules', 'dist', 'e2e/**'],
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
   },
 })

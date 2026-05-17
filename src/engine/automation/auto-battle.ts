@@ -133,3 +133,31 @@ export function runAutoBattleWithFinalWorld(config: AutoBattleConfig): { result:
   }
   return { result, finalWorld: world }
 }
+
+/**
+ * Async variant of runAutoBattleWithFinalWorld that yields the event loop every
+ * YIELD_EVERY_N_TICKS ticks via setImmediate. This prevents the worker thread from
+ * starving other concurrent workers under heavy parallel test load, and ensures
+ * vitest timeout signals can be processed between tick batches.
+ */
+const YIELD_EVERY_N_TICKS = 50
+export async function runAutoBattleWithFinalWorldAsync(
+  config: AutoBattleConfig,
+): Promise<{ result: AutoBattleResult; finalWorld: World }> {
+  let world = createAutoBattleWorld(config)
+  let ticksSinceYield = 0
+  while (!shouldStop(world, config)) {
+    world = runTickPhases(world, world.rngState).world
+    ticksSinceYield++
+    if (ticksSinceYield >= YIELD_EVERY_N_TICKS) {
+      ticksSinceYield = 0
+      await new Promise<void>(resolve => setImmediate(resolve))
+    }
+  }
+  const result: AutoBattleResult = {
+    winnerRealmId: getWinnerRealmId(world),
+    endTick: world.tick,
+    finalRealmStats: buildFinalRealmStats(world),
+  }
+  return { result, finalWorld: world }
+}

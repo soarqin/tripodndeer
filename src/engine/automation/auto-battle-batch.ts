@@ -1,6 +1,6 @@
 import type { DifficultyTier, RealmId } from '~/shared/types'
 
-import { runAutoBattleWithFinalWorld, type AutoBattleConfig } from './auto-battle'
+import { runAutoBattleWithFinalWorldAsync, type AutoBattleConfig } from './auto-battle'
 import { computeBehaviorMetrics, type BehaviorMetrics } from './behavior-metrics'
 import { SCENARIO_START_DATES } from './date-utils'
 import { getWinnerWithLargestActiveFallback } from './winner-fallback'
@@ -126,7 +126,7 @@ export async function runAutoBattleBatch(config: BatchConfig): Promise<BatchRepo
       stopCondition: 'unification',
     }
 
-    const { result, finalWorld } = runAutoBattleWithFinalWorld(battleConfig)
+    const { result, finalWorld } = await runAutoBattleWithFinalWorldAsync(battleConfig)
 
     const perGameMs = Date.now() - gameStart
     rollingMeanMs = i === 0 ? perGameMs : alpha * perGameMs + (1 - alpha) * rollingMeanMs
@@ -163,6 +163,8 @@ export async function runAutoBattleBatch(config: BatchConfig): Promise<BatchRepo
       lastWinner: winnerRealmId,
       endTick: finalWorld.tick,
     })
+
+    await new Promise<void>(resolve => setImmediate(resolve))
   }
 
   return buildBatchReport(config, traces, Date.now() - startMs)
